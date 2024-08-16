@@ -77,3 +77,10 @@ body {
       opacity: 1;
   }
 }
+
+.home-bg{
+  background-image: linear-gradient(0deg, rgba(255, 0, 150, 0.3), rgba(255, 0, 150, 0.3)), url('../assets/home_bg.jpeg');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
