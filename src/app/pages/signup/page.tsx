@@ -1,9 +1,8 @@
 "use client";
-import '../../app/globals.css'
+import '../../../app/globals.css'
 import React, { useState } from 'react'
 import Image from 'next/image'
-import elearning from '../../assets/elearning.jpg'
-import paystackLogo from '../../assets/paystack_logo.png'
+import paystackLogo from '../../../assets/paystack_logo.png'
 
 const SignupPage = () => {
     const [formType, setFormType] = useState("SignIn")
@@ -53,7 +52,7 @@ const SignupPage = () => {
                             <input type="checkbox" name="" id="" />
                             <h1 className=' ml-4 text-black text-xs'>I agree to the tems & conditions</h1>
                         </div>
-                        <input type="submit" value={"Register Now!"} className=' mb-4 w-full text-center text-sm py-2 bg-green-500 font-bold cursor-pointer duration-500 hover:text-lg text-white' />
+                        <a href="/pages/dashboard" className=' block mb-4 w-full text-center text-sm py-2 bg-green-500 font-bold cursor-pointer duration-500 hover:text-lg text-white'>Register Now!</a>
                         <h1 className=' text-black text-xs text-center'>Already have an account? <span className=' text-blue-500'><h1 className=' inline cursor-pointer' onClick={() => setFormType("SignIn")}>Sign in</h1></span></h1>
                     </div>
                 </form>
@@ -72,7 +71,7 @@ const SignupPage = () => {
                     <div className=' w-full'>
                         <input type="text" placeholder='Matric Number' className=' mb-4 block px-4 py-2 border border-slate-400 rounded-sm md:rounded-md w-full focus:outline-none placeholder:text-slate-400 text-black text-sm' />
                         <input type="password" placeholder='Enter Password' className=' mb-4 block px-4 py-2 border border-slate-400 rounded-sm md:rounded-md w-full focus:outline-none placeholder:text-slate-400 text-black text-sm' />
-                        <a href="./Dashboard" ><button className=' mb-4 w-full text-center text-sm py-2 bg-green-500 font-bold cursor-pointer duration-500 hover:text-lg text-white'>Login</button></a>
+                        <a href="/pages/dashboard" className=' block mb-4 w-full text-center text-sm py-2 bg-green-500 font-bold cursor-pointer duration-500 hover:text-lg text-white'>Login</a>
                         <h1 className=' text-black text-xs text-center'>Don't have an account? <span className=' text-blue-500'><h1 className=' inline cursor-pointer' onClick={() => setFormType("SignUp")}>Sign up</h1></span></h1>
                     </div>
                 </form>

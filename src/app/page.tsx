@@ -1,7 +1,6 @@
 "use client";
-
 import Image from "next/image";
-import SignupPage from "./pages/SignupPage";
+import SignupPage from "../app/pages/signup/page";
 import { useEffect, useState } from "react";
 
 export default function Home() {
