@@ -165,8 +165,8 @@ const page = () => {
                 </div>
             </div>
 
-            <div className=' max-h-[200px] w-full overflow-scroll py-6'>
-                <Table className=' bg-white h-[200px] overflow-y-scroll'>
+            <div className=' max-h-[200px] w-full overflow-scroll py-6 rounded-md'>
+                <Table className=' rounded-md bg-white h-[200px] overflow-y-scroll'>
                     <TableHeader className=''>
                         <TableRow>
                             <TableHead className="">S/N</TableHead>
