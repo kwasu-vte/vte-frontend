@@ -2,10 +2,16 @@ import React from 'react'
 import Link from 'next/link'
 import { CalendarMonth, Notifications } from '@mui/icons-material'
 import { Search } from 'lucide-react'
+import { Montserrat } from 'next/font/google'
+
+const montserrat = Montserrat({
+    subsets: ['latin'],
+    weight: ['400', '500', '700'], // Specify the weights you want to use
+  });
 
 const page = () => {
     return (
-        <div className=' w-full h-[100vh] overflow-hidden pl-[20%] py-2 pr-4'>
+        <div className={` w-full h-[100vh] overflow-hidden pl-[20%] py-2 pr-4`}>
             <div className=' h-[60px] w-full bg-transparent rounded-md flex items-center justify-between p-2 mb-4'>
                 <div className=' flex items-center justify-center bg-white p-2 rounded-md'>
                     <CalendarMonth className=' text-[#379E37]' />
@@ -32,17 +38,17 @@ const page = () => {
                         <Search />
                         <input type="text" className=' h-full bg-transparent px-3 focus:outline-none text-black placeholder:text-black text-sm' placeholder='Search here...' />
                     </div>
-                    <div className=' w-full bg-white h-[250px] overflow-scroll rounded-md py-3 mb-4'>
-                        <h1 className=' w-full bg-white py-2 px-4 border-b border-b-slate-300'>GNS203</h1>
-                        <h1 className=' w-full bg-white py-2 px-4 border-b border-b-slate-300'>GNS203</h1>
-                        <h1 className=' w-full bg-white py-2 px-4 border-b border-b-slate-300'>GNS203</h1>
-                        <h1 className=' w-full bg-white py-2 px-4 border-b border-b-slate-300'>GNS203</h1>
-                        <h1 className=' w-full bg-white py-2 px-4 border-b border-b-slate-300'>GNS203</h1>
-                        <h1 className=' w-full bg-white py-2 px-4 border-b border-b-slate-300'>GNS203</h1>
-                        <h1 className=' w-full bg-white py-2 px-4 border-b border-b-slate-300'>GNS203</h1>
-                        <h1 className=' w-full bg-white py-2 px-4 border-b border-b-slate-300'>GNS203</h1>
-                        <h1 className=' w-full bg-white py-2 px-4 border-b border-b-slate-300'>GNS203</h1>
-                        <h1 className=' w-full bg-white py-2 px-4 border-b border-b-slate-300'>GNS203</h1>
+                    <div className={`${montserrat.className} text-sm font-thin w-full bg-white h-[250px] overflow-scroll rounded-md py-3 mb-4`}>
+                        <h1 className=' w-full bg-white py-2 px-10 border-b border-b-slate-300'>GNS 203</h1>
+                        <h1 className=' w-full bg-white py-2 px-10 border-b border-b-slate-300'>GNS 203</h1>
+                        <h1 className=' w-full bg-white py-2 px-10 border-b border-b-slate-300'>GNS 203</h1>
+                        <h1 className=' w-full bg-white py-2 px-10 border-b border-b-slate-300'>GNS 203</h1>
+                        <h1 className=' w-full bg-white py-2 px-10 border-b border-b-slate-300'>GNS 203</h1>
+                        <h1 className=' w-full bg-white py-2 px-10 border-b border-b-slate-300'>GNS 203</h1>
+                        <h1 className=' w-full bg-white py-2 px-10 border-b border-b-slate-300'>GNS 203</h1>
+                        <h1 className=' w-full bg-white py-2 px-10 border-b border-b-slate-300'>GNS 203</h1>
+                        <h1 className=' w-full bg-white py-2 px-10 border-b border-b-slate-300'>GNS 203</h1>
+                        <h1 className=' w-full bg-white py-2 px-10 border-b border-b-slate-300'>GNS 203</h1>
                     </div>
 
                     <h1 className=' font-bold text-[#379E37] text-xl mb-4'>Course Group</h1>
@@ -50,17 +56,17 @@ const page = () => {
                         <Search />
                         <input type="text" className=' h-full bg-transparent px-3 focus:outline-none text-black placeholder:text-black text-sm' placeholder='Search here...' />
                     </div>
-                    <div className=' w-full bg-white h-[250px] overflow-scroll rounded-md py-3 mb-4'>
-                        <h1 className=' w-full bg-white py-2 px-4 border-b border-b-slate-300 uppercase'>Tailoring</h1>
-                        <h1 className=' w-full bg-white py-2 px-4 border-b border-b-slate-300 uppercase'>Tailoring</h1>
-                        <h1 className=' w-full bg-white py-2 px-4 border-b border-b-slate-300 uppercase'>Tailoring</h1>
-                        <h1 className=' w-full bg-white py-2 px-4 border-b border-b-slate-300 uppercase'>Tailoring</h1>
-                        <h1 className=' w-full bg-white py-2 px-4 border-b border-b-slate-300 uppercase'>Tailoring</h1>
-                        <h1 className=' w-full bg-white py-2 px-4 border-b border-b-slate-300 uppercase'>Tailoring</h1>
-                        <h1 className=' w-full bg-white py-2 px-4 border-b border-b-slate-300 uppercase'>Tailoring</h1>
-                        <h1 className=' w-full bg-white py-2 px-4 border-b border-b-slate-300 uppercase'>Tailoring</h1>
-                        <h1 className=' w-full bg-white py-2 px-4 border-b border-b-slate-300 uppercase'>Tailoring</h1>
-                        <h1 className=' w-full bg-white py-2 px-4 border-b border-b-slate-300 uppercase'>Tailoring</h1>
+                    <div className={`${montserrat.className} text-sm font-thin w-full bg-white h-[250px] overflow-scroll rounded-md py-3 mb-4`}>
+                        <h1 className=' w-full bg-white py-2 px-10 border-b border-b-slate-300 uppercase'>Tailoring</h1>
+                        <h1 className=' w-full bg-white py-2 px-10 border-b border-b-slate-300 uppercase'>Tailoring</h1>
+                        <h1 className=' w-full bg-white py-2 px-10 border-b border-b-slate-300 uppercase'>Tailoring</h1>
+                        <h1 className=' w-full bg-white py-2 px-10 border-b border-b-slate-300 uppercase'>Tailoring</h1>
+                        <h1 className=' w-full bg-white py-2 px-10 border-b border-b-slate-300 uppercase'>Tailoring</h1>
+                        <h1 className=' w-full bg-white py-2 px-10 border-b border-b-slate-300 uppercase'>Tailoring</h1>
+                        <h1 className=' w-full bg-white py-2 px-10 border-b border-b-slate-300 uppercase'>Tailoring</h1>
+                        <h1 className=' w-full bg-white py-2 px-10 border-b border-b-slate-300 uppercase'>Tailoring</h1>
+                        <h1 className=' w-full bg-white py-2 px-10 border-b border-b-slate-300 uppercase'>Tailoring</h1>
+                        <h1 className=' w-full bg-white py-2 px-10 border-b border-b-slate-300 uppercase'>Tailoring</h1>
                     </div>
                 </div>
 
