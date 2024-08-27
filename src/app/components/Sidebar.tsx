@@ -20,7 +20,7 @@ const Sidebar = () => {
                     <div className=' w-full'>
                         <Link href={"/studentDashboard"} className=' flex items-center justify-start w-[80%] px-2 duration-500 text-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'><HomeRounded className=' mx-2'/> Dashboard</Link>
                         <Link href={"/courses"} className=' flex items-center justify-start w-[80%] px-2 duration-500 text-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'><Book className=' mx-2'/> Course</Link>
-                        <Link href={""} className=' flex items-center justify-start w-[80%] px-2 duration-500 text-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'><WalletRounded className=' mx-2'/> Payment</Link>
+                        <Link href={"/payment"} className=' flex items-center justify-start w-[80%] px-2 duration-500 text-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'><WalletRounded className=' mx-2'/> Payment</Link>
                         <Link href={""} className=' flex items-center justify-start w-[80%] px-2 duration-500 text-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'><Settings className=' mx-2'/> Settings</Link>
                     </div>
                 </div>
