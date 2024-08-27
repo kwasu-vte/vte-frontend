@@ -24,7 +24,7 @@ const page = () => {
                     <input type="text" className=' h-full bg-transparent px-3 focus:outline-none text-black placeholder:text-black text-sm' placeholder='Search here...' />
                 </div>
                 <div className=' flex items-center justify-center'>
-                    <Link href={''}>
+                    <Link href={'/notifications/'}>
                         <Notifications className=' text-[#379E37] mx-4' />
                     </Link>
                     <div className=' h-[50px] w-[50px] bg-green-700 rounded-full mx-1'></div>

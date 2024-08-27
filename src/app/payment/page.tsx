@@ -28,7 +28,7 @@ const page = () => {
                     </select>
                 </div>
                 <div className=' flex items-center justify-center bg-white rounded-md py-2 px-3'>
-                    <Link href={''}>
+                    <Link href={'/notifications/'}>
                         <Notifications className=' text-[#379E37] mx-4' />
                     </Link>
                     <div className=' h-[50px] w-[50px] bg-green-700 rounded-full mx-1'></div>
