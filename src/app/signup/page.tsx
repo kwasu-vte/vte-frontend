@@ -7,7 +7,7 @@ import Link from 'next/link'
 const page = ({setIsAuthenticated}) => {
   return (
     <div className=' flex items-center justify-center h-[100vh] bg-[#BFE7BF]'>
-      <div className=' w-[80%] h-[80%] bg-white rounded-md flex items-center justify-between p-2'>
+      {/* <div className=' w-[80%] h-[80%] bg-white rounded-md flex items-center justify-between p-2'>
         <div className=' w-[45%] flex flex-col items-start justify-start h-full'>
           <div className=' flex items-center justify-center mb-6'>
             <Image
@@ -19,8 +19,8 @@ const page = ({setIsAuthenticated}) => {
           </div>
 
           <div className=' w-fit mx-auto mb-10'>
-            <h1 className=' font-[800] text-6xl text-center mx-auto'>Welcome back</h1>
-            <p className=' text-sm text-[#6E6E6E]'>Dont have an account? <span className=' text-[#379E37]'><Link href='/signup' className=' underline'>Sign up</Link></span></p>
+            <h1 className=' font-[800] text-6xl text-center mx-auto'>Get started</h1>
+            <p className=' text-sm text-[#6E6E6E]'>Dont have an account? <span className=' text-[#379E37]'><Link href={''} className=' underline'>Sign up</Link></span></p>
           </div>
 
           <div className="relative w-[80%] mx-auto mb-6">
@@ -59,7 +59,7 @@ const page = ({setIsAuthenticated}) => {
 
 
         </div>
-      </div>
+      </div> */}
     </div>
   )
 }

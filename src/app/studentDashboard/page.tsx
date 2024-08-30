@@ -111,23 +111,51 @@ const page = () => {
                         </div>
                         <div className=' max-h-[100px] overflow-scroll'>
                             <div className=' w-full flex items-center justify-between py-2 border-b border-b-slate-300'>
-                                <h1 className=' w-[60%]'>Breeding Tilapia Fish</h1>
+                                <h1 className=' w-[60%] flex items-center justify-start'> <div className=' h-[20px] w-[20px] bg-[#E8BB78] mx-1 my-0 rounded-md'></div> Breeding Tilapia Fish</h1>
                                 <h1 className=' w-[40%]'>Aug 17, 2024, 11:59pm</h1>
                             </div>
                             <div className=' w-full flex items-center justify-between py-2 border-b border-b-slate-300'>
-                                <h1 className=' w-[60%]'>Breeding Tilapia Fish</h1>
+                                <h1 className=' w-[60%] flex items-center justify-start'> <div className=' h-[20px] w-[20px] bg-[#E8BB78] mx-1 my-0 rounded-md'></div> Breeding Tilapia Fish</h1>
                                 <h1 className=' w-[40%]'>Aug 17, 2024, 11:59pm</h1>
                             </div>
                             <div className=' w-full flex items-center justify-between py-2 border-b border-b-slate-300'>
-                                <h1 className=' w-[60%]'>Breeding Tilapia Fish</h1>
+                                <h1 className=' w-[60%] flex items-center justify-start'> <div className=' h-[20px] w-[20px] bg-[#E8BB78] mx-1 my-0 rounded-md'></div> Breeding Tilapia Fish</h1>
                                 <h1 className=' w-[40%]'>Aug 17, 2024, 11:59pm</h1>
                             </div>
                             <div className=' w-full flex items-center justify-between py-2 border-b border-b-slate-300'>
-                                <h1 className=' w-[60%]'>Breeding Tilapia Fish</h1>
+                                <h1 className=' w-[60%] flex items-center justify-start'> <div className=' h-[20px] w-[20px] bg-[#E8BB78] mx-1 my-0 rounded-md'></div> Breeding Tilapia Fish</h1>
                                 <h1 className=' w-[40%]'>Aug 17, 2024, 11:59pm</h1>
                             </div>
                             <div className=' w-full flex items-center justify-between py-2 border-b border-b-slate-300'>
-                                <h1 className=' w-[60%]'>Breeding Tilapia Fish</h1>
+                                <h1 className=' w-[60%] flex items-center justify-start'> <div className=' h-[20px] w-[20px] bg-[#E8BB78] mx-1 my-0 rounded-md'></div> Breeding Tilapia Fish</h1>
+                                <h1 className=' w-[40%]'>Aug 17, 2024, 11:59pm</h1>
+                            </div>
+                            <div className=' w-full flex items-center justify-between py-2 border-b border-b-slate-300'>
+                                <h1 className=' w-[60%] flex items-center justify-start'> <div className=' h-[20px] w-[20px] bg-[#E8BB78] mx-1 my-0 rounded-md'></div> Breeding Tilapia Fish</h1>
+                                <h1 className=' w-[40%]'>Aug 17, 2024, 11:59pm</h1>
+                            </div>
+                            <div className=' w-full flex items-center justify-between py-2 border-b border-b-slate-300'>
+                                <h1 className=' w-[60%] flex items-center justify-start'> <div className=' h-[20px] w-[20px] bg-[#E8BB78] mx-1 my-0 rounded-md'></div> Breeding Tilapia Fish</h1>
+                                <h1 className=' w-[40%]'>Aug 17, 2024, 11:59pm</h1>
+                            </div>
+                            <div className=' w-full flex items-center justify-between py-2 border-b border-b-slate-300'>
+                                <h1 className=' w-[60%] flex items-center justify-start'> <div className=' h-[20px] w-[20px] bg-[#E8BB78] mx-1 my-0 rounded-md'></div> Breeding Tilapia Fish</h1>
+                                <h1 className=' w-[40%]'>Aug 17, 2024, 11:59pm</h1>
+                            </div>
+                            <div className=' w-full flex items-center justify-between py-2 border-b border-b-slate-300'>
+                                <h1 className=' w-[60%] flex items-center justify-start'> <div className=' h-[20px] w-[20px] bg-[#E8BB78] mx-1 my-0 rounded-md'></div> Breeding Tilapia Fish</h1>
+                                <h1 className=' w-[40%]'>Aug 17, 2024, 11:59pm</h1>
+                            </div>
+                            <div className=' w-full flex items-center justify-between py-2 border-b border-b-slate-300'>
+                                <h1 className=' w-[60%] flex items-center justify-start'> <div className=' h-[20px] w-[20px] bg-[#E8BB78] mx-1 my-0 rounded-md'></div> Breeding Tilapia Fish</h1>
+                                <h1 className=' w-[40%]'>Aug 17, 2024, 11:59pm</h1>
+                            </div>
+                            <div className=' w-full flex items-center justify-between py-2 border-b border-b-slate-300'>
+                                <h1 className=' w-[60%] flex items-center justify-start'> <div className=' h-[20px] w-[20px] bg-[#E8BB78] mx-1 my-0 rounded-md'></div> Breeding Tilapia Fish</h1>
+                                <h1 className=' w-[40%]'>Aug 17, 2024, 11:59pm</h1>
+                            </div>
+                            <div className=' w-full flex items-center justify-between py-2 border-b border-b-slate-300'>
+                                <h1 className=' w-[60%] flex items-center justify-start'> <div className=' h-[20px] w-[20px] bg-[#E8BB78] mx-1 my-0 rounded-md'></div> Breeding Tilapia Fish</h1>
                                 <h1 className=' w-[40%]'>Aug 17, 2024, 11:59pm</h1>
                             </div>
                         </div>
@@ -141,23 +169,39 @@ const page = () => {
                         </div>
                         <div className=' max-h-[100px] overflow-scroll'>
                             <div className=' w-full flex items-center justify-between py-2 border-b border-b-slate-300'>
-                                <h1 className=' w-[60%]'>Breeding Tilapia Fish</h1>
+                                <h1 className=' w-[60%] flex items-center justify-start'> <div className=' h-[20px] w-[20px] bg-[#7ABE7A] mx-1 my-0 rounded-md'></div> Breeding Tilapia Fish</h1>
                                 <h1 className=' w-[40%]'>Aug 17, 2024, 11:59pm</h1>
                             </div>
                             <div className=' w-full flex items-center justify-between py-2 border-b border-b-slate-300'>
-                                <h1 className=' w-[60%]'>Breeding Tilapia Fish</h1>
+                                <h1 className=' w-[60%] flex items-center justify-start'> <div className=' h-[20px] w-[20px] bg-[#7ABE7A] mx-1 my-0 rounded-md'></div> Breeding Tilapia Fish</h1>
                                 <h1 className=' w-[40%]'>Aug 17, 2024, 11:59pm</h1>
                             </div>
                             <div className=' w-full flex items-center justify-between py-2 border-b border-b-slate-300'>
-                                <h1 className=' w-[60%]'>Breeding Tilapia Fish</h1>
+                                <h1 className=' w-[60%] flex items-center justify-start'> <div className=' h-[20px] w-[20px] bg-[#7ABE7A] mx-1 my-0 rounded-md'></div> Breeding Tilapia Fish</h1>
                                 <h1 className=' w-[40%]'>Aug 17, 2024, 11:59pm</h1>
                             </div>
                             <div className=' w-full flex items-center justify-between py-2 border-b border-b-slate-300'>
-                                <h1 className=' w-[60%]'>Breeding Tilapia Fish</h1>
+                                <h1 className=' w-[60%] flex items-center justify-start'> <div className=' h-[20px] w-[20px] bg-[#7ABE7A] mx-1 my-0 rounded-md'></div> Breeding Tilapia Fish</h1>
                                 <h1 className=' w-[40%]'>Aug 17, 2024, 11:59pm</h1>
                             </div>
                             <div className=' w-full flex items-center justify-between py-2 border-b border-b-slate-300'>
-                                <h1 className=' w-[60%]'>Breeding Tilapia Fish</h1>
+                                <h1 className=' w-[60%] flex items-center justify-start'> <div className=' h-[20px] w-[20px] bg-[#7ABE7A] mx-1 my-0 rounded-md'></div> Breeding Tilapia Fish</h1>
+                                <h1 className=' w-[40%]'>Aug 17, 2024, 11:59pm</h1>
+                            </div>
+                            <div className=' w-full flex items-center justify-between py-2 border-b border-b-slate-300'>
+                                <h1 className=' w-[60%] flex items-center justify-start'> <div className=' h-[20px] w-[20px] bg-[#7ABE7A] mx-1 my-0 rounded-md'></div> Breeding Tilapia Fish</h1>
+                                <h1 className=' w-[40%]'>Aug 17, 2024, 11:59pm</h1>
+                            </div>
+                            <div className=' w-full flex items-center justify-between py-2 border-b border-b-slate-300'>
+                                <h1 className=' w-[60%] flex items-center justify-start'> <div className=' h-[20px] w-[20px] bg-[#7ABE7A] mx-1 my-0 rounded-md'></div> Breeding Tilapia Fish</h1>
+                                <h1 className=' w-[40%]'>Aug 17, 2024, 11:59pm</h1>
+                            </div>
+                            <div className=' w-full flex items-center justify-between py-2 border-b border-b-slate-300'>
+                                <h1 className=' w-[60%] flex items-center justify-start'> <div className=' h-[20px] w-[20px] bg-[#7ABE7A] mx-1 my-0 rounded-md'></div> Breeding Tilapia Fish</h1>
+                                <h1 className=' w-[40%]'>Aug 17, 2024, 11:59pm</h1>
+                            </div>
+                            <div className=' w-full flex items-center justify-between py-2 border-b border-b-slate-300'>
+                                <h1 className=' w-[60%] flex items-center justify-start'> <div className=' h-[20px] w-[20px] bg-[#7ABE7A] mx-1 my-0 rounded-md'></div> Breeding Tilapia Fish</h1>
                                 <h1 className=' w-[40%]'>Aug 17, 2024, 11:59pm</h1>
                             </div>
                         </div>

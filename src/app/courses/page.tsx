@@ -11,7 +11,7 @@ const montserrat = Montserrat({
 
 const page = () => {
     return (
-        <div className={` w-full h-[100vh] overflow-hidden pl-[20%] py-2 pr-4`}>
+        <div className={` w-full h-[100vh] overflow-hidden pl-[20%] pb-5 py-2 pr-4`}>
             <div className=' h-[60px] w-full bg-transparent rounded-md flex items-center justify-between p-2 mb-4'>
                 <div className=' flex items-center justify-center bg-white p-2 rounded-md'>
                     <CalendarMonth className=' text-[#379E37]' />
