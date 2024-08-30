@@ -7,7 +7,7 @@ import { Book, HomeRounded, LogoutRounded, Settings, WalletRounded } from '@mui/
 import customer from '@/assets/customerSupport.png'
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 
-const Sidebar = ({setIsAuthenticated}) => {
+const Sidebar = ({ setIsAuthenticated }) => {
     const [currentPath, setCurrentPath] = useState('');
     useEffect(() => {
         if (typeof window !== 'undefined') {
@@ -45,7 +45,7 @@ const Sidebar = ({setIsAuthenticated}) => {
                     <h1 className=' text-white mt-4'>Customer Support</h1>
                 </div>
 
-                <Link href={"/"} onClick={()=> setIsAuthenticated(true)} className=' bg-[#9BCE9B] text-[#0B200B] px-2 rounded-md py-1 hover:px-4 duration-500'><LogoutRounded className=' mx-2' /> Logout</Link>
+                <Link href={"/"} onClick={() => setIsAuthenticated(false)} className=' bg-[#9BCE9B] text-[#0B200B] px-2 rounded-md py-1 hover:px-4 duration-500'><LogoutRounded className=' mx-2' /> Logout</Link>
             </div>
         </div>
     )
