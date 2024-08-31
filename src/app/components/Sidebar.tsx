@@ -28,10 +28,57 @@ const Sidebar = ({ setIsAuthenticated }) => {
                         className=' m-auto'
                     />
                     <div className=' w-full'>
-                        <a href={"/studentDashboard"} className={currentPath === '/studentDashboard' ? 'flex items-center justify-start w-[80%] px-2 duration-500 text-[#379E37] bg-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2' : ` flex items-center justify-start w-[80%] px-2 duration-500 text-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2`}><HomeRounded className=' mx-2' /> Dashboard</a>
-                        <a href={"/courses"} className={currentPath === '/courses' ? 'flex items-center justify-start w-[80%] px-2 duration-500 text-[#379E37] bg-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2' : ' flex items-center justify-start w-[80%] px-2 duration-500 text-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'}><Book className=' mx-2' /> Course</a>
-                        <a href={"/payment"} className={currentPath === '/payment' ? 'flex items-center justify-start w-[80%] px-2 duration-500 text-[#379E37] bg-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2' : ' flex items-center justify-start w-[80%] px-2 duration-500 text-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'}><WalletRounded className=' mx-2' /> Payment</a>
-                        <a href={"/settings"} className={currentPath === '/settings' ? 'flex items-center justify-start w-[80%] px-2 duration-500 text-[#379E37] bg-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2' : ' flex items-center justify-start w-[80%] px-2 duration-500 text-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'}><Settings className=' mx-2' /> Settings</a>
+                        <Link href="/studentDashboard" onClick={() => setCurrentPath('/studentDashboard')}>
+                            <div
+                                className={
+                                    currentPath === '/studentDashboard'
+                                        ? 'flex items-center justify-start w-[80%] px-2 duration-500 text-[#379E37] bg-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'
+                                        : 'flex items-center justify-start w-[80%] px-2 duration-500 text-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'
+                                }
+                            >
+                                <HomeRounded className="mx-2" />
+                                Dashboard
+                            </div>
+                        </Link>
+
+                        <Link href="/courses" onClick={() => setCurrentPath('/courses')}>
+                            <div
+                                className={
+                                    currentPath === '/courses'
+                                        ? 'flex items-center justify-start w-[80%] px-2 duration-500 text-[#379E37] bg-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'
+                                        : 'flex items-center justify-start w-[80%] px-2 duration-500 text-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'
+                                }
+                            >
+                                <Book className=' mx-2' />
+                                Course
+                            </div>
+                        </Link>
+
+                        <Link href="/payment" onClick={() => setCurrentPath('/payment')}>
+                            <div
+                                className={
+                                    currentPath === '/payment'
+                                        ? 'flex items-center justify-start w-[80%] px-2 duration-500 text-[#379E37] bg-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'
+                                        : 'flex items-center justify-start w-[80%] px-2 duration-500 text-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'
+                                }
+                            >
+                                <WalletRounded className=' mx-2' />
+                                Payment
+                            </div>
+                        </Link>
+
+                        <Link href="/settings" onClick={() => setCurrentPath('/settings')}>
+                            <div
+                                className={
+                                    currentPath === '/settings'
+                                        ? 'flex items-center justify-start w-[80%] px-2 duration-500 text-[#379E37] bg-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'
+                                        : 'flex items-center justify-start w-[80%] px-2 duration-500 text-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'
+                                }
+                            >
+                                <Settings className=' mx-2' />
+                                Settings
+                            </div>
+                        </Link>
                     </div>
                 </div>
 
