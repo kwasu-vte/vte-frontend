@@ -220,32 +220,32 @@ export default function RootLayout({
                   <div className=" w-[80%] mx-auto flex items-center justify-between p-0 m-0 mb-4">
                     <div className="relative w-[48%] mx-auto mb-6">
                       <input
-                        type="password"
+                        type="text"
                         id="name"
                         name="name"
                         className=" placeholder:text-sm font-thin block w-full px-4 py-2 text-sm text-gray-900 border border-[#58AE58] rounded-lg focus:outline-none peer"
-                        placeholder="Enter your password"
+                        placeholder="Enter your matric number"
                       />
                       <label
 
                         className="absolute left-3 -top-2.5 px-1 bg-white text-sm text-black font-bold transition-all"
                       >
-                        Password
+                        Matric Number
                       </label>
                     </div>
                     <div className="relative w-[48%] mx-auto mb-6">
                       <input
-                        type="password"
+                        type="text"
                         id="name"
                         name="name"
                         className=" placeholder:text-sm font-thin block w-full px-4 py-2 text-sm text-gray-900 border border-[#58AE58] rounded-lg focus:outline-none peer"
-                        placeholder="Enter your password"
+                        placeholder="Enter your level"
                       />
                       <label
 
                         className="absolute left-3 -top-2.5 px-1 bg-white text-sm text-black font-bold transition-all"
                       >
-                        Password
+                        Level
                       </label>
                     </div>
                   </div>
