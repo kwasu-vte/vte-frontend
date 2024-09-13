@@ -21,9 +21,36 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [formType, setFormType] = useState("admin-log-in")
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false)
+  const [formType, setFormType] = useState<string>("admin-log-in")
 
+  const handleLogin = async () => {
+    const username = (document.querySelector('input[type="text"]') as HTMLInputElement).value;
+    const password = (document.querySelector('input[type="password"]') as HTMLInputElement).value ;
+    console.log(username, password)
+  
+    try {
+      const response = await fetch("https://vte-backend.onrender.com/api/auth/token", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `username=${username}&password=${password}`,
+      });
+      if (response.ok) {
+        const data: {access_token: string, refresh_token: string,
+          token_type: string, role: string} = await response.json();
+        console.log('Login successful', data);
+        localStorage.setItem('access_token', data.access_token);
+        localStorage.setItem('refresh_token', data.refresh_token);
+        localStorage.setItem('token_type', data.token_type);
+        localStorage.setItem('role', data.role);
+        setIsAuthenticated(true);
+      }
+    } catch (error) {
+        console.error("Error logging in:", error);
+    }
+  }
   if (isAuthenticated == true) {
     return (
       <html lang="en">
@@ -59,17 +86,17 @@ export default function RootLayout({
 
                   <div className="relative w-[80%] mx-auto mb-6">
                     <input
-                      type="email"
+                      type="text"
                       id="name"
                       name="name"
                       className=" placeholder:text-sm font-thin block w-full px-4 py-2 text-sm text-gray-900 border border-[#58AE58] rounded-lg focus:outline-none peer"
-                      placeholder="Enter your email"
+                      placeholder="Enter your email or matric number"
                     />
                     <label
 
                       className="absolute left-3 -top-2.5 px-1 bg-white text-sm text-black font-bold transition-all"
                     >
-                      Email
+                      Email / Matric No
                     </label>
                   </div>
 
@@ -91,7 +118,7 @@ export default function RootLayout({
 
 
 
-                  <button onClick={() => setIsAuthenticated(true)} className=' text-white bg-[#58AE58] w-[80%] mx-auto text-center py-2 rounded-md mb-4'>Login</button>
+                  <button onClick={handleLogin} className=' text-white bg-[#58AE58] w-[80%] mx-auto text-center py-2 rounded-md mb-4'>Login</button>
                   <p className=' w-[80%] mx-auto text-sm text-[#6E6E6E]'>Are you an admin? <span className=' text-[#379E37]'><button onClick={() => setFormType("admin-log-in")} className=' underline'>Log in as administartor</button></span></p>
                 </div>
               </div>
