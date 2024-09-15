@@ -30,7 +30,7 @@ export default function RootLayout({
     console.log(username, password)
   
     try {
-      const response = await fetch("https://vte-backend.onrender.com/api/auth/token", {
+      const response = await fetch(URL+"api/auth/token", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
