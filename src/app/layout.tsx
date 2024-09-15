@@ -9,6 +9,7 @@ import logo from '@/assets/kwasulogo.png'
 import Image from 'next/image'
 import Link from 'next/link'
 
+
 const inter = Inter({ subsets: ["latin"] });
 const urbanist = Urbanist({ subsets: ["latin"] });
 const roboto = Roboto({
@@ -27,10 +28,10 @@ export default function RootLayout({
   const handleLogin = async () => {
     const username = (document.querySelector('input[type="text"]') as HTMLInputElement).value;
     const password = (document.querySelector('input[type="password"]') as HTMLInputElement).value ;
-    console.log(username, password)
+    console.log(username, password);
   
     try {
-      const response = await fetch(URL+"api/auth/token", {
+      const response = await fetch("https://vte-backend.onrender.com/api/auth/token", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
