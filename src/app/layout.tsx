@@ -1,20 +1,20 @@
 "use client";
-import { Inter, Roboto_Condensed } from "next/font/google";
+import { Inter } from "next/font/google";
 import { Urbanist } from "next/font/google";
 import { Roboto } from "next/font/google";
 import "./globals.css";
 import Sidebar from "./components/Sidebar";
+import AdminSidebar from "./components/AdminSidebar";
 import { useState } from "react";
 import logo from '@/assets/kwasulogo.png'
 import Image from 'next/image'
-import Link from 'next/link'
-
+import Admin from '@/app/adminhome'
 
 const inter = Inter({ subsets: ["latin"] });
 const urbanist = Urbanist({ subsets: ["latin"] });
 const roboto = Roboto({
   subsets: ['latin'],
-  weight: ['400', '500', '700'], // Specify the weights you want to use
+  weight: ['400', '500', '700'],
 });
 
 export default function RootLayout({
@@ -24,12 +24,13 @@ export default function RootLayout({
 }>) {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false)
   const [formType, setFormType] = useState<string>("admin-log-in")
+  const [sidebarType, setSidebarType] = useState<string>("student")
 
   const handleLogin = async () => {
     const username = (document.querySelector('input[type="text"]') as HTMLInputElement).value;
-    const password = (document.querySelector('input[type="password"]') as HTMLInputElement).value ;
+    const password = (document.querySelector('input[type="password"]') as HTMLInputElement).value;
     console.log(username, password);
-  
+
     try {
       const response = await fetch("https://vte-backend.onrender.com/api/auth/token", {
         method: 'POST',
@@ -39,30 +40,79 @@ export default function RootLayout({
         body: `username=${username}&password=${password}`,
       });
       if (response.ok) {
-        const data: {access_token: string, refresh_token: string,
-          token_type: string, role: string} = await response.json();
+        const data: {
+          access_token: string, refresh_token: string,
+          token_type: string, role: string
+        } = await response.json();
         console.log('Login successful', data);
         localStorage.setItem('access_token', data.access_token);
         localStorage.setItem('refresh_token', data.refresh_token);
         localStorage.setItem('token_type', data.token_type);
         localStorage.setItem('role', data.role);
         setIsAuthenticated(true);
+        setSidebarType("student");
       }
     } catch (error) {
-        console.error("Error logging in:", error);
+      console.error("Error logging in:", error);
     }
   }
+  const handleAdminLogin = async () => {
+    setIsAuthenticated(true);
+    setSidebarType("admin")
+    // const username = (document.querySelector('input[type="text"]') as HTMLInputElement).value;
+    // const password = (document.querySelector('input[type="password"]') as HTMLInputElement).value;
+    // console.log(username, password);
+
+    // try {
+    //   const response = await fetch("https://vte-backend.onrender.com/api/auth/token", {
+    //     method: 'POST',
+    //     headers: {
+    //       'Content-Type': 'application/x-www-form-urlencoded',
+    //     },
+    //     body: `username=${username}&password=${password}`,
+    //   });
+    //   if (response.ok) {
+    //     const data: {
+    //       access_token: string, refresh_token: string,
+    //       token_type: string, role: string
+    //     } = await response.json();
+    //     console.log('Login successful', data);
+    //     localStorage.setItem('access_token', data.access_token);
+    //     localStorage.setItem('refresh_token', data.refresh_token);
+    //     localStorage.setItem('token_type', data.token_type);
+    //     localStorage.setItem('role', data.role);
+    //     setIsAuthenticated(true);
+    //     setSidebarType("admin")
+    //   }
+    // } catch (error) {
+    //   console.error("Error logging in:", error);
+    // }
+  }
+
   if (isAuthenticated == true) {
-    return (
-      <html lang="en">
-        <body className={roboto.className} >
-          <Sidebar setIsAuthenticated={setIsAuthenticated}/>
-          <main className="flex-grow mx-auto py-8 bg-[#BFE7BF]">
-            {children}
-          </main>
-        </body >
-      </html >
-    );
+    if (sidebarType === "student") {
+      return (
+        <html lang="en">
+          <body className={roboto.className} >
+            <Sidebar setIsAuthenticated={setIsAuthenticated} />
+            <main className="flex-grow mx-auto py-8 bg-[#BFE7BF]">
+              {children}
+            </main>
+          </body >
+        </html >
+      );
+    } else if (sidebarType === "admin") {
+      return (
+        <html lang="en">
+          <body className={roboto.className} >
+            <AdminSidebar setIsAuthenticated={setIsAuthenticated} />
+            <main className="flex-grow mx-auto py-8 bg-[#BFE7BF]">
+              {children}
+            </main>
+          </body >
+        </html >
+      );
+    }
   } else {
     if (isAuthenticated == false && formType === "log-in") {
       return (
@@ -323,7 +373,7 @@ export default function RootLayout({
 
 
 
-                  <button onClick={() => setIsAuthenticated(true)} className=' text-white bg-[#58AE58] w-[80%] mx-auto text-center py-2 rounded-md mb-4'>Login</button>
+                  <button onClick={handleAdminLogin} className=' text-white bg-[#58AE58] w-[80%] mx-auto text-center py-2 rounded-md mb-4'>Login</button>
                   <p className=' w-[80%] mx-auto text-sm text-[#6E6E6E]'>Are you a student? <span className=' text-[#379E37]'><button onClick={() => setFormType("log-in")} className=' underline'>Log in as student</button></span></p>
                 </div>
               </div>
