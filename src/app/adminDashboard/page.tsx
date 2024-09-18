@@ -1,7 +1,9 @@
+"use client";
 import React from 'react'
 import {
   CalendarMonth,
   CalendarViewDayRounded,
+  HeartBrokenSharp,
   Notifications,
   Search,
 } from "@mui/icons-material";
@@ -18,6 +20,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import barchart from "@/assets/BarLineChart.png";
+import '@/app/Calendar.css'
+import FullCalendar from '@fullcalendar/react';
+import dayGridPlugin from '@fullcalendar/daygrid';
 
 
 const lastName = "Ojuoye";
@@ -69,9 +74,9 @@ const page = () => {
         </div>
       </div>
 
-      <div className=" h-fit mb-4 w-full flex items-start justify-between">
-        <div className=" w-[45%] flex flex-col items-start justify-between">
-          <div className=' border-b-2 border-b-[#7ABE7A] w-full py-4 mb-4'>
+      <div className=" h-[70vh] mb-4 w-full flex items-start justify-between">
+        <div className=" w-[45%] flex flex-col items-start justify-start ">
+          <div className=' border-b-2 border-b-[#7ABE7A] w-full mb-4 pb-4'>
             <h1 className=" font-extrabold text-[#379E37] mb-4">
               Overview
             </h1>
@@ -123,11 +128,115 @@ const page = () => {
             />
           </div>
         </div>
-        <div className=" w-[45%]">
+        <div className=" w-[50%] h-full">
           <h1 className=" font-extrabold text-[#379E37] mb-4">
             Calendar and Tasks
           </h1>
-          <div className=' w-full bg-white'></div>
+          <div className=' w-full bg-white p-3 rounded-lg'>
+            <div className=' w-full flex items-end justify-between bg-white rounded-lg mb-4'>
+              <FullCalendar
+                plugins={[dayGridPlugin]}
+                initialView="dayGridMonth"
+                events={[
+                  { title: 'Test', date: '2024-09-20' },
+                  { title: 'Pract.', date: '2024-09-25' },
+                  { title: 'Assgn.', date: '2024-10-02' }
+                ]}
+              />
+
+              <div className=' w-[25%]'>
+                <h1 className=" font-extrabold text-[#379E37] mb-4 text-sm">
+                  Task / Reminder
+                </h1>
+                <div className=' h-[300px] w-full overflow-scroll bg-[#D7ECD7] rounded-md'></div>
+              </div>
+            </div>
+            <div className=' w-full overflow-scroll h-[150px]'>
+              <div className=' cursor-pointer group hover:text-white duration-500 hover:bg-[#379E37] bg-[#D7D6FF4D] w-full rounded-md flex items-end justify-between  px-4 py-6 mb-4 shadow-sm shadow-slate-400'>
+                <div className=' flex items-center justify-center'>
+                  <HeartBrokenSharp className=' text-[#379E37] mx-4 group-hover:text-white duration-500' />
+                  <div>
+                    <h1 className=' p-0 m-0 font-semibold text-lg'>New Payment</h1>
+                    <p className=' text-xs p-0 m-0'>Adepoju Raphael paid 1,100 for Tailoring ...</p>
+                  </div>
+                </div>
+
+                <h1 className=' font-thin text-xs'>Just Now</h1>
+              </div>
+
+              <div className=' cursor-pointer group hover:text-white duration-500 hover:bg-[#379E37] bg-[#D7D6FF4D] w-full rounded-md flex items-end justify-between  px-4 py-6 mb-4 shadow-sm shadow-slate-400'>
+                <div className=' flex items-center justify-center'>
+                  <HeartBrokenSharp className=' text-[#379E37] mx-4 group-hover:text-white duration-500' />
+                  <div>
+                    <h1 className=' p-0 m-0 font-semibold text-lg'>New Payment</h1>
+                    <p className=' text-xs p-0 m-0'>Adepoju Raphael paid 1,100 for Tailoring ...</p>
+                  </div>
+                </div>
+
+                <h1 className=' font-thin text-xs'>Just Now</h1>
+              </div>
+
+              <div className=' cursor-pointer group hover:text-white duration-500 hover:bg-[#379E37] bg-[#D7D6FF4D] w-full rounded-md flex items-end justify-between  px-4 py-6 mb-4 shadow-sm shadow-slate-400'>
+                <div className=' flex items-center justify-center'>
+                  <HeartBrokenSharp className=' text-[#379E37] mx-4 group-hover:text-white duration-500' />
+                  <div>
+                    <h1 className=' p-0 m-0 font-semibold text-lg'>New Payment</h1>
+                    <p className=' text-xs p-0 m-0'>Adepoju Raphael paid 1,100 for Tailoring ...</p>
+                  </div>
+                </div>
+
+                <h1 className=' font-thin text-xs'>Just Now</h1>
+              </div>
+
+              <div className=' cursor-pointer group hover:text-white duration-500 hover:bg-[#379E37] bg-[#D7D6FF4D] w-full rounded-md flex items-end justify-between  px-4 py-6 mb-4 shadow-sm shadow-slate-400'>
+                <div className=' flex items-center justify-center'>
+                  <HeartBrokenSharp className=' text-[#379E37] mx-4 group-hover:text-white duration-500' />
+                  <div>
+                    <h1 className=' p-0 m-0 font-semibold text-lg'>New Payment</h1>
+                    <p className=' text-xs p-0 m-0'>Adepoju Raphael paid 1,100 for Tailoring ...</p>
+                  </div>
+                </div>
+
+                <h1 className=' font-thin text-xs'>Just Now</h1>
+              </div>
+
+              <div className=' cursor-pointer group hover:text-white duration-500 hover:bg-[#379E37] bg-[#D7D6FF4D] w-full rounded-md flex items-end justify-between  px-4 py-6 mb-4 shadow-sm shadow-slate-400'>
+                <div className=' flex items-center justify-center'>
+                  <HeartBrokenSharp className=' text-[#379E37] mx-4 group-hover:text-white duration-500' />
+                  <div>
+                    <h1 className=' p-0 m-0 font-semibold text-lg'>New Payment</h1>
+                    <p className=' text-xs p-0 m-0'>Adepoju Raphael paid 1,100 for Tailoring ...</p>
+                  </div>
+                </div>
+
+                <h1 className=' font-thin text-xs'>Just Now</h1>
+              </div>
+
+              <div className=' cursor-pointer group hover:text-white duration-500 hover:bg-[#379E37] bg-[#D7D6FF4D] w-full rounded-md flex items-end justify-between  px-4 py-6 mb-4 shadow-sm shadow-slate-400'>
+                <div className=' flex items-center justify-center'>
+                  <HeartBrokenSharp className=' text-[#379E37] mx-4 group-hover:text-white duration-500' />
+                  <div>
+                    <h1 className=' p-0 m-0 font-semibold text-lg'>New Payment</h1>
+                    <p className=' text-xs p-0 m-0'>Adepoju Raphael paid 1,100 for Tailoring ...</p>
+                  </div>
+                </div>
+
+                <h1 className=' font-thin text-xs'>Just Now</h1>
+              </div>
+
+              <div className=' cursor-pointer group hover:text-white duration-500 hover:bg-[#379E37] bg-[#D7D6FF4D] w-full rounded-md flex items-end justify-between  px-4 py-6 mb-4 shadow-sm shadow-slate-400'>
+                <div className=' flex items-center justify-center'>
+                  <HeartBrokenSharp className=' text-[#379E37] mx-4 group-hover:text-white duration-500' />
+                  <div>
+                    <h1 className=' p-0 m-0 font-semibold text-lg'>New Payment</h1>
+                    <p className=' text-xs p-0 m-0'>Adepoju Raphael paid 1,100 for Tailoring ...</p>
+                  </div>
+                </div>
+
+                <h1 className=' font-thin text-xs'>Just Now</h1>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
