@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import logo from '../../assets/kwasulogo.png'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Book, HomeRounded, Layers, LogoutRounded, Person2, Settings, WalletRounded } from '@mui/icons-material'
+import { Book, Group, HomeRounded, Layers, LogoutRounded, Person2, Settings, WalletRounded } from '@mui/icons-material'
 import customer from '@/assets/customerSupport.png'
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 
@@ -83,16 +83,29 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ setIsAuthenticated }) => {
                             </div>
                         </Link>
 
-                        <Link href="/settings" onClick={() => setCurrentPath('/settings')}>
+                        <Link href="/courseManagement" onClick={() => setCurrentPath('/courseManagement')}>
                             <div
                                 className={
-                                    currentPath === '/settings'
+                                    currentPath === '/courseManagement'
                                         ? 'flex items-center justify-start w-[80%] px-2 duration-500 text-[#379E37] bg-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'
                                         : 'flex items-center justify-start w-[80%] px-2 duration-500 text-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'
                                 }
                             >
-                                <Settings className=' mx-2' />
-                                Settings
+                                <Group className=' mx-2' />
+                                Course Mgt.
+                            </div>
+                        </Link>
+
+                        <Link href="/groupManagement" onClick={() => setCurrentPath('/groupManagement')}>
+                            <div
+                                className={
+                                    currentPath === '/groupManagement'
+                                        ? 'flex items-center justify-start w-[80%] px-2 duration-500 text-[#379E37] bg-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'
+                                        : 'flex items-center justify-start w-[80%] px-2 duration-500 text-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'
+                                }
+                            >
+                                <Group className=' mx-2' />
+                                Group Mgt.
                             </div>
                         </Link>
                     </div>
@@ -108,7 +121,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ setIsAuthenticated }) => {
                     <h1 className=' text-white mt-4'>Customer Support</h1>
                 </div>
 
-                <button onClick={() => setIsAuthenticated(false)} className=' bg-[#9BCE9B] text-[#0B200B] px-2 rounded-md py-1 hover:px-4 duration-500'><LogoutRounded className=' mx-2' /> Logout</button>
+                <Link href={'/'}><button onClick={() => setIsAuthenticated(false)} className=' bg-[#9BCE9B] text-[#0B200B] px-2 rounded-md py-1 hover:px-4 duration-500'><LogoutRounded className=' mx-2' /> Logout</button></Link>
             </div>
         </div>
     )
