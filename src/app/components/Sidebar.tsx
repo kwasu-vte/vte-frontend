@@ -7,7 +7,7 @@ import { Book, HomeRounded, LogoutRounded, Settings, WalletRounded } from '@mui/
 import customer from '@/assets/customerSupport.png'
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 
-const Sidebar = ({ setIsAuthenticated }) => {
+const Sidebar = ({ setIsAuthenticated }: {setIsAuthenticated: (value: boolean) => void}) => {
     const [currentPath, setCurrentPath] = useState('');
     useEffect(() => {
         if (typeof window !== 'undefined') {

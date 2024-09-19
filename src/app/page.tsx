@@ -2,9 +2,13 @@
 import React from 'react'
 import Dashboard from '@/app/studentDashboard/page'
 
-const page = (props) => {
-  console.log(`custom prop is ${props.customProp}`)
-  if (typeof props.customProp === 'string' && props.customProp === 'someValue') {
+interface PageProps {
+  customProp: string;
+}
+
+const page = ({customProp}: PageProps): JSX.Element => {
+  console.log(`custom prop is ${customProp}`)
+  if (customProp === 'someValue') {
     return (
       <div>
         fuck
@@ -12,7 +16,7 @@ const page = (props) => {
     );
   } else {
     return (
-      <div>
+      <div> 
         <Dashboard />
       </div>
     );

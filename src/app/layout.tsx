@@ -39,14 +39,16 @@ export default function RootLayout({
         body: `username=${username}&password=${password}`,
       });
       if (response.ok) {
-        const data: {access_token: string, refresh_token: string,
-          token_type: string, role: string} = await response.json();
-        console.log('Login successful', data);
-        localStorage.setItem('access_token', data.access_token);
-        localStorage.setItem('refresh_token', data.refresh_token);
-        localStorage.setItem('token_type', data.token_type);
-        localStorage.setItem('role', data.role);
-        setIsAuthenticated(true);
+        // const data: {access_token: string, refresh_token: string,
+        //   token_type: string, role: string} = await response.json();
+        // console.log('Login successful', data);
+        // localStorage.setItem('access_token', data.access_token);
+        // localStorage.setItem('refresh_token', data.refresh_token);
+        // localStorage.setItem('token_type', data.token_type);
+        // localStorage.setItem('role', data.role);
+        const data = await response.json()
+        console.log(data)
+        setIsAuthenticated(data.status);
       }
     } catch (error) {
         console.error("Error logging in:", error);
