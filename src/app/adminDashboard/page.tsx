@@ -76,7 +76,7 @@ const page = () => {
 
       <div className=" h-[70vh] mb-4 w-full flex items-start justify-between">
         <div className=" w-[45%] flex flex-col items-start justify-start ">
-          <div className=' border-b-2 border-b-[#7ABE7A] w-full mb-4 pb-4'>
+          <div className=' border-b-2 border-b-[#7ABE7A] w-full mb-8 pb-8'>
             <h1 className=" font-extrabold text-[#379E37] mb-4">
               Overview
             </h1>
