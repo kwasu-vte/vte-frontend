@@ -15,6 +15,13 @@ const Sidebar = ({ setIsAuthenticated }: {setIsAuthenticated: (value: boolean) =
         }
     }, []);
 
+    const handleLogout = () => {
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("refresh_token");
+        localStorage.removeItem("role");
+        setIsAuthenticated(false)
+
+    }
 
     return (
         <div className=' z-50 fixed h-[100vh] py-2 w-[18%]'>
@@ -92,7 +99,7 @@ const Sidebar = ({ setIsAuthenticated }: {setIsAuthenticated: (value: boolean) =
                     <h1 className=' text-white mt-4'>Customer Support</h1>
                 </div>
 
-                <Link href={'/'}><button onClick={() => setIsAuthenticated(false)} className=' bg-[#9BCE9B] text-[#0B200B] px-2 rounded-md py-1 hover:px-4 duration-500'><LogoutRounded className=' mx-2' /> Logout</button></Link>
+                <Link href={'/'}><button onClick={() => handleLogout()} className=' bg-[#9BCE9B] text-[#0B200B] px-2 rounded-md py-1 hover:px-4 duration-500'><LogoutRounded className=' mx-2' /> Logout</button></Link>
             </div>
         </div>
     )

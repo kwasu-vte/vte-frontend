@@ -7,7 +7,7 @@ interface PageProps {
 }
 
 
-const page = (props) => {
+const page = (props: PageProps) => {
   console.log(`custom prop is ${props.customProp}`)
   if (typeof props.customProp === 'string' && props.customProp === 'someValue') {
     return (

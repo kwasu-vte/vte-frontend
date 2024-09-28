@@ -9,6 +9,10 @@ import logo from '@/assets/kwasulogo.png'
 import Image from 'next/image'
 import Link from 'next/link'
 import AdminSidebar from "./components/AdminSidebar";
+import {Login} from "@/lib/actions";
+import { UserInfo } from "@/lib/definitions";
+import { useRouter } from "next/navigation";
+import { Protected } from "@/components/protected";
 
 
 const inter = Inter({ subsets: ["latin"] });
@@ -26,34 +30,36 @@ export default function RootLayout({
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false)
   const [formType, setFormType] = useState<string>("log-in")
   const [sidebarType, setSidebarType] = useState<string>("student")
+  const router = useRouter();
+
+
 
   const handleLogin = async () => {
     const username = (document.querySelector('input[type="text"]') as HTMLInputElement).value;
     const password = (document.querySelector('input[type="password"]') as HTMLInputElement).value ;
-    console.log(username, password);
   
     try {
-      const response = await fetch("https://vte-backend.onrender.com/api/auth/token", {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: `username=${username}&password=${password}`,
-      });
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Login successful', data);
-        localStorage.setItem('access_token', data.access_token);
-        localStorage.setItem('refresh_token', data.refresh_token);
-        localStorage.setItem('token_type', data.token_type);
-        localStorage.setItem('role', data.role);
-        if (data.status == true) {
-          setSidebarType("student")
-          setIsAuthenticated(true);
-        }
+      const user: UserInfo | undefined = await Login({username:username, password:password});
+      const userInfo: UserInfo = user!;
+
+      if (typeof user !== 'undefined') {router.push('/')};
+
+      if (userInfo.role == 'student') {
+        setSidebarType("student");
+        setIsAuthenticated(true);
+        router.push('/studentDashboard')
+      }else if (userInfo.role == 'admin') {
+        setSidebarType("admin");
+        setIsAuthenticated(true);
+        router.push('/adminDashboard')
+      } else {
+        setSidebarType("staff");
+        setIsAuthenticated(true);
+        router.push('/staffDashboard')
       }
     } catch (error) {
         console.error("Error logging in:", error);
+        throw new Error(`Error: ${error}`)
     }
   }
 
@@ -88,10 +94,12 @@ export default function RootLayout({
       return (
         <html lang="en">
           <body className={roboto.className} >
-            <Sidebar setIsAuthenticated={setIsAuthenticated}/>
-            <main className="flex-grow mx-auto py-8 bg-[#BFE7BF]">
-              {children}
-            </main>
+            <Protected>
+              <Sidebar setIsAuthenticated={setIsAuthenticated}/>
+              <main className="flex-grow mx-auto py-8 bg-[#BFE7BF]">
+                {children}
+              </main>
+            </Protected>
           </body >
         </html >
       );
@@ -99,10 +107,12 @@ export default function RootLayout({
       return (
         <html lang="en">
           <body className={roboto.className} >
-            <AdminSidebar setIsAuthenticated={setIsAuthenticated}/>
-            <main className="flex-grow mx-auto py-8 bg-[#BFE7BF]">
-              {children}
-            </main>
+            <Protected>
+              <AdminSidebar setIsAuthenticated={setIsAuthenticated}/>
+              <main className="flex-grow mx-auto py-8 bg-[#BFE7BF]">
+                {children}
+              </main>
+            </Protected>
           </body >
         </html >
       );
@@ -156,7 +166,7 @@ export default function RootLayout({
                       </label>
                     </div>
                     <button onClick={() => handleLogin()} className=' text-white bg-[#58AE58] w-[80%] mx-auto text-center py-2 rounded-md mb-4'>Login</button>
-                    <p className=' w-[80%] mx-auto text-sm text-[#6E6E6E]'>Are you an admin? <span className=' text-[#379E37]'><button onClick={() => setFormType("admin-log-in")} className=' underline'>Log in as administartor</button></span></p>
+                    {/* <p className=' w-[80%] mx-auto text-sm text-[#6E6E6E]'>Are you an admin? <span className=' text-[#379E37]'><button onClick={() => setFormType("admin-log-in")} className=' underline'>Log in as administartor</button></span></p> */}
                   </div>
                 </div>
               </div>
