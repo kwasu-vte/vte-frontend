@@ -7,7 +7,10 @@ import { Book, Group, HomeRounded, Layers, LogoutRounded, Person2, Settings, Wal
 import customer from '@/assets/customerSupport.png'
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 
-const AdminSidebar = ({ setIsAuthenticated }) => {
+interface AdminSidebarProps {
+    setIsAuthenticated: (value: boolean) => void;
+}
+const AdminSidebar: React.FC<AdminSidebarProps> = ({ setIsAuthenticated }) => {
     const [currentPath, setCurrentPath] = useState('');
     useEffect(() => {
         if (typeof window !== 'undefined') {

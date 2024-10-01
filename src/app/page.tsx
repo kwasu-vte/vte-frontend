@@ -5,10 +5,9 @@ import { useMyProp } from './layout';
 import AdminDashboard from '@/app/adminDashboard/page'
 import StaffDashboard from '@/app/staffDashboard/page'
 
+
 const page = () => {
   const myProp = useMyProp();
-  console.log(myProp)
-
   if (myProp === "admin") {
     return (
       <div>
@@ -26,11 +25,8 @@ const page = () => {
       <div>
         <Dashboard />
       </div>
-    )
+    );
   }
-
-
-
 }
 
 export default page

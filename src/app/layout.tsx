@@ -4,8 +4,7 @@ import { Urbanist } from "next/font/google";
 import { Roboto } from "next/font/google";
 import "./globals.css";
 import Sidebar from "./components/Sidebar";
-import { useState } from "react";
-import { createContext, useContext } from 'react';
+import { createContext, useContext, useState } from "react";
 import logo from '@/assets/kwasulogo.png'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -19,6 +18,7 @@ const roboto = Roboto({
   subsets: ['latin'],
   weight: ['400', '500', '700'], // Specify the weights you want to use
 });
+
 
 const MyPropContext = createContext<string | null>(null);
 export function useMyProp() {
@@ -45,17 +45,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         body: `username=${username}&password=${password}`,
       });
       if (response.ok) {
-        const data: {
-          access_token: string, refresh_token: string,
-          token_type: string, role: string
-        } = await response.json();
+        const data = await response.json();
         console.log('Login successful', data);
         localStorage.setItem('access_token', data.access_token);
         localStorage.setItem('refresh_token', data.refresh_token);
         localStorage.setItem('token_type', data.token_type);
         localStorage.setItem('role', data.role);
-        setSidebarType("student")
-        setIsAuthenticated(true);
+        if (data.status == true) {
+          setSidebarType("student")
+          setIsAuthenticated(true);
+        }
       }
     } catch (error) {
       console.error("Error logging in:", error);
@@ -76,15 +75,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         body: `username=${username}&password=${password}`,
       });
       if (response.ok) {
-        const data: {
-          access_token: string, refresh_token: string,
-          token_type: string, role: string
-        } = await response.json();
+        const data = await response.json();
         console.log('Login successful', data);
-        localStorage.setItem('access_token', data.access_token);
-        localStorage.setItem('refresh_token', data.refresh_token);
-        localStorage.setItem('token_type', data.token_type);
-        localStorage.setItem('role', data.role);
+
         setSidebarType("admin")
         setIsAuthenticated(true);
       }
@@ -96,13 +89,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
   if (isAuthenticated == true) {
     if (sidebarType === "student") {
+      const myProp = "student"
       return (
         <html lang="en">
           <body className={roboto.className} >
             <Sidebar setIsAuthenticated={setIsAuthenticated} />
-            <main className="flex-grow mx-auto py-8 bg-[#BFE7BF]">
-              {children}
-            </main>
+            <MyPropContext.Provider value={myProp} >
+              <main className="flex-grow mx-auto py-8 bg-[#BFE7BF]">
+                {children}
+              </main>
+            </MyPropContext.Provider>
           </body >
         </html >
       );
