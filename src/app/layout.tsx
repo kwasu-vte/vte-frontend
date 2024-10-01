@@ -5,11 +5,15 @@ import { Roboto } from "next/font/google";
 import "./globals.css";
 import Sidebar from "./components/Sidebar";
 import { createContext, useContext, useState } from "react";
-import logo from '@/assets/kwasulogo.png'
+import logo from '@/assets/kwasulogo.png';
 import Image from 'next/image'
 import Link from 'next/link'
 import AdminSidebar from "./components/AdminSidebar";
 import StaffSidebar from "./components/StaffSidebar";
+import {Login} from "@/lib/actions";
+import { UserInfo } from "@/lib/definitions";
+import { useRouter } from "next/navigation";
+import { Protected } from "@/components/protected";
 
 
 const inter = Inter({ subsets: ["latin"] });
@@ -25,11 +29,18 @@ export function useMyProp() {
   return useContext(MyPropContext);
 }
 
+const UserInfoContext = createContext<UserInfo | null>(null);
+export function useUserInfo() {
+  return useContext(UserInfoContext);
+}
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   // const myProp = "admin"
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false)
   const [formType, setFormType] = useState<string>("log-in")
   const [sidebarType, setSidebarType] = useState<string>("student")
+  const [userInfo, setUserInfo] = useState<UserInfo|null>(null)
+  const router = useRouter();
 
   const handleLogin = async () => {
     const username = (document.querySelector('input[type="text"]') as HTMLInputElement).value;
@@ -37,27 +48,28 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     console.log(username, password);
 
     try {
-      const response = await fetch("https://vte-backend.onrender.com/api/auth/token", {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: `username=${username}&password=${password}`,
-      });
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Login successful', data);
-        localStorage.setItem('access_token', data.access_token);
-        localStorage.setItem('refresh_token', data.refresh_token);
-        localStorage.setItem('token_type', data.token_type);
-        localStorage.setItem('role', data.role);
-        if (data.status == true) {
-          setSidebarType("student")
-          setIsAuthenticated(true);
-        }
+      const user: UserInfo | undefined = await Login({username:username, password:password});
+      const userInfo: UserInfo = user!;
+
+      if (typeof user !== 'undefined') {router.push('/')};
+      setUserInfo(userInfo);
+
+      if (userInfo.role == 'student') {
+        setSidebarType("student");
+        setIsAuthenticated(true);
+        router.push('/studentDashboard');
+      }else if (userInfo.role == 'admin') {
+        setSidebarType("admin");
+        setIsAuthenticated(true);
+        router.push('/adminDashboard');
+      } else {
+        setSidebarType("staff");
+        setIsAuthenticated(true);
+        router.push('/staffDashboard');
       }
     } catch (error) {
       console.error("Error logging in:", error);
+      throw new Error(`Error: ${error}`);
     }
   }
 
@@ -93,12 +105,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       return (
         <html lang="en">
           <body className={roboto.className} >
-            <Sidebar setIsAuthenticated={setIsAuthenticated} />
-            <MyPropContext.Provider value={myProp} >
-              <main className="flex-grow mx-auto py-8 bg-[#BFE7BF]">
-                {children}
-              </main>
-            </MyPropContext.Provider>
+            <Protected>
+              <Sidebar setIsAuthenticated={setIsAuthenticated} />
+              <MyPropContext.Provider value={myProp} >
+                <UserInfoContext.Provider value={userInfo}>
+                  <main className="flex-grow mx-auto py-8 bg-[#BFE7BF]">
+                    {children}
+                  </main>
+                </UserInfoContext.Provider>
+              </MyPropContext.Provider>
+            </Protected>
           </body >
         </html >
       );
@@ -107,12 +123,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       return (
         <html lang="en">
           <body className={roboto.className} >
-            <StaffSidebar setIsAuthenticated={setIsAuthenticated} />
-            <MyPropContext.Provider value={myProp} >
-              <main className="flex-grow mx-auto py-8 bg-[#BFE7BF]">
-                {children}
-              </main>
-            </MyPropContext.Provider>
+            <Protected>
+              <StaffSidebar setIsAuthenticated={setIsAuthenticated} />
+              <MyPropContext.Provider value={myProp} >
+                <UserInfoContext.Provider value={userInfo}>
+                  <main className="flex-grow mx-auto py-8 bg-[#BFE7BF]">
+                    {children}
+                  </main>
+                </UserInfoContext.Provider>
+              </MyPropContext.Provider>
+              
+            </Protected>
           </body >
         </html >
       );
@@ -121,12 +142,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       return (
         <html lang="en">
           <body className={roboto.className} >
-            <AdminSidebar setIsAuthenticated={setIsAuthenticated} />
-            <MyPropContext.Provider value={myProp} >
-              <main className="flex-grow mx-auto py-8 bg-[#BFE7BF]">
-                {children}
-              </main>
-            </MyPropContext.Provider>
+            <Protected>
+              <AdminSidebar setIsAuthenticated={setIsAuthenticated} />
+              <MyPropContext.Provider value={myProp} >
+                <UserInfoContext.Provider value={userInfo}>
+                  <main className="flex-grow mx-auto py-8 bg-[#BFE7BF]">
+                    {children}
+                  </main>
+                </UserInfoContext.Provider>
+              </MyPropContext.Provider>
+            </Protected>
           </body >
         </html >
       );
@@ -179,8 +204,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                       Password
                     </label>
                   </div>
-                  <button onClick={() => { setIsAuthenticated(true); setSidebarType("student") }} className=' text-white bg-[#58AE58] w-[80%] mx-auto text-center py-2 rounded-md mb-4'>Login</button>
-                  <p className=' w-[80%] mx-auto text-sm text-[#6E6E6E]'>Are you an admin? <span className=' text-[#379E37]'><button onClick={() => setFormType("admin-log-in")} className=' underline'>Log in as administartor</button></span></p>
+                  <button onClick={() => {handleLogin(); /* setIsAuthenticated(true); setSidebarType("student") */ }} className=' text-white bg-[#58AE58] w-[80%] mx-auto text-center py-2 rounded-md mb-4'>Login</button>
+                  {/* <p className=' w-[80%] mx-auto text-sm text-[#6E6E6E]'>Are you an admin? <span className=' text-[#379E37]'><button onClick={() => setFormType("admin-log-in")} className=' underline'>Log in as administartor</button></span></p> */}
                 </div>
               </div>
             </div>
