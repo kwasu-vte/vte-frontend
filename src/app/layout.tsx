@@ -10,6 +10,7 @@ import logo from '@/assets/kwasulogo.png'
 import Image from 'next/image'
 import Link from 'next/link'
 import AdminSidebar from "./components/AdminSidebar";
+import StaffSidebar from "./components/StaffSidebar";
 
 
 const inter = Inter({ subsets: ["latin"] });
@@ -25,7 +26,7 @@ export function useMyProp() {
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const myProp = "admin"
+  // const myProp = "admin"
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false)
   const [formType, setFormType] = useState<string>("log-in")
   const [sidebarType, setSidebarType] = useState<string>("student")
@@ -105,7 +106,22 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </body >
         </html >
       );
+    } else if (sidebarType == "staff") {
+      const myProp = "staff"
+      return (
+        <html lang="en">
+          <body className={roboto.className} >
+            <StaffSidebar setIsAuthenticated={setIsAuthenticated} />
+            <MyPropContext.Provider value={myProp} >
+              <main className="flex-grow mx-auto py-8 bg-[#BFE7BF]">
+                {children}
+              </main>
+            </MyPropContext.Provider>
+          </body >
+        </html >
+      );
     } else {
+      const myProp = "admin"
       return (
         <html lang="en">
           <body className={roboto.className} >
@@ -365,6 +381,103 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
                   <button onClick={() => { setIsAuthenticated(true); setSidebarType("admin") }} className=' text-white bg-[#58AE58] w-[80%] mx-auto text-center py-2 rounded-md mb-4'>Login</button>
                   <p className=' w-[80%] mx-auto text-sm text-[#6E6E6E]'>Are you a student? <span className=' text-[#379E37]'><button onClick={() => setFormType("log-in")} className=' underline'>Log in as student</button></span></p>
+                  <p className=' w-[80%] mx-auto text-sm text-[#6E6E6E]'>Are you a staff? <span className=' text-[#379E37]'><button onClick={() => setFormType("staff-log-in")} className=' underline'>Log in as staff</button></span></p>
+                </div>
+              </div>
+            </div>
+          </body >
+        </html >
+      );
+    } else if (isAuthenticated == false && formType === "staff-log-in") {
+      return (
+        <html lang="en">
+          <body className={roboto.className} >
+            <div className=' flex items-center justify-center h-[100vh] bg-[#BFE7BF]'>
+              <div className=' w-[80%] h-[80%] bg-white rounded-md flex items-center justify-between p-2'>
+                <div className=' w-[45%] flex flex-col items-start justify-start h-full'>
+                  <div className=' flex items-center justify-center mb-6'>
+                    <Image
+                      alt=''
+                      src={logo}
+                      height={100}
+                      width={100} />
+                    <h1 className=' text-[#DC9935] font-bold text-lg'>Kwara State <br /> University</h1>
+                  </div>
+
+                  <div className=' w-fit mx-auto mb-10'>
+                    <h1 className=' font-[800] text-6xl text-center mx-auto'>Welcome back</h1>
+                    <p className=' text-sm text-[#6E6E6E]'>Dont have an account? <span className=' text-[#379E37]'><button className=' underline' onClick={() => setFormType("sign-up")}>Sign up</button></span></p>
+                  </div>
+
+                  <div className="relative w-[80%] mx-auto mb-6">
+                    <input
+                      type="email"
+                      id="name"
+                      name="name"
+                      className=" placeholder:text-sm font-thin block w-full px-4 py-2 text-sm text-gray-900 border border-[#58AE58] rounded-lg focus:outline-none peer"
+                      placeholder="Enter your email"
+                    />
+                    <label
+
+                      className="absolute left-3 -top-2.5 px-1 bg-white text-sm text-black font-bold transition-all"
+                    >
+                      Email
+                    </label>
+                  </div>
+
+                  <div className="relative w-[80%] mx-auto mb-6">
+                    <input
+                      type="password"
+                      id="name"
+                      name="name"
+                      className=" placeholder:text-sm font-thin block w-full px-4 py-2 text-sm text-gray-900 border border-[#58AE58] rounded-lg focus:outline-none peer"
+                      placeholder="Enter your staff ID"
+                    />
+                    <label
+
+                      className="absolute left-3 -top-2.5 px-1 bg-white text-sm text-black font-bold transition-all"
+                    >
+                      Staff ID
+                    </label>
+                  </div>
+
+                  <div className="relative w-[80%] mx-auto mb-6">
+                    <input
+                      type="text"
+                      id="name"
+                      name="name"
+                      className=" placeholder:text-sm font-thin block w-full px-4 py-2 text-sm text-gray-900 border border-[#58AE58] rounded-lg focus:outline-none peer"
+                      placeholder="Enter your department"
+                    />
+                    <label
+
+                      className="absolute left-3 -top-2.5 px-1 bg-white text-sm text-black font-bold transition-all"
+                    >
+                      Department
+                    </label>
+                  </div>
+
+                  <div className="relative w-[80%] mx-auto mb-6">
+                    <input
+                      type="password"
+                      id="name"
+                      name="name"
+                      className=" placeholder:text-sm font-thin block w-full px-4 py-2 text-sm text-gray-900 border border-[#58AE58] rounded-lg focus:outline-none peer"
+                      placeholder="Enter your password"
+                    />
+                    <label
+
+                      className="absolute left-3 -top-2.5 px-1 bg-white text-sm text-black font-bold transition-all"
+                    >
+                      Password
+                    </label>
+                  </div>
+
+
+
+                  <button onClick={() => { setIsAuthenticated(true); setSidebarType("staff") }} className=' text-white bg-[#58AE58] w-[80%] mx-auto text-center py-2 rounded-md mb-4'>Login</button>
+                  <p className=' w-[80%] mx-auto text-sm text-[#6E6E6E]'>Are you a student? <span className=' text-[#379E37]'><button onClick={() => setFormType("log-in")} className=' underline'>Log in as student</button></span></p>
+                  <p className=' w-[80%] mx-auto text-sm text-[#6E6E6E]'>Are you an admin? <span className=' text-[#379E37]'><button onClick={() => setFormType("admin-log-in")} className=' underline'>Log in as administrator</button></span></p>
                 </div>
               </div>
             </div>
