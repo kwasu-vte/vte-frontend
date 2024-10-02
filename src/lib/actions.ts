@@ -24,6 +24,9 @@ export const Login = async(params: LoginType) => {
 
           localStorage.setItem('access_token', data.access_token);
           localStorage.setItem('refresh_token', data.refresh_token);
+          localStorage.setItem('first_name', data.first_name || '');
+          localStorage.setItem('last_name', data.last_name || '');
+          localStorage.setItem('email', data.email || '');
           localStorage.setItem('role', data.role);
           sessionStorage.setItem("login_status", "1")
 
