@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { Book, Group, HomeRounded, Layers, LogoutRounded, Person2, Settings, WalletRounded } from '@mui/icons-material'
 import customer from '@/assets/customerSupport.png'
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import { Logout } from '@/lib/utils';
 
 interface AdminSidebarProps {
     setIsAuthenticated: (value: boolean) => void;
@@ -16,6 +17,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ setIsAuthenticated }) => {
         if (typeof window !== 'undefined') {
             setCurrentPath(window.location.pathname);
         }
+        /* verify if user is actually an admin */
     }, []);
 
 
@@ -121,7 +123,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ setIsAuthenticated }) => {
                     <h1 className=' text-white mt-4'>Customer Support</h1>
                 </div>
 
-                <Link href={'/'}><button onClick={() => setIsAuthenticated(false)} className=' bg-[#9BCE9B] text-[#0B200B] px-2 rounded-md py-1 hover:px-4 duration-500'><LogoutRounded className=' mx-2' /> Logout</button></Link>
+                <Link href={'/'}><button onClick={() => {setIsAuthenticated(false); Logout()}} className=' bg-[#9BCE9B] text-[#0B200B] px-2 rounded-md py-1 hover:px-4 duration-500'><LogoutRounded className=' mx-2' /> Logout</button></Link>
             </div>
         </div>
     )

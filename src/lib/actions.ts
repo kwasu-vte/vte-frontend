@@ -25,6 +25,7 @@ export const Login = async(params: LoginType) => {
           localStorage.setItem('access_token', data.access_token);
           localStorage.setItem('refresh_token', data.refresh_token);
           localStorage.setItem('role', data.role);
+          sessionStorage.setItem("login_status", "1")
 
           return data
 
@@ -35,15 +36,8 @@ export const Login = async(params: LoginType) => {
       }
 }
 
-export const confirmAuthStatus = async (params:Tokens) => {
-  if (!params.access_token || !params.refresh_token) {
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("refresh_token");
-    localStorage.removeItem("role");
-    redirect("/")
-  }
+export const statusBasemodel = async (params:Tokens) => {
   const data = {"access_token":params.access_token}
-
   try{
     const response = await fetch(`${API_URL}api/auth/refresh_token`, {
       method: 'POST',
@@ -59,13 +53,16 @@ export const confirmAuthStatus = async (params:Tokens) => {
       if (data.refreshed) {
         localStorage.removeItem("access_token");
         localStorage.setItem("access_token", data.access_token);
+
+        return true
       }
     }else {
       localStorage.removeItem("access_token");
       localStorage.removeItem("refresh_token");
       localStorage.removeItem("role");
+      sessionStorage.removeItem("login_status")
 
-      redirect("/")
+      return false
     }
 
   }catch (error) {
@@ -73,7 +70,42 @@ export const confirmAuthStatus = async (params:Tokens) => {
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
     localStorage.removeItem("role");
+    sessionStorage.removeItem("login_status")
 
-    redirect("/")
+    return false
   }
+}
+
+export const confirmAuthStatus = async (params:Tokens) => {
+  if (!params.access_token || !params.refresh_token) {
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
+    localStorage.removeItem("role");
+    sessionStorage.removeItem("login_status")
+    redirect("")
+  }
+
+  const confirm = statusBasemodel(params);
+  if (!confirm) {
+    redirect("")
+  }
+
+}
+
+export const checkLoginStatus = async () => {
+  const access_token = localStorage.getItem("access_token")!;
+  const refresh_token = localStorage.getItem("refresh_token")!;
+  const role = localStorage.getItem("role");
+
+  if (!access_token && !refresh_token && !role) {
+    return false
+  }
+  
+  const data: Tokens = {"access_token": access_token, "refresh_token": refresh_token}
+  const confirm = statusBasemodel(data);
+  if (!confirm) {
+    return false
+  }
+  return true
+
 }

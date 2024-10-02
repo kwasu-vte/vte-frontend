@@ -4,16 +4,17 @@ import { Urbanist } from "next/font/google";
 import { Roboto } from "next/font/google";
 import "./globals.css";
 import Sidebar from "./components/Sidebar";
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import logo from '@/assets/kwasulogo.png';
 import Image from 'next/image'
 import Link from 'next/link'
 import AdminSidebar from "./components/AdminSidebar";
 import StaffSidebar from "./components/StaffSidebar";
-import {Login} from "@/lib/actions";
+import {checkLoginStatus, Login} from "@/lib/actions";
 import { UserInfo } from "@/lib/definitions";
 import { useRouter } from "next/navigation";
 import { Protected } from "@/components/protected";
+import { LoginStatus } from "@/components/loginStatus";
 
 
 const inter = Inter({ subsets: ["latin"] });
@@ -41,6 +42,24 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const [sidebarType, setSidebarType] = useState<string>("student")
   const [userInfo, setUserInfo] = useState<UserInfo|null>(null)
   const router = useRouter();
+
+  /* const savedLoginStatus = sessionStorage.getItem("login_status")
+  if (savedLoginStatus == "1") {
+    setIsAuthenticated(true);
+  } */
+
+  /* useEffect(() => {
+
+    const loginStatus = async ()=>{
+      const status = await checkLoginStatus();
+      setIsAuthenticated(status);
+    };
+
+    return () => {
+      loginStatus();
+    };
+
+  }, []); */
 
   const handleLogin = async () => {
     const username = (document.querySelector('input[type="text"]') as HTMLInputElement).value;
@@ -162,6 +181,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       return (
         <html lang="en">
           <body className={roboto.className} >
+          <LoginStatus setIsAuthenticated={setIsAuthenticated}>
             <div className=' flex items-center justify-center h-[100vh] bg-[#BFE7BF]'>
               <div className=' w-[80%] h-[80%] bg-white rounded-md flex items-center justify-between p-2'>
                 <div className=' w-[45%] flex flex-col items-start justify-start h-full'>
@@ -209,6 +229,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 </div>
               </div>
             </div>
+          </LoginStatus>
           </body >
         </html >
       );
@@ -413,6 +434,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       return (
         <html lang="en">
           <body className={roboto.className} >
+          <LoginStatus setIsAuthenticated={setIsAuthenticated}>
             <div className=' flex items-center justify-center h-[100vh] bg-[#BFE7BF]'>
               <div className=' w-[80%] h-[80%] bg-white rounded-md flex items-center justify-between p-2'>
                 <div className=' w-[45%] flex flex-col items-start justify-start h-full'>
@@ -502,6 +524,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 </div>
               </div>
             </div>
+          </LoginStatus>
           </body >
         </html >
       );

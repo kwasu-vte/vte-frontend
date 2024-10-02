@@ -7,8 +7,9 @@ import { Book, CalendarMonth, Group, HomeRounded, Layers, LogoutRounded, Person2
 import customer from '@/assets/customerSupport.png'
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { Calendar, CalendarCog } from 'lucide-react';
+import { Logout } from '@/lib/utils';
 
-const StaffSidebar = ({ setIsAuthenticated }) => {
+const StaffSidebar = ({setIsAuthenticated}: {setIsAuthenticated: (value: boolean) => void}) => {
     const [currentPath, setCurrentPath] = useState('');
     useEffect(() => {
         if (typeof window !== 'undefined') {
@@ -80,7 +81,7 @@ const StaffSidebar = ({ setIsAuthenticated }) => {
                     <h1 className=' text-white mt-4'>Customer Support</h1>
                 </div>
 
-                <Link href={'/'}><button onClick={() => setIsAuthenticated(false)} className=' bg-[#9BCE9B] text-[#0B200B] px-2 rounded-md py-1 hover:px-4 duration-500'><LogoutRounded className=' mx-2' /> Logout</button></Link>
+                <Link href={'/'}><button onClick={() => {setIsAuthenticated(false); Logout()}} className=' bg-[#9BCE9B] text-[#0B200B] px-2 rounded-md py-1 hover:px-4 duration-500'><LogoutRounded className=' mx-2' /> Logout</button></Link>
             </div>
         </div>
     )
