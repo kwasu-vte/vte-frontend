@@ -3,12 +3,13 @@ import React, { useEffect, useState } from 'react'
 import logo from '../../assets/kwasulogo.png'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Book, HomeRounded, LogoutRounded, Settings, WalletRounded } from '@mui/icons-material'
+import { Book, CalendarMonth, Group, HomeRounded, Layers, LogoutRounded, Person2, Settings, WalletRounded } from '@mui/icons-material'
 import customer from '@/assets/customerSupport.png'
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import { Calendar, CalendarCog } from 'lucide-react';
 import { Logout } from '@/lib/utils';
 
-const Sidebar = ({ setIsAuthenticated }: {setIsAuthenticated: (value: boolean) => void}) => {
+const StaffSidebar = ({setIsAuthenticated}: {setIsAuthenticated: (value: boolean) => void}) => {
     const [currentPath, setCurrentPath] = useState('');
     useEffect(() => {
         if (typeof window !== 'undefined') {
@@ -29,10 +30,10 @@ const Sidebar = ({ setIsAuthenticated }: {setIsAuthenticated: (value: boolean) =
                         className=' m-auto'
                     />
                     <div className=' w-full'>
-                        <Link href="/studentDashboard" onClick={() => setCurrentPath('/studentDashboard')}>
+                        <Link href="/adminDashboard" onClick={() => setCurrentPath('/adminDashboard')}>
                             <div
                                 className={
-                                    currentPath === '/studentDashboard'
+                                    currentPath === '/adminDashboard'
                                         ? 'flex items-center justify-start w-[80%] px-2 duration-500 text-[#379E37] bg-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'
                                         : 'flex items-center justify-start w-[80%] px-2 duration-500 text-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'
                                 }
@@ -42,36 +43,23 @@ const Sidebar = ({ setIsAuthenticated }: {setIsAuthenticated: (value: boolean) =
                             </div>
                         </Link>
 
-                        <Link href="/courses" onClick={() => setCurrentPath('/courses')}>
+                        <Link href="/staffManagement" onClick={() => setCurrentPath('/staffManagement')}>
                             <div
                                 className={
-                                    currentPath === '/courses'
+                                    currentPath === '/staffManagement'
                                         ? 'flex items-center justify-start w-[80%] px-2 duration-500 text-[#379E37] bg-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'
                                         : 'flex items-center justify-start w-[80%] px-2 duration-500 text-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'
                                 }
                             >
-                                <Book className=' mx-2' />
-                                Course
+                                <CalendarMonth className=' mx-2' />
+                                Attendance
                             </div>
                         </Link>
 
-                        <Link href="/payment" onClick={() => setCurrentPath('/payment')}>
+                        <Link href="/groupManagement" onClick={() => setCurrentPath('/groupManagement')}>
                             <div
                                 className={
-                                    currentPath === '/payment'
-                                        ? 'flex items-center justify-start w-[80%] px-2 duration-500 text-[#379E37] bg-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'
-                                        : 'flex items-center justify-start w-[80%] px-2 duration-500 text-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'
-                                }
-                            >
-                                <WalletRounded className=' mx-2' />
-                                Payment
-                            </div>
-                        </Link>
-
-                        <Link href="/settings" onClick={() => setCurrentPath('/settings')}>
-                            <div
-                                className={
-                                    currentPath === '/settings'
+                                    currentPath === '/groupManagement'
                                         ? 'flex items-center justify-start w-[80%] px-2 duration-500 text-[#379E37] bg-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'
                                         : 'flex items-center justify-start w-[80%] px-2 duration-500 text-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'
                                 }
@@ -93,10 +81,10 @@ const Sidebar = ({ setIsAuthenticated }: {setIsAuthenticated: (value: boolean) =
                     <h1 className=' text-white mt-4'>Customer Support</h1>
                 </div>
 
-                <Link href={'/'}><button onClick={() => {setIsAuthenticated(false); Logout() }} className=' bg-[#9BCE9B] text-[#0B200B] px-2 rounded-md py-1 hover:px-4 duration-500'><LogoutRounded className=' mx-2' /> Logout</button></Link>
+                <Link href={'/'}><button onClick={() => {setIsAuthenticated(false); Logout()}} className=' bg-[#9BCE9B] text-[#0B200B] px-2 rounded-md py-1 hover:px-4 duration-500'><LogoutRounded className=' mx-2' /> Logout</button></Link>
             </div>
         </div>
     )
 }
 
-export default Sidebar
+export default StaffSidebar
