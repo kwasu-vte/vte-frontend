@@ -18,16 +18,31 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useEffect, useState } from "react";
-const lastName = "Ojuoye";
-const firstName = "Moshood";
-const level = "";
-const groupName = "";
-const groupNo = "40";
-const groupWhatsappLink = "40";
-//const groupWhatsappLink = "40";
 
 const page = () => {
+  let accessToken = "ave"; //localStorage.getItem("access_token");
+  let lastName = "bob"; //localStorage.getItem("last_name");
+  let firstName = "alice"; //localStorage.getItem("first_name");
+  let level = "200"; //localStorage.getItem("first_name");
+  let groupName = "DEV Club"; //localStorage.getItem("group_name");
+  let groupNo = 34; //localStorage.getItem("first_name");
+  let groupWhatsappLink = "www.whatapp.me/yedhdgccvfcvhvg/2";
+  let currentDate = "01/02/2024";
+
+  // let accessToken = localStorage.getItem("access_token");
+  //lastName = localStorage.getItem("last_name");
+  // let firstName = localStorage.getItem("first_name");
+  // let l45evel = "200"; //localStorage.getItem("first_name");
+  // let groupName = "DEV Club"; //localStorage.getItem("group_name");
+  // let groupNo = 34; //localStorage.getItem("first_name");
+  // let groupWhatsappLink = "www.whatapp.me/yedhdgccvfcvhvg/2"; //localStorage.getItem("first_name");
+  // let currentDate = "01/02/2024"; //new Date();
+  const fetchData = async () => {
+    const response = await fetch("/api/students"); // Replace with your API endpoint
+    const data = await response.json();
+    console.log(data);
+  };
+
   return (
     <div className=" w-full h-[100vh] overflow-hidden pl-[20%] py-2 pr-4">
       <div className=" h-[60px] w-full bg-white rounded-md flex items-center justify-between p-2 mb-4">
@@ -49,7 +64,7 @@ const page = () => {
               {lastName} {firstName}
             </h1>
             <p className=" uppercase text-[#379E37] text-xs font-bold">
-              200LVL
+              {level}LVL
             </p>
           </div>
         </div>
@@ -65,7 +80,7 @@ const page = () => {
         <div className=" flex items-center justify-center bg-white p-2 rounded-md">
           <CalendarMonth className=" text-[#379E37]" />
           <select name="" id="" className=" mx-4 appearance-none">
-            <option value="">August 16, 2024</option>
+            <option value="">{currentDate}</option>
           </select>
         </div>
       </div>

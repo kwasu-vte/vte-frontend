@@ -1,5 +1,5 @@
 "use client";
-import React from 'react'
+import React from "react";
 import {
   CalendarMonth,
   CalendarViewDayRounded,
@@ -20,17 +20,16 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import barchart from "@/assets/BarLineChart.png";
-import '@/app/Calendar.css'
-import FullCalendar from '@fullcalendar/react';
-import dayGridPlugin from '@fullcalendar/daygrid';
+import "@/app/Calendar.css";
+import FullCalendar from "@fullcalendar/react";
+import dayGridPlugin from "@fullcalendar/daygrid";
 
-
-const lastName = "Ojuoye";
-const firstName = "Moshood";
-const level = "";
-const groupName = "";
-const groupNo = "40";
-const groupWhatsappLink = "40";
+// const lastName = "Ojuoye";
+// const firstName = "Moshood";
+// const level = "";
+// const groupName = "";
+// const groupNo = "40";
+// const groupWhatsappLink = "40";
 
 const page = () => {
   return (
@@ -76,41 +75,39 @@ const page = () => {
 
       <div className=" h-[70vh] mb-4 w-full flex items-start justify-between">
         <div className=" w-[45%] flex flex-col items-start justify-start ">
-          <div className=' border-b-2 border-b-[#7ABE7A] w-full mb-8 pb-8'>
-            <h1 className=" font-extrabold text-[#379E37] mb-4">
-              Overview
-            </h1>
-            <div className=' w-full flex items-center justify-between mb-4'>
-              <div className=' bg-white flex items-center justify-between rounded-md py-2 px-6 w-[45%]'>
+          <div className=" border-b-2 border-b-[#7ABE7A] w-full mb-8 pb-8">
+            <h1 className=" font-extrabold text-[#379E37] mb-4">Overview</h1>
+            <div className=" w-full flex items-center justify-between mb-4">
+              <div className=" bg-white flex items-center justify-between rounded-md py-2 px-6 w-[45%]">
                 <Image src={group} width={50} alt="" height={30} />
-                <div className=' text-center w-[80%] flex flex-col items-center justify-center'>
-                  <h3 className=' text-sm font-semibold'>Total Students</h3>
-                  <h1 className=' font-extrabold text-4xl'>1,595</h1>
+                <div className=" text-center w-[80%] flex flex-col items-center justify-center">
+                  <h3 className=" text-sm font-semibold">Total Students</h3>
+                  <h1 className=" font-extrabold text-4xl">1,595</h1>
                 </div>
               </div>
 
-              <div className=' bg-white flex items-center justify-between rounded-md py-2 px-6 w-[45%]'>
+              <div className=" bg-white flex items-center justify-between rounded-md py-2 px-6 w-[45%]">
                 <Image src={group} width={50} alt="" height={30} />
-                <div className=' text-center w-[80%] flex flex-col items-center justify-center'>
-                  <h3 className=' text-sm font-semibold'>Total Staff</h3>
-                  <h1 className=' font-extrabold text-4xl'>52</h1>
+                <div className=" text-center w-[80%] flex flex-col items-center justify-center">
+                  <h3 className=" text-sm font-semibold">Total Staff</h3>
+                  <h1 className=" font-extrabold text-4xl">52</h1>
                 </div>
               </div>
             </div>
-            <div className=' w-full flex items-center justify-between'>
-              <div className=' bg-white flex items-center justify-between rounded-md py-2 px-6 w-[45%]'>
+            <div className=" w-full flex items-center justify-between">
+              <div className=" bg-white flex items-center justify-between rounded-md py-2 px-6 w-[45%]">
                 <Image src={group} width={50} alt="" height={30} />
-                <div className=' text-center w-[80%] flex flex-col items-center justify-center'>
-                  <h3 className=' text-sm font-semibold'>Courses</h3>
-                  <h1 className=' font-extrabold text-4xl'>17</h1>
+                <div className=" text-center w-[80%] flex flex-col items-center justify-center">
+                  <h3 className=" text-sm font-semibold">Courses</h3>
+                  <h1 className=" font-extrabold text-4xl">17</h1>
                 </div>
               </div>
 
-              <div className=' bg-white flex items-center justify-between rounded-md py-2 px-6 w-[45%]'>
+              <div className=" bg-white flex items-center justify-between rounded-md py-2 px-6 w-[45%]">
                 <Image src={group} width={50} alt="" height={30} />
-                <div className=' text-center w-[80%] flex flex-col items-center justify-center'>
-                  <h3 className=' text-sm font-semibold'>Groups</h3>
-                  <h1 className=' font-extrabold text-4xl'>150</h1>
+                <div className=" text-center w-[80%] flex flex-col items-center justify-center">
+                  <h3 className=" text-sm font-semibold">Groups</h3>
+                  <h1 className=" font-extrabold text-4xl">150</h1>
                 </div>
               </div>
             </div>
@@ -132,117 +129,143 @@ const page = () => {
           <h1 className=" font-extrabold text-[#379E37] mb-4">
             Calendar and Tasks
           </h1>
-          <div className=' w-full bg-white p-3 rounded-lg'>
-            <div className=' w-full flex items-end justify-between bg-white rounded-lg mb-4'>
+          <div className=" w-full bg-white p-3 rounded-lg">
+            <div className=" w-full flex items-end justify-between bg-white rounded-lg mb-4">
               <FullCalendar
                 plugins={[dayGridPlugin]}
                 initialView="dayGridMonth"
                 events={[
-                  { title: 'Test', date: '2024-09-20' },
-                  { title: 'Pract.', date: '2024-09-25' },
-                  { title: 'Assgn.', date: '2024-10-02' }
+                  { title: "Test", date: "2024-09-20" },
+                  { title: "Pract.", date: "2024-09-25" },
+                  { title: "Assgn.", date: "2024-10-02" },
                 ]}
               />
 
-              <div className=' w-[25%]'>
+              <div className=" w-[25%]">
                 <h1 className=" font-extrabold text-[#379E37] mb-4 text-sm">
                   Task / Reminder
                 </h1>
-                <div className=' h-[300px] w-full overflow-scroll bg-[#D7ECD7] rounded-md'></div>
+                <div className=" h-[300px] w-full overflow-scroll bg-[#D7ECD7] rounded-md"></div>
               </div>
             </div>
-            <div className=' w-full overflow-scroll h-[150px]'>
-              <div className=' cursor-pointer group hover:text-white duration-500 hover:bg-[#379E37] bg-[#D7D6FF4D] w-full rounded-md flex items-end justify-between  px-4 py-6 mb-4 shadow-sm shadow-slate-400'>
-                <div className=' flex items-center justify-center'>
-                  <HeartBrokenSharp className=' text-[#379E37] mx-4 group-hover:text-white duration-500' />
+            <div className=" w-full overflow-scroll h-[150px]">
+              <div className=" cursor-pointer group hover:text-white duration-500 hover:bg-[#379E37] bg-[#D7D6FF4D] w-full rounded-md flex items-end justify-between  px-4 py-6 mb-4 shadow-sm shadow-slate-400">
+                <div className=" flex items-center justify-center">
+                  <HeartBrokenSharp className=" text-[#379E37] mx-4 group-hover:text-white duration-500" />
                   <div>
-                    <h1 className=' p-0 m-0 font-semibold text-lg'>New Payment</h1>
-                    <p className=' text-xs p-0 m-0'>Adepoju Raphael paid 1,100 for Tailoring ...</p>
+                    <h1 className=" p-0 m-0 font-semibold text-lg">
+                      New Payment
+                    </h1>
+                    <p className=" text-xs p-0 m-0">
+                      Adepoju Raphael paid 1,100 for Tailoring ...
+                    </p>
                   </div>
                 </div>
 
-                <h1 className=' font-thin text-xs'>Just Now</h1>
+                <h1 className=" font-thin text-xs">Just Now</h1>
               </div>
 
-              <div className=' cursor-pointer group hover:text-white duration-500 hover:bg-[#379E37] bg-[#D7D6FF4D] w-full rounded-md flex items-end justify-between  px-4 py-6 mb-4 shadow-sm shadow-slate-400'>
-                <div className=' flex items-center justify-center'>
-                  <HeartBrokenSharp className=' text-[#379E37] mx-4 group-hover:text-white duration-500' />
+              <div className=" cursor-pointer group hover:text-white duration-500 hover:bg-[#379E37] bg-[#D7D6FF4D] w-full rounded-md flex items-end justify-between  px-4 py-6 mb-4 shadow-sm shadow-slate-400">
+                <div className=" flex items-center justify-center">
+                  <HeartBrokenSharp className=" text-[#379E37] mx-4 group-hover:text-white duration-500" />
                   <div>
-                    <h1 className=' p-0 m-0 font-semibold text-lg'>New Payment</h1>
-                    <p className=' text-xs p-0 m-0'>Adepoju Raphael paid 1,100 for Tailoring ...</p>
+                    <h1 className=" p-0 m-0 font-semibold text-lg">
+                      New Payment
+                    </h1>
+                    <p className=" text-xs p-0 m-0">
+                      Adepoju Raphael paid 1,100 for Tailoring ...
+                    </p>
                   </div>
                 </div>
 
-                <h1 className=' font-thin text-xs'>Just Now</h1>
+                <h1 className=" font-thin text-xs">Just Now</h1>
               </div>
 
-              <div className=' cursor-pointer group hover:text-white duration-500 hover:bg-[#379E37] bg-[#D7D6FF4D] w-full rounded-md flex items-end justify-between  px-4 py-6 mb-4 shadow-sm shadow-slate-400'>
-                <div className=' flex items-center justify-center'>
-                  <HeartBrokenSharp className=' text-[#379E37] mx-4 group-hover:text-white duration-500' />
+              <div className=" cursor-pointer group hover:text-white duration-500 hover:bg-[#379E37] bg-[#D7D6FF4D] w-full rounded-md flex items-end justify-between  px-4 py-6 mb-4 shadow-sm shadow-slate-400">
+                <div className=" flex items-center justify-center">
+                  <HeartBrokenSharp className=" text-[#379E37] mx-4 group-hover:text-white duration-500" />
                   <div>
-                    <h1 className=' p-0 m-0 font-semibold text-lg'>New Payment</h1>
-                    <p className=' text-xs p-0 m-0'>Adepoju Raphael paid 1,100 for Tailoring ...</p>
+                    <h1 className=" p-0 m-0 font-semibold text-lg">
+                      New Payment
+                    </h1>
+                    <p className=" text-xs p-0 m-0">
+                      Adepoju Raphael paid 1,100 for Tailoring ...
+                    </p>
                   </div>
                 </div>
 
-                <h1 className=' font-thin text-xs'>Just Now</h1>
+                <h1 className=" font-thin text-xs">Just Now</h1>
               </div>
 
-              <div className=' cursor-pointer group hover:text-white duration-500 hover:bg-[#379E37] bg-[#D7D6FF4D] w-full rounded-md flex items-end justify-between  px-4 py-6 mb-4 shadow-sm shadow-slate-400'>
-                <div className=' flex items-center justify-center'>
-                  <HeartBrokenSharp className=' text-[#379E37] mx-4 group-hover:text-white duration-500' />
+              <div className=" cursor-pointer group hover:text-white duration-500 hover:bg-[#379E37] bg-[#D7D6FF4D] w-full rounded-md flex items-end justify-between  px-4 py-6 mb-4 shadow-sm shadow-slate-400">
+                <div className=" flex items-center justify-center">
+                  <HeartBrokenSharp className=" text-[#379E37] mx-4 group-hover:text-white duration-500" />
                   <div>
-                    <h1 className=' p-0 m-0 font-semibold text-lg'>New Payment</h1>
-                    <p className=' text-xs p-0 m-0'>Adepoju Raphael paid 1,100 for Tailoring ...</p>
+                    <h1 className=" p-0 m-0 font-semibold text-lg">
+                      New Payment
+                    </h1>
+                    <p className=" text-xs p-0 m-0">
+                      Adepoju Raphael paid 1,100 for Tailoring ...
+                    </p>
                   </div>
                 </div>
 
-                <h1 className=' font-thin text-xs'>Just Now</h1>
+                <h1 className=" font-thin text-xs">Just Now</h1>
               </div>
 
-              <div className=' cursor-pointer group hover:text-white duration-500 hover:bg-[#379E37] bg-[#D7D6FF4D] w-full rounded-md flex items-end justify-between  px-4 py-6 mb-4 shadow-sm shadow-slate-400'>
-                <div className=' flex items-center justify-center'>
-                  <HeartBrokenSharp className=' text-[#379E37] mx-4 group-hover:text-white duration-500' />
+              <div className=" cursor-pointer group hover:text-white duration-500 hover:bg-[#379E37] bg-[#D7D6FF4D] w-full rounded-md flex items-end justify-between  px-4 py-6 mb-4 shadow-sm shadow-slate-400">
+                <div className=" flex items-center justify-center">
+                  <HeartBrokenSharp className=" text-[#379E37] mx-4 group-hover:text-white duration-500" />
                   <div>
-                    <h1 className=' p-0 m-0 font-semibold text-lg'>New Payment</h1>
-                    <p className=' text-xs p-0 m-0'>Adepoju Raphael paid 1,100 for Tailoring ...</p>
+                    <h1 className=" p-0 m-0 font-semibold text-lg">
+                      New Payment
+                    </h1>
+                    <p className=" text-xs p-0 m-0">
+                      Adepoju Raphael paid 1,100 for Tailoring ...
+                    </p>
                   </div>
                 </div>
 
-                <h1 className=' font-thin text-xs'>Just Now</h1>
+                <h1 className=" font-thin text-xs">Just Now</h1>
               </div>
 
-              <div className=' cursor-pointer group hover:text-white duration-500 hover:bg-[#379E37] bg-[#D7D6FF4D] w-full rounded-md flex items-end justify-between  px-4 py-6 mb-4 shadow-sm shadow-slate-400'>
-                <div className=' flex items-center justify-center'>
-                  <HeartBrokenSharp className=' text-[#379E37] mx-4 group-hover:text-white duration-500' />
+              <div className=" cursor-pointer group hover:text-white duration-500 hover:bg-[#379E37] bg-[#D7D6FF4D] w-full rounded-md flex items-end justify-between  px-4 py-6 mb-4 shadow-sm shadow-slate-400">
+                <div className=" flex items-center justify-center">
+                  <HeartBrokenSharp className=" text-[#379E37] mx-4 group-hover:text-white duration-500" />
                   <div>
-                    <h1 className=' p-0 m-0 font-semibold text-lg'>New Payment</h1>
-                    <p className=' text-xs p-0 m-0'>Adepoju Raphael paid 1,100 for Tailoring ...</p>
+                    <h1 className=" p-0 m-0 font-semibold text-lg">
+                      New Payment
+                    </h1>
+                    <p className=" text-xs p-0 m-0">
+                      Adepoju Raphael paid 1,100 for Tailoring ...
+                    </p>
                   </div>
                 </div>
 
-                <h1 className=' font-thin text-xs'>Just Now</h1>
+                <h1 className=" font-thin text-xs">Just Now</h1>
               </div>
 
-              <div className=' cursor-pointer group hover:text-white duration-500 hover:bg-[#379E37] bg-[#D7D6FF4D] w-full rounded-md flex items-end justify-between  px-4 py-6 mb-4 shadow-sm shadow-slate-400'>
-                <div className=' flex items-center justify-center'>
-                  <HeartBrokenSharp className=' text-[#379E37] mx-4 group-hover:text-white duration-500' />
+              <div className=" cursor-pointer group hover:text-white duration-500 hover:bg-[#379E37] bg-[#D7D6FF4D] w-full rounded-md flex items-end justify-between  px-4 py-6 mb-4 shadow-sm shadow-slate-400">
+                <div className=" flex items-center justify-center">
+                  <HeartBrokenSharp className=" text-[#379E37] mx-4 group-hover:text-white duration-500" />
                   <div>
-                    <h1 className=' p-0 m-0 font-semibold text-lg'>New Payment</h1>
-                    <p className=' text-xs p-0 m-0'>Adepoju Raphael paid 1,100 for Tailoring ...</p>
+                    <h1 className=" p-0 m-0 font-semibold text-lg">
+                      New Payment
+                    </h1>
+                    <p className=" text-xs p-0 m-0">
+                      Adepoju Raphael paid 1,100 for Tailoring ...
+                    </p>
                   </div>
                 </div>
 
-                <h1 className=' font-thin text-xs'>Just Now</h1>
+                <h1 className=" font-thin text-xs">Just Now</h1>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <h1 className=" font-extrabold text-[#379E37] mb-4">
-        Recent Payments
-      </h1>
+      <h1 className=" font-extrabold text-[#379E37] mb-4">Recent Payments</h1>
       <div className=" h-[400px] w-full overflow-scroll rounded-md">
         <Table className=" rounded-md bg-white h-[200px] overflow-y-scroll">
           <TableHeader className="">
@@ -432,7 +455,7 @@ const page = () => {
         </Table>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default page
+export default page;
