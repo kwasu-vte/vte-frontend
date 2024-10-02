@@ -3,21 +3,18 @@ import React, { useEffect, useState } from 'react'
 import logo from '../../assets/kwasulogo.png'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Book, Group, HomeRounded, Layers, LogoutRounded, Person2, Settings, WalletRounded } from '@mui/icons-material'
+import { Book, CalendarMonth, Group, HomeRounded, Layers, LogoutRounded, Person2, Settings, WalletRounded } from '@mui/icons-material'
 import customer from '@/assets/customerSupport.png'
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import { Calendar, CalendarCog } from 'lucide-react';
 import { Logout } from '@/lib/utils';
 
-interface AdminSidebarProps {
-    setIsAuthenticated: (value: boolean) => void;
-}
-const AdminSidebar: React.FC<AdminSidebarProps> = ({ setIsAuthenticated }) => {
+const StaffSidebar = ({setIsAuthenticated}: {setIsAuthenticated: (value: boolean) => void}) => {
     const [currentPath, setCurrentPath] = useState('');
     useEffect(() => {
         if (typeof window !== 'undefined') {
             setCurrentPath(window.location.pathname);
         }
-        /* verify if user is actually an admin */
     }, []);
 
 
@@ -54,47 +51,8 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ setIsAuthenticated }) => {
                                         : 'flex items-center justify-start w-[80%] px-2 duration-500 text-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'
                                 }
                             >
-                                <Person2 className=' mx-2' />
-                                Staff Mgt.
-                            </div>
-                        </Link>
-
-                        <Link href="/studentManagement" onClick={() => setCurrentPath('/studentManagement')}>
-                            <div
-                                className={
-                                    currentPath === '/studentManagement'
-                                        ? 'flex items-center justify-start w-[80%] px-2 duration-500 text-[#379E37] bg-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'
-                                        : 'flex items-center justify-start w-[80%] px-2 duration-500 text-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'
-                                }
-                            >
-                                <Person2 className=' mx-2' />
-                                Student Mgt.
-                            </div>
-                        </Link>
-
-                        <Link href="/adminApproval" onClick={() => setCurrentPath('/adminApproval')}>
-                            <div
-                                className={
-                                    currentPath === '/adminApproval'
-                                        ? 'flex items-center justify-start w-[80%] px-2 duration-500 text-[#379E37] bg-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'
-                                        : 'flex items-center justify-start w-[80%] px-2 duration-500 text-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'
-                                }
-                            >
-                                <Layers className=' mx-2' />
-                                Approval
-                            </div>
-                        </Link>
-
-                        <Link href="/courseManagement" onClick={() => setCurrentPath('/courseManagement')}>
-                            <div
-                                className={
-                                    currentPath === '/courseManagement'
-                                        ? 'flex items-center justify-start w-[80%] px-2 duration-500 text-[#379E37] bg-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'
-                                        : 'flex items-center justify-start w-[80%] px-2 duration-500 text-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'
-                                }
-                            >
-                                <Group className=' mx-2' />
-                                Course Mgt.
+                                <CalendarMonth className=' mx-2' />
+                                Attendance
                             </div>
                         </Link>
 
@@ -106,8 +64,8 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ setIsAuthenticated }) => {
                                         : 'flex items-center justify-start w-[80%] px-2 duration-500 text-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'
                                 }
                             >
-                                <Group className=' mx-2' />
-                                Group Mgt.
+                                <Settings className=' mx-2' />
+                                Settings
                             </div>
                         </Link>
                     </div>
@@ -129,4 +87,4 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ setIsAuthenticated }) => {
     )
 }
 
-export default AdminSidebar
+export default StaffSidebar

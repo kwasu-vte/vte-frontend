@@ -95,6 +95,7 @@ export default function RootLayout({
       }
     } catch (error) {
       console.error("Error logging in:", error);
+      console.error("Error logging in:", error);
     }
   };
 
@@ -248,7 +249,31 @@ export default function RootLayout({
                       Name
                     </label>
                   </div>
+                  <div className="relative w-[80%] mx-auto mb-6">
+                    <input
+                      type="text"
+                      id="name"
+                      name="name"
+                      className=" placeholder:text-sm font-thin block w-full px-4 py-2 text-sm text-gray-900 border border-[#58AE58] rounded-lg focus:outline-none peer"
+                      placeholder="Enter your name"
+                    />
+                    <label className="absolute left-3 -top-2.5 px-1 bg-white text-sm text-black font-bold transition-all">
+                      Name
+                    </label>
+                  </div>
 
+                  <div className="relative w-[80%] mx-auto mb-6">
+                    <input
+                      type="email"
+                      id="name"
+                      name="name"
+                      className=" placeholder:text-sm font-thin block w-full px-4 py-2 text-sm text-gray-900 border border-[#58AE58] rounded-lg focus:outline-none peer"
+                      placeholder="Enter your email"
+                    />
+                    <label className="absolute left-3 -top-2.5 px-1 bg-white text-sm text-black font-bold transition-all">
+                      Email
+                    </label>
+                  </div>
                   <div className="relative w-[80%] mx-auto mb-6">
                     <input
                       type="email"

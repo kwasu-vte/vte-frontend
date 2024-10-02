@@ -1,23 +1,28 @@
 "use client";
 import React from 'react'
 import Dashboard from '@/app/studentDashboard/page'
+import { useMyProp } from './layout';
+import AdminDashboard from '@/app/adminDashboard/page'
+import StaffDashboard from '@/app/staffDashboard/page'
 
-interface PageProps {
-  customProp: string;
-}
 
-
-const page = (props) => {
-  console.log(`custom prop is ${props.customProp}`)
-  if (typeof props.customProp === 'string' && props.customProp === 'someValue') {
+const page = () => {
+  const myProp = useMyProp();
+  if (myProp === "admin") {
     return (
       <div>
-        fuck
+        <AdminDashboard />
       </div>
-    );
+    )
+  } else if (myProp === "staff") {
+    return (
+      <div>
+        <StaffDashboard />
+      </div>
+    )
   } else {
     return (
-      <div> 
+      <div>
         <Dashboard />
       </div>
     );

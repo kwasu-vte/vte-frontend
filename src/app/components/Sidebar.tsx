@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { Book, HomeRounded, LogoutRounded, Settings, WalletRounded } from '@mui/icons-material'
 import customer from '@/assets/customerSupport.png'
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import { Logout } from '@/lib/utils';
 
 const Sidebar = ({ setIsAuthenticated }: {setIsAuthenticated: (value: boolean) => void}) => {
     const [currentPath, setCurrentPath] = useState('');
@@ -92,7 +93,7 @@ const Sidebar = ({ setIsAuthenticated }: {setIsAuthenticated: (value: boolean) =
                     <h1 className=' text-white mt-4'>Customer Support</h1>
                 </div>
 
-                <Link href={'/'}><button onClick={() => setIsAuthenticated(false)} className=' bg-[#9BCE9B] text-[#0B200B] px-2 rounded-md py-1 hover:px-4 duration-500'><LogoutRounded className=' mx-2' /> Logout</button></Link>
+                <Link href={'/'}><button onClick={() => {setIsAuthenticated(false); Logout() }} className=' bg-[#9BCE9B] text-[#0B200B] px-2 rounded-md py-1 hover:px-4 duration-500'><LogoutRounded className=' mx-2' /> Logout</button></Link>
             </div>
         </div>
     )
