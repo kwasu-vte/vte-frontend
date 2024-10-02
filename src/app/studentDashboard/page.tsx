@@ -21,20 +21,21 @@ import {
 } from "@/components/ui/table";
 import { useEffect, useState } from "react";
 
-const lastName = "Ojuoye";
-const firstName = "Moshood";
-const level = "";
-const groupName = "";
-const groupNo = "40";
-const groupWhatsappLink = "40";
-//const groupWhatsappLink = "40";
-
 const Page = () => {
+
+  const fetchData = async () => {
+    const response = await fetch("/api/students"); // Replace with your API endpoint
+    const data = await response.json();
+    console.log(data);
+  };
 
   const [lastName, setLastName] = useState<string | null>(null);
   const [firstName, setFirstName] = useState<string | null>(null);
   const level = "";
   const groupName = "";
+  let groupNo = 34; 
+  let groupWhatsappLink = "www.whatapp.me/yedhdgccvfcvhvg/2";
+  let currentDate = "01/02/2024";
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -72,7 +73,7 @@ const Page = () => {
               {lastName} {firstName}
             </h1>
             <p className=" uppercase text-[#379E37] text-xs font-bold">
-              200LVL
+              {level}LVL
             </p>
           
           </div>
@@ -93,7 +94,7 @@ const Page = () => {
         <div className=" flex items-center justify-center bg-white p-2 rounded-md">
           <CalendarMonth className=" text-[#379E37]" />
           <select name="" id="" className=" mx-4 appearance-none">
-            <option value="">August 16, 2024</option>
+            <option value="">{currentDate}</option>
           </select>
         </div>
 
