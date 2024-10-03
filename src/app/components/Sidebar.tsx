@@ -3,13 +3,15 @@ import React, { useEffect, useState } from 'react'
 import logo from '../../assets/kwasulogo.png'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Book, HomeRounded, LogoutRounded, Settings, WalletRounded } from '@mui/icons-material'
+import { Book, CalendarMonth, HomeRounded, LogoutRounded, Settings, WalletRounded } from '@mui/icons-material'
 import customer from '@/assets/customerSupport.png'
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { Logout } from '@/lib/utils';
+import QRCodeModal from '../modals/QRCodeModal';
 
 const Sidebar = ({ setIsAuthenticated }: {setIsAuthenticated: (value: boolean) => void}) => {
     const [currentPath, setCurrentPath] = useState('');
+    const [IsQRcodeModalOpen, setIsQRcodeModalOpen] = useState(false)
     useEffect(() => {
         if (typeof window !== 'undefined') {
             setCurrentPath(window.location.pathname);
@@ -55,6 +57,19 @@ const Sidebar = ({ setIsAuthenticated }: {setIsAuthenticated: (value: boolean) =
                             </div>
                         </Link>
 
+                        <Link href=" " onClick={() => {setCurrentPath('/attendance'), setIsQRcodeModalOpen(true)}}>
+                            <div
+                                className={
+                                    currentPath === '/attendance'
+                                        ? 'flex items-center justify-start w-[80%] px-2 duration-500 text-[#379E37] bg-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'
+                                        : 'flex items-center justify-start w-[80%] px-2 duration-500 text-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'
+                                }
+                            >
+                                <CalendarMonth className=' mx-2' />
+                                Attendance
+                            </div>
+                        </Link>
+
                         <Link href="/payment" onClick={() => setCurrentPath('/payment')}>
                             <div
                                 className={
@@ -95,6 +110,10 @@ const Sidebar = ({ setIsAuthenticated }: {setIsAuthenticated: (value: boolean) =
 
                 <Link href={'/'}><button onClick={() => {setIsAuthenticated(false); Logout() }} className=' bg-[#9BCE9B] text-[#0B200B] px-2 rounded-md py-1 hover:px-4 duration-500'><LogoutRounded className=' mx-2' /> Logout</button></Link>
             </div>
+
+            {
+                IsQRcodeModalOpen && <QRCodeModal setIsQRcodeModalOpen={setIsQRcodeModalOpen} />
+            }
         </div>
     )
 }
