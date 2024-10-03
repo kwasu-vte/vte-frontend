@@ -1,8 +1,11 @@
 import React from 'react'
 import QRCode from '@/assets/qrcode.png'
 import Image from 'next/image'
+interface QRCodeModalProps {
+    setIsQRcodeModalOpen: (isOpen: boolean) => void;
+}
 
-const QRCodeModal = ({ setIsQRcodeModalOpen }) => {
+const QRCodeModal: React.FC<QRCodeModalProps> = ({ setIsQRcodeModalOpen }) => {
     return (
         <div className='fixed right-0 bottom-0 left-0 top-0 px-2 py4 overflow-scroll scrollbar-hide z-50 justify-center items-center flex bg-[#00000080]'
             onClick={(e) => {

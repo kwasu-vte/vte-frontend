@@ -197,6 +197,7 @@ export default function RootLayout({
                   </div>
                   <button onClick={() => { setIsAuthenticated(true); setSidebarType("student") }} className=' text-white bg-[#58AE58] w-[80%] mx-auto text-center py-2 rounded-md mb-4'>Login</button>
                   <p className=' w-[80%] mx-auto text-sm text-[#6E6E6E]'>Are you an admin? <span className=' text-[#379E37]'><button onClick={() => setFormType("admin-log-in")} className=' underline'>Log in as administartor</button></span></p>
+                  <p className=' w-[80%] mx-auto text-sm text-[#6E6E6E]'>Are you a staff? <span className=' text-[#379E37]'><button onClick={() => setFormType("staff-log-in")} className=' underline'>Log in as staff</button></span></p>
                 </div>
               </div>
             </div>

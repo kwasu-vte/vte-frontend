@@ -1,7 +1,6 @@
 'use client';
 import {
   CalendarMonth,
-  CalendarViewDayRounded,
   Notifications,
   Search,
 } from "@mui/icons-material";
@@ -13,7 +12,6 @@ import group from "@/assets/Group.png";
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -24,7 +22,7 @@ import { useEffect, useState } from "react";
 const Page = () => {
 
   const fetchData = async () => {
-    const response = await fetch("/api/students"); // Replace with your API endpoint
+    const response = await fetch("/api/students");
     const data = await response.json();
     console.log(data);
   };
