@@ -30,10 +30,10 @@ const StaffSidebar = ({setIsAuthenticated}: {setIsAuthenticated: (value: boolean
                         className=' m-auto'
                     />
                     <div className=' w-full'>
-                        <Link href="/adminDashboard" onClick={() => setCurrentPath('/adminDashboard')}>
+                        <Link href="/staffDashboard" onClick={() => setCurrentPath('/staffDashboard')}>
                             <div
                                 className={
-                                    currentPath === '/adminDashboard'
+                                    currentPath === '/staffDashboard'
                                         ? 'flex items-center justify-start w-[80%] px-2 duration-500 text-[#379E37] bg-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'
                                         : 'flex items-center justify-start w-[80%] px-2 duration-500 text-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'
                                 }
@@ -43,10 +43,10 @@ const StaffSidebar = ({setIsAuthenticated}: {setIsAuthenticated: (value: boolean
                             </div>
                         </Link>
 
-                        <Link href="/staffManagement" onClick={() => setCurrentPath('/staffManagement')}>
+                        <Link href="/staffAttendance" onClick={() => setCurrentPath('/staffAttendance')}>
                             <div
                                 className={
-                                    currentPath === '/staffManagement'
+                                    currentPath === '/staffAttendance'
                                         ? 'flex items-center justify-start w-[80%] px-2 duration-500 text-[#379E37] bg-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'
                                         : 'flex items-center justify-start w-[80%] px-2 duration-500 text-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'
                                 }
@@ -56,10 +56,10 @@ const StaffSidebar = ({setIsAuthenticated}: {setIsAuthenticated: (value: boolean
                             </div>
                         </Link>
 
-                        <Link href="/groupManagement" onClick={() => setCurrentPath('/groupManagement')}>
+                        <Link href="/staffSettings" onClick={() => setCurrentPath('/staffSettings')}>
                             <div
                                 className={
-                                    currentPath === '/groupManagement'
+                                    currentPath === '/staffSettings'
                                         ? 'flex items-center justify-start w-[80%] px-2 duration-500 text-[#379E37] bg-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'
                                         : 'flex items-center justify-start w-[80%] px-2 duration-500 text-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'
                                 }

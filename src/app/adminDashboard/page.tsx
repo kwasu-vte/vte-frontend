@@ -24,12 +24,12 @@ import "@/app/Calendar.css";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 
-// const lastName = "Ojuoye";
-// const firstName = "Moshood";
-// const level = "";
-// const groupName = "";
-// const groupNo = "40";
-// const groupWhatsappLink = "40";
+const lastName = "Ojuoye";
+const firstName = "Moshood";
+const level = "";
+const groupName = "";
+const groupNo = "40";
+const groupWhatsappLink = "40";
 
 const page = () => {
   return (
