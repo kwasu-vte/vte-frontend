@@ -1,6 +1,7 @@
 import React from 'react'
 import QRCode from '@/assets/qrcode.png'
 import Image from 'next/image'
+import { FadeInFromBottom } from '../components/FadeInFromBottom';
 interface QRCodeModalProps {
     setIsQRcodeModalOpen: (isOpen: boolean) => void;
 }
@@ -16,13 +17,17 @@ const QRCodeModal: React.FC<QRCodeModalProps> = ({ setIsQRcodeModalOpen }) => {
             }}
         >
             <div className=' w-[65%] h-[50%] bg-[#D7ECD7] flex items-center justify-center'>
-                <Image
-                    src={QRCode}
-                    alt="qr code"
-                    width={200}
-                />
+                <div className=' w-full h-full flex items-center justify-center'>
+                    <FadeInFromBottom>
+                        <Image
+                            src={QRCode}
+                            alt="qr code"
+                            width={200}
+                        />
+                    </FadeInFromBottom>
+                </div>
             </div>
-        </div>
+        </div >
     )
 }
 
