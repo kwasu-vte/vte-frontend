@@ -62,7 +62,7 @@ const Page = () => {
             <Notifications className=" text-[#379E37] mx-4" />
           </Link>
 
-          <div className=" h-[50px] w-[50px] bg-green-700 rounded-full mx-1"></div>
+          <div className=" h-[50px] w-[50px] bg-green-700 profile rounded-full mx-1"></div>
 
           <div className=" mx-1 h-full flex flex-col items-start justify-center">
             <h1 className=" font-bold text-lg">

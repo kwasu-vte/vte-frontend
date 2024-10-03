@@ -32,7 +32,7 @@ const page = () => {
           <Link href={'/notifications/'}>
             <Notifications className=' text-[#379E37] mx-4' />
           </Link>
-          <div className=' h-[50px] w-[50px] bg-green-700 rounded-full mx-1'></div>
+          <div className=' h-[50px] w-[50px] bg-green-700 profile rounded-full mx-1'></div>
           <div className=' mx-1 h-full flex flex-col items-start justify-center'>
             <h1 className=' font-bold text-lg'>Olusanmi Pelumi</h1>
             <p className=' uppercase text-[#379E37] text-xs font-bold'>200LVL</p>
@@ -47,7 +47,7 @@ const page = () => {
         <div className=' w-[78%] h-[600px] bg-white py-10 px-16'>
           <div className=' w-full flex items-start justify-between mb-6'>
             <div className=' flex items-start justify-center'>
-              <div className=' h-[100px] w-[100px] bg-red-800 rounded-full'></div>
+              <div className=' h-[100px] w-[100px] bg-red-800 profile rounded-full'></div>
               <div className=' mx-4 py-2'>
                 <h1 className=' text-lg font-semibold'>Olusanmi Pelumi</h1>
                 <h1>Biological Science</h1>

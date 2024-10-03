@@ -2,3 +2,9 @@
 @tailwind components;
 @tailwind utilities;
   
+.profile {
+    background-image:  url('../assets/profile.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}

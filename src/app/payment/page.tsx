@@ -31,7 +31,7 @@ const page = () => {
                     <Link href={'/notifications/'}>
                         <Notifications className=' text-[#379E37] mx-4' />
                     </Link>
-                    <div className=' h-[50px] w-[50px] bg-green-700 rounded-full mx-1'></div>
+                    <div className=' h-[50px] w-[50px] bg-green-700 profile rounded-full mx-1'></div>
                     <div className=' mx-1 h-full flex flex-col items-start justify-center'>
                         <h1 className=' font-bold text-lg'>Olusanmi Pelumi</h1>
                         <p className=' uppercase text-[#379E37] text-xs font-bold'>200LVL</p>
@@ -66,14 +66,14 @@ const page = () => {
                         </div>
                         <div className=' h-[480px] overflow-scroll'>
                             <Table className=' rounded-md bg-white'>
-                                <TableHeader className=''>
+                                <TableHeader className=' bg-[#98c898] hover:bg-[#98c898]'>
                                     <TableRow>
-                                        <TableHead className="">Date</TableHead>
-                                        <TableHead className="">Description</TableHead>
-                                        <TableHead className="">Payment Method</TableHead>
-                                        <TableHead className="">Amount</TableHead>
-                                        <TableHead>Status</TableHead>
-                                        <TableHead className="text-right">Action</TableHead>
+                                        <TableHead className=" text-black font-bold">Date</TableHead>
+                                        <TableHead className=" text-black font-bold">Description</TableHead>
+                                        <TableHead className=" text-black font-bold">Payment Method</TableHead>
+                                        <TableHead className=" text-black font-bold">Amount</TableHead>
+                                        <TableHead className=' text-black font-bold'>Status</TableHead>
+                                        <TableHead className="text-right text-black font-bold">Action</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody >

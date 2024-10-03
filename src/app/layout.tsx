@@ -1,19 +1,16 @@
 "use client";
-import { Inter, Roboto_Condensed } from "next/font/google";
-import { Urbanist } from "next/font/google";
 import { Roboto } from "next/font/google";
 import "./globals.css";
 import Sidebar from "./components/Sidebar";
 import logo from "@/assets/kwasulogo.png";
 import Image from "next/image";
-import Link from "next/link";
 import AdminSidebar from "./components/AdminSidebar";
 import { createContext, useContext, useState } from "react";
 import StaffSidebar from "./components/StaffSidebar";
 
 const roboto = Roboto({
   subsets: ["latin"],
-  weight: ["400", "500", "700"], // Specify the weights you want to use
+  weight: ["400", "500", "700"],
 });
 
 const MyPropContext = createContext<string | null>(null);
@@ -147,7 +144,6 @@ export default function RootLayout({
         </html >
       );
     }
-
   } else {
     if (isAuthenticated == false && formType === "log-in") {
       return (
@@ -485,9 +481,6 @@ export default function RootLayout({
                       Password
                     </label>
                   </div>
-
-
-
                   <button onClick={() => { setIsAuthenticated(true); setSidebarType("staff") }} className=' text-white bg-[#58AE58] w-[80%] mx-auto text-center py-2 rounded-md mb-4'>Login</button>
                   <p className=' w-[80%] mx-auto text-sm text-[#6E6E6E]'>Are you a student? <span className=' text-[#379E37]'><button onClick={() => setFormType("log-in")} className=' underline'>Log in as student</button></span></p>
                   <p className=' w-[80%] mx-auto text-sm text-[#6E6E6E]'>Are you an admin? <span className=' text-[#379E37]'><button onClick={() => setFormType("admin-log-in")} className=' underline'>Log in as administrator</button></span></p>
