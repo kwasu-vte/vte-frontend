@@ -7,7 +7,7 @@ import { Montserrat } from 'next/font/google'
 const montserrat = Montserrat({
     subsets: ['latin'],
     weight: ['400', '500', '700'], // Specify the weights you want to use
-  });
+});
 
 const page = () => {
     return (
@@ -71,9 +71,9 @@ const page = () => {
                 </div>
 
                 <div className=' w-[40%] h-[100vh] flex flex-col items-center justify-start py-24'>
-                    <div className=' w-full text-center'>
+                    <div className=' w-full text-center mb-4'>
                         <h1 className=' font-bold text-[#379E37] text-xl mb-4'>Selection Details</h1>
-                        <div className=' w-[80%] m-auto py-4 bg-[#98c898] rounded-lg'>
+                        <div className=' w-[80%] m-auto py-4 bg-[#98c898] rounded-lg mb-4'>
                             <div className=' text-center mb-4'>
                                 <p>Assigned Group Name</p>
                                 <h1 className=' uppercase font-extrabold text-3xl'>xavier</h1>
@@ -98,6 +98,10 @@ const page = () => {
                                 <p>Amount To Be Paid</p>
                                 <h1 className=' uppercase font-extrabold text-3xl'>N 1,100</h1>
                             </div>
+                        </div>
+                        <div className=' w-full flex flex-col items-center justify-center'>
+                            <Link href={"/payment"} className=' w-[80%] bg-[#379E37] text-white mb-4 py-2 rounded-md'>Make Payment</Link>
+                            <Link href={"/payment"} className=' text-sm text-[#379E37] underline'>Show Payment History</Link>
                         </div>
                     </div>
                 </div>

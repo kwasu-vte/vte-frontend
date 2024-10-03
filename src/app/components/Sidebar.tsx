@@ -70,7 +70,7 @@ const Sidebar = ({ setIsAuthenticated }: {setIsAuthenticated: (value: boolean) =
                             </div>
                         </Link>
 
-                        <Link href="/payment" onClick={() => setCurrentPath('/payment')}>
+                        {/* <Link href="/payment" onClick={() => setCurrentPath('/payment')}>
                             <div
                                 className={
                                     currentPath === '/payment'
@@ -81,7 +81,7 @@ const Sidebar = ({ setIsAuthenticated }: {setIsAuthenticated: (value: boolean) =
                                 <WalletRounded className=' mx-2' />
                                 Payment
                             </div>
-                        </Link>
+                        </Link> */}
 
                         <Link href="/settings" onClick={() => setCurrentPath('/settings')}>
                             <div

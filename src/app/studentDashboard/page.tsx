@@ -29,11 +29,11 @@ const Page = () => {
     console.log(data);
   };
 
-  const [lastName, setLastName] = useState<string | null>(null);
-  const [firstName, setFirstName] = useState<string | null>(null);
-  const level = "";
-  const groupName = "";
-  let groupNo = 34; 
+  const lastName = "Ojuyoye";
+  const firstName = "Moshood";
+  const level = "100 ";
+  const groupName = "XAVIER";
+  let groupNo = 34;
   let groupWhatsappLink = "www.whatapp.me/yedhdgccvfcvhvg/2";
   let currentDate = "01/02/2024";
 
@@ -41,16 +41,14 @@ const Page = () => {
     if (typeof window !== "undefined") {
       const storedLastName = localStorage.getItem("last_name");
       const storedFirstName = localStorage.getItem("first_name");
-      setFirstName(storedFirstName);
-      setLastName(storedLastName)
     }
   }, []);
 
   return (
     <div className=" w-full h-[100vh] overflow-hidden pl-[20%] py-2 pr-4">
-      
+
       <div className=" h-[60px] w-full bg-white rounded-md flex items-center justify-between p-2 mb-4">
-        
+
         <div className=" bg-[#BFE7BF7A] h-full w-[30%] px-3">
           <Search />
           <input
@@ -59,15 +57,15 @@ const Page = () => {
             placeholder="Search here..."
           />
         </div>
-        
+
         <div className=" flex items-center justify-center">
-          
+
           <Link href={"/notifications/"}>
             <Notifications className=" text-[#379E37] mx-4" />
           </Link>
-          
+
           <div className=" h-[50px] w-[50px] bg-green-700 rounded-full mx-1"></div>
-          
+
           <div className=" mx-1 h-full flex flex-col items-start justify-center">
             <h1 className=" font-bold text-lg">
               {lastName} {firstName}
@@ -75,7 +73,7 @@ const Page = () => {
             <p className=" uppercase text-[#379E37] text-xs font-bold">
               {level}LVL
             </p>
-          
+
           </div>
 
         </div>
@@ -83,7 +81,7 @@ const Page = () => {
       </div>
 
       <div className=" w-full bg-transparent flex items-start justify-between p-2 mb-2 border-b-2 border-b-[#7ABE7A]">
-        
+
         <div>
           <h1 className=" text-4xl font-extrabold text-[#379E37] mb-2">
             Welcome back {lastName} {firstName}! 👋🏽
@@ -101,13 +99,13 @@ const Page = () => {
       </div>
 
       <div className=" h-fit mb-4 w-full flex items-start justify-between">
-        
+
         <div className=" w-[58%] flex flex-col items-start justify-between">
-         
+
           <h1 className=" font-extrabold text-[#379E37] mb-4">
             Group Information
           </h1>
-          
+
           <div className=" w-full flex items-center justify-between h-[80px] mb-4">
             <div className=" px-2 w-[32%] flex items-center justify-center h-full rounded-lg shadow-sm shadow-slate-500 bg-white">
               <Image src={group} width={50} alt="" height={30} />
@@ -131,7 +129,7 @@ const Page = () => {
               </div>
             </div>
           </div>
-          
+
           <div className=" w-full bg-white min-h-[200px] rounded-md shadow-sm shadow-slate-500 px-2 py-4">
             <h1 className=" font-extrabold text-black mb-4">
               Task completion / Performance
@@ -144,7 +142,7 @@ const Page = () => {
               className=" my-4 max-w-[90%] m-auto"
             />
           </div>
-        
+
         </div>
 
         <div className=" w-[40%]">
