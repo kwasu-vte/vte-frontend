@@ -21,14 +21,8 @@ import { useEffect, useState } from "react";
 import { FadeInFromBottom } from "../components/FadeInFromBottom";
 import { useAuth } from "@/lib/auth";
 
-const Page = () => {
+export default function Dashboard() {
   const { user } = useAuth();
-
-  const fetchData = async () => {
-    const response = await fetch("/api/students");
-    const data = await response.json();
-    console.log(data);
-  };
 
   const lastName = user.last_name;
   const firstName = user.first_name;
@@ -65,9 +59,17 @@ const Page = () => {
               <h1 className=" font-bold text-lg">
                 {lastName} {firstName}
               </h1>
-              <p className=" uppercase text-[#379E37] text-xs font-bold">
-                {level}LVL
-              </p>
+              <div className="flex">
+                <p className=" uppercase text-[#379E37] text-xs font-bold">
+                  {level}LVL
+                </p>
+                <select className="text-xs uppercase font-semibold  text-[#B7802C] border-none" name="course" id="course">
+                  <option value="gns-202">gns202</option>
+                  <option value="vte-202">vte202</option>
+                  <option value=""></option>
+                  <option value=""></option>
+                </select>
+              </div>
 
             </div>
 
@@ -400,5 +402,3 @@ const Page = () => {
     </FadeInFromBottom>
   );
 };
-
-export default Page;
