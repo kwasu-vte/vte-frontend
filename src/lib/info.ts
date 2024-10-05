@@ -10,25 +10,29 @@ export async function makePayment({course, specialization}: {course: string, spe
      *     specialization: This represents the specilization of the class
      *  Return: This returns the activitation_url to be redirected to.
     **/
-    const response = await fetch("https://vte-backend.onrender.com/api/auth/register_course", {
-        method: "POST",
-        body: JSON.stringify({
-            course: `${course}`,
-            specialization: `${specialization}`,
-        }),
-        headers: {
-            "Content-Type": "application/json",
-            "accept": "application/json",
-        }
-    });
+   try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}api/auth/register_course`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "accept": "application/json",
+                "Authorization": `Bearer ${Cookies.get('access_token')}`
+            },
+            body: JSON.stringify({course, specialization}),
+        });
 
-    if (response.status == 200) {
-        const data = await response.json();
-        if (data.status == true) {
-            Cookies.set('course', `${course}`)
-            return data.authorization_url;
+        if (response.ok) {
+            const data = await response.json();
+            if (data.status == true) {
+                Cookies.set('course', course)
+                return data.data.authorization_url;
+            }
         }
-    }
+        return false;
+   } catch(err) {
+        console.log(err);
+        return false;
+   }
 }
 
 export async function paystackRedirect({reference}: {reference: string}) {
@@ -38,21 +42,22 @@ export async function paystackRedirect({reference}: {reference: string}) {
      *      reference: This is the reference
      *  return: It returns a msg to represent success.  
      */
-    const course = Cookies.get('course');
-    const response = await fetch("https://vte-backend.onrender.com/api/auth/activate", {
-        method: "POST",
-        body: JSON.stringify({
-            reference: `${reference}`,
-            course_name: `${course}`,
-        }),
-        headers: {
-            "Content-Type": "application/json",
-            "accept": "application/json",
+    try {
+        const course = Cookies.get('course');
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}api/auth/activate?reference=${reference}&course_name=${course}`, {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${Cookies.get("access_token")}`
+            },
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            Cookies.remove("course");
+            return (data.msg);
         }
-    });
-    
-    if (response.status == 200) {
-        const data = await response.json();
-        return (data.msg);
+        return false;
+    } catch (err) {
+        return false;
     }
 }

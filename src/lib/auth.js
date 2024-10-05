@@ -58,6 +58,7 @@ export function AuthProvider({ children }) {
     }, []);
 
     const login = async (credentials) => {
+        console.log(credentials);
         try {
         let res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}api/auth/token`, {
             method: 'POST',
