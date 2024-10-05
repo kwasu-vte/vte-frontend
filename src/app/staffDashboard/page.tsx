@@ -65,7 +65,7 @@ const page = () => {
                     <div className=" flex items-center justify-center bg-white p-2 rounded-md">
                         <CalendarMonth className=" text-[#379E37]" />
                         <select name="" id="" className=" mx-4 appearance-none">
-                            <option value="">August 16, 2024</option>
+                            <option value="">August 17, 2024</option>
                         </select>
                     </div>
                 </div>
