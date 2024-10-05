@@ -41,7 +41,10 @@ export default function Page() {
             console.log(await res.json());
             router.push("/auth/sign_in");
         }
-        else router.push("/auth/sign_up");
+        else {
+            console.log(await res.json());
+            router.push("/auth/sign_up");
+        }
     }
     return (
         <div className=' flex items-center justify-center h-[100vh] bg-[#BFE7BF]'>
