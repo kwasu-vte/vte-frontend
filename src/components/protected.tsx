@@ -9,7 +9,7 @@ export const Protected = ({children}:{children: React.ReactNode}) => {
     const access_token = localStorage.getItem("access_token")!;
     const refresh_token = localStorage.getItem("refresh_token")!;
     if (access_token === null) {router.push("/")};
-    if (access_token === null) {router.push("/")};
+    if (refresh_token === null) {router.push("/")};
 
     useEffect(() => {
         const handleauthValidate = async() => {

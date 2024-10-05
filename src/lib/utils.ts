@@ -11,5 +11,5 @@ export const Logout = async () => {
   localStorage.removeItem("refresh_token");
   localStorage.removeItem("role");
   sessionStorage.removeItem("login_status")
-  //redirect("")
+  redirect("/auth/sign_in")
 }

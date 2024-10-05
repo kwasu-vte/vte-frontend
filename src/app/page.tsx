@@ -1,32 +1,22 @@
 "use client";
 import React from 'react'
 import Dashboard from '@/app/studentDashboard/page'
-import { useMyProp } from './layout';
 import AdminDashboard from '@/app/adminDashboard/page'
 import StaffDashboard from '@/app/staffDashboard/page'
 
+import StaffSidebar from "./components/StaffSidebar";
+import AdminSidebar from "./components/AdminSidebar";
 
-const page = () => {
-  const myProp = useMyProp();
-  if (myProp === "admin") {
-    return (
-      <div>
-        <AdminDashboard />
-      </div>
-    )
-  } else if (myProp === "staff") {
-    return (
-      <div>
-        <StaffDashboard />
-      </div>
-    )
-  } else {
-    return (
-      <div>
-        <Dashboard />
-      </div>
-    );
-  }
+import { Protected } from '@/components/protected';
+
+{/* // <StaffDashboard />
+  // <Dashboard /> */}
+
+export default function Page() {
+  return (
+    <Protected>
+      <AdminSidebar />
+      <AdminDashboard />
+    </Protected>
+  );
 }
-
-export default page

@@ -2,9 +2,11 @@ import { LoginType, Tokens, UserInfo } from '@/lib/definitions';
 import { redirect } from 'next/navigation';
 //import encrypt from '@/lib/encrypt';
 
+import Cookies from "js-cookie";
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL
 
-export const Login = async(params: LoginType) => {
+export const Login = async(params: LoginType) =>  {
     console.log(params);
     try {
         const response = await fetch(`${API_URL}api/auth/token`, {
@@ -19,23 +21,29 @@ export const Login = async(params: LoginType) => {
           const data: UserInfo = await response.json();
           console.log('Login successful', data);
 
-          if (!data.status){throw new Error("SomethingWent Wrong Try Again Later")}   
+          if (!data.status){throw new Error("Something Went Wrong Try Again Later")}   
           if (!data.is_active) {throw new Error("User has been deactivated")}
 
-          localStorage.setItem('access_token', data.access_token);
-          localStorage.setItem('refresh_token', data.refresh_token);
-          localStorage.setItem('first_name', data.first_name || '');
-          localStorage.setItem('last_name', data.last_name || '');
-          localStorage.setItem('email', data.email || '');
-          localStorage.setItem('role', data.role);
-          sessionStorage.setItem("login_status", "1")
-
-          return data
-
+          let user_info = {
+            "email": data["email"],
+            "first_name": data["first_name"],
+            "last_name": data["last_name"],
+            "matric_number": data["matric_number"],
+            "role": data["role"],
+            "level": data["level"],
+            "is_superuser": data["is_superuser"],
+          }
+          
+          Cookies.set("access_token", data["access_token"]);
+          Cookies.set("refresh_token", data["refresh_token"]);
+          Cookies.set("user_info", JSON.stringify(user_info))
+          
+          return true
         }
+        return false
       } catch (error) {
           console.error("Error logging in:", error);
-          throw new Error(`Error: ${error}`)
+          return false
       }
 }
 
@@ -85,12 +93,12 @@ export const confirmAuthStatus = async (params:Tokens) => {
     localStorage.removeItem("refresh_token");
     localStorage.removeItem("role");
     sessionStorage.removeItem("login_status")
-    redirect("")
+    redirect("/auth/sign_in")
   }
 
   const confirm = statusBasemodel(params);
   if (!confirm) {
-    redirect("")
+    redirect("/auth/sign_in")
   }
 
 }
