@@ -1,6 +1,6 @@
 "use client";
 import React from 'react'
-import Dashboard from '@/app/studentDashboard/page'
+import Dashboard from '@/app/studentDashboard/dashboard'
 import AdminDashboard from '@/app/adminDashboard/page'
 import StaffDashboard from '@/app/staffDashboard/page'
 

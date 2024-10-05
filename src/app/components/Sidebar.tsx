@@ -11,17 +11,12 @@ import QRCodeModal from '../modals/QRCodeModal';
 import { FadeInFromBottom } from './FadeInFromBottom';
 import { FadeInFromLeft } from './FadeInFromLeft';
 import { useAuth } from '@/lib/auth';
+import { usePathname } from 'next/navigation';
 
 const Sidebar = () => {
     const { logout } = useAuth();
-    const [currentPath, setCurrentPath] = useState('');
     const [IsQRcodeModalOpen, setIsQRcodeModalOpen] = useState(false)
-    useEffect(() => {
-        if (typeof window !== 'undefined') {
-            setCurrentPath(window.location.pathname);
-        }
-    }, []);
-
+    const currentPath = usePathname();
 
     return (
         <div className=' z-50 fixed h-[100vh] py-2 w-[18%]'>
@@ -36,10 +31,10 @@ const Sidebar = () => {
                             className=' m-auto'
                         />
                         <div className=' w-full'>
-                            <Link href="/studentDashboard" onClick={() => setCurrentPath('/studentDashboard')}>
+                            <Link href="/">
                                 <div
                                     className={
-                                        currentPath === '/studentDashboard'
+                                        currentPath === '/'
                                             ? 'flex items-center justify-start w-[80%] px-2 duration-500 text-[#379E37] bg-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'
                                             : 'flex items-center justify-start w-[80%] px-2 duration-500 text-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'
                                     }
@@ -49,7 +44,7 @@ const Sidebar = () => {
                                 </div>
                             </Link>
 
-                            <Link href="/courses" onClick={() => setCurrentPath('/courses')}>
+                            <Link href="/courses">
                                 <div
                                     className={
                                         currentPath === '/courses'
@@ -62,7 +57,7 @@ const Sidebar = () => {
                                 </div>
                             </Link>
 
-                            <Link href=" " onClick={() => { setCurrentPath('/attendance'), setIsQRcodeModalOpen(true) }}>
+                            <Link href="/attendance">
                                 <div
                                     className={
                                         currentPath === '/attendance'
@@ -88,7 +83,7 @@ const Sidebar = () => {
                             </div>
                         </Link> */}
 
-                            <Link href="/settings" onClick={() => setCurrentPath('/settings')}>
+                            <Link href="/settings">
                                 <div
                                     className={
                                         currentPath === '/settings'
