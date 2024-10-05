@@ -8,17 +8,11 @@ import customer from '@/assets/customerSupport.png'
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { Logout } from '@/lib/utils';
 import { FadeInFromLeft } from './FadeInFromLeft';
+import { useAuth } from '@/lib/auth';
 
 const AdminSidebar = () => {
-    const [currentPath, setCurrentPath] = useState('');
-    useEffect(() => {
-        if (typeof window !== 'undefined') {
-            setCurrentPath(window.location.pathname);
-        }
-        /* verify if user is actually an admin */
-    }, []);
-
-
+    const { logout } = useAuth();
+    let currentPath = '/adminDashboard'; // This is temporary
     return (
         <div className=' z-50 fixed h-[100vh] py-2 w-[18%]'>
             <FadeInFromLeft>
@@ -32,7 +26,7 @@ const AdminSidebar = () => {
                             className=' m-auto'
                         />
                         <div className=' w-full'>
-                            <Link href="/adminDashboard" onClick={() => setCurrentPath('/adminDashboard')}>
+                            <Link href="/adminDashboard">
                                 <div
                                     className={
                                         currentPath === '/adminDashboard'
@@ -45,7 +39,7 @@ const AdminSidebar = () => {
                                 </div>
                             </Link>
 
-                            <Link href="/staffManagement" onClick={() => setCurrentPath('/staffManagement')}>
+                            <Link href="/staffManagement">
                                 <div
                                     className={
                                         currentPath === '/staffManagement'
@@ -58,7 +52,7 @@ const AdminSidebar = () => {
                                 </div>
                             </Link>
 
-                            <Link href="/studentManagement" onClick={() => setCurrentPath('/studentManagement')}>
+                            <Link href="/studentManagement">
                                 <div
                                     className={
                                         currentPath === '/studentManagement'
@@ -71,7 +65,7 @@ const AdminSidebar = () => {
                                 </div>
                             </Link>
 
-                            <Link href="/adminApproval" onClick={() => setCurrentPath('/adminApproval')}>
+                            <Link href="/adminApproval">
                                 <div
                                     className={
                                         currentPath === '/adminApproval'
@@ -84,7 +78,7 @@ const AdminSidebar = () => {
                                 </div>
                             </Link>
 
-                            <Link href="/courseManagement" onClick={() => setCurrentPath('/courseManagement')}>
+                            <Link href="/courseManagement">
                                 <div
                                     className={
                                         currentPath === '/courseManagement'
@@ -97,7 +91,7 @@ const AdminSidebar = () => {
                                 </div>
                             </Link>
 
-                            <Link href="/groupManagement" onClick={() => setCurrentPath('/groupManagement')}>
+                            <Link href="/groupManagement">
                                 <div
                                     className={
                                         currentPath === '/groupManagement'
@@ -122,7 +116,7 @@ const AdminSidebar = () => {
                         <h1 className=' text-white mt-4'>Customer Support</h1>
                     </div>
 
-                    <Link href={'/'}><button onClick={() => { Logout() }} className=' bg-[#9BCE9B] text-[#0B200B] px-2 rounded-md py-1 hover:px-4 duration-500'><LogoutRounded className=' mx-2' /> Logout</button></Link>
+                    <button onClick={logout} className=' bg-[#9BCE9B] text-[#0B200B] px-2 rounded-md py-1 hover:px-4 duration-500'><LogoutRounded className=' mx-2' /> Logout</button>
                 </div>
             </FadeInFromLeft>
         </div>

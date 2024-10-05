@@ -89,7 +89,7 @@ export function AuthProvider({ children }) {
         } catch (err) {
             console.error("Login failed", err);
         }
-        router.push("/");
+        window.location.href = "/";
     }
 
     const logout = () => {
@@ -97,6 +97,7 @@ export function AuthProvider({ children }) {
         Cookies.remove("refresh_token");
         Cookies.remove("user_info");
         setUser(null);
+        router.push("/auth/sign_in");
     }
 
     return (
