@@ -9,8 +9,10 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { Calendar, CalendarCog } from 'lucide-react';
 import { Logout } from '@/lib/utils';
 import { FadeInFromLeft } from './FadeInFromLeft';
+import { useAuth } from '@/lib/auth';
 
-const StaffSidebar = ({ setIsAuthenticated }: { setIsAuthenticated: (value: boolean) => void }) => {
+const StaffSidebar = () => {
+    const { logout } = useAuth();
     const [currentPath, setCurrentPath] = useState('');
     useEffect(() => {
         if (typeof window !== 'undefined') {
@@ -83,7 +85,7 @@ const StaffSidebar = ({ setIsAuthenticated }: { setIsAuthenticated: (value: bool
                         <h1 className=' text-white mt-4'>Customer Support</h1>
                     </div>
 
-                    <Link href={'/'}><button onClick={() => { setIsAuthenticated(false); Logout() }} className=' bg-[#9BCE9B] text-[#0B200B] px-2 rounded-md py-1 hover:px-4 duration-500'><LogoutRounded className=' mx-2' /> Logout</button></Link>
+                    <button onClick={logout} className=' bg-[#9BCE9B] text-[#0B200B] px-2 rounded-md py-1 hover:px-4 duration-500'><LogoutRounded className=' mx-2' /> Logout</button>
                 </div>
             </FadeInFromLeft>
         </div>

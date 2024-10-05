@@ -10,8 +10,10 @@ import { Logout } from '@/lib/utils';
 import QRCodeModal from '../modals/QRCodeModal';
 import { FadeInFromBottom } from './FadeInFromBottom';
 import { FadeInFromLeft } from './FadeInFromLeft';
+import { useAuth } from '@/lib/auth';
 
-const Sidebar = ({ setIsAuthenticated }: { setIsAuthenticated: (value: boolean) => void }) => {
+const Sidebar = () => {
+    const { logout } = useAuth();
     const [currentPath, setCurrentPath] = useState('');
     const [IsQRcodeModalOpen, setIsQRcodeModalOpen] = useState(false)
     useEffect(() => {
@@ -111,7 +113,7 @@ const Sidebar = ({ setIsAuthenticated }: { setIsAuthenticated: (value: boolean) 
                         <h1 className=' text-white mt-4'>Customer Support</h1>
                     </div>
 
-                    <Link href={'/'}><button onClick={() => { setIsAuthenticated(false); Logout() }} className=' bg-[#9BCE9B] text-[#0B200B] px-2 rounded-md py-1 hover:px-4 duration-500'><LogoutRounded className=' mx-2' /> Logout</button></Link>
+                    <Link href={'/'}><button onClick={logout} className=' bg-[#9BCE9B] text-[#0B200B] px-2 rounded-md py-1 hover:px-4 duration-500'><LogoutRounded className=' mx-2' /> Logout</button></Link>
                 </div>
             </FadeInFromLeft>
 

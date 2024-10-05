@@ -32,7 +32,7 @@ const groupName = "";
 const groupNo = "40";
 const groupWhatsappLink = "40";
 
-const page = () => {
+export default function Page() {
   return (
     <FadeInFromBottom>
       <div className=" w-full h-[100vh] overflow-scroll pl-[20%] py-2 pr-4">
@@ -460,5 +460,3 @@ const page = () => {
     </FadeInFromBottom>
   );
 };
-
-export default page;

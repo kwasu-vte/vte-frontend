@@ -19,8 +19,10 @@ import {
 } from "@/components/ui/table";
 import { useEffect, useState } from "react";
 import { FadeInFromBottom } from "../components/FadeInFromBottom";
+import { useAuth } from "@/lib/auth";
 
 const Page = () => {
+  const { user } = useAuth();
 
   const fetchData = async () => {
     const response = await fetch("/api/students");
@@ -28,20 +30,14 @@ const Page = () => {
     console.log(data);
   };
 
-  const lastName = "Ojuyoye";
-  const firstName = "Moshood";
-  const level = "100 ";
-  const groupName = "XAVIER";
-  let groupNo = 34;
+  const lastName = user.last_name;
+  const firstName = user.first_name;
+  const level = user.level;
+  const groupName = "";
+  let groupNo = "";
   let groupWhatsappLink = "www.whatapp.me/yedhdgccvfcvhvg/2";
-  let currentDate = "01/02/2024";
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const storedLastName = localStorage.getItem("last_name");
-      const storedFirstName = localStorage.getItem("first_name");
-    }
-  }, []);
+  let d = new Date();
+  let currentDate = d.toDateString();
 
   return (
     <FadeInFromBottom>
@@ -83,7 +79,7 @@ const Page = () => {
 
           <div>
             <h1 className=" text-4xl font-extrabold text-[#379E37] mb-2">
-              Welcome back {lastName} {firstName}! 👋🏽
+              Welcome back {firstName} {lastName}! 👋🏽
             </h1>
             <p>Stay up to date with your VTE course</p>
           </div>
@@ -133,13 +129,13 @@ const Page = () => {
               <h1 className=" font-extrabold text-black mb-4">
                 Task completion / Performance
               </h1>
-              <Image
+              {/* <Image
                 src={barchart}
                 height={300}
                 width={800}
                 alt=""
                 className=" my-4 max-w-[90%] m-auto"
-              />
+              /> */}
             </div>
 
           </div>
@@ -156,7 +152,7 @@ const Page = () => {
                 <h1 className=" w-[60%]">Task</h1>
                 <h1 className=" w-[40%] text-[#379E37]">Due Date</h1>
               </div>
-              <div className=" max-h-[100px] overflow-scroll">
+              {/* <div className=" max-h-[100px] overflow-scroll">
                 <div className=" w-full flex items-center justify-between py-2 border-b border-b-slate-300">
                   <h1 className=" w-[60%] flex items-center justify-start">
                     {" "}
@@ -253,7 +249,7 @@ const Page = () => {
                   </h1>
                   <h1 className=" w-[40%]">Aug 17, 2024, 11:59pm</h1>
                 </div>
-              </div>
+              </div> */}
             </div>
 
             <div className=" w-full bg-white p-2 rounded-md mb-4">
@@ -264,7 +260,7 @@ const Page = () => {
                 <h1 className=" w-[60%]">Task</h1>
                 <h1 className=" w-[40%] text-[#379E37]">Due Date</h1>
               </div>
-              <div className=" max-h-[100px] overflow-scroll">
+              {/* <div className=" max-h-[100px] overflow-scroll">
                 <div className=" w-full flex items-center justify-between py-2 border-b border-b-slate-300">
                   <h1 className=" w-[60%] flex items-center justify-start">
                     {" "}
@@ -337,7 +333,7 @@ const Page = () => {
                   </h1>
                   <h1 className=" w-[40%]">Aug 17, 2024, 11:59pm</h1>
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
@@ -357,7 +353,7 @@ const Page = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              <TableRow>
+              {/* <TableRow>
                 <TableCell className="font-medium">1</TableCell>
                 <TableCell>EDD</TableCell>
                 <TableCell>Breeding Of Tilapia Fish</TableCell>
@@ -396,7 +392,7 @@ const Page = () => {
                 <TableCell>Not Submitted</TableCell>
                 <TableCell>---</TableCell>
                 <TableCell className="text-right">View</TableCell>
-              </TableRow>
+              </TableRow> */}
             </TableBody>
           </Table>
         </div>
