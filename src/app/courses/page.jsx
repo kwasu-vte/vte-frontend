@@ -1,16 +1,19 @@
 "use client"
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation';
 import Link from 'next/link'
 import { CalendarMonth, Notifications } from '@mui/icons-material'
 import { Search } from 'lucide-react'
 import { Montserrat } from 'next/font/google'
 import Cookies from 'js-cookie'
+import clsx from 'clsx'
 
 import { FadeInFromBottom } from '../components/FadeInFromBottom'
 
 import { Protected } from '@/components/protected'
 import Sidebar from '../components/Sidebar'
 import { useAuth } from '@/lib/auth'
+import { makePayment } from '@/lib/info'
 
 const montserrat = Montserrat({
     subsets: ['latin'],
@@ -19,16 +22,23 @@ const montserrat = Montserrat({
 
 export default function Page() {
     const { loading, user } = useAuth();
+    const [selectionDetails, setSelectionDetails] = useState({
+        "course_code": "",
+        "course_specialization": "",
+    });
+    const [courses, setCourses] = React.useState([]);
+    const [specializations, setSpecializations] = React.useState([]);
 
     useEffect(() => {
         const fetchCourse = async () => {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/courses/`, {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}api/auth/courses/`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${Cookies.get('access_token')}`,
                 },
             });
             const data = await res.json();
+            setCourses(data);
             console.log(data);
         }
 
@@ -43,6 +53,31 @@ export default function Page() {
         last_name = user.last_name;
         level = user.level;
     }
+
+    function updateCourseCode(course) {
+        updateCourseSpecialization("");
+        if (course.specialization) {
+            setSpecializations(course.specialization);
+        } else {
+            setSpecializations([]);
+        }
+        setSelectionDetails((prev) => {
+            return ({
+                ...prev,
+                course_code: course.course,
+            })
+        })
+    }
+
+    function updateCourseSpecialization(course_specialization) {
+        setSelectionDetails((prev) => {
+            return ({
+                ...prev,
+                course_specialization,
+            })
+        })
+    }
+
     return (
         <Protected>
             <Sidebar />
@@ -75,20 +110,29 @@ export default function Page() {
                                 <input type="text" className=' h-full bg-transparent px-3 focus:outline-none text-black placeholder:text-black text-sm' placeholder='Search here...' />
                             </div>
                             <div className={`${montserrat.className} text-sm font-thin w-full bg-white h-[250px] overflow-scroll rounded-md py-3 mb-4`}>
-                                <h1 className=' w-full bg-white py-2 px-10 border-b border-b-slate-300'>GNS 203</h1>
+                                {courses.map((course, idx) => {
+                                    return (
+                                        // @ts-ignore
+                                        <h1 onClick={() => updateCourseCode(course)} key={`${course.course}-${idx}`} className='cursor-pointer w-full bg-white py-2 px-10 border-b border-b-slate-300'>{course.course}</h1>
+                                    );
+                                })}
                             </div>
 
-                            <h1 className=' font-bold text-[#379E37] text-xl mb-4'>Course Group</h1>
+                            <h1 className=' font-bold text-[#379E37] text-xl mb-4'>Course Specialization</h1>
                             <div className=' bg-white w-full px-3 flex items-center justify-start py-3 rounded-md mb-3'>
                                 <Search />
                                 <input type="text" className=' h-full bg-transparent px-3 focus:outline-none text-black placeholder:text-black text-sm' placeholder='Search here...' />
                             </div>
                             <div className={`${montserrat.className} text-sm font-thin w-full bg-white h-[250px] overflow-scroll rounded-md py-3 mb-4`}>
-                                <h1 className=' w-full bg-white py-2 px-10 border-b border-b-slate-300 uppercase'>Tailoring</h1>
+                                {specializations.map((specialization, idx) => {
+                                    return (
+                                        <h1 onClick={() => updateCourseSpecialization(specialization)} key={`${specialization}-${idx}`} className='cursor-pointer w-full bg-white py-2 px-10 border-b border-b-slate-300 uppercase'>{specialization}</h1>
+                                    );
+                                })}
                             </div>
                         </div>
 
-                        <PaymentBlock />
+                        <PaymentBlock selectionDetails={selectionDetails}/>
                     </div>
                 </div>
             </FadeInFromBottom>
@@ -97,7 +141,24 @@ export default function Page() {
 }
 
 
-function PaymentBlock() {
+function PaymentBlock({selectionDetails}) {
+    const [loading, setLoading] = useState(false);
+    const router = useRouter();
+
+    async function handlePaymentClick() {
+        let course = selectionDetails.course_code;
+        let specialization = selectionDetails.course_specialization;
+        if (course == "") return;
+        setLoading(true);
+        let url = await makePayment({course, specialization});
+        if (url) {
+            router.push(url);
+        } else {
+            setLoading(false);
+        }
+    }
+
+
     return (
         <div className=' w-[40%] h-[100vh] flex flex-col items-center justify-start py-24'>
             <div className=' w-full text-center mb-4'>
@@ -105,22 +166,22 @@ function PaymentBlock() {
                 <div className=' w-[80%] m-auto py-4 bg-[#98c898] rounded-lg mb-4'>
                     <div className=' text-center mb-4'>
                         <p>Assigned Group Name</p>
-                        <h1 className=' uppercase font-extrabold text-3xl'>xavier</h1>
+                        <h1 className=' uppercase font-extrabold text-3xl'>null</h1>
                     </div>
 
                     <div className=' text-center mb-4'>
                         <p>Group Number</p>
-                        <h1 className=' uppercase font-extrabold text-3xl'>39</h1>
+                        <h1 className=' uppercase font-extrabold text-3xl'>null</h1>
                     </div>
 
                     <div className=' text-center mb-4'>
                         <p>Course Code</p>
-                        <h1 className=' uppercase font-extrabold text-3xl'>gns303</h1>
+                        <h1 className=' uppercase font-extrabold text-3xl'>{selectionDetails.course_code}</h1>
                     </div>
 
                     <div className=' text-center mb-4'>
                         <p>Course Group</p>
-                        <h1 className=' uppercase font-extrabold text-3xl'>tailoring</h1>
+                        <h1 className=' uppercase font-extrabold text-3xl'>{selectionDetails.course_specialization}</h1>
                     </div>
 
                     <div className=' text-center mb-4'>
@@ -129,7 +190,7 @@ function PaymentBlock() {
                     </div>
                 </div>
                 <div className=' w-full flex flex-col items-center justify-center'>
-                    <Link href={"/payment"} className=' w-[80%] bg-[#379E37] text-white mb-4 py-2 rounded-md'>Make Payment</Link>
+                    <button onClick={handlePaymentClick} type='button' className={"w-[80%] bg-[#379E37] text-white mb-4 py-2 rounded-md"} disabled={loading}>{loading? "loading...":"Make Payment"}</button>
                     <Link href={"/payment"} className=' text-sm text-[#379E37] underline'>Show Payment History</Link>
                 </div>
             </div>
