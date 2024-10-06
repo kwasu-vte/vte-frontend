@@ -9,10 +9,11 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { Logout } from '@/lib/utils';
 import { FadeInFromLeft } from './FadeInFromLeft';
 import { useAuth } from '@/lib/auth';
+import { usePathname } from 'next/navigation';
 
 const AdminSidebar = () => {
     const { logout } = useAuth();
-    let currentPath = '/adminDashboard'; // This is temporary
+    let currentPath = usePathname();
     return (
         <div className=' z-50 fixed h-[100vh] py-2 w-[18%]'>
             <FadeInFromLeft>
@@ -26,10 +27,10 @@ const AdminSidebar = () => {
                             className=' m-auto'
                         />
                         <div className=' w-full'>
-                            <Link href="/adminDashboard">
+                            <Link href="/">
                                 <div
                                     className={
-                                        currentPath === '/adminDashboard'
+                                        currentPath === '/'
                                             ? 'flex items-center justify-start w-[80%] px-2 duration-500 text-[#379E37] bg-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'
                                             : 'flex items-center justify-start w-[80%] px-2 duration-500 text-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'
                                     }

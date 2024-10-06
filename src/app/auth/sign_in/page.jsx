@@ -32,7 +32,7 @@ export default function Page() {
 
                     <div className=' w-fit mx-auto mb-10'>
                         <h1 className=' font-[800] text-6xl text-center mx-auto'>Welcome back</h1>
-                        <p className=' text-sm text-[#6E6E6E]'>Dont have an account? <span className=' text-[#379E37]'><button className=' underline'>Sign up</button></span></p>
+                        <p className=' text-sm text-[#6E6E6E]'>Dont have an account? <a href="/auth/sign_up"><span className=' text-[#379E37]'><button className=' underline'>Sign up</button></span></a></p>
                     </div>
 
                     <form onSubmit={handleSubmit} className="login relative w-[80%] mx-auto mb-6" style={{ marginLeft: 'auto', marginRight: 'auto' }}>

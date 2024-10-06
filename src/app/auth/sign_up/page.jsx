@@ -62,7 +62,7 @@ export default function Page() {
 
                 <div className=' w-[80%] mx-auto mb-10'>
                     <h1 className=' font-[800] text-6xl text-left mx-auto'>Get started</h1>
-                    <p className=' text-sm text-[#6E6E6E]'>already have an account? <span className=' text-[#379E37]'><button className=' underline'>Log in</button></span></p>
+                    <p className=' text-sm text-[#6E6E6E]'>already have an account? <a href="/auth/sign_in"><span className=' text-[#379E37]'><button className=' underline'>Log in</button></span></a></p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="relative w-[80%] mx-auto mb-6">

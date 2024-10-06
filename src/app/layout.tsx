@@ -1,5 +1,6 @@
-import { Roboto } from "next/font/google";
 import "./globals.css";
+import { Roboto } from "next/font/google";
+import { NextUIProvider } from "@nextui-org/react";
 
 import { AuthProvider } from "@/lib/auth";
 
@@ -16,9 +17,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={roboto.className}>
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+        <NextUIProvider>
+          <div className='bg-[#BFE7BF]'>
+            <AuthProvider>
+              {children}
+            </AuthProvider>
+          </div>
+        </NextUIProvider>
       </body>
     </html>
   );

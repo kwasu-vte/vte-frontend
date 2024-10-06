@@ -10,16 +10,11 @@ import { Calendar, CalendarCog } from 'lucide-react';
 import { Logout } from '@/lib/utils';
 import { FadeInFromLeft } from './FadeInFromLeft';
 import { useAuth } from '@/lib/auth';
+import { usePathname } from 'next/navigation';
 
 const StaffSidebar = () => {
     const { logout } = useAuth();
-    const [currentPath, setCurrentPath] = useState('');
-    useEffect(() => {
-        if (typeof window !== 'undefined') {
-            setCurrentPath(window.location.pathname);
-        }
-    }, []);
-
+    const currentPath = usePathname();
 
     return (
         <div className=' z-50 fixed h-[100vh] py-2 w-[18%]'>
@@ -34,10 +29,10 @@ const StaffSidebar = () => {
                             className=' m-auto'
                         />
                         <div className=' w-full'>
-                            <Link href="/staffDashboard" onClick={() => setCurrentPath('/staffDashboard')}>
+                            <Link href="/">
                                 <div
                                     className={
-                                        currentPath === '/staffDashboard'
+                                        currentPath === '/'
                                             ? 'flex items-center justify-start w-[80%] px-2 duration-500 text-[#379E37] bg-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'
                                             : 'flex items-center justify-start w-[80%] px-2 duration-500 text-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'
                                     }
@@ -47,7 +42,7 @@ const StaffSidebar = () => {
                                 </div>
                             </Link>
 
-                            <Link href="/staffAttendance" onClick={() => setCurrentPath('/staffAttendance')}>
+                            <Link href="/staffAttendance">
                                 <div
                                     className={
                                         currentPath === '/staffAttendance'
@@ -60,7 +55,7 @@ const StaffSidebar = () => {
                                 </div>
                             </Link>
 
-                            <Link href="/staffSettings" onClick={() => setCurrentPath('/staffSettings')}>
+                            <Link href="/staffSettings">
                                 <div
                                     className={
                                         currentPath === '/staffSettings'

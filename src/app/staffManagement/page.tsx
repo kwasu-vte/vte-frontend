@@ -1,4 +1,5 @@
-import React from 'react'
+"use client"
+import React, { useState } from 'react'
 import {
   CalendarMonth,
   CalendarViewDayRounded,
@@ -6,6 +7,9 @@ import {
   Search,
 } from "@mui/icons-material";
 import Link from "next/link";
+import { useDisclosure, Modal, ModalBody, ModalContent, ModalHeader, ModalFooter, } from '@nextui-org/react';
+
+
 import {
   Table,
   TableBody,
@@ -17,248 +21,101 @@ import {
 } from "@/components/ui/table";
 import { FadeInFromBottom } from '../components/FadeInFromBottom';
 
-const lastName = "Ojuoye";
-const firstName = "Moshood";
-const level = "";
-const groupName = "";
-const groupNo = "40";
-const groupWhatsappLink = "40";
+import { Protected } from '@/components/protected';
+import AdminSidebar from '../components/AdminSidebar';
+import { useAuth } from '@/lib/auth';
+
+import CreateStaffModal from './createStaff';
+
 
 const page = () => {
+  const { loading, user } = useAuth();
+  const {isOpen, onOpen, onOpenChange} = useDisclosure();
+
+  var lastName = "";
+  var firstName = "";
+
+  if (!loading && user) {
+    lastName = user.last_name;
+    firstName = user.first_name;
+  }
   return (
-    <FadeInFromBottom>
-      <div className=" w-full h-[100vh] overflow-scroll pl-[20%] py-2 pr-4">
-        <div className=" h-[60px] w-full bg-white rounded-md flex items-center justify-between p-2 mb-4">
-          <div className=" bg-[#BFE7BF7A] h-full w-[30%] px-3">
-            <Search />
-            <input
-              type="text"
-              className=" h-full bg-transparent px-3 focus:outline-none text-black placeholder:text-black text-sm"
-              placeholder="Search here..."
-            />
+    <Protected>
+      <AdminSidebar />
+      <FadeInFromBottom>
+        <div className=" w-full h-[100vh] overflow-scroll pl-[20%] py-2 pr-4">
+          <div className=" h-[60px] w-full bg-white rounded-md flex items-center justify-between p-2 mb-4">
+            <div className=" bg-[#BFE7BF7A] h-full w-[30%] px-3">
+              <Search />
+              <input
+                type="text"
+                className=" h-full bg-transparent px-3 focus:outline-none text-black placeholder:text-black text-sm"
+                placeholder="Search here..."
+              />
+            </div>
+            <div className=" flex items-center justify-center">
+              <Link href={"/studentPages/notifications/"}>
+                <Notifications className=" text-[#379E37] mx-4" />
+              </Link>
+              <div className=" h-[50px] w-[50px] bg-green-700 profile rounded-full mx-1"></div>
+              <div className=" mx-1 h-full flex flex-col items-start justify-center">
+                <h1 className=" font-bold text-lg">
+                  {lastName} {firstName}
+                </h1>
+                <p className=" uppercase text-[#379E37] text-xs font-bold">
+                  Admin
+                </p>
+              </div>
+            </div>
           </div>
-          <div className=" flex items-center justify-center">
-            <Link href={"/studentPages/notifications/"}>
-              <Notifications className=" text-[#379E37] mx-4" />
-            </Link>
-            <div className=" h-[50px] w-[50px] bg-green-700 profile rounded-full mx-1"></div>
-            <div className=" mx-1 h-full flex flex-col items-start justify-center">
-              <h1 className=" font-bold text-lg">
-                {lastName} {firstName}
-              </h1>
-              <p className=" uppercase text-[#379E37] text-xs font-bold">
-                200LVL
-              </p>
+
+          <div>
+            <h1 className=" font-extrabold text-[#379E37] mb-4 text-xl">
+              Staff Management
+            </h1>
+          </div>
+
+          <div className=' w-full h-[80vh] bg-white p-4 rounded-lg'>
+            <div className=' flex items-center justify-between'>
+              <button onClick={onOpen} className='bg-green-600 text-white rounded-md p-2 px-4'>Create</button>
+              <div className=" flex items-center justify-center bg-white p-2 rounded-md">
+                <CalendarMonth className=" text-[#379E37]" />
+                <select name="" id="" className=" mx-4 appearance-none">
+                  <option value="">August 16, 2024</option>
+                </select>
+              </div>
+            </div>
+            <div className='mt-2 h-[90%] w-full overflow-scroll'>
+              <Table>
+                <TableHeader className="">
+                  <TableRow>
+                    <TableHead className="">S/N</TableHead>
+                    <TableHead className="">Full Name</TableHead>
+                    <TableHead className="">Staff Number</TableHead>
+                    <TableHead className="">Assigned Group</TableHead>
+                    <TableHead>Action</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  <TableRow>
+                    <TableCell className="font-medium">1</TableCell>
+                    <TableCell>Olusanmi Pelumi</TableCell>
+                    <TableCell>Kwas/17/Biol123</TableCell>
+                    <TableCell>Group A</TableCell>
+                    <TableCell>
+                      <div className=''>
+
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
             </div>
           </div>
         </div>
-
-        <div>
-          <h1 className=" font-extrabold text-[#379E37] mb-4 text-xl">
-            Staff Management
-          </h1>
-        </div>
-
-        <div className=' w-full h-[80vh] bg-white p-4 rounded-lg'>
-          <div className=' flex items-center justify-end'>
-            <div className=" flex items-center justify-center bg-white p-2 rounded-md">
-              <CalendarMonth className=" text-[#379E37]" />
-              <select name="" id="" className=" mx-4 appearance-none">
-                <option value="">August 16, 2024</option>
-              </select>
-            </div>
-          </div>
-          <div className=' h-[90%] w-full overflow-scroll'>
-            <Table>
-              <TableHeader className="">
-                <TableRow>
-                  <TableHead className="">S/N</TableHead>
-                  <TableHead className="">Course</TableHead>
-                  <TableHead className="">Task Title</TableHead>
-                  <TableHead className="">Description</TableHead>
-                  <TableHead>Time Status</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Score</TableHead>
-                  <TableHead className="text-right">Details</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <TableRow>
-                  <TableCell className="font-medium">1</TableCell>
-                  <TableCell>EDD</TableCell>
-                  <TableCell>Breeding Of Tilapia Fish</TableCell>
-                  <TableCell>Choose healthy an...</TableCell>
-                  <TableCell>Submission Open</TableCell>
-                  <TableCell>Not Submitted</TableCell>
-                  <TableCell>---</TableCell>
-                  <TableCell className="text-right">View</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">1</TableCell>
-                  <TableCell>EDD</TableCell>
-                  <TableCell>Breeding Of Tilapia Fish</TableCell>
-                  <TableCell>Choose healthy an...</TableCell>
-                  <TableCell>Submission Open</TableCell>
-                  <TableCell>Not Submitted</TableCell>
-                  <TableCell>---</TableCell>
-                  <TableCell className="text-right">View</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">1</TableCell>
-                  <TableCell>EDD</TableCell>
-                  <TableCell>Breeding Of Tilapia Fish</TableCell>
-                  <TableCell>Choose healthy an...</TableCell>
-                  <TableCell>Submission Open</TableCell>
-                  <TableCell>Not Submitted</TableCell>
-                  <TableCell>---</TableCell>
-                  <TableCell className="text-right">View</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">1</TableCell>
-                  <TableCell>EDD</TableCell>
-                  <TableCell>Breeding Of Tilapia Fish</TableCell>
-                  <TableCell>Choose healthy an...</TableCell>
-                  <TableCell>Submission Open</TableCell>
-                  <TableCell>Not Submitted</TableCell>
-                  <TableCell>---</TableCell>
-                  <TableCell className="text-right">View</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">1</TableCell>
-                  <TableCell>EDD</TableCell>
-                  <TableCell>Breeding Of Tilapia Fish</TableCell>
-                  <TableCell>Choose healthy an...</TableCell>
-                  <TableCell>Submission Open</TableCell>
-                  <TableCell>Not Submitted</TableCell>
-                  <TableCell>---</TableCell>
-                  <TableCell className="text-right">View</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">1</TableCell>
-                  <TableCell>EDD</TableCell>
-                  <TableCell>Breeding Of Tilapia Fish</TableCell>
-                  <TableCell>Choose healthy an...</TableCell>
-                  <TableCell>Submission Open</TableCell>
-                  <TableCell>Not Submitted</TableCell>
-                  <TableCell>---</TableCell>
-                  <TableCell className="text-right">View</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">1</TableCell>
-                  <TableCell>EDD</TableCell>
-                  <TableCell>Breeding Of Tilapia Fish</TableCell>
-                  <TableCell>Choose healthy an...</TableCell>
-                  <TableCell>Submission Open</TableCell>
-                  <TableCell>Not Submitted</TableCell>
-                  <TableCell>---</TableCell>
-                  <TableCell className="text-right">View</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">1</TableCell>
-                  <TableCell>EDD</TableCell>
-                  <TableCell>Breeding Of Tilapia Fish</TableCell>
-                  <TableCell>Choose healthy an...</TableCell>
-                  <TableCell>Submission Open</TableCell>
-                  <TableCell>Not Submitted</TableCell>
-                  <TableCell>---</TableCell>
-                  <TableCell className="text-right">View</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">1</TableCell>
-                  <TableCell>EDD</TableCell>
-                  <TableCell>Breeding Of Tilapia Fish</TableCell>
-                  <TableCell>Choose healthy an...</TableCell>
-                  <TableCell>Submission Open</TableCell>
-                  <TableCell>Not Submitted</TableCell>
-                  <TableCell>---</TableCell>
-                  <TableCell className="text-right">View</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">1</TableCell>
-                  <TableCell>EDD</TableCell>
-                  <TableCell>Breeding Of Tilapia Fish</TableCell>
-                  <TableCell>Choose healthy an...</TableCell>
-                  <TableCell>Submission Open</TableCell>
-                  <TableCell>Not Submitted</TableCell>
-                  <TableCell>---</TableCell>
-                  <TableCell className="text-right">View</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">1</TableCell>
-                  <TableCell>EDD</TableCell>
-                  <TableCell>Breeding Of Tilapia Fish</TableCell>
-                  <TableCell>Choose healthy an...</TableCell>
-                  <TableCell>Submission Open</TableCell>
-                  <TableCell>Not Submitted</TableCell>
-                  <TableCell>---</TableCell>
-                  <TableCell className="text-right">View</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">1</TableCell>
-                  <TableCell>EDD</TableCell>
-                  <TableCell>Breeding Of Tilapia Fish</TableCell>
-                  <TableCell>Choose healthy an...</TableCell>
-                  <TableCell>Submission Open</TableCell>
-                  <TableCell>Not Submitted</TableCell>
-                  <TableCell>---</TableCell>
-                  <TableCell className="text-right">View</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">1</TableCell>
-                  <TableCell>EDD</TableCell>
-                  <TableCell>Breeding Of Tilapia Fish</TableCell>
-                  <TableCell>Choose healthy an...</TableCell>
-                  <TableCell>Submission Open</TableCell>
-                  <TableCell>Not Submitted</TableCell>
-                  <TableCell>---</TableCell>
-                  <TableCell className="text-right">View</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">1</TableCell>
-                  <TableCell>EDD</TableCell>
-                  <TableCell>Breeding Of Tilapia Fish</TableCell>
-                  <TableCell>Choose healthy an...</TableCell>
-                  <TableCell>Submission Open</TableCell>
-                  <TableCell>Not Submitted</TableCell>
-                  <TableCell>---</TableCell>
-                  <TableCell className="text-right">View</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">1</TableCell>
-                  <TableCell>EDD</TableCell>
-                  <TableCell>Breeding Of Tilapia Fish</TableCell>
-                  <TableCell>Choose healthy an...</TableCell>
-                  <TableCell>Submission Open</TableCell>
-                  <TableCell>Not Submitted</TableCell>
-                  <TableCell>---</TableCell>
-                  <TableCell className="text-right">View</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">1</TableCell>
-                  <TableCell>EDD</TableCell>
-                  <TableCell>Breeding Of Tilapia Fish</TableCell>
-                  <TableCell>Choose healthy an...</TableCell>
-                  <TableCell>Submission Open</TableCell>
-                  <TableCell>Not Submitted</TableCell>
-                  <TableCell>---</TableCell>
-                  <TableCell className="text-right">View</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">1</TableCell>
-                  <TableCell>EDD</TableCell>
-                  <TableCell>Breeding Of Tilapia Fish</TableCell>
-                  <TableCell>Choose healthy an...</TableCell>
-                  <TableCell>Submission Open</TableCell>
-                  <TableCell>Not Submitted</TableCell>
-                  <TableCell>---</TableCell>
-                  <TableCell className="text-right">View</TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-          </div>
-        </div>
-      </div>
-    </FadeInFromBottom>
+      </FadeInFromBottom>
+      <CreateStaffModal isOpen={isOpen} onOpenChange={onOpenChange}/>
+    </Protected>
   )
 }
 
