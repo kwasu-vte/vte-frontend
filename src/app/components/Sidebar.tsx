@@ -12,11 +12,13 @@ import { FadeInFromBottom } from './FadeInFromBottom';
 import { FadeInFromLeft } from './FadeInFromLeft';
 import { useAuth } from '@/lib/auth';
 import { usePathname } from 'next/navigation';
+import StudentQRCode from '../modals/StudentQRCode';
 
 const Sidebar = () => {
     const { logout } = useAuth();
     const [IsQRcodeModalOpen, setIsQRcodeModalOpen] = useState(false)
     const currentPath = usePathname();
+    const [buttonActive, setButtonActive] = useState(false)
 
     return (
         <div className=' z-50 fixed h-[100vh] py-2 w-[18%]'>
@@ -57,10 +59,10 @@ const Sidebar = () => {
                                 </div>
                             </Link>
 
-                            <Link href="/attendance">
+                            <button className=' w-full' onClick={() => { setIsQRcodeModalOpen(true); setButtonActive(true) }}>
                                 <div
                                     className={
-                                        currentPath === '/attendance'
+                                        buttonActive
                                             ? 'flex items-center justify-start w-[80%] px-2 duration-500 text-[#379E37] bg-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'
                                             : 'flex items-center justify-start w-[80%] px-2 duration-500 text-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'
                                     }
@@ -68,7 +70,7 @@ const Sidebar = () => {
                                     <CalendarMonth className=' mx-2' />
                                     Attendance
                                 </div>
-                            </Link>
+                            </button>
 
                             {/* <Link href="/payment" onClick={() => setCurrentPath('/payment')}>
                             <div
@@ -113,7 +115,7 @@ const Sidebar = () => {
             </FadeInFromLeft>
 
             {
-                IsQRcodeModalOpen && <QRCodeModal setIsQRcodeModalOpen={setIsQRcodeModalOpen} />
+                IsQRcodeModalOpen && <StudentQRCode setIsStudentQRCodeOpen={setIsQRcodeModalOpen} setButtonActive={setButtonActive} />
             }
         </div>
     )

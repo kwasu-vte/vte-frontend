@@ -55,15 +55,15 @@ export default function Dashboard() {
 
             <div className=" h-[50px] w-[50px] bg-green-700 profile rounded-full mx-1"></div>
 
-            <div className=" mx-1 h-full flex flex-col items-start justify-center">
+            <div className=" mx-1 h-full flex flex-col items-start justify-center min-w-[100px]">
               <h1 className=" font-bold text-lg">
                 {lastName} {firstName}
               </h1>
               <div className="flex">
-                <p className=" uppercase text-[#379E37] text-xs font-bold">
+                <p className=" uppercase text-[#379E37] text-xs font-bold mr-4">
                   {level}LVL
                 </p>
-                <select className="text-xs uppercase font-semibold  text-[#B7802C] border-none" name="course" id="course">
+                <select className="text-xs uppercase font-semibold  text-[#B7802C] border-none focus:outline-none" name="course" id="course">
                   <option value="gns-202">gns202</option>
                   <option value="vte-202">vte202</option>
                   <option value=""></option>
