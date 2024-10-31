@@ -27,6 +27,7 @@ import { FadeInFromBottom } from "../components/FadeInFromBottom";
 
 import { Protected } from "@/components/protected";
 import { useAuth } from "@/lib/auth";
+import Typewriter from "../components/Typewriter";
 
 export default function Page() {
   const { user, loading } = useAuth();
@@ -72,7 +73,7 @@ export default function Page() {
           <div className=" w-full bg-transparent flex items-start justify-between p-2 mb-2 border-b-2 border-b-[#7ABE7A]">
             <div>
               <h1 className=" text-4xl font-extrabold text-[#379E37] mb-2">
-                Welcome back {lastName} {firstName}! 👋🏽
+                <Typewriter text={`Welcome back ${firstName} ${lastName}! 👋🏽`} speed={100} />
               </h1>
             </div>
             <div className=" flex items-center justify-center bg-white p-2 rounded-md">

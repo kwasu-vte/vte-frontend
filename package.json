@@ -20,6 +20,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "framer-motion": "^11.11.1",
+    "grapheme-splitter": "^1.0.4",
     "js-cookie": "^3.0.5",
     "lucide-react": "^0.436.0",
     "next": "14.2.5",
@@ -28,6 +29,7 @@
     "react-intersection-observer": "^9.13.1",
     "react-qr-barcode-scanner": "^2.0.0",
     "react-router-dom": "^6.26.1",
+    "react-typewriter-effect": "^1.1.0",
     "tailwind-merge": "^2.5.2",
     "tailwindcss-animate": "^1.0.7"
   },
