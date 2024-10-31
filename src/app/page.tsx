@@ -33,7 +33,7 @@ export default function Page() {
             </> :
             <div className=" h-[100vh] w-[100vw] flex items-center justify-center home-bg">
               <div
-                className={`bg-green-500 md:hover:bg-blue-400 w-[90%] md:w-[50%] lg:w-[30%] text-white text-[0.85rem] duration-150 py-[1rem] px-[2.3rem] font-semibold tracking-wider md:tracking-widest mt-[1rem] md:mt-[1.5rem] uppercase flex items-center justify-center`}
+                className={`bg-green-500 md:hover:bg-green-500 w-[90%] md:w-[50%] lg:w-[30%] text-white text-[0.85rem] duration-150 py-[1rem] px-[2.3rem] font-semibold tracking-wider md:tracking-widest mt-[1rem] md:mt-[1.5rem] uppercase flex items-center justify-center`}
               >
                 <div>
                   <div className="animate-spin h-5 w-5 mx-auto border-2 border-white rounded-full border-t-transparent"></div>
