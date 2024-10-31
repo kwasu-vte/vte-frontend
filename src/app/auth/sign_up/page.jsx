@@ -49,7 +49,7 @@ export default function Page() {
         }
     }
     return (
-        <div className=' flex items-center justify-center h-[100vh] bg-[#BFE7BF]'>
+        <div className='flex items-center justify-center h-[100vh] bg-[#BFE7BF]'>
             <FadeInFromBottom>
                 <div className=' w-[80%] h-[80%] bg-white rounded-md flex items-center justify-between p-2'>
                     <div className=' w-[45%] flex flex-col items-start justify-start h-full'>
@@ -163,6 +163,116 @@ export default function Page() {
                         </form>
                     </div>
                 </div>
+
+                {/* <div className=" h-[100vh] md:hidden w-[90%] flex flex-col items-start justify-start mx-auto">
+                    <div className=' flex items-center justify-center mb-6'>
+                        <Image
+                            alt=''
+                            src={logo}
+                            height={100}
+                            width={100} />
+                        <h1 className=' text-[#DC9935] font-extrabold text-lg'>Kwara State <br /> University</h1>
+                    </div>
+
+                    <div className=' w-fit mb-10'>
+                        <h1 className=' font-[800] text-4xl text-center mx-auto'>Welcome back</h1>
+                        <p className=' text-sm text-[#6E6E6E]'>Dont have an account? <a href="/auth/sign_up"><span className=' text-[#379E37]'><button className=' underline'>Sign up</button></span></a></p>
+                    </div>
+
+                    <form onSubmit={handleSubmit} className="login relative w-full mx-auto mb-6">
+                        <div className="relative w-full mx-auto mb-6">
+                            <input
+                                type="text"
+                                id="first_name"
+                                name="first_name"
+                                className=" placeholder:text-sm font-thin block w-full px-4 py-2 text-sm text-gray-900 border border-[#58AE58] rounded-lg focus:outline-none peer"
+                                placeholder="Enter your first name"
+                                onChange={handleChange}
+                            />
+                            <label className="absolute left-3 -top-2.5 px-1 bg-[#BFE7BF] text-sm text-black font-bold transition-all">
+                                First Name
+                            </label>
+                        </div>
+
+                        <div className="relative w-full mx-auto mb-6">
+                            <input
+                                type="text"
+                                id="last_name"
+                                name="last_name"
+                                className=" placeholder:text-sm font-thin block w-full px-4 py-2 text-sm text-gray-900 border border-[#58AE58] rounded-lg focus:outline-none peer"
+                                placeholder="Enter your last name"
+                                onChange={handleChange}
+                            />
+                            <label className="absolute left-3 -top-2.5 px-1 bg-[#BFE7BF] text-sm text-black font-bold transition-all">
+                                Last Name
+                            </label>
+                        </div>
+
+                        <div className="relative w-full mx-auto mb-6">
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                className=" placeholder:text-sm font-thin block w-full px-4 py-2 text-sm text-gray-900 border border-[#58AE58] rounded-lg focus:outline-none peer"
+                                placeholder="Enter your email"
+                                onChange={handleChange}
+                            />
+                            <label className="absolute left-3 -top-2.5 px-1 bg-[#BFE7BF] text-sm text-black font-bold transition-all">
+                                Email
+                            </label>
+                        </div>
+
+                        <div className=" w-full mx-auto flex items-center justify-between p-0 m-0 mb-4">
+                            <div className="relative w-[48%] mx-auto mb-6">
+                                <input
+                                    type="text"
+                                    id="matric_number"
+                                    name="matric_number"
+                                    className=" placeholder:text-sm font-thin block w-full px-4 py-2 text-sm text-gray-900 border border-[#58AE58] rounded-lg focus:outline-none peer"
+                                    placeholder="Enter your matric number"
+                                    onChange={handleChange}
+                                />
+                                <label
+
+                                    className="absolute left-3 -top-2.5 px-1 bg-[#BFE7BF] text-sm text-black font-bold transition-all"
+                                >
+                                    Matric Number
+                                </label>
+                            </div>
+                            <div className="relative w-[48%] mx-auto mb-6">
+                                <input
+                                    type="text"
+                                    id="level"
+                                    name="level"
+                                    className=" placeholder:text-sm font-thin block w-full px-4 py-2 text-sm text-gray-900 border border-[#58AE58] rounded-lg focus:outline-none peer"
+                                    placeholder="Enter your level"
+                                    onChange={handleChange}
+                                />
+                                <label className="absolute left-3 -top-2.5 px-1 bg-[#BFE7BF] text-sm text-black font-bold transition-all"
+                                >
+                                    Level
+                                </label>
+                            </div>
+                        </div>
+
+                        {
+                            isSignUpProcessStarted ? (
+                                <div
+                                    className={`bg-green-500 w-full text-white text-[0.85rem] duration-150 py-[1rem] px-[2.3rem] font-semibold tracking-wider md:tracking-widest mt-[1rem] md:mt-[1.5rem] uppercase`}
+                                >
+                                    <div className="animate-spin h-5 w-5 mx-auto border-2 border-white rounded-full border-t-transparent"></div>
+                                </div>
+                            ) : (
+                                <button
+                                    type="submit"
+                                    className={`bg-green-500 md:hover:bg-green-400 w-full text-white text-[0.85rem] duration-150 py-[1rem] px-[2.3rem] font-semibold tracking-wider md:tracking-widest mt-[1rem] md:mt-[1.5rem] uppercase`}
+                                >
+                                    Sign Up
+                                </button>
+                            )
+                        }
+                    </form>
+                </div> */}
             </FadeInFromBottom>
         </div>
     );

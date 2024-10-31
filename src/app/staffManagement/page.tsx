@@ -26,11 +26,12 @@ import AdminSidebar from '../components/AdminSidebar';
 import { useAuth } from '@/lib/auth';
 
 import CreateStaffModal from './createStaff';
+import data from '@/helpers/demodata';
 
 
 const page = () => {
   const { loading, user } = useAuth();
-  const {isOpen, onOpen, onOpenChange} = useDisclosure();
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   var lastName = "";
   var firstName = "";
@@ -77,7 +78,7 @@ const page = () => {
 
           <div className=' w-full h-[80vh] bg-white p-4 rounded-lg'>
             <div className=' flex items-center justify-between'>
-              <button onClick={onOpen} className='bg-green-600 text-white rounded-md p-2 px-4'>Create</button>
+              <button onClick={onOpen} className='bg-green-600 hover:border-[2px] hover:border-green-600 hover:bg-transparent hover:text-green-600 duration-500 text-white rounded-md p-2 px-4'>+ Create New Staff</button>
               <div className=" flex items-center justify-center bg-white p-2 rounded-md">
                 <CalendarMonth className=" text-[#379E37]" />
                 <select name="" id="" className=" mx-4 appearance-none">
@@ -97,24 +98,28 @@ const page = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  <TableRow>
-                    <TableCell className="font-medium">1</TableCell>
-                    <TableCell>Olusanmi Pelumi</TableCell>
-                    <TableCell>Kwas/17/Biol123</TableCell>
-                    <TableCell>Group A</TableCell>
-                    <TableCell>
-                      <div className=''>
+                  {
+                    data.users.staff.map((staff, index) => (
+                      <TableRow key={index}>
+                        <TableCell className="font-medium">{staff.id}</TableCell>
+                        <TableCell>{staff.first_name} {staff.last_name}</TableCell>
+                        <TableCell>{staff.staff_number}</TableCell>
+                        <TableCell>Group {staff.group}</TableCell>
+                        <TableCell>
+                          <div className=''>
 
-                      </div>
-                    </TableCell>
-                  </TableRow>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  }
                 </TableBody>
               </Table>
             </div>
           </div>
         </div>
       </FadeInFromBottom>
-      <CreateStaffModal isOpen={isOpen} onOpenChange={onOpenChange}/>
+      <CreateStaffModal isOpen={isOpen} onOpenChange={onOpenChange} />
     </Protected>
   )
 }

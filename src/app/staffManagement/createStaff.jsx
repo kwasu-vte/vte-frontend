@@ -90,10 +90,10 @@ const CreateStaffModal = ({ isOpen, onOpenChange}) => {
                                 <input onChange={handleChange} type="password" name="password" placeholder="Password" className="w-full p-2 mb-4 rounded-md" />
                             </ModalBody>
                             <ModalFooter>
-                                <button className='p-2 px-4 rounded-md' onClick={onClose}>
+                                <button className='p-2 px-4 rounded-md hover:text-red-500 duration-500' onClick={onClose}>
                                     Close
                                 </button>
-                                <button onClick={handleSubmit} className="bg-green-600 text-white p-2 px-4 rounded-md" >
+                                <button onClick={handleSubmit} className="bg-green-600 duration-500 hover:bg-green-500 text-white p-2 px-4 rounded-md" >
                                     Submit
                                 </button>
                             </ModalFooter>

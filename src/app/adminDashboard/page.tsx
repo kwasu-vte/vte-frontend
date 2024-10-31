@@ -28,6 +28,7 @@ import { FadeInFromBottom } from "../components/FadeInFromBottom";
 import { Protected } from "@/components/protected";
 import { useAuth } from "@/lib/auth";
 import Typewriter from "../components/Typewriter";
+import data from "@/helpers/demodata";
 
 export default function Page() {
   const { user, loading } = useAuth();
@@ -93,7 +94,7 @@ export default function Page() {
                     <Image src={group} width={50} alt="" height={30} />
                     <div className=" text-center w-[80%] flex flex-col items-center justify-center">
                       <h3 className=" text-sm font-semibold">Total Students</h3>
-                      <h1 className=" font-extrabold text-4xl">0</h1>
+                      <h1 className=" font-extrabold text-4xl">{data.users.student.length}</h1>
                     </div>
                   </div>
 
@@ -101,7 +102,7 @@ export default function Page() {
                     <Image src={group} width={50} alt="" height={30} />
                     <div className=" text-center w-[80%] flex flex-col items-center justify-center">
                       <h3 className=" text-sm font-semibold">Total Staff</h3>
-                      <h1 className=" font-extrabold text-4xl">0</h1>
+                      <h1 className=" font-extrabold text-4xl">{data.users.staff.length}</h1>
                     </div>
                   </div>
                 </div>
@@ -110,7 +111,7 @@ export default function Page() {
                     <Image src={group} width={50} alt="" height={30} />
                     <div className=" text-center w-[80%] flex flex-col items-center justify-center">
                       <h3 className=" text-sm font-semibold">Courses</h3>
-                      <h1 className=" font-extrabold text-4xl">0</h1>
+                      <h1 className=" font-extrabold text-4xl">{data.courses.length}</h1>
                     </div>
                   </div>
 
@@ -118,7 +119,7 @@ export default function Page() {
                     <Image src={group} width={50} alt="" height={30} />
                     <div className=" text-center w-[80%] flex flex-col items-center justify-center">
                       <h3 className=" text-sm font-semibold">Groups</h3>
-                      <h1 className=" font-extrabold text-4xl">0</h1>
+                      <h1 className=" font-extrabold text-4xl">{data.assignments.grouped.length}</h1>
                     </div>
                   </div>
                 </div>

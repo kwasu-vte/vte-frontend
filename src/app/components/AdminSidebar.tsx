@@ -66,7 +66,7 @@ const AdminSidebar = () => {
                                 </div>
                             </Link>
 
-                            <Link href="/adminApproval">
+                            {/* <Link href="/adminApproval">
                                 <div
                                     className={
                                         currentPath === '/adminApproval'
@@ -77,7 +77,7 @@ const AdminSidebar = () => {
                                     <Layers className=' mx-2' />
                                     Approval
                                 </div>
-                            </Link>
+                            </Link> */}
 
                             <Link href="/courseManagement">
                                 <div
