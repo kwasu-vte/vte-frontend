@@ -104,21 +104,21 @@ export default function Dashboard() {
             </h1>
 
             <div className=" w-full flex items-center justify-between h-[80px] mb-4">
-              <div className=" px-2 w-[32%] flex items-center justify-center h-full rounded-lg shadow-sm shadow-slate-500 bg-white">
+              <div className=" px-2 w-[32%] flex items-center justify-center h-full rounded-lg shadow-sm shadow-slate-500 bg-white border-[4px] border-white hover:border-[#379E37] duration-500 cursor-pointer">
                 <Image src={group} width={50} alt="" height={30} />
                 <div className=" text-center mx-4">
                   <h1>Group</h1>
                   <h1 className=" font-bold text-xl">{groupName}</h1>
                 </div>
               </div>
-              <div className=" px-2 w-[32%] flex items-center justify-center h-full rounded-lg shadow-sm shadow-slate-500 bg-white">
+              <div className=" px-2 w-[32%] flex items-center justify-center h-full rounded-lg shadow-sm shadow-slate-500 bg-white border-[4px] border-white hover:border-[#379E37] duration-500 cursor-pointer">
                 <Image src={group} width={50} alt="" height={30} />
                 <div className=" text-center mx-4">
                   <h1>Group Number</h1>
                   <h1 className=" font-bold text-3xl">{groupNo}</h1>
                 </div>
               </div>
-              <div className=" px-2 w-[32%] flex items-center justify-center h-full rounded-lg shadow-sm shadow-slate-500 bg-white">
+              <div className=" px-2 w-[32%] flex items-center justify-center h-full rounded-lg shadow-sm shadow-slate-500 bg-white border-[4px] border-white hover:border-[#379E37] duration-500 cursor-pointer">
                 <Image src={group} width={50} alt="" height={30} />
                 <div className=" text-center mx-4">
                   <h1>Group</h1>
