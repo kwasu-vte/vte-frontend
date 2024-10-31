@@ -1,5 +1,6 @@
 import "./globals.css";
 import { Roboto } from "next/font/google";
+import { Urbanist } from "next/font/google";
 import { NextUIProvider } from "@nextui-org/react";
 
 import { AuthProvider } from "@/lib/auth";
@@ -9,6 +10,11 @@ const roboto = Roboto({
   weight: ["400", "500", "700"],
 });
 
+const urbanist = Urbanist({
+  subsets: ["latin"],
+  weight: ["400", "500", "700"],
+})
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -16,7 +22,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={roboto.className}>
+      <body className={urbanist.className}>
         <NextUIProvider>
           <div className='bg-[#BFE7BF]'>
             <AuthProvider>

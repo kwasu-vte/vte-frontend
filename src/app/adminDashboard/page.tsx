@@ -88,41 +88,41 @@ export default function Page() {
               <div className=" border-b-2 border-b-[#7ABE7A] w-full mb-8 pb-8">
                 <h1 className=" font-extrabold text-[#379E37] mb-4">Overview</h1>
                 <div className=" w-full flex items-center justify-between mb-4">
-                  <div className=" bg-white flex items-center justify-between rounded-md py-2 px-6 w-[45%]">
+                  <div className=" bg-white flex items-center justify-between rounded-md py-2 px-6 w-[45%] hover:border-[4px] hover:border-[#379E37] border-[4px] border-white duration-500 cursor-pointer">
                     <Image src={group} width={50} alt="" height={30} />
                     <div className=" text-center w-[80%] flex flex-col items-center justify-center">
                       <h3 className=" text-sm font-semibold">Total Students</h3>
-                      <h1 className=" font-extrabold text-4xl">1,595</h1>
+                      <h1 className=" font-extrabold text-4xl">0</h1>
                     </div>
                   </div>
 
-                  <div className=" bg-white flex items-center justify-between rounded-md py-2 px-6 w-[45%]">
+                  <div className=" bg-white flex items-center justify-between rounded-md py-2 px-6 w-[45%] hover:border-[4px] hover:border-[#379E37] border-[4px] border-white duration-500 cursor-pointer">
                     <Image src={group} width={50} alt="" height={30} />
                     <div className=" text-center w-[80%] flex flex-col items-center justify-center">
                       <h3 className=" text-sm font-semibold">Total Staff</h3>
-                      <h1 className=" font-extrabold text-4xl">52</h1>
+                      <h1 className=" font-extrabold text-4xl">0</h1>
                     </div>
                   </div>
                 </div>
                 <div className=" w-full flex items-center justify-between">
-                  <div className=" bg-white flex items-center justify-between rounded-md py-2 px-6 w-[45%]">
+                  <div className=" bg-white flex items-center justify-between rounded-md py-2 px-6 w-[45%] hover:border-[4px] hover:border-[#379E37] border-[4px] border-white duration-500 cursor-pointer">
                     <Image src={group} width={50} alt="" height={30} />
                     <div className=" text-center w-[80%] flex flex-col items-center justify-center">
                       <h3 className=" text-sm font-semibold">Courses</h3>
-                      <h1 className=" font-extrabold text-4xl">17</h1>
+                      <h1 className=" font-extrabold text-4xl">0</h1>
                     </div>
                   </div>
 
-                  <div className=" bg-white flex items-center justify-between rounded-md py-2 px-6 w-[45%]">
+                  <div className=" bg-white flex items-center justify-between rounded-md py-2 px-6 w-[45%] hover:border-[4px] hover:border-[#379E37] border-[4px] border-white duration-500 cursor-pointer">
                     <Image src={group} width={50} alt="" height={30} />
                     <div className=" text-center w-[80%] flex flex-col items-center justify-center">
                       <h3 className=" text-sm font-semibold">Groups</h3>
-                      <h1 className=" font-extrabold text-4xl">150</h1>
+                      <h1 className=" font-extrabold text-4xl">0</h1>
                     </div>
                   </div>
                 </div>
               </div>
-              <div className=" w-full bg-white min-h-[200px] rounded-md shadow-sm shadow-slate-500 px-2 py-4">
+              <div className=" w-full bg-white min-h-[200px] rounded-md shadow-sm shadow-slate-500 px-2 py-4 hover:px-1 hover:py-1 duration-500">
                 <h1 className=" font-extrabold text-black mb-4">
                   Task completion / Performance
                 </h1>
