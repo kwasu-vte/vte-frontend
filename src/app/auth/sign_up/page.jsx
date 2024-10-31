@@ -8,6 +8,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function Page() {
+    const [isLoginProcessStarted, setIsLoginProcessStarted] = useState(false)
     const router = useRouter();
     const [userInfo, setUserInfo] = useState({
         "first_name": "",
@@ -141,7 +142,23 @@ export default function Page() {
                         </div>
                     </div>
 
-                    <button type="submit" className=' text-white bg-[#58AE58] w-full mx-auto text-center py-2 rounded-md'>Sign up</button>
+                    {/* <button type="submit" className=' text-white bg-[#58AE58] w-full mx-auto text-center py-2 rounded-md'>Sign up</button> */}
+                    {
+                                isLoginProcessStarted ? (
+                                    <div
+                                        className={`bg-green-500 w-full text-white text-[0.85rem] duration-150 py-[1rem] px-[2.3rem] font-semibold tracking-wider md:tracking-widest mt-[1rem] md:mt-[1.5rem] uppercase`}
+                                    >
+                                        <div className="animate-spin h-5 w-5 mx-auto border-2 border-white rounded-full border-t-transparent"></div>
+                                    </div>
+                                ) : (
+                                    <button
+                                        type="submit"
+                                        className={`bg-green-500 md:hover:bg-green-400 w-full text-white text-[0.85rem] duration-150 py-[1rem] px-[2.3rem] font-semibold tracking-wider md:tracking-widest mt-[1rem] md:mt-[1.5rem] uppercase`}
+                                    >
+                                        Sign Up
+                                    </button>
+                                )
+                            }
                 </form>
                 </div>
             </div>
