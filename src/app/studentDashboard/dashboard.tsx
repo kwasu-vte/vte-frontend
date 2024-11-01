@@ -81,8 +81,8 @@ export default function Dashboard() {
                 <div className=" w-full bg-transparent flex items-start justify-between p-2 mb-2 border-b-2 border-b-[#7ABE7A]">
 
                     <div>
-                        <h1 className=" text-4xl font-extrabold text-[#379E37] mb-2">
-                            <Typewriter text={`Welcome back ${firstName} ${lastName}! 👋🏽`} speed={100} />
+                        <h1 className=" text-4xl font-extrabold text-[#379E37] mb-2 flex">
+                            W<Typewriter text={`elcome back ${firstName} ${lastName}!`} speed={100} />👋🏽
                         </h1>
                         <p>
                             Stay up to date with your VTE course

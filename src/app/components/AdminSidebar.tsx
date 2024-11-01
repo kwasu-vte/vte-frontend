@@ -11,9 +11,18 @@ import { FadeInFromLeft } from './FadeInFromLeft';
 import { useAuth } from '@/lib/auth';
 import { usePathname } from 'next/navigation';
 
+// interface AdminSidebarProps {
+//     role: string; // or use a specific type if you have defined roles
+//     setRoles: React.Dispatch<React.SetStateAction<string>>;
+// }
+
 const AdminSidebar = () => {
+    // console.log(`role is ${role}`)
     const { logout } = useAuth();
     let currentPath = usePathname();
+    // const handleRoleChange = (newRole: string) => {
+    //     setRoles(newRole); // Update the roles state in the parent component
+    // };
     return (
         <div className=' z-50 fixed h-[100vh] py-2 w-[18%]'>
             <FadeInFromLeft>

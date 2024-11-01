@@ -1,5 +1,5 @@
 "use client";
-import React from 'react'
+import React, { useState } from 'react'
 import Dashboard from '@/app/studentDashboard/dashboard'
 import AdminDashboard from '@/app/adminDashboard/page'
 import StaffDashboard from '@/app/staffDashboard/page'
@@ -13,14 +13,16 @@ import { useAuth } from '@/lib/auth';
 
 export default function Page() {
   const { loading, user } = useAuth();
+  const [roles, setRoles] = useState("");
 
   var role = "";
   if (!loading && user) { role = user.role; }
+  console.log(role)
   return (
     <Protected>
-      {role === 'admin' ?
+      {role === 'admin'||roles === 'admin' ?
         <>
-          <AdminSidebar />
+          <AdminSidebar role={role} setRoles={setRoles}/>
           <AdminDashboard />
         </> : role === "staff" ?
           <>
