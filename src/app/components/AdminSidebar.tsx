@@ -126,7 +126,7 @@ const AdminSidebar = () => {
                         <h1 className=' text-white mt-4'>Customer Support</h1>
                     </div>
 
-                    <button onClick={logout} className=' bg-[#9BCE9B] text-[#0B200B] px-2 rounded-md py-1 hover:px-4 duration-500'><LogoutRounded className=' mx-2' /> Logout</button>
+                    <button onClick={logout} className=' bg-[#9BCE9B] text-[#0B200B] px-2 rounded-md py-1 hover:px-4 duration-500'><LogoutRounded className=' mx-2'/> Logout</button>
                 </div>
             </FadeInFromLeft>
         </div>

@@ -3,7 +3,7 @@ import Admin from '@/app/adminDashboard/page'
 const adminhome = () => {
   return (
     <div>
-      <Admin/>
+      <Admin />
     </div>
   )
 }
