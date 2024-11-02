@@ -275,5 +275,122 @@ export default function Page() {
                 </div> */}
             </FadeInFromBottom>
         </div>
+        
+        //attempt at making it responsive
+    //     <div className="flex items-center justify-center h-[100vh] bg-[#BFE7BF] px-4 sm:px-0">
+    //   <FadeInFromBottom>
+    //     <div className="w-full sm:w-[80%] h-full sm:h-[80%] bg-white rounded-md flex flex-col sm:flex-row items-center justify-between p-4 sm:p-8">
+          
+    //       {/* Left Section: Logo and Welcome Text */}
+    //       <div className="w-full sm:w-[45%] flex flex-col items-center sm:items-start justify-start h-full mb-8 sm:mb-0">
+    //         <div className="flex items-center justify-center mb-6">
+    //           <Image alt="Kwara State University Logo" src={logo} height={80} width={80} />
+    //           <h1 className="text-[#DC9935] font-bold text-lg ml-4">Kwara State <br /> University</h1>
+    //         </div>
+
+    //         <div className="text-center sm:text-left mb-10">
+    //           <h1 className="font-extrabold text-3xl sm:text-6xl mb-2">Get started</h1>
+    //           <p className="text-sm text-[#6E6E6E]">
+    //             Already have an account?{' '}
+    //             <a href="/auth/sign_in">
+    //               <span className="text-[#379E37] underline">Log in</span>
+    //             </a>
+    //           </p>
+    //         </div>
+    //       </div>
+
+    //       {/* Right Section: Sign-Up Form */}
+    //       <div className="w-full sm:w-[50%]">
+    //         <form onSubmit={handleSubmit} className="w-full max-w-md mx-auto space-y-6">
+    //           <div className="relative">
+    //             <input
+    //               type="text"
+    //               id="first_name"
+    //               name="first_name"
+    //               className="placeholder:text-sm font-thin block w-full px-4 py-2 text-sm text-gray-900 border border-[#58AE58] rounded-lg focus:outline-none peer"
+    //               placeholder="Enter your first name"
+    //               onChange={handleChange}
+    //             />
+    //             <label className="absolute left-4 -top-2.5 px-1 bg-white text-sm text-black font-bold transition-all">
+    //               First Name
+    //             </label>
+    //           </div>
+
+    //           <div className="relative">
+    //             <input
+    //               type="text"
+    //               id="last_name"
+    //               name="last_name"
+    //               className="placeholder:text-sm font-thin block w-full px-4 py-2 text-sm text-gray-900 border border-[#58AE58] rounded-lg focus:outline-none peer"
+    //               placeholder="Enter your last name"
+    //               onChange={handleChange}
+    //             />
+    //             <label className="absolute left-4 -top-2.5 px-1 bg-white text-sm text-black font-bold transition-all">
+    //               Last Name
+    //             </label>
+    //           </div>
+
+    //           <div className="relative">
+    //             <input
+    //               type="email"
+    //               id="email"
+    //               name="email"
+    //               className="placeholder:text-sm font-thin block w-full px-4 py-2 text-sm text-gray-900 border border-[#58AE58] rounded-lg focus:outline-none peer"
+    //               placeholder="Enter your email"
+    //               onChange={handleChange}
+    //             />
+    //             <label className="absolute left-4 -top-2.5 px-1 bg-white text-sm text-black font-bold transition-all">
+    //               Email
+    //             </label>
+    //           </div>
+
+    //           <div className="flex flex-col sm:flex-row w-full gap-4">
+    //             <div className="relative w-full">
+    //               <input
+    //                 type="text"
+    //                 id="matric_number"
+    //                 name="matric_number"
+    //                 className="placeholder:text-sm font-thin block w-full px-4 py-2 text-sm text-gray-900 border border-[#58AE58] rounded-lg focus:outline-none peer"
+    //                 placeholder="Enter your matric number"
+    //                 onChange={handleChange}
+    //               />
+    //               <label className="absolute left-4 -top-2.5 px-1 bg-white text-sm text-black font-bold transition-all">
+    //                 Matric Number
+    //               </label>
+    //             </div>
+
+    //             <div className="relative w-full">
+    //               <input
+    //                 type="text"
+    //                 id="level"
+    //                 name="level"
+    //                 className="placeholder:text-sm font-thin block w-full px-4 py-2 text-sm text-gray-900 border border-[#58AE58] rounded-lg focus:outline-none peer"
+    //                 placeholder="Enter your level"
+    //                 onChange={handleChange}
+    //               />
+    //               <label className="absolute left-4 -top-2.5 px-1 bg-white text-sm text-black font-bold transition-all">
+    //                 Level
+    //               </label>
+    //             </div>
+    //           </div>
+
+    //           {/* Submit Button */}
+    //           {isSignUpProcessStarted ? (
+    //             <div className="bg-green-500 w-full text-white text-center py-3 font-semibold tracking-wider rounded-lg mt-4">
+    //               <div className="animate-spin h-5 w-5 mx-auto border-2 border-white rounded-full border-t-transparent"></div>
+    //             </div>
+    //           ) : (
+    //             <button
+    //               type="submit"
+    //               className="bg-green-500 hover:bg-green-400 w-full text-white text-[0.85rem] py-3 rounded-lg font-semibold tracking-wider uppercase mt-4 transition duration-150"
+    //             >
+    //               Sign Up
+    //             </button>
+    //           )}
+    //         </form>
+    //       </div>
+    //     </div>
+    //   </FadeInFromBottom>
+    // </div>
     );
 }
