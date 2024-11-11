@@ -2,7 +2,7 @@ import {useEffect} from 'react';
 import Cookies from 'js-cookie';
 // Install cookies from js-cookies;
 
-export async function makePayment({course, specialization}: {course: string, specialization: string}) {
+export async function makePayment({course, specialization}: {course: string, specialization: string | null}) {
     /** This function is used to make payment 
      * 
      *  Argument: 
@@ -10,6 +10,7 @@ export async function makePayment({course, specialization}: {course: string, spe
      *     specialization: This represents the specilization of the class
      *  Return: This returns the activitation_url to be redirected to.
     **/
+   specialization = specialization == "" ? null : specialization;
    try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}api/auth/register_course`, {
             method: "POST",
