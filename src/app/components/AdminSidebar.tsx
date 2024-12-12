@@ -3,13 +3,14 @@ import React, { useEffect, useState } from 'react'
 import logo from '../../assets/kwasulogo.png'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Book, Group, HomeRounded, Layers, LogoutRounded, Person2, Settings, WalletRounded } from '@mui/icons-material'
+import { Book, CloudDone, Group, HomeRounded, Layers, LogoutRounded, Person2, Settings, WalletRounded } from '@mui/icons-material'
 import customer from '@/assets/customerSupport.png'
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { Logout } from '@/lib/utils';
 import { FadeInFromLeft } from './FadeInFromLeft';
 import { useAuth } from '@/lib/auth';
 import { usePathname } from 'next/navigation';
+import { Cloud } from 'lucide-react';
 
 // interface AdminSidebarProps {
 //     role: string; // or use a specific type if you have defined roles
@@ -58,11 +59,11 @@ const AdminSidebar = () => {
                                     }
                                 >
                                     <Person2 className=' mx-2' />
-                                    Staff Mgt.
+                                    Management
                                 </div>
                             </Link>
 
-                            <Link href="/studentManagement">
+                            {/* <Link href="/studentManagement">
                                 <div
                                     className={
                                         currentPath === '/studentManagement'
@@ -73,20 +74,20 @@ const AdminSidebar = () => {
                                     <Person2 className=' mx-2' />
                                     Student Mgt.
                                 </div>
-                            </Link>
+                            </Link> */}
 
-                            {/* <Link href="/adminApproval">
+                            <Link href="/adminRecord">
                                 <div
                                     className={
-                                        currentPath === '/adminApproval'
+                                        currentPath === '/adminRecord'
                                             ? 'flex items-center justify-start w-[80%] px-2 duration-500 text-[#379E37] bg-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'
                                             : 'flex items-center justify-start w-[80%] px-2 duration-500 text-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'
                                     }
                                 >
-                                    <Layers className=' mx-2' />
-                                    Approval
+                                    <CloudDone className=' mx-2' />
+                                    Record
                                 </div>
-                            </Link> */}
+                            </Link>
 
                             <Link href="/courseManagement">
                                 <div

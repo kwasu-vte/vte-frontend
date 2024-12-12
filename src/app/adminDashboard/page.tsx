@@ -774,7 +774,7 @@ export default function Page() {
 
           {/* Top Navigation Bar (Visible on larger screens) */}
           <div className="hidden sm:flex items-center justify-between bg-white rounded-md p-2 mb-4">
-            <div className="bg-[#BFE7BF7A] h-full w-[30%] px-3 flex items-center">
+            <div className="bg-[#BFE7BF7A] h-[50px] w-[30%] px-3 flex items-center">
               <Search />
               <input
                 type="text"
@@ -801,7 +801,7 @@ export default function Page() {
             </h1>
             <div className="flex items-center bg-white p-2 rounded-md">
               <CalendarMonth className="text-[#379E37]" />
-              <select className="mx-2 sm:mx-4 appearance-none">
+              <select className="mx-2 sm:mx-4 appearance-none focus:outline-none">
                 <option>August 16, 2024</option>
               </select>
             </div>
@@ -813,14 +813,14 @@ export default function Page() {
             <div className="w-full sm:w-[45%] flex flex-col">
               <div className="border-b-2 border-[#7ABE7A] mb-8 pb-8">
                 <h1 className="font-extrabold text-[#379E37] mb-4">Overview</h1>
-                <div className="grid grid-cols-2 gap-4 sm:flex sm:justify-between">
+                <div className="grid grid-cols-2 gap-4">
                   {/* Card Components */}
                   {["Total Students", "Total Staff", "Courses", "Groups"].map((label, index) => (
-                    <div key={index} className="bg-white flex items-center p-4 rounded-md hover:border-[#379E37] duration-500 cursor-pointer">
-                      <Image src={group} width={40} alt="" height={30} />
-                      <div className="text-center w-full ml-4">
-                        <h3 className="text-sm font-semibold">{label}</h3>
-                        <h1 className="font-extrabold text-2xl">{index * 10 + 4}</h1> {/* Placeholder counts */}
+                    <div key={index} className="bg-white flex items-center justify-between p-4 rounded-md hover:border-[#379E37] duration-500 cursor-pointer">
+                      <Image src={group} width={55} alt="" height={30} />
+                      <div className="text-center w-[70%] ml-4">
+                        <h3 className="text-lg font-semibold">{label}</h3>
+                        <h1 className="font-extrabold text-3xl">{index * 10 + 4}</h1> {/* Placeholder counts */}
                       </div>
                     </div>
                   ))}
@@ -830,7 +830,7 @@ export default function Page() {
               {/* Performance Chart */}
               <div className="bg-white rounded-md shadow-sm px-2 py-4">
                 <h1 className="font-extrabold text-black mb-4">Task completion / Performance</h1>
-                <Image src={barchart} height={250} width={350} alt="Performance chart" />
+                <Image src={barchart} height={250} width={550} alt="Performance chart" />
               </div>
             </div>
 
