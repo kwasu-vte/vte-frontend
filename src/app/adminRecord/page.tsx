@@ -5,6 +5,14 @@ import AdminSidebar from '../components/AdminSidebar'
 import { Link, Search } from 'lucide-react'
 import { Notifications } from '@mui/icons-material'
 import { useAuth } from '@/lib/auth'
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table";
 
 const page = () => {
     const { user, loading } = useAuth();
@@ -41,9 +49,172 @@ const page = () => {
                         </div>
                     </div>
                 </div>
-                
 
-                <h1 className=' text-green-700 font-extrabold'>Record</h1>
+
+                <div>
+                    <h1 className=" font-extrabold text-[#379E37] mb-4 text-xl">
+                        Records
+                    </h1>
+                </div>
+
+                <div className=' w-full h-[80vh] bg-white p-4 rounded-lg'>
+                    <h1 className=" font-extrabold text-[#379E37] mb-4 text-xl">
+                        Tailoring Group A
+                    </h1>
+                    <div className="overflow-scroll rounded-md">
+                        <Table className="rounded-md">
+                            <TableHeader>
+                                <TableRow className=' bg-[#BFE7BF7A] hover:bg-[#BFE7BF7A] text-black'>
+                                    <TableHead className=' text-black'>S/N</TableHead>
+                                    <TableHead className=' text-black'>Full Name</TableHead>
+                                    <TableHead className=' text-black'>Matriculation Number</TableHead>
+                                    <TableHead className=' text-black'>Group</TableHead>
+                                    {/* <TableHead>Time Status</TableHead>
+                                    <TableHead>Status</TableHead>
+                                    <TableHead>Score</TableHead> */}
+                                    <TableHead className="text-center text-black">
+                                        Scores
+                                        <div className=' flex items-center justify-between'>
+                                            <div className=' w-[20px] text-center'>
+                                                <h1>1st</h1>
+                                            </div>
+                                            <div className=' w-[20px] text-center'>
+                                                <h1>2nd</h1>
+                                            </div>
+                                            <div className=' w-[20px] text-center'>
+                                                <h1>3rd</h1>
+                                            </div>
+                                            <div className=' w-[20px] text-center'>
+                                                <h1>CA</h1>
+                                            </div>
+                                            <div className=' w-[20px] text-center'>
+                                                <h1>Exam</h1>
+                                            </div>
+                                            <div className=' w-[20px] text-center'>
+                                                <h1>Total</h1>
+                                            </div>
+                                        </div>
+                                    </TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {/* Sample Table Row */}
+                                <TableRow>
+                                    <TableCell className="font-medium">1</TableCell>
+                                    <TableCell>Olusanmi Pelumi</TableCell>
+                                    <TableCell>Kwas/17/Biol123</TableCell>
+                                    <TableCell>A</TableCell>
+                                    <TableCell className="text-right">
+                                        <div className=' flex items-center justify-between'>
+                                            <div className=' w-[20px] text-center'>
+                                                <h1>10</h1>
+                                            </div>
+                                            <div className=' w-[20px] text-center'>
+                                                <h1>10</h1>
+                                            </div>
+                                            <div className=' w-[20px] text-center'>
+                                                <h1>10</h1>
+                                            </div>
+                                            <div className=' w-[20px] text-center'>
+                                                <h1>10</h1>
+                                            </div>
+                                            <div className=' w-[20px] text-center'>
+                                                <h1>60</h1>
+                                            </div>
+                                            <div className=' w-[20px] text-center'>
+                                                <h1>100</h1>
+                                            </div>
+                                        </div>
+                                    </TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell className="font-medium">1</TableCell>
+                                    <TableCell>Olusanmi Pelumi</TableCell>
+                                    <TableCell>Kwas/17/Biol123</TableCell>
+                                    <TableCell>A</TableCell>
+                                    <TableCell className="text-right">
+                                        <div className=' flex items-center justify-between'>
+                                            <div className=' w-[20px] text-center'>
+                                                <h1>10</h1>
+                                            </div>
+                                            <div className=' w-[20px] text-center'>
+                                                <h1>10</h1>
+                                            </div>
+                                            <div className=' w-[20px] text-center'>
+                                                <h1>10</h1>
+                                            </div>
+                                            <div className=' w-[20px] text-center'>
+                                                <h1>10</h1>
+                                            </div>
+                                            <div className=' w-[20px] text-center'>
+                                                <h1>60</h1>
+                                            </div>
+                                            <div className=' w-[20px] text-center'>
+                                                <h1>100</h1>
+                                            </div>
+                                        </div>
+                                    </TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell className="font-medium">1</TableCell>
+                                    <TableCell>Olusanmi Pelumi</TableCell>
+                                    <TableCell>Kwas/17/Biol123</TableCell>
+                                    <TableCell>A</TableCell>
+                                    <TableCell className="text-right">
+                                        <div className=' flex items-center justify-between'>
+                                            <div className=' w-[20px] text-center'>
+                                                <h1>10</h1>
+                                            </div>
+                                            <div className=' w-[20px] text-center'>
+                                                <h1>10</h1>
+                                            </div>
+                                            <div className=' w-[20px] text-center'>
+                                                <h1>10</h1>
+                                            </div>
+                                            <div className=' w-[20px] text-center'>
+                                                <h1>10</h1>
+                                            </div>
+                                            <div className=' w-[20px] text-center'>
+                                                <h1>60</h1>
+                                            </div>
+                                            <div className=' w-[20px] text-center'>
+                                                <h1>100</h1>
+                                            </div>
+                                        </div>
+                                    </TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell className="font-medium">1</TableCell>
+                                    <TableCell>Olusanmi Pelumi</TableCell>
+                                    <TableCell>Kwas/17/Biol123</TableCell>
+                                    <TableCell>A</TableCell>
+                                    <TableCell className="text-right">
+                                        <div className=' flex items-center justify-between'>
+                                            <div className=' w-[20px] text-center'>
+                                                <h1>10</h1>
+                                            </div>
+                                            <div className=' w-[20px] text-center'>
+                                                <h1>10</h1>
+                                            </div>
+                                            <div className=' w-[20px] text-center'>
+                                                <h1>10</h1>
+                                            </div>
+                                            <div className=' w-[20px] text-center'>
+                                                <h1>10</h1>
+                                            </div>
+                                            <div className=' w-[20px] text-center'>
+                                                <h1>60</h1>
+                                            </div>
+                                            <div className=' w-[20px] text-center'>
+                                                <h1>100</h1>
+                                            </div>
+                                        </div>
+                                    </TableCell>
+                                </TableRow>
+                            </TableBody>
+                        </Table>
+                    </div>
+                </div>
             </div>
         </Protected>
     )
