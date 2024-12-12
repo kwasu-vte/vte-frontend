@@ -16,7 +16,6 @@ import {
 
 const page = () => {
     const { user, loading } = useAuth();
-    const [sidebarOpen, setSidebarOpen] = useState(false);
 
     var lastName = "";
     var firstName = "";
