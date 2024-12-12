@@ -11,6 +11,7 @@ import { FadeInFromLeft } from './FadeInFromLeft';
 import { useAuth } from '@/lib/auth';
 import { usePathname } from 'next/navigation';
 import { Cloud } from 'lucide-react';
+import ManagementModal from '../modals/ManagementModal';
 
 // interface AdminSidebarProps {
 //     role: string; // or use a specific type if you have defined roles
@@ -21,6 +22,8 @@ const AdminSidebar = () => {
     // console.log(`role is ${role}`)
     const { logout } = useAuth();
     let currentPath = usePathname();
+    const [isManagementModalOpen, setIsManagementModalOpen] = useState(false)
+    const [buttonActive, setButtonActive] = useState(false)
     // const handleRoleChange = (newRole: string) => {
     //     setRoles(newRole); // Update the roles state in the parent component
     // };
@@ -50,7 +53,20 @@ const AdminSidebar = () => {
                                 </div>
                             </Link>
 
-                            <Link href="/staffManagement">
+                            <button className=' w-full' onClick={() => { setIsManagementModalOpen(true); setButtonActive(true) }}>
+                                <div
+                                    className={
+                                        buttonActive
+                                            ? 'flex items-center justify-start w-[80%] px-2 duration-500 text-[#379E37] bg-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'
+                                            : 'flex items-center justify-start w-[80%] px-2 duration-500 text-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'
+                                    }
+                                >
+                                    <Person2 className=' mx-2' />
+                                    Management
+                                </div>
+                            </button>
+                            {/* <Link href="/staffManagement"> */}
+                            {/* <button>
                                 <div
                                     className={
                                         currentPath === '/staffManagement'
@@ -61,7 +77,8 @@ const AdminSidebar = () => {
                                     <Person2 className=' mx-2' />
                                     Management
                                 </div>
-                            </Link>
+                            </button> */}
+                            {/* </Link> */}
 
                             {/* <Link href="/studentManagement">
                                 <div
@@ -127,9 +144,13 @@ const AdminSidebar = () => {
                         <h1 className=' text-white mt-4'>Customer Support</h1>
                     </div>
 
-                    <button onClick={logout} className=' bg-[#9BCE9B] text-[#0B200B] px-2 rounded-md py-1 hover:px-4 duration-500'><LogoutRounded className=' mx-2'/> Logout</button>
+                    <button onClick={logout} className=' bg-[#9BCE9B] text-[#0B200B] px-2 rounded-md py-1 hover:px-4 duration-500'><LogoutRounded className=' mx-2' /> Logout</button>
                 </div>
             </FadeInFromLeft>
+
+            {
+                isManagementModalOpen && <ManagementModal setIsManagementModalOpen={setIsManagementModalOpen} setButtonActive={setButtonActive} />
+            }
         </div>
     )
 }
