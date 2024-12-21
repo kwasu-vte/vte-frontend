@@ -277,7 +277,7 @@ export default function Page() {
         // </div>
 
     //mobile view v1
-    <div className="flex items-center justify-center min-h-screen bg-[#BFE7BF]">
+    <div className="flex items-center justify-center min-h-screen bg-[#BFE7BF] login-background">
     <FadeInFromBottom>
         <div className="w-full md:w-[80%] h-full md:h-[80%] bg-white rounded-md flex flex-col md:flex-row items-center md:items-start justify-center md:justify-between p-4 md:p-6">
             {/* Logo and Heading */}

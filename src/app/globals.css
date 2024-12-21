@@ -8,3 +8,17 @@
     background-repeat: no-repeat;
     background-position: center;
 }
+
+.login-background {
+    background-image: url('../assets/login-background.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.form-background {
+    background-image: url('../assets/form-bg-image.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}
