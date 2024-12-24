@@ -788,7 +788,7 @@ export default function Page() {
               </Link>
               <div className="h-[50px] w-[50px] bg-green-700 rounded-full"></div>
               <div className="mx-2 flex flex-col items-start">
-                <h1 className="font-bold text-lg text-red-500">{lastName} {firstName}</h1>
+                <h1 className="font-bold text-lg text-[#379E37]">{lastName} {firstName}</h1>
                 <p className="uppercase text-[#379E37] text-xs font-bold">Admin</p>
               </div>
             </div>

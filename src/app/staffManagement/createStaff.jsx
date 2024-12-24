@@ -76,11 +76,11 @@ const CreateStaffModal = ({ isOpen, onOpenChange}) => {
                 <ModalContent>
                     {(onClose) => (
                         <>
-                            <ModalHeader>
-                                <h1 className=" font-extrabold text-[#379E37] mb-4 text-xl">
+                            {/* <ModalHeader> */}
+                                <h1 className=" font-extrabold text-[#379E37] mb-4 text-xl py-4 px-3">
                                     Create Staff
                                 </h1>
-                            </ModalHeader>
+                            {/* </ModalHeader> */}
                             <ModalBody>
                                 {message.error && <p className="text-[#ea3a3a] mb-4">{message.message}</p>}
                                 {!(message.error) && (message.message != "") && <p className="text-green-500 mb-4">{message.message}</p>}

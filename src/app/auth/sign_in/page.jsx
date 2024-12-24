@@ -27,14 +27,14 @@ export default function Page() {
         <div className="flex items-center justify-center min-h-screen bg-[#BFE7BF] login-background">
             <div className=" w-full h-[100vh] flex items-center justify-center">
                 <FadeInFromLeft>
-                    <div className="w-full md:w-[80%] h-full md:h-[90%] bg-white rounded-md flex flex-col md:flex-row items-center justify-center md:justify-between p-4 md:p-[20px]">
-                        {/* Logo and Heading */}
-                        <div className="w-full md:w-[45%] flex flex-col items-center md:items-start justify-start h-full p-[20px]">
+                    <div className="w-full md:w-[80%] h-full md:h-[90%] lg:bg-white rounded-md flex flex-col md:flex-row items-center justify-center md:justify-between p-4 md:p-[20px]">
+                        <div className="w-full lg::w-[45%] flex flex-col items-start justify-start h-full p-[20px]">
+                            {/* Logo and Heading */}
                             <div className={`flex items-center justify-center mb-20  ${notoSans.className}`}>
                                 <Image
                                     alt="Kwara State University Logo"
                                     src={logo}
-                                    className=" md:w-[60px] mr-2"
+                                    className=" w-[30px] md:w-[60px] mr-2"
                                 />
                                 <div>
                                     <h1 className="text-[#DC9935] font-bold text-lg md:text-medium text-center md:text-left m-0 p-0">
@@ -44,8 +44,8 @@ export default function Page() {
                                 </div>
                             </div>
 
-                            <div className="text-center md:text-left mb-6">
-                                <h1 className={`font-extrabold text-2xl md:text-5xl ${notoSans.className} mb-3`}>Welcome back</h1>
+                            <div className="text-left mb-6">
+                                <h1 className={`font-extrabold text-4xl md:text-5xl ${notoSans.className} mb-3`}>Welcome back</h1>
                                 <p className="text-sm text-[#6E6E6E]">
                                     Don’t have an account?{" "}
                                     <a href="/auth/sign_up" className="text-[#379E37] underline">
@@ -57,7 +57,7 @@ export default function Page() {
                             {/* Login Form */}
                             <form
                                 onSubmit={handleSubmit}
-                                className="w-full mb-4 md:mb-6 px-4 md:px-0"
+                                className="w-full mb-4 md:mb-6 px-0"
                             >
                                 {/* Email / Matric No Field */}
                                 <div className="relative w-full mx-auto mb-4">
@@ -69,7 +69,7 @@ export default function Page() {
                                         placeholder="Enter your email or matric number"
                                         onChange={(e) => setUsername(e.target.value)}
                                     />
-                                    <label className="absolute left-3 -top-2.5 px-1 bg-white text-sm text-black font-bold transition-all">
+                                    <label className="absolute left-3 -top-2.5 px-1 bg-white rounded-md text-sm text-black font-bold transition-all">
                                         Email / Matric No
                                     </label>
                                 </div>
@@ -84,7 +84,7 @@ export default function Page() {
                                         placeholder="Enter your password"
                                         onChange={(e) => setPassword(e.target.value)}
                                     />
-                                    <label className="absolute left-3 -top-2.5 px-1 bg-white text-sm text-black font-bold transition-all">
+                                    <label className="absolute left-3 -top-2.5 px-1 bg-white rounded-md text-sm text-black font-bold transition-all">
                                         Password
                                     </label>
                                 </div>
@@ -106,7 +106,7 @@ export default function Page() {
                                 )}
                             </form>
                         </div>
-                        <div className=" w-[45%] h-full flex items-end justify-center relative">
+                        <div className=" hidden w-[45%] h-full lg:flex items-end justify-center relative">
                             <Image
                                 src={loginImage}
                                 alt=""
@@ -117,9 +117,9 @@ export default function Page() {
                                     <div className=" h-[70%] flex flex-col items-center justify-center w-full">
                                         <h1 className={`${notoSans.className} font-extrabold text-4xl bg-[#DC9935] p-2 rounded-md text-green-500 mb-6`}>Kwasu</h1>
                                         <p className={` font-extrabold text-white text-2xl text-center ${notoSans.className}`}>
-                                            Center For <br/>
-                                            Entrepreneurs <br/>
-                                            Payment Platform <br/>
+                                            Center For <br />
+                                            Entrepreneurs <br />
+                                            Payment Platform <br />
                                         </p>
                                     </div>
                                     <div className=" flex items-center justify-between w-[600px] overflow-visible">

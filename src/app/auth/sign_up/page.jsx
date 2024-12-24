@@ -56,14 +56,14 @@ export default function Page() {
         <div className="flex items-center justify-center min-h-screen bg-[#BFE7BF] login-background">
             <div className=" w-full h-[100vh] flex items-center justify-center">
                 <FadeInFromBottom>
-                    <div className="w-full md:w-[80%] h-full md:h-[90%] bg-white rounded-md flex flex-col md:flex-row items-center justify-center md:justify-between p-4 md:p-[20px]">
-                        {/* Logo and Heading */}
-                        <div className="w-full md:w-[45%] flex flex-col items-center md:items-start justify-start h-full px-4">
+                    <div className="w-full md:w-[80%] h-full md:h-[90%] lg:bg-white rounded-md flex flex-col md:flex-row items-center justify-center md:justify-between p-4 md:p-[20px]">
+                        <div className="w-full md:w-[45%] flex flex-col items-start justify-start h-full px-4">
+                            {/* Logo and Heading */}
                             <div className={`flex items-center justify-center mb-20  ${notoSans.className}`}>
                                 <Image
                                     alt="Kwara State University Logo"
                                     src={logo}
-                                    className=" md:w-[60px] mr-2"
+                                    className=" w-[30px] md:w-[60px] mr-2"
                                 />
                                 <div>
                                     <h1 className="text-[#DC9935] font-bold text-lg md:text-medium text-center md:text-left m-0 p-0">
@@ -73,8 +73,8 @@ export default function Page() {
                                 </div>
                             </div>
 
-                            <div className="text-center md:text-left mb-6">
-                                <h1 className={`font-extrabold text-2xl md:text-5xl ${notoSans.className} mb-3`}>Get Started</h1>
+                            <div className="text-left mb-6">
+                                <h1 className={`font-extrabold text-4xl md:text-5xl ${notoSans.className} mb-3`}>Get Started</h1>
                                 <p className="text-sm text-[#6E6E6E]">
                                     Already have an account?{" "}
                                     <a href="/auth/sign_in" className="text-[#379E37] underline">
@@ -86,7 +86,7 @@ export default function Page() {
                             {/* Sign Up Form */}
                             <form
                                 onSubmit={handleSubmit}
-                                className="w-full mb-4 md:mb-6 px-4 md:px-0"
+                                className="w-full mb-4 md:mb-6 px-0"
                             >
                                 {/* Name Field */}
                                 <div className="relative w-full mx-auto mb-4">
@@ -98,7 +98,7 @@ export default function Page() {
                                         placeholder="Enter your name"
                                         onChange={handleChange}
                                     />
-                                    <label className="absolute left-3 -top-2.5 px-1 bg-white text-sm text-black font-bold transition-all">
+                                    <label className="absolute left-3 -top-2.5 px-1 bg-white rounded-md text-sm text-black font-bold transition-all">
                                         Name
                                     </label>
                                 </div>
@@ -113,7 +113,7 @@ export default function Page() {
                                         placeholder="Enter your email"
                                         onChange={handleChange}
                                     />
-                                    <label className="absolute left-3 -top-2.5 px-1 bg-white text-sm text-black font-bold transition-all">
+                                    <label className="absolute left-3 -top-2.5 px-1 bg-white rounded-md text-sm text-black font-bold transition-all">
                                         Email
                                     </label>
                                 </div>
@@ -128,7 +128,7 @@ export default function Page() {
                                         placeholder="Enter your password"
                                         onChange={handleChange}
                                     />
-                                    <label className="absolute left-3 -top-2.5 px-1 bg-white text-sm text-black font-bold transition-all">
+                                    <label className="absolute left-3 -top-2.5 px-1 bg-white rounded-md text-sm text-black font-bold transition-all">
                                         Password
                                     </label>
                                 </div>
@@ -144,7 +144,7 @@ export default function Page() {
                                             placeholder="Enter your matric number"
                                             onChange={handleChange}
                                         />
-                                        <label className="absolute left-3 -top-2.5 px-1 bg-white text-sm text-black font-bold transition-all">
+                                        <label className="absolute left-3 -top-2.5 px-1 bg-white rounded-md text-sm text-black font-bold transition-all">
                                             Matric Number
                                         </label>
                                     </div>
@@ -157,7 +157,7 @@ export default function Page() {
                                             placeholder="Enter your level"
                                             onChange={handleChange}
                                         />
-                                        <label className="absolute left-3 -top-2.5 px-1 bg-white text-sm text-black font-bold transition-all">
+                                        <label className="absolute left-3 -top-2.5 px-1 bg-white rounded-md text-sm text-black font-bold transition-all">
                                             Level
                                         </label>
                                     </div>
@@ -178,7 +178,7 @@ export default function Page() {
                                 )}
                             </form>
                         </div>
-                        <div className=" w-[45%] h-full flex items-end justify-center relative">
+                        <div className=" hidden w-[45%] h-full lg:flex items-end justify-center relative">
                             <Image
                                 src={loginImage}
                                 alt=""

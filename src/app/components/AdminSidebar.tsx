@@ -34,10 +34,10 @@ const AdminSidebar = () => {
                     <div className=' w-full'>
                         <Image
                             src={logo}
-                            height={200}
-                            width={200}
+                            // height={200}
+                            // width={200}
                             alt=''
-                            className=' m-auto'
+                            className=' m-auto w-[50%] my-[30px]'
                         />
                         <div className=' w-full'>
                             <Link href="/">
