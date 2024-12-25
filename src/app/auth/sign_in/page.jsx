@@ -28,7 +28,7 @@ export default function Page() {
             <div className=" w-full h-[100vh] flex items-center justify-center">
                 <FadeInFromLeft>
                     <div className="w-full md:w-[80%] h-full md:h-[90%] lg:bg-white rounded-md flex flex-col md:flex-row items-center justify-center md:justify-between p-4 md:p-[20px]">
-                        <div className="w-full lg::w-[45%] flex flex-col items-start justify-start h-full p-[20px]">
+                        <div className="w-full lg:w-[45%] flex flex-col items-start justify-start h-full p-[20px]">
                             {/* Logo and Heading */}
                             <div className={`flex items-center justify-center mb-20  ${notoSans.className}`}>
                                 <Image
