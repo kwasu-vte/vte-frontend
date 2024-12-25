@@ -21,7 +21,7 @@ import { useEffect, useState } from "react";
 import { FadeInFromBottom } from "../components/FadeInFromBottom";
 import { useAuth } from "@/lib/auth";
 import Typewriter from "../components/Typewriter";
-import { MenuIcon } from "lucide-react";
+import ResponsiveSidebar from "../components/ResponsiveSidebar";
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -37,7 +37,7 @@ export default function Dashboard() {
 
   return (
     <FadeInFromBottom>
-      <div className=" w-full h-[100vh] overflow-hidden lg:pl-[20%] py-2 pr-4">
+      <div className=" w-full h-[100vh] overflow-hidden lg:pl-[20%] py-2 lg:pr-4">
         <div className=" h-[60px] w-full bg-white rounded-md hidden lg:flex items-center justify-between p-2 mb-4">
           <div className=" bg-[#BFE7BF7A] h-full w-[30%] px-3">
             <Search />
@@ -78,7 +78,7 @@ export default function Dashboard() {
 
         {/* Mobile header */}
         <div className=" lg:hidden w-[100vw] h-[60px] px-3 flex items-center justify-between">
-          <MenuIcon />
+          <ResponsiveSidebar />
 
           <div className=" h-[90%] w-fit bg-white rounded-lg px-2">
             <div className=" h-full flex items-center justify-center">
@@ -144,26 +144,26 @@ export default function Dashboard() {
               Group Information
             </h1>
 
-            <div className=" w-full flex items-center justify-between h-[80px] mb-4">
-              <div className=" px-2 w-[32%] flex flex-col lg:flex-row items-center justify-center h-full rounded-lg shadow-sm shadow-slate-500 bg-white border-[4px] border-white hover:border-[#379E37] duration-500 cursor-pointer">
+            <div className=" w-full flex items-center justify-between lg:h-[80px] mb-4">
+              <div className=" px-2 w-[32%] flex flex-col lg:flex-row items-center justify-center min-h-[100px] lg:h-full rounded-lg shadow-sm shadow-slate-500 bg-white border-[4px] border-white hover:border-[#379E37] duration-500 cursor-pointer">
                 <Image src={group} alt="" className=" w-[30px] lg:w-[50px]" />
                 <div className=" text-center mx-4">
-                  <h1>Group</h1>
+                  <h1 className=" text-sm lg:text-lg">Group</h1>
                   <h1 className=" font-bold text-xl">{groupName}</h1>
                 </div>
               </div>
-              <div className=" px-2 w-[32%] flex flex-col lg:flex-row items-center justify-center h-full rounded-lg shadow-sm shadow-slate-500 bg-white border-[4px] border-white hover:border-[#379E37] duration-500 cursor-pointer">
+              <div className=" px-2 w-[32%] flex flex-col lg:flex-row items-center justify-center min-h-[100px] lg:h-full rounded-lg shadow-sm shadow-slate-500 bg-white border-[4px] border-white hover:border-[#379E37] duration-500 cursor-pointer">
                 <Image src={group} alt="" className=" w-[30px] lg:w-[50px]" />
                 <div className=" text-center mx-4">
-                  <h1>Group Number</h1>
+                  <h1 className=" text-sm lg:text-lg">Group Number</h1>
                   <h1 className=" font-bold text-3xl">{groupNo}</h1>
                 </div>
               </div>
-              <div className=" px-2 w-[32%] flex flex-col lg:flex-row items-center justify-center h-full rounded-lg shadow-sm shadow-slate-500 bg-white border-[4px] border-white hover:border-[#379E37] duration-500 cursor-pointer">
+              <div className=" px-2 w-[32%] flex flex-col lg:flex-row items-center justify-center min-h-[100px] lg:h-full rounded-lg shadow-sm shadow-slate-500 bg-white border-[4px] border-white hover:border-[#379E37] duration-500 cursor-pointer">
                 <Image src={group} alt="" className=" w-[30px] lg:w-[50px]" />
                 <div className=" text-center mx-4">
-                  <h1>Group</h1>
-                  <h1 className=" font-semibold">WhatsAppLink</h1>
+                  <h1 className=" text-sm lg:text-lg">Group</h1>
+                  <h1 className=" font-semibold text-sm lg:text-lg">WhatsAppLink</h1>
                 </div>
               </div>
             </div>
