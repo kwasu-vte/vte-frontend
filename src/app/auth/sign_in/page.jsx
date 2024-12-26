@@ -23,6 +23,7 @@ export default function Page() {
         e.preventDefault();
         login({ username, password })
     }
+    
     return (
         <div className="flex items-center justify-center min-h-screen bg-[#BFE7BF] login-background">
             <div className=" w-full h-[100vh] flex items-center justify-center">

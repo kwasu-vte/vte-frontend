@@ -28,7 +28,7 @@ const ResponsiveSidebar = () => {
     return (
         <div>
             <Sheet>
-                <SheetTrigger><MenuIcon className=' text-[#379E37]'/></SheetTrigger>
+                <SheetTrigger><MenuIcon className=' text-[#379E37]' /></SheetTrigger>
                 <SheetContent className=" bg-gradient-to-t from-[#133813] to-[#379E37]">
                     <SheetHeader>
                         <SheetTitle>
@@ -71,18 +71,18 @@ const ResponsiveSidebar = () => {
                             </Link>
 
                             <SheetClose className=' block w-full'>
-                                <button className=' w-full' onClick={() => { setIsQRcodeModalOpen(true); setButtonActive(true) }}>
-                                    <div
-                                        className={
-                                            buttonActive
-                                                ? 'flex items-center justify-start w-[80%] px-2 duration-500 text-[#379E37] bg-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'
-                                                : 'flex items-center justify-start w-[80%] px-2 duration-500 text-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'
-                                        }
-                                    >
-                                        <CalendarMonth className=' mx-2' />
-                                        Attendance
+                                    <div className=' w-full' onClick={() => { setIsQRcodeModalOpen(true); setButtonActive(true) }}>
+                                        <div
+                                            className={
+                                                buttonActive
+                                                    ? 'flex items-center justify-start w-[80%] px-2 duration-500 text-[#379E37] bg-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'
+                                                    : 'flex items-center justify-start w-[80%] px-2 duration-500 text-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'
+                                            }
+                                        >
+                                            <CalendarMonth className=' mx-2' />
+                                            Attendance
+                                        </div>
                                     </div>
-                                </button>
                             </SheetClose>
 
                             {/* <Link href="/payment" onClick={() => setCurrentPath('/payment')}>

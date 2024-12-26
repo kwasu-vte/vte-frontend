@@ -180,11 +180,15 @@ export default function Page() {
 
 function PaymentBlock({ selectionDetails }) {
     const [loading, setLoading] = useState(false);
+    const [isCourseToastShown, setIsCourseToastShown] = useState(false)
     const router = useRouter();
 
     async function handlePaymentClick() {
         let course = selectionDetails.course_code;
         let specialization = selectionDetails.course_specialization;
+        if(!course || course === null){
+            setIsCourseToastShown(true)
+        }
         if (course == "") return;
         setLoading(true);
         let url = await makePayment({ course, specialization });
@@ -226,8 +230,11 @@ function PaymentBlock({ selectionDetails }) {
                         <h1 className=' uppercase font-extrabold text-3xl'>N 1,100</h1>
                     </div>
                 </div>
+                {
+                    isCourseToastShown && <h1 className=' text-red-500 mb-4'>Please select a course !</h1>
+                }
                 <div className=' w-full flex flex-col items-center justify-center'>
-                    <button onClick={handlePaymentClick} type='button' className={"w-[80%] bg-[#379E37] text-white mb-4 py-2 rounded-md"} disabled={loading}>{loading ? "loading..." : "Make Payment"}</button>
+                    <button onClick={handlePaymentClick} type='button' className={"w-[80%] bg-[#379E37] text-white mb-4 py-2 rounded-md"} disabled={loading}>{loading ? "Loading..." : "Make Payment"}</button>
                     <Link href={"/payment"} className=' text-sm text-[#379E37] underline'>Show Payment History</Link>
                 </div>
             </div>

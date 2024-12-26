@@ -170,7 +170,7 @@ const page = () => {
               </div>
 
               <div className=" w-[80%] flex flex-col lg:flex-row items-start justify-between p-0 m-0 mb-4">
-                <div className="relative w-full lg:w-[48%] mx-auto mb-6">
+                <div className="relative w-full lg:w-[48%] mx-0 mb-6">
                   <input
                     type="text"
                     id="name"
@@ -186,7 +186,7 @@ const page = () => {
                     Matric Number
                   </label>
                 </div>
-                <div className="relative w-full lg:w-[48%] mx-auto mb-6">
+                <div className="relative w-full lg:w-[48%] mx-0 mb-6">
                   <input
                     type="text"
                     id="name"
