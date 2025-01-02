@@ -15,6 +15,15 @@ const level = "";
 const groupName = "";
 const groupNo = "40";
 const groupWhatsappLink = "40";
+import {
+    Table,
+    TableBody,
+    TableCaption,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+  } from "@/components/ui/table";
 
 
 const page = () => {
@@ -55,7 +64,46 @@ const page = () => {
                     </div>
 
                     <div className=' w-full h-[80vh] bg-white p-4 rounded-lg'>
+                        <div className=' w-full flex items-center justify-end'>
+                            <button className=' mx-6 bg-[#379E37] px-3 py-2 rounded-lg text-white cursor-pointer hover:bg-white hover:text-[#379E37] duration-500'>+ Add New Button</button>
 
+                            <div className=" flex items-center justify-center bg-white p-2 rounded-md">
+                                <CalendarMonth className=" text-[#379E37]" />
+                                <select name="" id="" className=" mx-4 appearance-none">
+                                    <option value="">August 16, 2024</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div className='mt-2 h-[90%] w-full overflow-scroll'>
+                            <Table>
+                                <TableHeader className="">
+                                    <TableRow>
+                                        <TableHead className="">Course Title</TableHead>
+                                        <TableHead className="">Staff</TableHead>
+                                        <TableHead className="">Enrolled Students</TableHead>
+                                        <TableHead className="">Status</TableHead>
+                                        <TableHead>Action</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {/* {
+                                        data.users.staff.map((staff, index) => ( */}
+                                            <TableRow>
+                                                <TableCell className="font-medium">EDD205</TableCell>
+                                                <TableCell>Olusanmi Pelumi</TableCell>
+                                                <TableCell>45</TableCell>
+                                                <TableCell>Active</TableCell>
+                                                <TableCell>
+                                                    <div className=''>
+
+                                                    </div>
+                                                </TableCell>
+                                            </TableRow>
+                                        {/* ))
+                                    } */}
+                                </TableBody>
+                            </Table>
+                        </div>
                     </div>
                 </div>
             </FadeInFromBottom>
