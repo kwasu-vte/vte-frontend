@@ -24,14 +24,19 @@ import { FadeInFromBottom } from '../components/FadeInFromBottom';
 import { Protected } from '@/components/protected';
 import AdminSidebar from '../components/AdminSidebar';
 import { useAuth } from '@/lib/auth';
-
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import CreateStaffModal from './createStaff';
 import data from '@/helpers/demodata';
+import DeleteModal from '../modals/DeleteModal';
+import EditStaffModal from '../modals/EditStaffModal';
 
 
 const page = () => {
   const { loading, user } = useAuth();
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const [isDeleteModal, setIsDeleteModal] = useState(false)
+  const [isEditStaffModalOpen, setIsEditStaffModalOpen] = useState(false)
 
   var lastName = "";
   var firstName = "";
@@ -88,13 +93,13 @@ const page = () => {
             </div>
             <div className='mt-2 h-[90%] w-full overflow-scroll'>
               <Table>
-                <TableHeader className="">
+                <TableHeader className=" bg-[#BFE7BF7A]">
                   <TableRow>
-                    <TableHead className="">S/N</TableHead>
-                    <TableHead className="">Full Name</TableHead>
-                    <TableHead className="">Staff Number</TableHead>
-                    <TableHead className="">Assigned Group</TableHead>
-                    <TableHead>Action</TableHead>
+                    <TableHead className=" text-black">S/N</TableHead>
+                    <TableHead className=" text-black">Full Name</TableHead>
+                    <TableHead className=" text-black">Staff Number</TableHead>
+                    <TableHead className=" text-black">Assigned Group</TableHead>
+                    <TableHead className=' text-right text-black'>Action</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -106,8 +111,19 @@ const page = () => {
                         <TableCell>{staff.staff_number}</TableCell>
                         <TableCell>Group {staff.group}</TableCell>
                         <TableCell>
-                          <div className=''>
-
+                          <div className=' flex items-center justify-end'>
+                            <button
+                              onClick={() => setIsEditStaffModalOpen(true)}
+                              className=' mx-2'
+                            >
+                              <EditOutlinedIcon className=' text-yellow-500 hover:text-yellow-300 duration-500' />
+                            </button>
+                            <button
+                              onClick={() => setIsDeleteModal(true)}
+                              className=' mx-2'
+                            >
+                              <DeleteOutlineOutlinedIcon className=' text-red-500 hover:text-red-300 duration-500' />
+                            </button>
                           </div>
                         </TableCell>
                       </TableRow>
@@ -119,6 +135,12 @@ const page = () => {
           </div>
         </div>
       </FadeInFromBottom>
+      {
+        isDeleteModal && <DeleteModal setIsDeleteModal={setIsDeleteModal} deleteType={"staff"}/>
+      }
+      {
+        isEditStaffModalOpen && <EditStaffModal setIsEditStaffModalOpen={setIsEditStaffModalOpen}/>
+      }
       <CreateStaffModal isOpen={isOpen} onOpenChange={onOpenChange} />
     </Protected>
   )
