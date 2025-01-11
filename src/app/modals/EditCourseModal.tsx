@@ -1,10 +1,11 @@
 "use client"
 import React, { useState } from 'react'
-interface CreateCourseModalProps {
-    setIsCreateCourseModalOpen: (isOpen: boolean) => void;
+interface EditCourseModalProps {
+    setIsEditCourseModalOpen: (isOpen: boolean) => void;
 }
 
-const CreateCourseModal: React.FC<CreateCourseModalProps> = ({ setIsCreateCourseModalOpen }) => {
+
+const EditCourseModal: React.FC<EditCourseModalProps> = ({ setIsEditCourseModalOpen }) => {
     const [staffStatus, setStaffStatus] = useState(false)
     return (
         <div
@@ -13,12 +14,12 @@ const CreateCourseModal: React.FC<CreateCourseModalProps> = ({ setIsCreateCourse
                 if (e.target !== e.currentTarget) {
                     return
                 }
-                setIsCreateCourseModalOpen(false);
+                setIsEditCourseModalOpen(false);
             }}
         >
             <div className=' lg:h-[60%] lg:w-[60%] bg-[#D7ECD7] rounded-2xl w-[95%]  min-h-[60%] flex flex-col items-start justify-center px-[10px]'>
                 <div className=' w-fit mb-4'>
-                    <h1 className=' text-xl text-[#379E37]'>Create New Course</h1>
+                    <h1 className=' text-xl text-[#379E37]'>Edit Course</h1>
                     <div className=' h-[2px] bg-[#379E37] w-[30%]'></div>
                 </div>
                 <form action="" className=' text-[#000] w-full'>
@@ -70,14 +71,14 @@ const CreateCourseModal: React.FC<CreateCourseModalProps> = ({ setIsCreateCourse
 
                     <div>
                         <button
-                            onClick={() => setIsCreateCourseModalOpen(false)}
+                            onClick={() => setIsEditCourseModalOpen(false)}
                             className=' bg-green-500 p-2 rounded-md block lg:inline mr-4 hover:p-3 duration-500 text-white'
                         >
-                            Create Course
+                            Save Changes
                         </button>
 
                         <button
-                            onClick={() => setIsCreateCourseModalOpen(false)}
+                            onClick={() => setIsEditCourseModalOpen(false)}
                             className=' bg-red-500 p-2 rounded-md block lg:inline mr-4 hover:p-3 duration-500 text-white'
                         >
                             Cancel
@@ -94,4 +95,4 @@ const CreateCourseModal: React.FC<CreateCourseModalProps> = ({ setIsCreateCourse
     )
 }
 
-export default CreateCourseModal
+export default EditCourseModal

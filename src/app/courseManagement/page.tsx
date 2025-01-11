@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import {
     CalendarMonth,
     CalendarViewDayRounded,
+    EditCalendarOutlined,
     Notifications,
     Search,
 } from "@mui/icons-material";
@@ -27,10 +28,16 @@ import {
 } from "@/components/ui/table";
 import ResponsiveAdminSidebar from '../components/ResponsiveAdminSidebar';
 import CreateCourseModal from '../modals/CreateCourseModal';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import EditCourseModal from '../modals/EditCourseModal';
+import DeleteModal from '../modals/DeleteModal';
 
 
 const page = () => {
     const [isCreateCourseModalOpen, setIsCreateCourseModalOpen] = useState(false)
+    const [isEditCourseModalOpen, setIsEditCourseModalOpen] = useState(false)
+    const [isDeleteModal, setIsDeleteModal] = useState(false)
     return (
         <Protected>
             <AdminSidebar />
@@ -104,9 +111,9 @@ const page = () => {
 
                     <div className=' w-full h-[80vh] bg-white p-4 rounded-lg'>
                         <div className=' w-full flex items-center justify-end'>
-                            <button 
-                            onClick={() => setIsCreateCourseModalOpen(true)}
-                            className=' mx-6 hover:border hover:border-[#379e37] bg-[#379E37] px-3 py-2 rounded-lg text-white cursor-pointer hover:bg-white hover:text-[#379E37] duration-500'>
+                            <button
+                                onClick={() => setIsCreateCourseModalOpen(true)}
+                                className=' mx-6 hover:border hover:border-[#379e37] bg-[#379E37] px-3 py-2 rounded-lg text-white cursor-pointer hover:bg-white hover:text-[#379E37] duration-500'>
                                 + Add New Course
                             </button>
 
@@ -123,7 +130,7 @@ const page = () => {
                                         <TableHead className="">Staff</TableHead>
                                         <TableHead className="">Enrolled Students</TableHead>
                                         <TableHead className="">Status</TableHead>
-                                        <TableHead>Action</TableHead>
+                                        <TableHead className=' text-right'>Actions</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -135,8 +142,19 @@ const page = () => {
                                         <TableCell>45</TableCell>
                                         <TableCell>Active</TableCell>
                                         <TableCell>
-                                            <div className=''>
-
+                                            <div className=' flex items-center justify-end'>
+                                                <button
+                                                    onClick={() => setIsEditCourseModalOpen(true)}
+                                                    className=' mx-2'
+                                                >
+                                                    <EditOutlinedIcon className=' text-yellow-500 hover:text-yellow-300 duration-500' />
+                                                </button>
+                                                <button
+                                                    onClick={() => setIsDeleteModal(true)}
+                                                    className=' mx-2'
+                                                >
+                                                    <DeleteOutlineOutlinedIcon className=' text-red-500 hover:text-red-300 duration-500' />
+                                                </button>
                                             </div>
                                         </TableCell>
                                     </TableRow>
@@ -149,7 +167,13 @@ const page = () => {
                 </div>
             </FadeInFromBottom>
             {
-                isCreateCourseModalOpen && <CreateCourseModal  setIsCreateCourseModalOpen={setIsCreateCourseModalOpen}/>
+                isCreateCourseModalOpen && <CreateCourseModal setIsCreateCourseModalOpen={setIsCreateCourseModalOpen} />
+            }
+            {
+                isEditCourseModalOpen && <EditCourseModal setIsEditCourseModalOpen={setIsEditCourseModalOpen} />
+            }
+            {
+                isDeleteModal && <DeleteModal setIsDeleteModal={setIsDeleteModal} deleteType={"course"}/>
             }
         </Protected>
     )
