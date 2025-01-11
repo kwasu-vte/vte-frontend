@@ -120,8 +120,11 @@ export default function Page() {
 
           {/* Welcome Section */}
           <div className="w-full flex flex-col sm:flex-row sm:items-center sm:justify-between p-2 mb-2 border-b-2 border-[#7ABE7A]">
-            <h1 className="text-2xl sm:text-4xl font-extrabold text-[#379E37] mb-2 sm:mb-0 flex">
+            <h1 className="text-2xl sm:text-4xl font-extrabold text-[#379E37] mb-2 sm:mb-0 hidden lg:flex">
               W<Typewriter text={`elcome back ${firstName} ${lastName}!`} speed={100} /> 👋🏽
+            </h1>
+            <h1 className="text-2xl sm:text-4xl font-extrabold text-[#379E37] mb-2 sm:mb-0 lg:hidden flex">
+              Welcome back {firstName} {lastName}! 👋🏽
             </h1>
             <div className="flex items-center bg-white p-2 rounded-md">
               <CalendarMonth className="text-[#379E37]" />

@@ -4,8 +4,8 @@ import {
   Notifications,
   Search,
 } from "@mui/icons-material";
-import Image from "next/image";
-import Link from "next/link";
+import Image from "next/image"  ;
+import Link from "next/link"; 
 import React from "react";
 import barchart from "@/assets/BarLineChart.png";
 import group from "@/assets/Group.png";
@@ -25,7 +25,6 @@ import ResponsiveSidebar from "../components/ResponsiveSidebar";
 
 export default function Dashboard() {
   const { user } = useAuth();
-
   const lastName = user.last_name;
   const firstName = user.first_name;
   const level = user.level;
@@ -71,9 +70,7 @@ export default function Dashboard() {
                 </select>
               </div>
             </div>
-
           </div>
-
         </div>
 
         {/* Mobile header */}
@@ -148,7 +145,7 @@ export default function Dashboard() {
               <div className=" px-2 w-[32%] flex flex-col lg:flex-row items-center justify-center min-h-[100px] lg:h-full rounded-lg shadow-sm shadow-slate-500 bg-white border-[4px] border-white hover:border-[#379E37] duration-500 cursor-pointer">
                 <Image src={group} alt="" className=" w-[30px] lg:w-[50px]" />
                 <div className=" text-center mx-4">
-                  <h1 className=" text-sm lg:text-lg">Group</h1>
+                  <h1 className=" text-sm lg:text-lg">Specialization</h1>
                   <h1 className=" font-bold text-xl">{groupName}</h1>
                 </div>
               </div>

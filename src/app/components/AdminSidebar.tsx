@@ -12,6 +12,7 @@ import { useAuth } from '@/lib/auth';
 import { usePathname } from 'next/navigation';
 import { Cloud } from 'lucide-react';
 import ManagementModal from '../modals/ManagementModal';
+import QRCodeModal from '../modals/QRCodeModal';
 
 // interface AdminSidebarProps {
 //     role: string; // or use a specific type if you have defined roles
@@ -23,6 +24,7 @@ const AdminSidebar = () => {
     const { logout } = useAuth();
     let currentPath = usePathname();
     const [isManagementModalOpen, setIsManagementModalOpen] = useState(false)
+    const [isQRcodeopen, setIsQRcodeopen] = useState(false)
     const [buttonActive, setButtonActive] = useState(false)
     // const handleRoleChange = (newRole: string) => {
     //     setRoles(newRole); // Update the roles state in the parent component
@@ -63,6 +65,18 @@ const AdminSidebar = () => {
                                 >
                                     <Person2 className=' mx-2' />
                                     Management
+                                </div>
+                            </button>
+                            <button className=' w-full' onClick={() => { setIsQRcodeopen(true); setButtonActive(true) }}>
+                                <div
+                                    className={
+                                        buttonActive
+                                            ? 'flex items-center justify-start w-[80%] px-2 duration-500 text-[#379E37] bg-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'
+                                            : 'flex items-center justify-start w-[80%] px-2 duration-500 text-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2'
+                                    }
+                                >
+                                    <Person2 className=' mx-2' />
+                                    Attendance
                                 </div>
                             </button>
                             {/* <Link href="/staffManagement"> */}
@@ -150,6 +164,9 @@ const AdminSidebar = () => {
 
             {
                 isManagementModalOpen && <ManagementModal setIsManagementModalOpen={setIsManagementModalOpen} setButtonActive={setButtonActive} />
+            }
+            {
+                isQRcodeopen && <QRCodeModal setIsQRcodeopen={setIsQRcodeopen} setButtonActive={setButtonActive}/>
             }
         </div>
     )
