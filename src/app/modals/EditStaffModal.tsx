@@ -49,21 +49,6 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ setIsEditStaffModalOpen
 
                     <div className=' mb-4'>
                         <label htmlFor="" className=' block'>Assigned Group:</label>
-                        {/* <input
-                            type="text"
-                            placeholder='Enter your last name (e.g Doe)'
-                            className=' w-full bg-transparent focus:outline-none border-b border-b-[#379e37] text-[#379e37] placeholder:text-[#379e37] mt-2 placeholder:font-thin capitalize'
-                        /> */}
-                        {/* <div className=' flex items-center justify-start'>
-                            <div
-                                onClick={() => setStaffStatus(!staffStatus)}
-                                className={`mr-[10px] w-[90px] cursor-pointer h-[40px] px-2 bg-white rounded-full items-center flex ${staffStatus ? "justify-end" : " justify-start"}`}>
-                                <div className={`${!staffStatus ? "bg-red-500" : "bg-green-500"} h-[35px] w-[35px] rounded-full`}></div>
-                            </div>
-                            {
-                                staffStatus ? <h1>Active</h1> : <h1>Inactive</h1>
-                            }
-                        </div> */}
                         <select name="" id="" className=' bg-transparent w-[65%] border border-[#379e37] px-3 rounded-md focus:outline-none'>
                             <option value="">Group A</option>
                         </select>

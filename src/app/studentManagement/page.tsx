@@ -30,10 +30,12 @@ import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import DeleteModal from '../modals/DeleteModal';
 import EditStudentModal from '../modals/EditStudentModal';
+import StudentDetailsModal from '../modals/StudentDetailsModal';
 
 const page = () => {
   const [isDeleteModal, setIsDeleteModal] = useState(false)
   const [isEditStudentModalOpen, setIsEditStudentModalOpen] = useState(false)
+  const [isStudentDetailsModalOpen, setIsStudentDeatilsModalOpen] = useState(false)
   return (
     <Protected>
       <AdminSidebar />
@@ -86,15 +88,17 @@ const page = () => {
                     <TableHead className=" text-black font-extrabold">S/N</TableHead>
                     <TableHead className=" text-black font-extrabold">Full Name</TableHead>
                     <TableHead className=" text-black font-extrabold">Staff Number</TableHead>
+                    <TableHead className=" text-black font-extrabold">Department</TableHead>
                     <TableHead className=" text-black font-extrabold">Assigned Group</TableHead>
                     <TableHead className="text-right text-black font-extrabold">Action</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  <TableRow>
+                  <TableRow onClick={() => setIsStudentDeatilsModalOpen(true)}>
                     <TableCell className="font-medium">1</TableCell>
                     <TableCell>Olusanmi Pelumi</TableCell>
                     <TableCell>Kwas/17/Biol123</TableCell>
+                    <TableCell>Electrical Engineering</TableCell>
                     <TableCell>Group A</TableCell>
                     <TableCell className="text-right">
                       <button
@@ -122,6 +126,9 @@ const page = () => {
       }
       {
         isEditStudentModalOpen && <EditStudentModal setIsEditStudentModalOpen={setIsEditStudentModalOpen} />
+      }
+      {
+        isStudentDetailsModalOpen && <StudentDetailsModal setIsStudentDeatilsModalOpen={setIsStudentDeatilsModalOpen} />
       }
     </Protected>
   )
