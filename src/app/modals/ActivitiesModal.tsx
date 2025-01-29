@@ -43,6 +43,11 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({ setIsActivitesModalOp
         lastName = user.last_name;
         firstName = user.first_name;
     }
+
+    let d = new Date();
+    let currentDate = d.toDateString();
+
+
     return (
         <Protected>
             <div
@@ -125,7 +130,7 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({ setIsActivitesModalOp
                         <div className="flex items-center bg-white p-2 rounded-md">
                             <CalendarMonth className="text-[#379E37]" />
                             <select className="mx-2 sm:mx-4 appearance-none focus:outline-none">
-                                <option>August 16, 2024</option>
+                                <option>{currentDate}</option>
                             </select>
                         </div>
                     </div>

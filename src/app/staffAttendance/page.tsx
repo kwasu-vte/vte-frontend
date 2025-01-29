@@ -22,10 +22,13 @@ import StaffSidebar from '../components/StaffSidebar';
 import { Protected } from '@/components/protected';
 import { useAuth } from '@/lib/auth';
 
-const page = () => {
+const Page = () => {
     const { user, loading } = useAuth();
 
     if (loading) return "Loading...";
+    let d = new Date();
+    let currentDate = d.toDateString();
+
 
     const lastName = user.last_name;
     const firstName = user.first_name;
@@ -73,7 +76,7 @@ const page = () => {
                             <div className=" flex items-center justify-center bg-white p-2 rounded-md">
                                 <CalendarMonth className=" text-[#379E37]" />
                                 <select name="" id="" className=" mx-4 appearance-none">
-                                    <option value="">August 16, 2024</option>
+                                    <option value="">{currentDate}</option>
                                 </select>
                             </div>
                         </div>
@@ -114,4 +117,4 @@ const page = () => {
     )
 }
 
-export default page
+export default Page

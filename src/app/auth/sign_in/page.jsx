@@ -5,7 +5,7 @@ import { FadeInFromLeft } from '@/app/components/FadeInFromLeft';
 import { useAuth } from "@/lib/auth";
 import { useState } from "react";
 import '../../globals.css'
-import { Noto_Sans } from '@next/font/google';
+import { Noto_Sans } from 'next/font/google';
 import loginImage from '@/assets/form-bg-image.png';
 import male from "@/assets/login-male.png"
 import female from "@/assets/login-female.png"

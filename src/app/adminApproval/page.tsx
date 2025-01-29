@@ -24,7 +24,10 @@ const groupName = "";
 const groupNo = "40";
 const groupWhatsappLink = "40";
 
-const page = () => {
+const Page = () => {
+  let d = new Date();
+  let currentDate = d.toDateString();
+
   return (
     <FadeInFromBottom>
       <div className=" w-full h-[100vh] overflow-scroll pl-[20%] py-2 pr-4">
@@ -64,7 +67,7 @@ const page = () => {
             <div className=" flex items-center justify-center bg-white p-2 rounded-md">
               <CalendarMonth className=" text-[#379E37]" />
               <select name="" id="" className=" mx-4 appearance-none">
-                <option value="">August 16, 2024</option>
+                <option value="">{currentDate}</option>
               </select>
             </div>
           </div>
@@ -262,4 +265,4 @@ const page = () => {
   )
 }
 
-export default page
+export default Page

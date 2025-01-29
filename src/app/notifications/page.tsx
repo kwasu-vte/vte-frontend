@@ -6,7 +6,7 @@ import { FadeInFromBottom } from '../components/FadeInFromBottom'
 import { useAuth } from '@/lib/auth'
 import ResponsiveSidebar from '../components/ResponsiveSidebar'
 
-const page = () => {
+const Page = () => {
     const lastName = "Olusanmi";
     const firstName = "Pelumi";
     const level = 300;
@@ -78,7 +78,7 @@ const page = () => {
                     <div className=' flex items-center justify-center bg-white p-2 rounded-md'>
                         <CalendarMonth className=' text-[#379E37]' />
                         <select name="" id="" className=' mx-4 appearance-none'>
-                            <option value="">August 16, 2024</option>
+                            <option value="">{currentDate}</option>
                         </select>
                     </div>
                 </div>
@@ -91,7 +91,7 @@ const page = () => {
                         <div className=' w-[90%]'>
                             <div className=' w-full flex items-center justify-between mb-2'>
                                 <h1 className=' bg-[#379E37] w-fit p-2 rounded-md text-sm text-white'>New Course Registration</h1>
-                                <h1 className=' flex items-center justify-center text-sm text-[#6E6E6E]'><ClockIcon size={20} className=' mx-2' /> August 16, 2024 at 8:00 am</h1>
+                                <h1 className=' flex items-center justify-center text-sm text-[#6E6E6E]'><ClockIcon size={20} className=' mx-2' /> {currentDate} at 8:00 am</h1>
                             </div>
                             <h1 className=' font-bold mb-2'>GNS 203: Introduction to Barbing</h1>
                             <h1 className=' text-[#262626] text-sm'>This practical class will walk you through the basics, giving you the skills and confidence to start cutting and styling hair.</h1>
@@ -104,7 +104,7 @@ const page = () => {
                         <div className=' w-[90%]'>
                             <div className=' w-full flex items-center justify-between mb-2'>
                                 <h1 className=' bg-[#379E37] w-fit p-2 rounded-md text-sm text-white'>New Course Registration</h1>
-                                <h1 className=' flex items-center justify-center text-sm text-[#6E6E6E]'><ClockIcon size={20} className=' mx-2' /> August 16, 2024 at 8:00 am</h1>
+                                <h1 className=' flex items-center justify-center text-sm text-[#6E6E6E]'><ClockIcon size={20} className=' mx-2' /> {currentDate} at 8:00 am</h1>
                             </div>
                             <h1 className=' font-bold mb-2'>GNS 203: Introduction to Barbing</h1>
                             <h1 className=' text-[#262626] text-sm'>This practical class will walk you through the basics, giving you the skills and confidence to start cutting and styling hair.</h1>
@@ -117,7 +117,7 @@ const page = () => {
                         <div className=' w-[90%]'>
                             <div className=' w-full flex items-center justify-between mb-2'>
                                 <h1 className=' bg-[#379E37] w-fit p-2 rounded-md text-sm text-white'>New Course Registration</h1>
-                                <h1 className=' flex items-center justify-center text-sm text-[#6E6E6E]'><ClockIcon size={20} className=' mx-2' /> August 16, 2024 at 8:00 am</h1>
+                                <h1 className=' flex items-center justify-center text-sm text-[#6E6E6E]'><ClockIcon size={20} className=' mx-2' /> {currentDate} at 8:00 am</h1>
                             </div>
                             <h1 className=' font-bold mb-2'>GNS 203: Introduction to Barbing</h1>
                             <h1 className=' text-[#262626] text-sm'>This practical class will walk you through the basics, giving you the skills and confidence to start cutting and styling hair.</h1>
@@ -130,7 +130,7 @@ const page = () => {
                         <div className=' w-[90%]'>
                             <div className=' w-full flex items-center justify-between mb-2'>
                                 <h1 className=' bg-[#379E37] w-fit p-2 rounded-md text-sm text-white'>New Course Registration</h1>
-                                <h1 className=' flex items-center justify-center text-sm text-[#6E6E6E]'><ClockIcon size={20} className=' mx-2' /> August 16, 2024 at 8:00 am</h1>
+                                <h1 className=' flex items-center justify-center text-sm text-[#6E6E6E]'><ClockIcon size={20} className=' mx-2' /> {currentDate} at 8:00 am</h1>
                             </div>
                             <h1 className=' font-bold mb-2'>GNS 203: Introduction to Barbing</h1>
                             <h1 className=' text-[#262626] text-sm'>This practical class will walk you through the basics, giving you the skills and confidence to start cutting and styling hair.</h1>
@@ -143,7 +143,7 @@ const page = () => {
                         <div className=' w-[90%]'>
                             <div className=' w-full flex items-center justify-between mb-2'>
                                 <h1 className=' bg-[#379E37] w-fit p-2 rounded-md text-sm text-white'>New Course Registration</h1>
-                                <h1 className=' flex items-center justify-center text-sm text-[#6E6E6E]'><ClockIcon size={20} className=' mx-2' /> August 16, 2024 at 8:00 am</h1>
+                                <h1 className=' flex items-center justify-center text-sm text-[#6E6E6E]'><ClockIcon size={20} className=' mx-2' /> {currentDate} at 8:00 am</h1>
                             </div>
                             <h1 className=' font-bold mb-2'>GNS 203: Introduction to Barbing</h1>
                             <h1 className=' text-[#262626] text-sm'>This practical class will walk you through the basics, giving you the skills and confidence to start cutting and styling hair.</h1>
@@ -156,7 +156,7 @@ const page = () => {
                         <div className=' w-[90%]'>
                             <div className=' w-full flex items-center justify-between mb-2'>
                                 <h1 className=' bg-[#379E37] w-fit p-2 rounded-md text-sm text-white'>New Course Registration</h1>
-                                <h1 className=' flex items-center justify-center text-sm text-[#6E6E6E]'><ClockIcon size={20} className=' mx-2' /> August 16, 2024 at 8:00 am</h1>
+                                <h1 className=' flex items-center justify-center text-sm text-[#6E6E6E]'><ClockIcon size={20} className=' mx-2' /> {currentDate} at 8:00 am</h1>
                             </div>
                             <h1 className=' font-bold mb-2'>GNS 203: Introduction to Barbing</h1>
                             <h1 className=' text-[#262626] text-sm'>This practical class will walk you through the basics, giving you the skills and confidence to start cutting and styling hair.</h1>
@@ -169,7 +169,7 @@ const page = () => {
                         <div className=' w-[90%]'>
                             <div className=' w-full flex items-center justify-between mb-2'>
                                 <h1 className=' bg-[#379E37] w-fit p-2 rounded-md text-sm text-white'>New Course Registration</h1>
-                                <h1 className=' flex items-center justify-center text-sm text-[#6E6E6E]'><ClockIcon size={20} className=' mx-2' /> August 16, 2024 at 8:00 am</h1>
+                                <h1 className=' flex items-center justify-center text-sm text-[#6E6E6E]'><ClockIcon size={20} className=' mx-2' /> {currentDate} at 8:00 am</h1>
                             </div>
                             <h1 className=' font-bold mb-2'>GNS 203: Introduction to Barbing</h1>
                             <h1 className=' text-[#262626] text-sm'>This practical class will walk you through the basics, giving you the skills and confidence to start cutting and styling hair.</h1>
@@ -182,7 +182,7 @@ const page = () => {
                         <div className=' w-[90%]'>
                             <div className=' w-full flex items-center justify-between mb-2'>
                                 <h1 className=' bg-[#379E37] w-fit p-2 rounded-md text-sm text-white'>New Course Registration</h1>
-                                <h1 className=' flex items-center justify-center text-sm text-[#6E6E6E]'><ClockIcon size={20} className=' mx-2' /> August 16, 2024 at 8:00 am</h1>
+                                <h1 className=' flex items-center justify-center text-sm text-[#6E6E6E]'><ClockIcon size={20} className=' mx-2' /> {currentDate} at 8:00 am</h1>
                             </div>
                             <h1 className=' font-bold mb-2'>GNS 203: Introduction to Barbing</h1>
                             <h1 className=' text-[#262626] text-sm'>This practical class will walk you through the basics, giving you the skills and confidence to start cutting and styling hair.</h1>
@@ -195,7 +195,7 @@ const page = () => {
                         <div className=' w-[90%]'>
                             <div className=' w-full flex items-center justify-between mb-2'>
                                 <h1 className=' bg-[#379E37] w-fit p-2 rounded-md text-sm text-white'>New Course Registration</h1>
-                                <h1 className=' flex items-center justify-center text-sm text-[#6E6E6E]'><ClockIcon size={20} className=' mx-2' /> August 16, 2024 at 8:00 am</h1>
+                                <h1 className=' flex items-center justify-center text-sm text-[#6E6E6E]'><ClockIcon size={20} className=' mx-2' /> {currentDate} at 8:00 am</h1>
                             </div>
                             <h1 className=' font-bold mb-2'>GNS 203: Introduction to Barbing</h1>
                             <h1 className=' text-[#262626] text-sm'>This practical class will walk you through the basics, giving you the skills and confidence to start cutting and styling hair.</h1>
@@ -208,7 +208,7 @@ const page = () => {
                         <div className=' w-[90%]'>
                             <div className=' w-full flex items-center justify-between mb-2'>
                                 <h1 className=' bg-[#379E37] w-fit p-2 rounded-md text-sm text-white'>New Course Registration</h1>
-                                <h1 className=' flex items-center justify-center text-sm text-[#6E6E6E]'><ClockIcon size={20} className=' mx-2' /> August 16, 2024 at 8:00 am</h1>
+                                <h1 className=' flex items-center justify-center text-sm text-[#6E6E6E]'><ClockIcon size={20} className=' mx-2' /> {currentDate} at 8:00 am</h1>
                             </div>
                             <h1 className=' font-bold mb-2'>GNS 203: Introduction to Barbing</h1>
                             <h1 className=' text-[#262626] text-sm'>This practical class will walk you through the basics, giving you the skills and confidence to start cutting and styling hair.</h1>
@@ -221,7 +221,7 @@ const page = () => {
                         <div className=' w-[90%]'>
                             <div className=' w-full flex items-center justify-between mb-2'>
                                 <h1 className=' bg-[#379E37] w-fit p-2 rounded-md text-sm text-white'>New Course Registration</h1>
-                                <h1 className=' flex items-center justify-center text-sm text-[#6E6E6E]'><ClockIcon size={20} className=' mx-2' /> August 16, 2024 at 8:00 am</h1>
+                                <h1 className=' flex items-center justify-center text-sm text-[#6E6E6E]'><ClockIcon size={20} className=' mx-2' /> {currentDate} at 8:00 am</h1>
                             </div>
                             <h1 className=' font-bold mb-2'>GNS 203: Introduction to Barbing</h1>
                             <h1 className=' text-[#262626] text-sm'>This practical class will walk you through the basics, giving you the skills and confidence to start cutting and styling hair.</h1>
@@ -234,7 +234,7 @@ const page = () => {
                         <div className=' w-[90%]'>
                             <div className=' w-full flex items-center justify-between mb-2'>
                                 <h1 className=' bg-[#379E37] w-fit p-2 rounded-md text-sm text-white'>New Course Registration</h1>
-                                <h1 className=' flex items-center justify-center text-sm text-[#6E6E6E]'><ClockIcon size={20} className=' mx-2' /> August 16, 2024 at 8:00 am</h1>
+                                <h1 className=' flex items-center justify-center text-sm text-[#6E6E6E]'><ClockIcon size={20} className=' mx-2' /> {currentDate} at 8:00 am</h1>
                             </div>
                             <h1 className=' font-bold mb-2'>GNS 203: Introduction to Barbing</h1>
                             <h1 className=' text-[#262626] text-sm'>This practical class will walk you through the basics, giving you the skills and confidence to start cutting and styling hair.</h1>
@@ -247,7 +247,7 @@ const page = () => {
                         <div className=' w-[90%]'>
                             <div className=' w-full flex items-center justify-between mb-2'>
                                 <h1 className=' bg-[#379E37] w-fit p-2 rounded-md text-sm text-white'>New Course Registration</h1>
-                                <h1 className=' flex items-center justify-center text-sm text-[#6E6E6E]'><ClockIcon size={20} className=' mx-2' /> August 16, 2024 at 8:00 am</h1>
+                                <h1 className=' flex items-center justify-center text-sm text-[#6E6E6E]'><ClockIcon size={20} className=' mx-2' /> {currentDate} at 8:00 am</h1>
                             </div>
                             <h1 className=' font-bold mb-2'>GNS 203: Introduction to Barbing</h1>
                             <h1 className=' text-[#262626] text-sm'>This practical class will walk you through the basics, giving you the skills and confidence to start cutting and styling hair.</h1>
@@ -260,7 +260,7 @@ const page = () => {
                         <div className=' w-[90%]'>
                             <div className=' w-full flex items-center justify-between mb-2'>
                                 <h1 className=' bg-[#379E37] w-fit p-2 rounded-md text-sm text-white'>New Course Registration</h1>
-                                <h1 className=' flex items-center justify-center text-sm text-[#6E6E6E]'><ClockIcon size={20} className=' mx-2' /> August 16, 2024 at 8:00 am</h1>
+                                <h1 className=' flex items-center justify-center text-sm text-[#6E6E6E]'><ClockIcon size={20} className=' mx-2' /> {currentDate} at 8:00 am</h1>
                             </div>
                             <h1 className=' font-bold mb-2'>GNS 203: Introduction to Barbing</h1>
                             <h1 className=' text-[#262626] text-sm'>This practical class will walk you through the basics, giving you the skills and confidence to start cutting and styling hair.</h1>
@@ -273,7 +273,7 @@ const page = () => {
                         <div className=' w-[90%]'>
                             <div className=' w-full flex items-center justify-between mb-2'>
                                 <h1 className=' bg-[#379E37] w-fit p-2 rounded-md text-sm text-white'>New Course Registration</h1>
-                                <h1 className=' flex items-center justify-center text-sm text-[#6E6E6E]'><ClockIcon size={20} className=' mx-2' /> August 16, 2024 at 8:00 am</h1>
+                                <h1 className=' flex items-center justify-center text-sm text-[#6E6E6E]'><ClockIcon size={20} className=' mx-2' /> {currentDate} at 8:00 am</h1>
                             </div>
                             <h1 className=' font-bold mb-2'>GNS 203: Introduction to Barbing</h1>
                             <h1 className=' text-[#262626] text-sm'>This practical class will walk you through the basics, giving you the skills and confidence to start cutting and styling hair.</h1>
@@ -286,7 +286,7 @@ const page = () => {
                         <div className=' w-[90%]'>
                             <div className=' w-full flex items-center justify-between mb-2'>
                                 <h1 className=' bg-[#379E37] w-fit p-2 rounded-md text-sm text-white'>New Course Registration</h1>
-                                <h1 className=' flex items-center justify-center text-sm text-[#6E6E6E]'><ClockIcon size={20} className=' mx-2' /> August 16, 2024 at 8:00 am</h1>
+                                <h1 className=' flex items-center justify-center text-sm text-[#6E6E6E]'><ClockIcon size={20} className=' mx-2' /> {currentDate} at 8:00 am</h1>
                             </div>
                             <h1 className=' font-bold mb-2'>GNS 203: Introduction to Barbing</h1>
                             <h1 className=' text-[#262626] text-sm'>This practical class will walk you through the basics, giving you the skills and confidence to start cutting and styling hair.</h1>
@@ -299,7 +299,7 @@ const page = () => {
                         <div className=' w-[90%]'>
                             <div className=' w-full flex items-center justify-between mb-2'>
                                 <h1 className=' bg-[#379E37] w-fit p-2 rounded-md text-sm text-white'>New Course Registration</h1>
-                                <h1 className=' flex items-center justify-center text-sm text-[#6E6E6E]'><ClockIcon size={20} className=' mx-2' /> August 16, 2024 at 8:00 am</h1>
+                                <h1 className=' flex items-center justify-center text-sm text-[#6E6E6E]'><ClockIcon size={20} className=' mx-2' /> {currentDate} at 8:00 am</h1>
                             </div>
                             <h1 className=' font-bold mb-2'>GNS 203: Introduction to Barbing</h1>
                             <h1 className=' text-[#262626] text-sm'>This practical class will walk you through the basics, giving you the skills and confidence to start cutting and styling hair.</h1>
@@ -312,7 +312,7 @@ const page = () => {
                         <div className=' w-[90%]'>
                             <div className=' w-full flex items-center justify-between mb-2'>
                                 <h1 className=' bg-[#379E37] w-fit p-2 rounded-md text-sm text-white'>New Course Registration</h1>
-                                <h1 className=' flex items-center justify-center text-sm text-[#6E6E6E]'><ClockIcon size={20} className=' mx-2' /> August 16, 2024 at 8:00 am</h1>
+                                <h1 className=' flex items-center justify-center text-sm text-[#6E6E6E]'><ClockIcon size={20} className=' mx-2' /> {currentDate} at 8:00 am</h1>
                             </div>
                             <h1 className=' font-bold mb-2'>GNS 203: Introduction to Barbing</h1>
                             <h1 className=' text-[#262626] text-sm'>This practical class will walk you through the basics, giving you the skills and confidence to start cutting and styling hair.</h1>
@@ -325,7 +325,7 @@ const page = () => {
                         <div className=' w-[90%]'>
                             <div className=' w-full flex items-center justify-between mb-2'>
                                 <h1 className=' bg-[#379E37] w-fit p-2 rounded-md text-sm text-white'>New Course Registration</h1>
-                                <h1 className=' flex items-center justify-center text-sm text-[#6E6E6E]'><ClockIcon size={20} className=' mx-2' /> August 16, 2024 at 8:00 am</h1>
+                                <h1 className=' flex items-center justify-center text-sm text-[#6E6E6E]'><ClockIcon size={20} className=' mx-2' /> {currentDate} at 8:00 am</h1>
                             </div>
                             <h1 className=' font-bold mb-2'>GNS 203: Introduction to Barbing</h1>
                             <h1 className=' text-[#262626] text-sm'>This practical class will walk you through the basics, giving you the skills and confidence to start cutting and styling hair.</h1>
@@ -338,7 +338,7 @@ const page = () => {
                         <div className=' w-[90%]'>
                             <div className=' w-full flex items-center justify-between mb-2'>
                                 <h1 className=' bg-[#379E37] w-fit p-2 rounded-md text-sm text-white'>New Course Registration</h1>
-                                <h1 className=' flex items-center justify-center text-sm text-[#6E6E6E]'><ClockIcon size={20} className=' mx-2' /> August 16, 2024 at 8:00 am</h1>
+                                <h1 className=' flex items-center justify-center text-sm text-[#6E6E6E]'><ClockIcon size={20} className=' mx-2' /> {currentDate} at 8:00 am</h1>
                             </div>
                             <h1 className=' font-bold mb-2'>GNS 203: Introduction to Barbing</h1>
                             <h1 className=' text-[#262626] text-sm'>This practical class will walk you through the basics, giving you the skills and confidence to start cutting and styling hair.</h1>
@@ -351,7 +351,7 @@ const page = () => {
                         <div className=' w-[90%]'>
                             <div className=' w-full flex items-center justify-between mb-2'>
                                 <h1 className=' bg-[#379E37] w-fit p-2 rounded-md text-sm text-white'>New Course Registration</h1>
-                                <h1 className=' flex items-center justify-center text-sm text-[#6E6E6E]'><ClockIcon size={20} className=' mx-2' /> August 16, 2024 at 8:00 am</h1>
+                                <h1 className=' flex items-center justify-center text-sm text-[#6E6E6E]'><ClockIcon size={20} className=' mx-2' /> {currentDate} at 8:00 am</h1>
                             </div>
                             <h1 className=' font-bold mb-2'>GNS 203: Introduction to Barbing</h1>
                             <h1 className=' text-[#262626] text-sm'>This practical class will walk you through the basics, giving you the skills and confidence to start cutting and styling hair.</h1>
@@ -364,7 +364,7 @@ const page = () => {
                         <div className=' w-[90%]'>
                             <div className=' w-full flex items-center justify-between mb-2'>
                                 <h1 className=' bg-[#379E37] w-fit p-2 rounded-md text-sm text-white'>New Course Registration</h1>
-                                <h1 className=' flex items-center justify-center text-sm text-[#6E6E6E]'><ClockIcon size={20} className=' mx-2' /> August 16, 2024 at 8:00 am</h1>
+                                <h1 className=' flex items-center justify-center text-sm text-[#6E6E6E]'><ClockIcon size={20} className=' mx-2' /> {currentDate} at 8:00 am</h1>
                             </div>
                             <h1 className=' font-bold mb-2'>GNS 203: Introduction to Barbing</h1>
                             <h1 className=' text-[#262626] text-sm'>This practical class will walk you through the basics, giving you the skills and confidence to start cutting and styling hair.</h1>
@@ -377,7 +377,7 @@ const page = () => {
                         <div className=' w-[90%]'>
                             <div className=' w-full flex items-center justify-between mb-2'>
                                 <h1 className=' bg-[#379E37] w-fit p-2 rounded-md text-sm text-white'>New Course Registration</h1>
-                                <h1 className=' flex items-center justify-center text-sm text-[#6E6E6E]'><ClockIcon size={20} className=' mx-2' /> August 16, 2024 at 8:00 am</h1>
+                                <h1 className=' flex items-center justify-center text-sm text-[#6E6E6E]'><ClockIcon size={20} className=' mx-2' /> {currentDate} at 8:00 am</h1>
                             </div>
                             <h1 className=' font-bold mb-2'>GNS 203: Introduction to Barbing</h1>
                             <h1 className=' text-[#262626] text-sm'>This practical class will walk you through the basics, giving you the skills and confidence to start cutting and styling hair.</h1>
@@ -390,4 +390,4 @@ const page = () => {
     )
 }
 
-export default page
+export default Page

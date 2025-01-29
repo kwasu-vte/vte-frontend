@@ -15,14 +15,14 @@ export default function Page() {
   const { loading, user } = useAuth();
   const [roles, setRoles] = useState("");
 
-  var role = "";
+  let role = "";
   if (!loading && user) { role = user.role; }
   console.log(role)
   return (
     <Protected>
-      {role === 'admin'||roles === 'admin' ?
+      {role === 'admin' || roles === 'admin' ?
         <>
-          <AdminSidebar role={role} setRoles={setRoles}/>
+          <AdminSidebar/> {/*  role={role} setRoles={setRoles}/> */}
           <AdminDashboard />
         </> : role === "staff" ?
           <>

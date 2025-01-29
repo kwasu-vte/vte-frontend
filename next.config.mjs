@@ -51,3 +51,5 @@ const nextConfig = withPWA({
   });
   
   export default nextConfig; */
+
+/* "@next/font": "^14.2.15", */

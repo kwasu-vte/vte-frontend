@@ -34,10 +34,15 @@ import EditCourseModal from '../modals/EditCourseModal';
 import DeleteModal from '../modals/DeleteModal';
 
 
-const page = () => {
+const Page = () => {
     const [isCreateCourseModalOpen, setIsCreateCourseModalOpen] = useState(false)
     const [isEditCourseModalOpen, setIsEditCourseModalOpen] = useState(false)
     const [isDeleteModal, setIsDeleteModal] = useState(false)
+
+    let d = new Date();
+    let currentDate = d.toDateString();
+
+
     return (
         <Protected>
             <AdminSidebar />
@@ -119,7 +124,7 @@ const page = () => {
 
                             <div className=" flex items-center justify-center bg-white p-2 rounded-md">
                                 <CalendarMonth className=" text-[#379E37]" />
-                                <h1 className=' mx-4'>August 16, 2024</h1>
+                                <h1 className=' mx-4'>{currentDate}</h1>
                             </div>
                         </div>
                         <div className='mt-2 h-[90%] w-full overflow-scroll'>
@@ -179,4 +184,4 @@ const page = () => {
     )
 }
 
-export default page
+export default Page

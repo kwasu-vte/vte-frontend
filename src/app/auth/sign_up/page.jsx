@@ -4,7 +4,7 @@ import logo from "@/assets/kwasulogo.png";
 import { FadeInFromBottom } from "@/app/components/FadeInFromBottom";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Noto_Sans } from '@next/font/google';
+import { Noto_Sans } from 'next/font/google';
 import loginImage from '@/assets/form-bg-image.png';
 import male from "@/assets/login-male.png"
 import female from "@/assets/login-female.png"

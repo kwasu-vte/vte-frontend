@@ -32,7 +32,7 @@ import DeleteModal from '../modals/DeleteModal';
 import EditStaffModal from '../modals/EditStaffModal';
 
 
-const page = () => {
+const Page = () => {
   const { loading, user } = useAuth();
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [isDeleteModal, setIsDeleteModal] = useState(false)
@@ -45,6 +45,11 @@ const page = () => {
     lastName = user.last_name;
     firstName = user.first_name;
   }
+
+  let d = new Date();
+  let currentDate = d.toDateString();
+
+
   return (
     <Protected>
       <AdminSidebar />
@@ -87,7 +92,7 @@ const page = () => {
               <div className=" flex items-center justify-center bg-white p-2 rounded-md">
                 <CalendarMonth className=" text-[#379E37]" />
                 <select name="" id="" className=" mx-4 appearance-none">
-                  <option value="">August 16, 2024</option>
+                  <option value="">{currentDate}</option>
                 </select>
               </div>
             </div>
@@ -146,4 +151,4 @@ const page = () => {
   )
 }
 
-export default page
+export default Page

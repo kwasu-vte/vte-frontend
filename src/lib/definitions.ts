@@ -41,3 +41,14 @@ export type Tokens = {
     access_token: string,
     refresh_token: string,
 }
+
+
+export const userInfo = {
+    "email": "ecode5814@gmail.com",
+    "first_name": "Abubakar",
+    "last_name": "Alaya",
+    "matric_number": "22/67am/585",
+    "role": "student",
+    "level": "300",
+    "is_superuser": false,
+}

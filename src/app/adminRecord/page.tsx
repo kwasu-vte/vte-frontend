@@ -14,7 +14,7 @@ import {
     TableRow,
 } from "@/components/ui/table";
 
-const page = () => {
+const Page = () => {
     const { user, loading } = useAuth();
 
     var lastName = "";
@@ -219,4 +219,4 @@ const page = () => {
     )
 }
 
-export default page
+export default Page

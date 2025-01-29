@@ -3,6 +3,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 
 import Cookies from "js-cookie";
 import { redirect, useRouter } from "next/navigation";
+import { userInfo } from "./definitions";
 
 const AuthContext = createContext();
 
@@ -47,6 +48,10 @@ export function AuthProvider({ children }) {
                 user_info = user_info == ""? null: JSON.parse(user_info)
                 setUser(user_info);
             }
+            
+            //test
+            setUser(userInfo);
+            
         } catch (err) {
             console.error("Not authenticated", err);
         } finally {
@@ -55,7 +60,7 @@ export function AuthProvider({ children }) {
         };
 
         checkAuth();
-    }, []);
+    }, [loading]);
 
     const login = async (credentials) => {
         console.log(credentials);
@@ -89,6 +94,8 @@ export function AuthProvider({ children }) {
         }
         } catch (err) {
             console.error("Login failed", err);
+            //test
+            Cookies.set("user_info", JSON.stringify(userInfo))
         }
         window.location.href = "/";
     }

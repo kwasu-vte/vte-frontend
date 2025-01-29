@@ -8,7 +8,8 @@ export const Protected = ({children}:{children: React.ReactNode}) => {
     const router = useRouter();
     const { loading, user } = useAuth();
 
-    if (!loading && user == null) router.push("/auth/sign_in");
+    //test
+    //if (!loading && user == null) router.push("/auth/sign_in");
     return (
         <>{children}</>
     )

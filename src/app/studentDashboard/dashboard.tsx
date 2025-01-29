@@ -36,7 +36,7 @@ export default function Dashboard() {
 
   return (
     <FadeInFromBottom>
-      <div className=" w-full h-[100vh] overflow-hidden lg:pl-[20%] py-2 lg:pr-4">
+      <div className=" w-full h-[100vh] overflow-scroll lg:pl-[20%] py-2 lg:pr-4">
         <div className=" h-[60px] w-full bg-white rounded-md hidden lg:flex items-center justify-between p-2 mb-4">
           <div className=" bg-[#BFE7BF7A] h-full w-[30%] px-3">
             <Search />
@@ -65,7 +65,6 @@ export default function Dashboard() {
                 <select className="text-xs uppercase font-semibold  text-[#B7802C] border-none focus:outline-none" name="course" id="course">
                   <option value="gns-202">gns202</option>
                   <option value="vte-202">vte202</option>
-                  <option value=""></option>
                   <option value=""></option>
                 </select>
               </div>
@@ -99,7 +98,6 @@ export default function Dashboard() {
                   <select className="text-xs uppercase font-semibold  text-[#B7802C] border-none focus:outline-none" name="course" id="course">
                     <option value="gns-202">gns202</option>
                     <option value="vte-202">vte202</option>
-                    <option value=""></option>
                     <option value=""></option>
                   </select>
                 </div>
@@ -192,7 +190,7 @@ export default function Dashboard() {
                 <h1 className=" w-[60%]">Task</h1>
                 <h1 className=" w-[40%] text-[#379E37]">Due Date</h1>
               </div>
-              {/* <div className=" max-h-[100px] overflow-scroll">
+              <div className=" max-h-[100px] overflow-scroll">
                 <div className=" w-full flex items-center justify-between py-2 border-b border-b-slate-300">
                   <h1 className=" w-[60%] flex items-center justify-start">
                     {" "}
@@ -201,95 +199,7 @@ export default function Dashboard() {
                   </h1>
                   <h1 className=" w-[40%]">Aug 17, 2024, 11:59pm</h1>
                 </div>
-                <div className=" w-full flex items-center justify-between py-2 border-b border-b-slate-300">
-                  <h1 className=" w-[60%] flex items-center justify-start">
-                    {" "}
-                    <div className=" h-[20px] w-[20px] bg-[#E8BB78] mx-1 my-0 rounded-md"></div>{" "}
-                    Breeding Tilapia Fish
-                  </h1>
-                  <h1 className=" w-[40%]">Aug 17, 2024, 11:59pm</h1>
-                </div>
-                <div className=" w-full flex items-center justify-between py-2 border-b border-b-slate-300">
-                  <h1 className=" w-[60%] flex items-center justify-start">
-                    {" "}
-                    <div className=" h-[20px] w-[20px] bg-[#E8BB78] mx-1 my-0 rounded-md"></div>{" "}
-                    Breeding Tilapia Fish
-                  </h1>
-                  <h1 className=" w-[40%]">Aug 17, 2024, 11:59pm</h1>
-                </div>
-                <div className=" w-full flex items-center justify-between py-2 border-b border-b-slate-300">
-                  <h1 className=" w-[60%] flex items-center justify-start">
-                    {" "}
-                    <div className=" h-[20px] w-[20px] bg-[#E8BB78] mx-1 my-0 rounded-md"></div>{" "}
-                    Breeding Tilapia Fish
-                  </h1>
-                  <h1 className=" w-[40%]">Aug 17, 2024, 11:59pm</h1>
-                </div>
-                <div className=" w-full flex items-center justify-between py-2 border-b border-b-slate-300">
-                  <h1 className=" w-[60%] flex items-center justify-start">
-                    {" "}
-                    <div className=" h-[20px] w-[20px] bg-[#E8BB78] mx-1 my-0 rounded-md"></div>{" "}
-                    Breeding Tilapia Fish
-                  </h1>
-                  <h1 className=" w-[40%]">Aug 17, 2024, 11:59pm</h1>
-                </div>
-                <div className=" w-full flex items-center justify-between py-2 border-b border-b-slate-300">
-                  <h1 className=" w-[60%] flex items-center justify-start">
-                    {" "}
-                    <div className=" h-[20px] w-[20px] bg-[#E8BB78] mx-1 my-0 rounded-md"></div>{" "}
-                    Breeding Tilapia Fish
-                  </h1>
-                  <h1 className=" w-[40%]">Aug 17, 2024, 11:59pm</h1>
-                </div>
-                <div className=" w-full flex items-center justify-between py-2 border-b border-b-slate-300">
-                  <h1 className=" w-[60%] flex items-center justify-start">
-                    {" "}
-                    <div className=" h-[20px] w-[20px] bg-[#E8BB78] mx-1 my-0 rounded-md"></div>{" "}
-                    Breeding Tilapia Fish
-                  </h1>
-                  <h1 className=" w-[40%]">Aug 17, 2024, 11:59pm</h1>
-                </div>
-                <div className=" w-full flex items-center justify-between py-2 border-b border-b-slate-300">
-                  <h1 className=" w-[60%] flex items-center justify-start">
-                    {" "}
-                    <div className=" h-[20px] w-[20px] bg-[#E8BB78] mx-1 my-0 rounded-md"></div>{" "}
-                    Breeding Tilapia Fish
-                  </h1>
-                  <h1 className=" w-[40%]">Aug 17, 2024, 11:59pm</h1>
-                </div>
-                <div className=" w-full flex items-center justify-between py-2 border-b border-b-slate-300">
-                  <h1 className=" w-[60%] flex items-center justify-start">
-                    {" "}
-                    <div className=" h-[20px] w-[20px] bg-[#E8BB78] mx-1 my-0 rounded-md"></div>{" "}
-                    Breeding Tilapia Fish
-                  </h1>
-                  <h1 className=" w-[40%]">Aug 17, 2024, 11:59pm</h1>
-                </div>
-                <div className=" w-full flex items-center justify-between py-2 border-b border-b-slate-300">
-                  <h1 className=" w-[60%] flex items-center justify-start">
-                    {" "}
-                    <div className=" h-[20px] w-[20px] bg-[#E8BB78] mx-1 my-0 rounded-md"></div>{" "}
-                    Breeding Tilapia Fish
-                  </h1>
-                  <h1 className=" w-[40%]">Aug 17, 2024, 11:59pm</h1>
-                </div>
-                <div className=" w-full flex items-center justify-between py-2 border-b border-b-slate-300">
-                  <h1 className=" w-[60%] flex items-center justify-start">
-                    {" "}
-                    <div className=" h-[20px] w-[20px] bg-[#E8BB78] mx-1 my-0 rounded-md"></div>{" "}
-                    Breeding Tilapia Fish
-                  </h1>
-                  <h1 className=" w-[40%]">Aug 17, 2024, 11:59pm</h1>
-                </div>
-                <div className=" w-full flex items-center justify-between py-2 border-b border-b-slate-300">
-                  <h1 className=" w-[60%] flex items-center justify-start">
-                    {" "}
-                    <div className=" h-[20px] w-[20px] bg-[#E8BB78] mx-1 my-0 rounded-md"></div>{" "}
-                    Breeding Tilapia Fish
-                  </h1>
-                  <h1 className=" w-[40%]">Aug 17, 2024, 11:59pm</h1>
-                </div>
-              </div> */}
+              </div>
             </div>
 
             <div className=" w-full bg-white p-2 rounded-md mb-4">
@@ -300,7 +210,8 @@ export default function Dashboard() {
                 <h1 className=" w-[60%]">Task</h1>
                 <h1 className=" w-[40%] text-[#379E37]">Due Date</h1>
               </div>
-              {/* <div className=" max-h-[100px] overflow-scroll">
+              <div className=" max-h-[100px] overflow-scroll">
+
                 <div className=" w-full flex items-center justify-between py-2 border-b border-b-slate-300">
                   <h1 className=" w-[60%] flex items-center justify-start">
                     {" "}
@@ -309,76 +220,13 @@ export default function Dashboard() {
                   </h1>
                   <h1 className=" w-[40%]">Aug 17, 2024, 11:59pm</h1>
                 </div>
-                <div className=" w-full flex items-center justify-between py-2 border-b border-b-slate-300">
-                  <h1 className=" w-[60%] flex items-center justify-start">
-                    {" "}
-                    <div className=" h-[20px] w-[20px] bg-[#7ABE7A] mx-1 my-0 rounded-md"></div>{" "}
-                    Breeding Tilapia Fish
-                  </h1>
-                  <h1 className=" w-[40%]">Aug 17, 2024, 11:59pm</h1>
-                </div>
-                <div className=" w-full flex items-center justify-between py-2 border-b border-b-slate-300">
-                  <h1 className=" w-[60%] flex items-center justify-start">
-                    {" "}
-                    <div className=" h-[20px] w-[20px] bg-[#7ABE7A] mx-1 my-0 rounded-md"></div>{" "}
-                    Breeding Tilapia Fish
-                  </h1>
-                  <h1 className=" w-[40%]">Aug 17, 2024, 11:59pm</h1>
-                </div>
-                <div className=" w-full flex items-center justify-between py-2 border-b border-b-slate-300">
-                  <h1 className=" w-[60%] flex items-center justify-start">
-                    {" "}
-                    <div className=" h-[20px] w-[20px] bg-[#7ABE7A] mx-1 my-0 rounded-md"></div>{" "}
-                    Breeding Tilapia Fish
-                  </h1>
-                  <h1 className=" w-[40%]">Aug 17, 2024, 11:59pm</h1>
-                </div>
-                <div className=" w-full flex items-center justify-between py-2 border-b border-b-slate-300">
-                  <h1 className=" w-[60%] flex items-center justify-start">
-                    {" "}
-                    <div className=" h-[20px] w-[20px] bg-[#7ABE7A] mx-1 my-0 rounded-md"></div>{" "}
-                    Breeding Tilapia Fish
-                  </h1>
-                  <h1 className=" w-[40%]">Aug 17, 2024, 11:59pm</h1>
-                </div>
-                <div className=" w-full flex items-center justify-between py-2 border-b border-b-slate-300">
-                  <h1 className=" w-[60%] flex items-center justify-start">
-                    {" "}
-                    <div className=" h-[20px] w-[20px] bg-[#7ABE7A] mx-1 my-0 rounded-md"></div>{" "}
-                    Breeding Tilapia Fish
-                  </h1>
-                  <h1 className=" w-[40%]">Aug 17, 2024, 11:59pm</h1>
-                </div>
-                <div className=" w-full flex items-center justify-between py-2 border-b border-b-slate-300">
-                  <h1 className=" w-[60%] flex items-center justify-start">
-                    {" "}
-                    <div className=" h-[20px] w-[20px] bg-[#7ABE7A] mx-1 my-0 rounded-md"></div>{" "}
-                    Breeding Tilapia Fish
-                  </h1>
-                  <h1 className=" w-[40%]">Aug 17, 2024, 11:59pm</h1>
-                </div>
-                <div className=" w-full flex items-center justify-between py-2 border-b border-b-slate-300">
-                  <h1 className=" w-[60%] flex items-center justify-start">
-                    {" "}
-                    <div className=" h-[20px] w-[20px] bg-[#7ABE7A] mx-1 my-0 rounded-md"></div>{" "}
-                    Breeding Tilapia Fish
-                  </h1>
-                  <h1 className=" w-[40%]">Aug 17, 2024, 11:59pm</h1>
-                </div>
-                <div className=" w-full flex items-center justify-between py-2 border-b border-b-slate-300">
-                  <h1 className=" w-[60%] flex items-center justify-start">
-                    {" "}
-                    <div className=" h-[20px] w-[20px] bg-[#7ABE7A] mx-1 my-0 rounded-md"></div>{" "}
-                    Breeding Tilapia Fish
-                  </h1>
-                  <h1 className=" w-[40%]">Aug 17, 2024, 11:59pm</h1>
-                </div>
-              </div> */}
+
+              </div>
             </div>
           </div>
         </div>
 
-        <div className=" max-h-[200px] w-full overflow-scroll py-6 rounded-md">
+        <div className=" max-h-[200px] w-full overflow-scroll py-4 rounded-md">
           <Table className=" rounded-md bg-white h-[200px] overflow-y-scroll">
             <TableHeader className="">
               <TableRow>
@@ -393,46 +241,18 @@ export default function Dashboard() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {/* <TableRow>
-                <TableCell className="font-medium">1</TableCell>
-                <TableCell>EDD</TableCell>
-                <TableCell>Breeding Of Tilapia Fish</TableCell>
-                <TableCell>Choose healthy an...</TableCell>
-                <TableCell>Submission Open</TableCell>
-                <TableCell>Not Submitted</TableCell>
-                <TableCell>---</TableCell>
-                <TableCell className="text-right">View</TableCell>
-              </TableRow>
+
               <TableRow>
-                <TableCell className="font-medium">1</TableCell>
-                <TableCell>EDD</TableCell>
-                <TableCell>Breeding Of Tilapia Fish</TableCell>
-                <TableCell>Choose healthy an...</TableCell>
-                <TableCell>Submission Open</TableCell>
-                <TableCell>Not Submitted</TableCell>
-                <TableCell>---</TableCell>
-                <TableCell className="text-right">View</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell className="font-medium">1</TableCell>
-                <TableCell>EDD</TableCell>
-                <TableCell>Breeding Of Tilapia Fish</TableCell>
-                <TableCell>Choose healthy an...</TableCell>
-                <TableCell>Submission Open</TableCell>
-                <TableCell>Not Submitted</TableCell>
-                <TableCell>---</TableCell>
-                <TableCell className="text-right">View</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell className="font-medium">1</TableCell>
-                <TableCell>EDD</TableCell>
-                <TableCell>Breeding Of Tilapia Fish</TableCell>
-                <TableCell>Choose healthy an...</TableCell>
-                <TableCell>Submission Open</TableCell>
-                <TableCell>Not Submitted</TableCell>
-                <TableCell>---</TableCell>
-                <TableCell className="text-right">View</TableCell>
-              </TableRow> */}
+                  <TableCell className="font-medium">1</TableCell>
+                  <TableCell>EDD</TableCell>
+                  <TableCell>Breeding Of Tilapia Fish</TableCell>
+                  <TableCell>Choose healthy an...</TableCell>
+                  <TableCell>Submission Open</TableCell>
+                  <TableCell>Not Submitted</TableCell>
+                  <TableCell>---</TableCell>
+                  <TableCell className="text-right">View</TableCell>
+                </TableRow>
+
             </TableBody>
           </Table>
         </div>

@@ -23,6 +23,9 @@ import { Protected } from '@/components/protected'
 import StaffSidebar from '../components/StaffSidebar'
 
 export default function Page() {
+  let d = new Date();
+  let currentDate = d.toDateString();
+
 
   return (
     <Protected>
@@ -33,7 +36,7 @@ export default function Page() {
             <div className=' flex items-center justify-center bg-white p-2 rounded-md'>
               <CalendarMonth className=' text-[#379E37]' />
               <select name="" id="" className=' mx-4 appearance-none'>
-                <option value="">August 16, 2024</option>
+                <option value="">{currentDate}</option>
               </select>
             </div>
             <div className=' flex items-center justify-center bg-white rounded-md py-2 px-3'>

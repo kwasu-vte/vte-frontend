@@ -6,6 +6,7 @@ const QRCodeScanner = () => {
 
     const handleScan = (err, result) => {
         if (result) {
+            //TODO: Run qrcode verification function
             setData(result.text);
         }
         if (err) {

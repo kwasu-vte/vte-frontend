@@ -1,3 +1,4 @@
+"use client";
 import React from 'react'
 import { CalendarMonth, CalendarViewDayRounded, Filter, Filter1Rounded, Notifications, Person, Search, Sort } from '@mui/icons-material'
 import Image from 'next/image'
@@ -21,8 +22,18 @@ import { FadeInFromBottom } from '../components/FadeInFromBottom'
 import { Protected } from '@/components/protected'
 import Sidebar from '../components/Sidebar'
 import ResponsiveSidebar from '../components/ResponsiveSidebar'
+import { useAuth } from '@/lib/auth'
 
-const page = () => {
+const Page = () => {
+  const { user } = useAuth();
+  const lastName = user.last_name;
+  const firstName = user.first_name;
+  const level = user.level;
+
+  let d = new Date();
+  let currentDate = d.toDateString();
+
+
   return (
     <Protected>
       <Sidebar />
@@ -32,7 +43,7 @@ const page = () => {
             <div className=' flex items-center justify-center bg-white p-2 rounded-md'>
               <CalendarMonth className=' text-[#379E37]' />
               <select name="" id="" className=' mx-4 appearance-none'>
-                <option value="">August 16, 2024</option>
+                <option value="">{currentDate}</option>
               </select>
             </div>
             <div className=' flex items-center justify-center bg-white rounded-md py-2 px-3'>
@@ -41,8 +52,8 @@ const page = () => {
               </Link>
               <div className=' h-[50px] w-[50px] bg-green-700 profile rounded-full mx-1'></div>
               <div className=' mx-1 h-full flex flex-col items-start justify-center'>
-                <h1 className=' font-bold text-lg'>Olusanmi Pelumi</h1>
-                <p className=' uppercase text-[#379E37] text-xs font-bold'>200LVL</p>
+                <h1 className=' font-bold text-lg'>{lastName} {firstName}</h1>
+                <p className=' uppercase text-[#379E37] text-xs font-bold'>{level}LVL</p>
               </div>
             </div>
           </div>
@@ -64,11 +75,11 @@ const page = () => {
 
                 <div className=" mx-1 h-full flex flex-col items-start justify-center min-w-[100px]">
                   <h1 className=" font-bold text-md">
-                    Olusanmi Pelumi
+                    {lastName} {firstName}
                   </h1>
                   <div className="flex">
                     <p className=" uppercase text-[#379E37] text-xs font-bold mr-4">
-                      200LVL
+                      {level}LVL
                     </p>
                     <select className="text-xs uppercase font-semibold  text-[#B7802C] border-none focus:outline-none" name="course" id="course">
                       <option value="gns-202">gns202</option>
@@ -93,9 +104,9 @@ const page = () => {
                 <div className=' flex flex-col lg:flex-row items-start justify-center'>
                   <div className=' h-[100px] w-[100px] bg-red-800 profile rounded-full'></div>
                   <div className=' mx-4 py-2'>
-                    <h1 className=' text-lg font-semibold'>Olusanmi Pelumi</h1>
+                    <h1 className=' text-lg font-semibold'>{lastName} {firstName}</h1>
                     <h1>Biological Science</h1>
-                    <h1>200LVL</h1>
+                    <h1>{level}LVL</h1>
                   </div>
                 </div>
                 <button className=' text-white bg-[#379E37] px-5 text-center py-2 rounded-sm mb-4'>Save Changes</button>
@@ -107,8 +118,8 @@ const page = () => {
                   id="name"
                   name="name"
                   className=" placeholder:text-sm font-thin block w-full px-4 py-2 text-sm text-[#929292] border border-[#58AE58] rounded-lg focus:outline-none peer"
-                  placeholder="Enter your email"
-                  value={"Olusanmi  Pelumi"}
+                  placeholder="Enter your full name"
+                  defaultValue={`${lastName} ${firstName}`}
                 />
                 <label
 
@@ -125,7 +136,7 @@ const page = () => {
                   name="name"
                   className=" placeholder:text-sm font-thin block w-full px-4 py-2 text-sm text-[#929292] border border-[#58AE58] rounded-lg focus:outline-none peer"
                   placeholder="Enter your email"
-                  value={"Joshuasangbeto@gmail.com"}
+                  defaultValue={"Joshuasangbeto@gmail.com"}
                 />
                 <label
 
@@ -138,17 +149,18 @@ const page = () => {
               <div className="relative w-[80%] mb-6">
                 <input
                   type="text"
-                  id="name"
-                  name="name"
+                  id="faculty"
+                  name="faculty"
                   className=" placeholder:text-sm font-thin block w-full px-4 py-2 text-sm text-[#929292] border border-[#58AE58] rounded-lg focus:outline-none peer"
-                  placeholder="Enter your email"
-                  value={"Olusanmi  Pelumi"}
+                  placeholder="Enter your Faculty"
+                  value={"Engineering and Technology"}
+                  readOnly
                 />
                 <label
 
                   className="absolute left-3 -top-2.5 px-1 bg-white text-sm text-black font-bold transition-all"
                 >
-                  GNS Course
+                  Faculty
                 </label>
               </div>
 
@@ -159,7 +171,7 @@ const page = () => {
                   name="name"
                   className=" placeholder:text-sm font-thin block w-full px-4 py-2 text-sm text-[#929292] border border-[#58AE58] rounded-lg focus:outline-none peer"
                   placeholder="Enter your email"
-                  value={"Olusanmi  Pelumi"}
+                  defaultValue={"Olusanmi  Pelumi"}
                 />
                 <label
 
@@ -177,7 +189,7 @@ const page = () => {
                     name="name"
                     className=" placeholder:text-sm font-thin block w-full px-4 py-2 text-sm text-[#929292] border border-[#58AE58] rounded-lg focus:outline-none peer"
                     placeholder="Enter your matric number"
-                    value={"Kwas/bio/218"}
+                    defaultValue={"Kwas/bio/218"}
                   />
                   <label
 
@@ -193,7 +205,7 @@ const page = () => {
                     name="name"
                     className=" placeholder:text-sm font-thin block w-full px-4 py-2 text-sm text-[#929292] border border-[#58AE58] rounded-lg focus:outline-none peer"
                     placeholder="Enter your level"
-                    value={'200 level'}
+                    defaultValue={'200 level'}
                   />
                   <label
 
@@ -212,4 +224,4 @@ const page = () => {
   )
 }
 
-export default page
+export default Page
