@@ -25,13 +25,12 @@ export function AuthProvider({ children }) {
             const refresh_token = Cookies.get("refresh_token");
 
             if (access_token != null && access_token != "") {
-                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}api/auth/refresh_token`, {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/core/token/verify/`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        "Authorization" : `Bearer ${refresh_token}`,
                     },
-                    body: JSON.stringify({access_token}),
+                    body: JSON.stringify({"token": access_token}),
                 });
             
                 if (response.ok) {
@@ -54,6 +53,33 @@ export function AuthProvider({ children }) {
             
         } catch (err) {
             console.error("Not authenticated", err);
+            
+            if (err.response && err.response.status === 401) {
+                const refresh_token = Cookies.get("refresh_token");
+
+                const refresh_response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/core/token/refresh/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({"refresh": refresh_token}),
+                });
+
+                if (refresh_response.ok) {
+                    const data = await refresh_response.json();
+                    if (data.refreshed) {
+                        Cookies.set("access_token", data["access"]);
+                    }
+                }else {
+                    Cookies.remove("access_token");
+                    Cookies.remove("refresh_token");
+                    Cookies.remove("user_info")
+                }
+                let user_info = Cookies.get("user_info")
+                user_info = user_info == ""? null: JSON.parse(user_info)
+                setUser(user_info);
+
+            }
         } finally {
             setLoading(false);
         }
@@ -65,18 +91,20 @@ export function AuthProvider({ children }) {
     const login = async (credentials) => {
         console.log(credentials);
         try {
-        let res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}api/auth/token`, {
+        let res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/core/token/`, {
             method: 'POST',
             headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
+            'Content-Type': 'application/json',
             },
-            body: `username=${credentials.username}&password=${credentials.password}`,
-        });
+            body: {username:credentials.username, 
+                password:credentials.password}},
+            );
 
         if (res.ok) {
             let data = await res.json();
             console.log(data);
-            let user_info = {
+            let user_info = data
+            /* let user_info = {
                 "email": data["email"],
                 "first_name": data["first_name"],
                 "last_name": data["last_name"],
@@ -84,7 +112,7 @@ export function AuthProvider({ children }) {
                 "role": data["role"],
                 "level": data["level"],
                 "is_superuser": data["is_superuser"],
-            }
+            } */
             
             Cookies.set("access_token", data["access_token"]);
             Cookies.set("refresh_token", data["refresh_token"]);

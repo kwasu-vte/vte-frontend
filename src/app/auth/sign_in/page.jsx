@@ -60,18 +60,20 @@ export default function Page() {
                                 onSubmit={handleSubmit}
                                 className="w-full mb-4 md:mb-6 px-0"
                             >
-                                {/* Email / Matric No Field */}
+                                {/* Matric No Field */}
                                 <div className="relative w-full mx-auto mb-4">
                                     <input
                                         type="text"
                                         id="username"
                                         name="username"
                                         className="placeholder:text-sm font-thin block w-full px-4 py-2 text-sm text-gray-900 border border-[#58AE58] rounded-lg focus:outline-none peer"
-                                        placeholder="Enter your email or matric number"
+                                        placeholder="Enter your matric number"
+                                        value={username}
                                         onChange={(e) => setUsername(e.target.value)}
+                                        required
                                     />
                                     <label className="absolute left-3 -top-2.5 px-1 bg-white rounded-md text-sm text-black font-bold transition-all">
-                                        Email / Matric No
+                                        Matric Number
                                     </label>
                                 </div>
 
@@ -83,7 +85,9 @@ export default function Page() {
                                         name="password"
                                         className="placeholder:text-sm font-thin block w-full px-4 py-2 text-sm text-gray-900 border border-[#58AE58] rounded-lg focus:outline-none peer"
                                         placeholder="Enter your password"
+                                        value={password}
                                         onChange={(e) => setPassword(e.target.value)}
+                                        required
                                     />
                                     <label className="absolute left-3 -top-2.5 px-1 bg-white rounded-md text-sm text-black font-bold transition-all">
                                         Password
