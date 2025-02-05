@@ -128,16 +128,16 @@ export function AuthProvider({ children }) {
         window.location.href = "/";
     }
 
-    const logout = () => {
-        Cookies.remove("access_token");
-        Cookies.remove("refresh_token");
-        Cookies.remove("user_info");
-        setUser(null);
-        router.push("/auth/sign_in");
-    }
+    // const logout = () => {
+    //     Cookies.remove("access_token");
+    //     Cookies.remove("refresh_token");
+    //     Cookies.remove("user_info");
+    //     setUser(null);
+    //     router.push("/auth/sign_in");
+    // }
 
     return (
-        <AuthContext.Provider value={{ user, login, logout, loading }}>
+        <AuthContext.Provider value={{ user, login, loading }}>
         {/* {!loading && children} */}
         {children}
         </AuthContext.Provider>

@@ -1,27 +1,22 @@
-"use client";
 import { useDeleteUser } from "@/hooks/mutations/useDeleteUser";
-import { Mentor } from "@/lib/queries/getMentors";
-import React, { useState } from "react";
+import { Student } from "@/lib/queries/getStudents";
+import React from "react";
 import { toast } from "react-toastify";
 
-interface DeleteModalProps {
+interface DeleteStudentModalProps {
   setIsDeleteModal: (isOpen: boolean) => void;
-  deleteType: String;
-  selectedStaff: Mentor | null;
+  selectedStudent: Student | null;
 }
-const DeleteModal: React.FC<DeleteModalProps> = ({
+const DeleteStudentModal: React.FC<DeleteStudentModalProps> = ({
   setIsDeleteModal,
-  deleteType,
-  selectedStaff,
+  selectedStudent,
 }) => {
   const { mutate, isPending } = useDeleteUser();
 
-  
-
   const handleDelete = () => {
-    mutate(selectedStaff?.id || "", {
+    mutate(selectedStudent?.id || "", {
       onSuccess: () => {
-        toast.success("Staff deleted successfully!", {
+        toast.success("Student deleted successfully!", {
           position: "top-right",
           autoClose: 3000,
           hideProgressBar: false,
@@ -54,8 +49,8 @@ const DeleteModal: React.FC<DeleteModalProps> = ({
         onClick={(e) => e.stopPropagation()}
       >
         <h1 className=" mb-5">
-          Are you sure you would like to DELETE this {deleteType}? <br /> This
-          action cannot be undone
+          Are you sure you would like to DELETE this student? <br /> This action
+          cannot be undone
         </h1>
         <div>
           <button
@@ -76,4 +71,4 @@ const DeleteModal: React.FC<DeleteModalProps> = ({
   );
 };
 
-export default DeleteModal;
+export default DeleteStudentModal;

@@ -1,11 +1,7 @@
-'use client';
-import {
-  CalendarMonth,
-  Notifications,
-  Search,
-} from "@mui/icons-material";
-import Image from "next/image"  ;
-import Link from "next/link"; 
+"use client";
+import { CalendarMonth, Notifications, Search } from "@mui/icons-material";
+import Image from "next/image";
+import Link from "next/link";
 import React from "react";
 import barchart from "@/assets/BarLineChart.png";
 import group from "@/assets/Group.png";
@@ -19,15 +15,21 @@ import {
 } from "@/components/ui/table";
 import { useEffect, useState } from "react";
 import { FadeInFromBottom } from "../components/FadeInFromBottom";
-import { useAuth } from "@/lib/auth";
+import useAuth from "@/lib/useAuth";
 import Typewriter from "../components/Typewriter";
 import ResponsiveSidebar from "../components/ResponsiveSidebar";
+import { useFetchStudentDetails } from "@/hooks/queries/useFetchStudentDetails";
 
 export default function Dashboard() {
-  const { user } = useAuth();
-  const lastName = user.last_name;
-  const firstName = user.first_name;
-  const level = user.level;
+  const { userDetails } = useAuth();
+  const id = userDetails?.id;
+
+  const { data, isLoading, error } = useFetchStudentDetails(id ?? "", id ?? "");
+  console.log({ data });
+
+  const { first_name, last_name, username, email, matric_number, level, role } =
+    data || {};
+
   const groupName = "";
   let groupNo = "";
   let groupWhatsappLink = "www.whatapp.me/yedhdgccvfcvhvg/2";
@@ -56,13 +58,18 @@ export default function Dashboard() {
 
             <div className=" mx-1 h-full flex flex-col items-start justify-center min-w-[100px]">
               <h1 className=" font-bold text-lg">
-                {lastName} {firstName}
+                {last_name} {first_name}
               </h1>
               <div className="flex">
                 <p className=" uppercase text-[#379E37] text-xs font-bold mr-4">
-                  {level}LVL
+                  {level}
+                  LVL
                 </p>
-                <select className="text-xs uppercase font-semibold  text-[#B7802C] border-none focus:outline-none" name="course" id="course">
+                <select
+                  className="text-xs uppercase font-semibold  text-[#B7802C] border-none focus:outline-none"
+                  name="course"
+                  id="course"
+                >
                   <option value="gns-202">gns202</option>
                   <option value="vte-202">vte202</option>
                   <option value=""></option>
@@ -86,16 +93,20 @@ export default function Dashboard() {
                 <Notifications className=" text-[#379E37] mr-3" />
               </Link>
 
-
               <div className=" mx-1 h-full flex flex-col items-start justify-center min-w-[100px]">
                 <h1 className=" font-bold text-md">
-                  {lastName} {firstName}
+                  {last_name} {first_name}
                 </h1>
                 <div className="flex">
                   <p className=" uppercase text-[#379E37] text-xs font-bold mr-4">
-                    {level}LVL
+                    {level}
+                    LVL
                   </p>
-                  <select className="text-xs uppercase font-semibold  text-[#B7802C] border-none focus:outline-none" name="course" id="course">
+                  <select
+                    className="text-xs uppercase font-semibold  text-[#B7802C] border-none focus:outline-none"
+                    name="course"
+                    id="course"
+                  >
                     <option value="gns-202">gns202</option>
                     <option value="vte-202">vte202</option>
                     <option value=""></option>
@@ -110,19 +121,22 @@ export default function Dashboard() {
         <div className=" w-[97%] m-auto lg:w-full bg-transparent flex items-start justify-between p-2 mb-2 border-b-2 border-b-[#7ABE7A]">
           <div className=" hidden lg:block">
             <h1 className=" text-xl lg:text-4xl font-extrabold text-[#379E37] mb-2 flex">
-              W<Typewriter text={`elcome back ${firstName} ${lastName}!`} speed={100} />👋🏽
+              <Typewriter
+                text={`Welcome back ${first_name} ${last_name}!`}
+                speed={100}
+              />
+              👋🏽
+              {/* ResponsiveSidebar */}
             </h1>
-            <p>
-              Stay up to date with your VTE course
-            </p>
+            <p>Stay up to date with your VTE course</p>
           </div>
           <div className=" lg:hidden block">
             <h1 className=" text-xl lg:text-4xl font-extrabold text-[#379E37] mb-2 flex">
-              Welcome back {firstName} {lastName}!👋🏽
+              Welcome back
+              {first_name} {last_name}
+              !👋🏽
             </h1>
-            <p>
-              Stay up to date with your VTE course
-            </p>
+            <p>Stay up to date with your VTE course</p>
           </div>
 
           <div className=" hidden lg:flex items-center justify-center bg-white p-2 rounded-md">
@@ -158,7 +172,9 @@ export default function Dashboard() {
                 <Image src={group} alt="" className=" w-[30px] lg:w-[50px]" />
                 <div className=" text-center mx-4">
                   <h1 className=" text-sm lg:text-lg">Group</h1>
-                  <h1 className=" font-semibold text-sm lg:text-lg">WhatsAppLink</h1>
+                  <h1 className=" font-semibold text-sm lg:text-lg">
+                    WhatsAppLink
+                  </h1>
                 </div>
               </div>
             </div>
@@ -175,7 +191,6 @@ export default function Dashboard() {
                 className=" my-4 max-w-[90%] m-auto"
               /> */}
             </div>
-
           </div>
 
           <div className=" w-full lg:w-[40%]">
@@ -211,7 +226,6 @@ export default function Dashboard() {
                 <h1 className=" w-[40%] text-[#379E37]">Due Date</h1>
               </div>
               <div className=" max-h-[100px] overflow-scroll">
-
                 <div className=" w-full flex items-center justify-between py-2 border-b border-b-slate-300">
                   <h1 className=" w-[60%] flex items-center justify-start">
                     {" "}
@@ -220,7 +234,6 @@ export default function Dashboard() {
                   </h1>
                   <h1 className=" w-[40%]">Aug 17, 2024, 11:59pm</h1>
                 </div>
-
               </div>
             </div>
           </div>
@@ -241,22 +254,20 @@ export default function Dashboard() {
               </TableRow>
             </TableHeader>
             <TableBody>
-
               <TableRow>
-                  <TableCell className="font-medium">1</TableCell>
-                  <TableCell>EDD</TableCell>
-                  <TableCell>Breeding Of Tilapia Fish</TableCell>
-                  <TableCell>Choose healthy an...</TableCell>
-                  <TableCell>Submission Open</TableCell>
-                  <TableCell>Not Submitted</TableCell>
-                  <TableCell>---</TableCell>
-                  <TableCell className="text-right">View</TableCell>
-                </TableRow>
-
+                <TableCell className="font-medium">1</TableCell>
+                <TableCell>EDD</TableCell>
+                <TableCell>Breeding Of Tilapia Fish</TableCell>
+                <TableCell>Choose healthy an...</TableCell>
+                <TableCell>Submission Open</TableCell>
+                <TableCell>Not Submitted</TableCell>
+                <TableCell>---</TableCell>
+                <TableCell className="text-right">View</TableCell>
+              </TableRow>
             </TableBody>
           </Table>
         </div>
       </div>
     </FadeInFromBottom>
   );
-};
+}
