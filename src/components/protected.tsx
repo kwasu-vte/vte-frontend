@@ -1,16 +1,14 @@
-'use client';
+"use client";
 import React from "react";
 import { useRouter } from "next/navigation";
 
-import { useAuth } from "@/lib/auth";
+import useAuth from "@/lib/useAuth";
 
-export const Protected = ({children}:{children: React.ReactNode}) => {
-    const router = useRouter();
-    const { loading, user } = useAuth();
+export const Protected = ({ children }: { children: React.ReactNode }) => {
+  const router = useRouter();
+  const { userDetails } = useAuth();
 
-    //test
-    //if (!loading && user == null) router.push("/auth/sign_in");
-    return (
-        <>{children}</>
-    )
-}
+  //test
+  //if (!loading && user == null) router.push("/auth/sign_in");
+  return <>{children}</>;
+};
