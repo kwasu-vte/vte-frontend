@@ -194,10 +194,7 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({
         </form>
       </div>
     </div>
-    // course title
-    // staff name
-    // status
-    // enrolled students
+    
   );
 };
 

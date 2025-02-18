@@ -69,13 +69,13 @@ const CreateCourseModal: React.FC<CreateCourseModalProps> = ({
     <div
       className="fixed right-0 bottom-0 left-0 top-0 px-2 py4 overflow-scroll scrollbar-hide z-50 justify-center items-center flex bg-[#00000080] max-h-[100vh]"
       onClick={(e) => {
-        if (e.target !== e.currentTarget) {
-          return;
-        }
         setIsCreateCourseModalOpen(false);
       }}
     >
-      <div className="lg:w-[60%] bg-[#D7ECD7] rounded-2xl w-[95%] py-4 flex flex-col items-start justify-center px-[10px]">
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="lg:w-[60%] bg-[#D7ECD7] rounded-2xl w-[95%] py-4 flex flex-col items-start justify-center px-[10px]"
+      >
         <div className=" w-fit mb-4">
           <h1 className=" text-xl text-[#379E37]">Create New Course</h1>
           <div className=" h-[2px] bg-[#379E37] w-[30%]"></div>
