@@ -1,6 +1,6 @@
 import { instance } from "../api";
 
-type Course = {
+export type Course = {
   id: string;
   code: string;
   title: string;

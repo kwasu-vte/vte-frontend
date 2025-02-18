@@ -28,7 +28,7 @@
     "grapheme-splitter": "^1.0.4",
     "js-cookie": "^3.0.5",
     "lucide-react": "^0.436.0",
-    "next": "14.2.5",
+    "next": "^15.1.7",
     "react": "^18",
     "react-dom": "^18",
     "react-intersection-observer": "^9.13.1",

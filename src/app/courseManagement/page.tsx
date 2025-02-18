@@ -34,11 +34,14 @@ import { useCreateCourse } from "@/hooks/mutations/useCreateCourse";
 import useAuth from "@/lib/useAuth";
 import { useFetchAdminDetails } from "@/hooks/queries/useFetchAdminDetails";
 import { useFetchCourses } from "@/hooks/queries/useFetchCourses";
+import { Course } from "@/lib/queries/getCourses";
+import DeleteCourseModal from "../modals/DeleteCourseModal";
 
 const Page = () => {
   const [isCreateCourseModalOpen, setIsCreateCourseModalOpen] = useState(false);
   const [isEditCourseModalOpen, setIsEditCourseModalOpen] = useState(false);
   const [isDeleteModal, setIsDeleteModal] = useState(false);
+  const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
 
   const { userDetails } = useAuth();
   const id = userDetails?.id;
@@ -169,13 +172,19 @@ const Page = () => {
                       <TableCell>
                         <div className=" flex items-center justify-end">
                           <button
-                            onClick={() => setIsEditCourseModalOpen(true)}
+                            onClick={() => {
+                              setSelectedCourse(course);
+                              setIsEditCourseModalOpen(true);
+                            }}
                             className=" mx-2"
                           >
                             <EditOutlinedIcon className=" text-yellow-500 hover:text-yellow-300 duration-500" />
                           </button>
                           <button
-                            onClick={() => setIsDeleteModal(true)}
+                            onClick={() => {
+                              setSelectedCourse(course);
+                              setIsDeleteModal(true);
+                            }}
                             className=" mx-2"
                           >
                             <DeleteOutlineOutlinedIcon className=" text-red-500 hover:text-red-300 duration-500" />
@@ -198,12 +207,15 @@ const Page = () => {
         />
       )}
       {isEditCourseModalOpen && (
-        <EditCourseModal setIsEditCourseModalOpen={setIsEditCourseModalOpen} />
+        <EditCourseModal
+          selectedCourse={selectedCourse}
+          setIsEditCourseModalOpen={setIsEditCourseModalOpen}
+        />
       )}
       {isDeleteModal && (
-        <DeleteModal
+        <DeleteCourseModal
+          selectedCourse={selectedCourse}
           setIsDeleteModal={setIsDeleteModal}
-          deleteType={"course"}
         />
       )}
     </Protected>

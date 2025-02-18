@@ -1,6 +1,6 @@
 "use client";
 import { Protected } from "@/components/protected";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import AdminSidebar from "../components/AdminSidebar";
 import { Link, Search } from "lucide-react";
 import { Notifications } from "@mui/icons-material";
@@ -15,6 +15,7 @@ import {
 import useAuth from "@/lib/useAuth";
 import { useFetchAdminDetails } from "@/hooks/queries/useFetchAdminDetails";
 import { useFetchGroups } from "@/hooks/queries/useFetchGroups";
+import { useFetchGroupDetails } from "@/hooks/queries/usefetchGroupDetails";
 
 const Page = () => {
   const { userDetails } = useAuth();
@@ -27,6 +28,17 @@ const Page = () => {
   const { data: groups, isLoading: isFetchingGroups } = useFetchGroups();
 
   const [selectedGroup, setSelectedGroup] = useState<string>("");
+
+  useEffect(() => {
+    if (groups?.length) {
+      setSelectedGroup(groups[0].id);
+    }
+  }, [groups]);
+
+  const { data: group, isLoading: isFetchingGroup } =
+    useFetchGroupDetails(selectedGroup);
+
+  console.log({ group });
 
   return (
     <Protected>
@@ -84,7 +96,7 @@ const Page = () => {
 
         <div className=" w-full h-[80vh] bg-white p-4 rounded-lg">
           <h1 className=" font-extrabold text-[#379E37] mb-4 text-xl">
-            Tailoring Group A
+            {group?.name}
           </h1>
           <div className="overflow-scroll rounded-md">
             <Table className="rounded-md">

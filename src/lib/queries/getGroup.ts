@@ -1,15 +1,15 @@
 import { instance } from "../api";
 
-export type Group = {
+export const getGroup = async (
+  pathId: string
+): Promise<{
   id: string;
   name: string;
   creation_date: string;
   end_date: string;
   course: string;
   members: string[];
-};
-
-export const getGroups = async (): Promise<Group[]> => {
-  const response = await instance.get("/api/grouping/groups/");
+}> => {
+  const response = await instance.get(`/api/grouping/groups/${pathId}/`);
   return response.data;
 };
