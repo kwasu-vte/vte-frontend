@@ -25,7 +25,7 @@ export default function Page() {
           <AdminSidebar /> {/*  role={role} setRoles={setRoles}/> */}
           <AdminDashboard />
         </>
-      ) : userDetails?.role === "staff" ? (
+      ) : userDetails?.role === "mentor" ? (
         <>
           <StaffSidebar />
           <StaffDashboard />

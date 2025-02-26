@@ -5,18 +5,19 @@ export const useSignIn = () =>
   useMutation<SignInResponse, Error, SignInPayload>({
     mutationFn: (data: SignInPayload) => signIn(data),
     onSuccess: (data) => {
+      const resData = data?.data;
       if (!data) {
         console.error("No data returned from createUser mutation.");
         return;
       }
 
       localStorage.setItem("isLoggedIn", "true");
-      localStorage.setItem("userDetails", JSON.stringify(data));
+      localStorage.setItem("userDetails", JSON.stringify(resData));
 
       const now = new Date();
       now.setHours(now.getHours() + 3);
       localStorage.setItem("expirationDate", now.toISOString());
-      const token = data?.access;
+      const token = resData?.access;
       if (token) {
         // localStorage.setItem("expirationDate", expirationDate.toISOString());
         localStorage.setItem("token", token);

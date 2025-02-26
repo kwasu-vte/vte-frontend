@@ -49,7 +49,7 @@ export default function Page() {
   const { data, isLoading, error } = useFetchAdminDetails(id ?? "");
   console.log({ data });
 
-  const { first_name, last_name, username, email, role } = data || {};
+  const { first_name, last_name, username, email, role } = data?.data || {};
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isACtivitiesModalOpen, setIsActivitesModalOpen] = useState(false);
   const [autoAddStudents, setAutoAddStudents] = useState(false);
@@ -74,7 +74,7 @@ export default function Page() {
   const { data: groupLimits, isLoading: isFetchingGroupLimits } =
     useFetchGroupLimit();
 
-  const lastGroupLimit = groupLimits?.length
+  const lastGroupLimit = groupLimits?.data?.length
     ? groupLimits[groupLimits.length - 1]
     : null;
 
@@ -257,25 +257,25 @@ export default function Page() {
                       <AdminDashboardCard
                         title="Total Students"
                         image={group}
-                        number={students?.length || "0"}
+                        number={students?.data?.length || "0"}
                       />
 
                       <AdminDashboardCard
                         title="Total Staff"
                         image={group}
-                        number={mentors?.length || "0"}
+                        number={mentors?.data?.length || "0"}
                       />
 
                       <AdminDashboardCard
                         title="Courses"
                         image={group}
-                        number={courses?.length || "0"}
+                        number={courses?.data?.length || "0"}
                       />
 
                       <AdminDashboardCard
                         title="Groups"
                         image={group}
-                        number={groups?.length || "0"}
+                        number={groups?.data?.length || "0"}
                       />
                       {/* Card Components */}
                       {/* {[
@@ -561,7 +561,7 @@ export default function Page() {
                       </h1>
                     </div>
                     <ul className="p-3 h-[28vh] overflow-y-auto">
-                      {groups?.map((group) => (
+                      {groups?.data?.map((group) => (
                         <li key={group?.id}>{group?.name}</li>
                       ))}
                     </ul>

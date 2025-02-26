@@ -161,7 +161,7 @@ const Page = () => {
                 <TableBody>
                   {/* {
                                         data.users.staff.map((staff, index) => ( */}
-                  {courses?.map((course) => (
+                  {courses?.data?.map((course) => (
                     <TableRow key={course?.id}>
                       <TableCell className="font-medium">
                         {course?.title}
