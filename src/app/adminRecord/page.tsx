@@ -30,8 +30,8 @@ const Page = () => {
   const [selectedGroup, setSelectedGroup] = useState<string>("");
 
   useEffect(() => {
-    if (groups?.length) {
-      setSelectedGroup(groups[0].id);
+    if (groups?.data?.length) {
+      setSelectedGroup(groups?.data[0].id);
     }
   }, [groups]);
 
@@ -85,7 +85,7 @@ const Page = () => {
               value={selectedGroup}
               onChange={(e) => setSelectedGroup(e.target.value)}
             >
-              {groups?.map((group) => (
+              {groups?.data?.map((group) => (
                 <option key={group?.id} value={group?.id} className="">
                   {group?.name}
                 </option>

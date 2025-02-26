@@ -46,6 +46,8 @@ export default function Page() {
 
     mutate(userInfo, {
       onSuccess: (data) => {
+        console.log({ data });
+
         toast.success("User signed in successfully!", {
           position: "top-right",
           autoClose: 3000,
@@ -58,8 +60,6 @@ export default function Page() {
         });
 
         router.push("/");
-
-        console.log({ data });
       },
       onError: (error: any) => {
         toast.error(error?.response?.data?.message || "Something went wrong!", {

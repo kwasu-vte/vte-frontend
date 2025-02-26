@@ -134,7 +134,7 @@ const Page = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {mentors?.map((staff, index) => (
+                  {mentors?.data?.map((staff, index) => (
                     <TableRow key={index}>
                       <TableCell className="font-medium">
                         {`${staff?.id.slice(0, 6)}...`}

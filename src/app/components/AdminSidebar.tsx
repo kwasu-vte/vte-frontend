@@ -83,24 +83,26 @@ const AdminSidebar = () => {
                   Management
                 </div>
               </button>
-              <button
-                className=" w-full"
-                onClick={() => {
-                  setIsQRcodeopen(true);
-                  setButtonActive(true);
-                }}
-              >
-                <div
-                  className={
-                    buttonActive
-                      ? "flex items-center justify-start w-[80%] px-2 duration-500 text-[#379E37] bg-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2"
-                      : "flex items-center justify-start w-[80%] px-2 duration-500 text-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2"
-                  }
+              <Link href="/attendance">
+                <button
+                  className=" w-full"
+                  // onClick={() => {
+                  //   setIsQRcodeopen(true);
+                  //   setButtonActive(true);
+                  // }}
                 >
-                  <Person2 className=" mx-2" />
-                  Attendance
-                </div>
-              </button>
+                  <div
+                    className={
+                      buttonActive
+                        ? "flex items-center justify-start w-[80%] px-2 duration-500 text-[#379E37] bg-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2"
+                        : "flex items-center justify-start w-[80%] px-2 duration-500 text-white font-bold hover:text-[#379E37] rounded-md m-auto hover:bg-white mb-4 text-left py-2"
+                    }
+                  >
+                    <Person2 className=" mx-2" />
+                    Attendance
+                  </div>
+                </button>
+              </Link>
               {/* <Link href="/staffManagement"> */}
               {/* <button>
                                 <div

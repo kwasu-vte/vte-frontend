@@ -124,7 +124,7 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
                 className="w-full bg-transparent focus:outline-none border-b border-b-[#379e37] text-[#379e37] placeholder:text-[#379e37] mt-2 placeholder:font-thin capitalize max-h-[40px] h-[40px] overflow-hidden"
               >
                 <option value="">Select a Course</option>
-                {courses?.map((course) => (
+                {courses?.data?.map((course) => (
                   <option
                     key={course.id}
                     value={course.id}
@@ -165,7 +165,7 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
                 onChange={(e) => handleSelectStudent(e.target.value)}
                 className=" w-full bg-transparent focus:outline-none border-b border-b-[#379e37] text-[#379e37] placeholder:text-[#379e37] mt-2 placeholder:font-thin"
               >
-                {students?.map((student) => (
+                {students?.data?.map((student) => (
                   <option
                     key={student?.id}
                     value={student?.id}
@@ -182,7 +182,9 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
             <h3 className="text-sm font-semibold">Selected Members:</h3>
             <ul>
               {groupInfo.members.map((id) => {
-                const student = students?.find((student) => student.id === id);
+                const student = students?.data?.find(
+                  (student) => student.id === id
+                );
                 return (
                   <li key={id} className="text-blue-600">
                     {student

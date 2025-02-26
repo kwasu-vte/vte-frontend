@@ -121,7 +121,7 @@ const Page = () => {
                 </TableHeader>
 
                 <TableBody>
-                  {groups?.map((group) => (
+                  {groups?.data?.map((group) => (
                     <TableRow key={group?.id}>
                       <TableCell className="font-medium">
                         {group?.name}

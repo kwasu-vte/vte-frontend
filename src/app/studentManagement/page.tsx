@@ -125,7 +125,7 @@ const Page = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {students?.map((student) => (
+                  {students?.data?.map((student) => (
                     <TableRow
                       onClick={() => setIsStudentDeatilsModalOpen(true)}
                       key={student?.id}
