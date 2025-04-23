@@ -1,6 +1,6 @@
 "use client";
 import { useCreateGroup } from "@/hooks/mutations/useCreategroup";
-import { useFetchCourses } from "@/hooks/queries/useFetchCourses";
+import { useFetchSkills } from "@/hooks/queries/useFetchSkills";
 import { useFetchStudents } from "@/hooks/queries/useFetchStudents";
 import React, { useState } from "react";
 import { toast } from "react-toastify";
@@ -12,37 +12,16 @@ interface CreateGroupModalProps {
 const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
   setIsCreateGroupModalOpen,
 }) => {
-  const [staffStatus, setStaffStatus] = useState(false);
-  const { data: students, isLoading: isFetchingStudents } = useFetchStudents();
-  const { data: courses, isLoading: isFetchingCourses } = useFetchCourses();
   const { mutate, isPending } = useCreateGroup();
   const [groupInfo, setGroupInfo] = useState({
-    name: "",
-    end_date: "",
-    course: "",
-    members: [] as string[],
+    skill_id: "",
   });
 
   console.log({ groupInfo });
 
-  const handleSelectStudent = (userId: string) => {
-    setGroupInfo((prev) => ({
-      ...prev,
-      members: prev.members.includes(userId)
-        ? prev.members.filter((id) => id !== userId)
-        : [...prev.members, userId],
-    }));
-  };
+  const { data: skills, isLoading: isFetchingSkills } = useFetchSkills();
 
-  function handleChange(
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) {
-    const { name, value } = e.target;
-    setGroupInfo((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  }
+  console.log({ skills });
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -56,10 +35,8 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
         });
 
         setGroupInfo({
-          name: "",
-          end_date: "",
-          course: "",
-          members: [] as string[],
+          skill_id: "",
+          force: false,
         });
 
         setIsCreateGroupModalOpen(false);
@@ -96,130 +73,25 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
         <form onSubmit={handleSubmit} className=" text-[#000] w-full">
           <div className=" mb-4">
             <label htmlFor="" className=" block">
-              Group Title:
+              Select skill:
             </label>
-            <input
-              type="text"
-              placeholder="Enter the group title"
-              className=" w-full bg-transparent focus:outline-none border-b border-b-[#379e37] text-[#379e37] placeholder:text-[#379e37] mt-2 placeholder:font-thin capitalize"
-              name="name"
-              value={groupInfo.name}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className="mb-4 w-full">
-            <label htmlFor="course" className="block">
-              Select a Course:
-            </label>
-
-            <div className="relative">
-              <select
-                id="course"
-                name="course"
-                value={groupInfo.course}
-                onChange={(e) =>
-                  setGroupInfo({ ...groupInfo, course: e.target.value })
-                }
-                className="w-full bg-transparent focus:outline-none border-b border-b-[#379e37] text-[#379e37] placeholder:text-[#379e37] mt-2 placeholder:font-thin capitalize max-h-[40px] h-[40px] overflow-hidden"
-              >
-                <option value="">Select a Course</option>
-                {courses?.data?.map((course) => (
-                  <option
-                    key={course.id}
-                    value={course.id}
-                    className="truncate"
-                  >
-                    {course.title}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          <div className=" mb-4">
-            <label htmlFor="" className=" block">
-              Group End Date:
-            </label>
-
-            <input
-              type="date"
-              value={groupInfo.end_date}
+            <select
+              name=""
+              id=""
               onChange={(e) =>
-                setGroupInfo({ ...groupInfo, end_date: e.target.value })
+                setGroupInfo({
+                  ...groupInfo,
+                  skill_id: e.target.value,
+                })
               }
-              className=" w-full bg-transparent focus:outline-none border-b border-b-[#379e37] text-[#379e37] placeholder:text-[#379e37] mt-2 placeholder:font-thin capitalize"
-            />
-          </div>
-
-          <div className=" mb-4">
-            <label htmlFor="" className=" block">
-              Select Members
-            </label>
-
-            {isFetchingStudents ? (
-              <p>Loading students...</p>
-            ) : (
-              <select
-                multiple
-                onChange={(e) => handleSelectStudent(e.target.value)}
-                className=" w-full bg-transparent focus:outline-none border-b border-b-[#379e37] text-[#379e37] placeholder:text-[#379e37] mt-2 placeholder:font-thin"
-              >
-                {students?.data?.map((student) => (
-                  <option
-                    key={student?.id}
-                    value={student?.id}
-                    className="mb-1"
-                  >
-                    {`${student?.last_name} ${student?.first_name} - ${student?.level}L`}
-                  </option>
-                ))}
-              </select>
-            )}
-          </div>
-
-          <div className="mt-4">
-            <h3 className="text-sm font-semibold">Selected Members:</h3>
-            <ul>
-              {groupInfo.members.map((id) => {
-                const student = students?.data?.find(
-                  (student) => student.id === id
-                );
-                return (
-                  <li key={id} className="text-blue-600">
-                    {student
-                      ? `${student.last_name} ${student.first_name}`
-                      : "Unknown User"}
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-
-          <div className=" mb-4">
-            <label htmlFor="" className=" block">
-              Status:
-            </label>
-            {/* <input
-                            type="text"
-                            placeholder='Enter your last name (e.g Doe)'
-                            className=' w-full bg-transparent focus:outline-none border-b border-b-[#379e37] text-[#379e37] placeholder:text-[#379e37] mt-2 placeholder:font-thin capitalize'
-                        /> */}
-            <div className=" flex items-center justify-start">
-              <div
-                onClick={() => setStaffStatus(!staffStatus)}
-                className={`mr-[10px] w-[90px] cursor-pointer h-[40px] px-2 bg-white rounded-full items-center flex ${
-                  staffStatus ? "justify-end" : " justify-start"
-                }`}
-              >
-                <div
-                  className={`${
-                    !staffStatus ? "bg-red-500" : "bg-green-500"
-                  } h-[35px] w-[35px] rounded-full`}
-                ></div>
-              </div>
-              {staffStatus ? <h1>Active</h1> : <h1>Inactive</h1>}
-            </div>
+            >
+              <option value="">Select skill</option>
+              {skills?.data?.map((skill) => (
+                <option key={skill?.id} value={skill?.id}>
+                  {skill?.title}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div>

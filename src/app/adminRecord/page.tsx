@@ -16,10 +16,16 @@ import useAuth from "@/lib/useAuth";
 import { useFetchAdminDetails } from "@/hooks/queries/useFetchAdminDetails";
 import { useFetchGroups } from "@/hooks/queries/useFetchGroups";
 import { useFetchGroupDetails } from "@/hooks/queries/usefetchGroupDetails";
+import { useRouter } from "next/navigation";
 
 const Page = () => {
-  const { userDetails } = useAuth();
+  const { userDetails, mounted, isLoggedIn } = useAuth();
   const id = userDetails?.id;
+  const router = useRouter();
+
+  if (mounted && isLoggedIn === false) {
+    router.push("/auth/sign_in");
+  }
 
   const { data, isLoading, error } = useFetchAdminDetails(id ?? "");
   console.log({ data });
@@ -138,118 +144,38 @@ const Page = () => {
               </TableHeader>
               <TableBody>
                 {/* Sample Table Row */}
-                <TableRow>
-                  <TableCell className="font-medium">1</TableCell>
-                  <TableCell>Olusanmi Pelumi</TableCell>
-                  <TableCell>Kwas/17/Biol123</TableCell>
-                  <TableCell>A</TableCell>
-                  <TableCell className="text-right">
-                    <div className=" flex items-center justify-between">
-                      <div className=" w-[20px] text-center">
-                        <h1>10</h1>
+                {group?.data?.members?.map((student) => (
+                  <TableRow key={student?.id}>
+                    <TableCell className="font-medium">1</TableCell>
+                    <TableCell>
+                      {student?.last_name} {student?.first_name}
+                    </TableCell>
+                    <TableCell>{student?.matric_number}</TableCell>
+                    <TableCell>A</TableCell>
+                    <TableCell className="text-right">
+                      <div className=" flex items-center justify-between">
+                        <div className=" w-[20px] text-center">
+                          <h1>10</h1>
+                        </div>
+                        <div className=" w-[20px] text-center">
+                          <h1>10</h1>
+                        </div>
+                        <div className=" w-[20px] text-center">
+                          <h1>10</h1>
+                        </div>
+                        <div className=" w-[20px] text-center">
+                          <h1>10</h1>
+                        </div>
+                        <div className=" w-[20px] text-center">
+                          <h1>60</h1>
+                        </div>
+                        <div className=" w-[20px] text-center">
+                          <h1>100</h1>
+                        </div>
                       </div>
-                      <div className=" w-[20px] text-center">
-                        <h1>10</h1>
-                      </div>
-                      <div className=" w-[20px] text-center">
-                        <h1>10</h1>
-                      </div>
-                      <div className=" w-[20px] text-center">
-                        <h1>10</h1>
-                      </div>
-                      <div className=" w-[20px] text-center">
-                        <h1>60</h1>
-                      </div>
-                      <div className=" w-[20px] text-center">
-                        <h1>100</h1>
-                      </div>
-                    </div>
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">1</TableCell>
-                  <TableCell>Olusanmi Pelumi</TableCell>
-                  <TableCell>Kwas/17/Biol123</TableCell>
-                  <TableCell>A</TableCell>
-                  <TableCell className="text-right">
-                    <div className=" flex items-center justify-between">
-                      <div className=" w-[20px] text-center">
-                        <h1>10</h1>
-                      </div>
-                      <div className=" w-[20px] text-center">
-                        <h1>10</h1>
-                      </div>
-                      <div className=" w-[20px] text-center">
-                        <h1>10</h1>
-                      </div>
-                      <div className=" w-[20px] text-center">
-                        <h1>10</h1>
-                      </div>
-                      <div className=" w-[20px] text-center">
-                        <h1>60</h1>
-                      </div>
-                      <div className=" w-[20px] text-center">
-                        <h1>100</h1>
-                      </div>
-                    </div>
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">1</TableCell>
-                  <TableCell>Olusanmi Pelumi</TableCell>
-                  <TableCell>Kwas/17/Biol123</TableCell>
-                  <TableCell>A</TableCell>
-                  <TableCell className="text-right">
-                    <div className=" flex items-center justify-between">
-                      <div className=" w-[20px] text-center">
-                        <h1>10</h1>
-                      </div>
-                      <div className=" w-[20px] text-center">
-                        <h1>10</h1>
-                      </div>
-                      <div className=" w-[20px] text-center">
-                        <h1>10</h1>
-                      </div>
-                      <div className=" w-[20px] text-center">
-                        <h1>10</h1>
-                      </div>
-                      <div className=" w-[20px] text-center">
-                        <h1>60</h1>
-                      </div>
-                      <div className=" w-[20px] text-center">
-                        <h1>100</h1>
-                      </div>
-                    </div>
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">1</TableCell>
-                  <TableCell>Olusanmi Pelumi</TableCell>
-                  <TableCell>Kwas/17/Biol123</TableCell>
-                  <TableCell>A</TableCell>
-                  <TableCell className="text-right">
-                    <div className=" flex items-center justify-between">
-                      <div className=" w-[20px] text-center">
-                        <h1>10</h1>
-                      </div>
-                      <div className=" w-[20px] text-center">
-                        <h1>10</h1>
-                      </div>
-                      <div className=" w-[20px] text-center">
-                        <h1>10</h1>
-                      </div>
-                      <div className=" w-[20px] text-center">
-                        <h1>10</h1>
-                      </div>
-                      <div className=" w-[20px] text-center">
-                        <h1>60</h1>
-                      </div>
-                      <div className=" w-[20px] text-center">
-                        <h1>100</h1>
-                      </div>
-                    </div>
-                  </TableCell>
-                </TableRow>
+                    </TableCell>
+                  </TableRow>
+                ))}
               </TableBody>
             </Table>
           </div>

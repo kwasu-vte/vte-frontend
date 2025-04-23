@@ -34,9 +34,10 @@ import { Student } from "@/lib/queries/getStudents";
 import DeleteStudentModal from "../modals/DeleteStudentModal";
 import useAuth from "@/lib/useAuth";
 import { useFetchAdminDetails } from "@/hooks/queries/useFetchAdminDetails";
+import { useRouter } from "next/navigation";
 
 const Page = () => {
-  const { userDetails } = useAuth();
+  const { userDetails, mounted, isLoggedIn } = useAuth();
   const id = userDetails?.id;
 
   const { data, isLoading, error } = useFetchAdminDetails(id ?? "");
@@ -48,6 +49,11 @@ const Page = () => {
   const [isStudentDetailsModalOpen, setIsStudentDeatilsModalOpen] =
     useState(false);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
+  const router = useRouter();
+
+  if (mounted && isLoggedIn === false) {
+    router.push("/auth/sign_in");
+  }
 
   let d = new Date();
   let currentDate = d.toDateString();

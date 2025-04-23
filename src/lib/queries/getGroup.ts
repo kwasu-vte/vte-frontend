@@ -1,7 +1,7 @@
 import { instance } from "../api";
 
 export const getGroup = async (
-  pathId: string
+  group_id: string
 ): Promise<{
   id: string;
   name: string;
@@ -10,6 +10,6 @@ export const getGroup = async (
   course: string;
   members: string[];
 }> => {
-  const response = await instance.get(`/api/grouping/groups/${pathId}/`);
+  const response = await instance.get(`/api/group/${group_id}/`);
   return response.data;
 };

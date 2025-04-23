@@ -38,6 +38,7 @@ import { useFetchAdminDetails } from "@/hooks/queries/useFetchAdminDetails";
 import { useFetchGroups } from "@/hooks/queries/useFetchGroups";
 import { Group } from "@/lib/queries/getGroups";
 import DeleteGroupModal from "../modals/DeleteGroupModal";
+import { useRouter } from "next/navigation";
 
 const Page = () => {
   const [isCreateGroupModalOpen, setIsCreateGroupModalOpen] = useState(false);
@@ -45,8 +46,13 @@ const Page = () => {
   const [isDeleteModal, setIsDeleteModal] = useState(false);
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
 
-  const { userDetails } = useAuth();
+  const { userDetails, mounted, isLoggedIn } = useAuth();
   const id = userDetails?.id;
+  const router = useRouter();
+
+  if (mounted && isLoggedIn === false) {
+    router.push("/auth/sign_in");
+  }
 
   const { data, isLoading, error } = useFetchAdminDetails(id ?? "");
   console.log({ data });
@@ -57,6 +63,9 @@ const Page = () => {
   let currentDate = d.toDateString();
 
   const { data: groups, isLoading: isFetchingGroups } = useFetchGroups();
+
+  console.log({groups});
+  
 
   return (
     <Protected>
@@ -115,7 +124,7 @@ const Page = () => {
                     <TableHead className="">Group Title</TableHead>
                     <TableHead className="">Staff</TableHead>
                     <TableHead className="">Enrolled Students</TableHead>
-                    <TableHead className="">Status</TableHead>
+                    <TableHead className="">Skill</TableHead>
                     <TableHead className=" text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -126,9 +135,9 @@ const Page = () => {
                       <TableCell className="font-medium">
                         {group?.name}
                       </TableCell>
-                      <TableCell>Olusanmi Pelumi</TableCell>
+                      <TableCell>{group?.primary_mentor?.first_name} {group?.primary_mentor?.last_name}</TableCell>
                       <TableCell>{group?.members?.length || "0"}</TableCell>
-                      <TableCell>Active</TableCell>
+                      <TableCell>{group?.skil?.code}</TableCell>
                       <TableCell>
                         <div className=" flex items-center justify-end">
                           <button

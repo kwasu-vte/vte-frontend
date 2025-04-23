@@ -23,10 +23,11 @@ const getUserDetails = () => {
   return null;
 };
 
-const clearAuthData = () => {
+export const clearAuthData = () => {
   localStorage.removeItem("isLoggedIn");
   localStorage.removeItem("userDetails");
   localStorage.removeItem("expirationDate");
+  localStorage.removeItem("token");
 };
 
 const useAuth = () => {

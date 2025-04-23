@@ -9,7 +9,13 @@ export type Group = {
   members: string[];
 };
 
-export const getGroups = async (): Promise<Group[]> => {
-  const response = await instance.get("/api/grouping/groups/");
+type Data = {
+  status: boolean;
+  message: string;
+  data: Group[];
+};
+
+export const getGroups = async (): Promise<Data> => {
+  const response = await instance.get("/api/group/list/");
   return response.data;
 };
