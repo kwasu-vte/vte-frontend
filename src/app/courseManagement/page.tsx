@@ -36,6 +36,10 @@ import { useFetchAdminDetails } from "@/hooks/queries/useFetchAdminDetails";
 import { useFetchCourses } from "@/hooks/queries/useFetchCourses";
 import { Course } from "@/lib/queries/getCourses";
 import DeleteCourseModal from "../modals/DeleteCourseModal";
+import { useFetchSkills } from "@/hooks/queries/useFetchSkills";
+import { useRouter } from "next/navigation";
+import { useEnrollStudentsInSkill } from "@/hooks/mutations/useEnrollStudentsInSkill";
+import { toast } from "react-toastify";
 
 const Page = () => {
   const [isCreateCourseModalOpen, setIsCreateCourseModalOpen] = useState(false);
@@ -43,8 +47,13 @@ const Page = () => {
   const [isDeleteModal, setIsDeleteModal] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
 
-  const { userDetails } = useAuth();
+  const { userDetails, mounted, isLoggedIn } = useAuth();
   const id = userDetails?.id;
+  const router = useRouter();
+
+  if (mounted && isLoggedIn === false) {
+    router.push("/auth/sign_in");
+  }
 
   const { data, isLoading, error } = useFetchAdminDetails(id ?? "");
   console.log({ data });
@@ -54,9 +63,34 @@ const Page = () => {
   let d = new Date();
   let currentDate = d.toDateString();
 
-  const { data: courses, isLoading: isFetchingCourses } = useFetchCourses();
+  const { data: skills, isLoading: isFetchingSkills } = useFetchSkills();
 
-  console.log({ courses });
+  console.log({ skills });
+
+  const [isAssigned, setIsAssigned] = useState(false);
+  const { mutate: assignSkill, isPending: isPendingEnrollment } =
+    useEnrollStudentsInSkill();
+
+  const handleClick = () => {
+    assignSkill(undefined, {
+      onSuccess: () => {
+        toast.success("Skill enrolled successfully!", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+        });
+        setIsAssigned(false);
+      },
+      onError: (error: any) => {
+        console.log({ error });
+        toast.error(error?.response?.data?.detail || "Something went wrong!", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+        });
+      },
+    });
+  };
 
   return (
     <Protected>
@@ -129,24 +163,37 @@ const Page = () => {
 
           <div>
             <h1 className=" font-extrabold text-[#379E37] mb-4 text-xl">
-              Course Management
+              Skills Management
             </h1>
           </div>
 
           <div className=" w-full h-[80vh] bg-white p-4 rounded-lg">
-            <div className=" w-full flex items-center justify-end">
-              <button
-                onClick={() => setIsCreateCourseModalOpen(true)}
-                className=" mx-6 hover:border hover:border-[#379e37] bg-[#379E37] px-3 py-2 rounded-lg text-white cursor-pointer hover:bg-white hover:text-[#379E37] duration-500"
-              >
-                + Add New Course
-              </button>
+            <div className="flex items-center justify-between w-full">
+              {isAssigned && (
+                <button
+                  onClick={handleClick}
+                  className={`px-4 py-2 rounded text-white font-medium transition duration-200 bg-[#379E37] hover:bg-green-700 w-40`}
+                  disabled={isPendingEnrollment}
+                >
+                  {isPendingEnrollment ? "Enrolling..." : "Assign Skill"}
+                </button>
+              )}
 
-              <div className=" flex items-center justify-center bg-white p-2 rounded-md">
-                <CalendarMonth className=" text-[#379E37]" />
-                <h1 className=" mx-4">{currentDate}</h1>
+              <div className=" w-full flex items-center justify-end">
+                <button
+                  onClick={() => setIsCreateCourseModalOpen(true)}
+                  className=" mx-6 hover:border hover:border-[#379e37] bg-[#379E37] px-3 py-2 rounded-lg text-white cursor-pointer hover:bg-white hover:text-[#379E37] duration-500"
+                >
+                  + Add New Skill
+                </button>
+
+                <div className=" flex items-center justify-center bg-white p-2 rounded-md">
+                  <CalendarMonth className=" text-[#379E37]" />
+                  <h1 className=" mx-4">{currentDate}</h1>
+                </div>
               </div>
             </div>
+
             <div className="mt-2 h-[90%] w-full overflow-scroll">
               <Table>
                 <TableHeader className="">
@@ -159,12 +206,10 @@ const Page = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {/* {
-                                        data.users.staff.map((staff, index) => ( */}
-                  {courses?.data?.map((course) => (
-                    <TableRow key={course?.id}>
+                  {skills?.data?.map((skill) => (
+                    <TableRow key={skill?.id}>
                       <TableCell className="font-medium">
-                        {course?.title}
+                        {skill?.title}
                       </TableCell>
                       <TableCell>Olusanmi Pelumi</TableCell>
                       <TableCell>45</TableCell>
@@ -173,7 +218,7 @@ const Page = () => {
                         <div className=" flex items-center justify-end">
                           <button
                             onClick={() => {
-                              setSelectedCourse(course);
+                              setSelectedCourse(skill);
                               setIsEditCourseModalOpen(true);
                             }}
                             className=" mx-2"
@@ -182,7 +227,7 @@ const Page = () => {
                           </button>
                           <button
                             onClick={() => {
-                              setSelectedCourse(course);
+                              setSelectedCourse(skill);
                               setIsDeleteModal(true);
                             }}
                             className=" mx-2"
@@ -193,8 +238,6 @@ const Page = () => {
                       </TableCell>
                     </TableRow>
                   ))}
-                  {/* ))
-                                    } */}
                 </TableBody>
               </Table>
             </div>
@@ -204,6 +247,7 @@ const Page = () => {
       {isCreateCourseModalOpen && (
         <CreateCourseModal
           setIsCreateCourseModalOpen={setIsCreateCourseModalOpen}
+          setIsAssigned={setIsAssigned}
         />
       )}
       {isEditCourseModalOpen && (

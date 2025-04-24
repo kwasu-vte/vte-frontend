@@ -1,52 +1,87 @@
 "use client";
-import { useCreateCourse } from "@/hooks/mutations/useCreateCourse";
+import { useCreateSkill } from "@/hooks/mutations/useCreateSkill";
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 
 interface CreateCourseModalProps {
   setIsCreateCourseModalOpen: (isOpen: boolean) => void;
+  setIsAssigned: (isAssigned: boolean) => void;
 }
 
 const CreateCourseModal: React.FC<CreateCourseModalProps> = ({
   setIsCreateCourseModalOpen,
+  setIsAssigned,
 }) => {
   const [staffStatus, setStaffStatus] = useState(false);
-  const { mutate, isPending } = useCreateCourse();
-  const [courseInfo, setCourseInfo] = useState({
+  const [levelId, setLevelId] = useState("");
+  const { mutate, isPending } = useCreateSkill();
+  const [skillInfo, setSkillInfo] = useState({
     code: "",
     title: "",
     description: "",
-    department: "",
+    enrollment_deadline: "",
     price: "",
+    available_level_ids: [] as string[],
+    capacity: 0,
   });
+
+  console.log({ skillInfo });
 
   function handleChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) {
     const { name, value } = e.target;
-    setCourseInfo((prev) => ({
+    setSkillInfo((prev) => ({
       ...prev,
       [name]: value,
+    }));
+  }
+
+  function handleLevelIdAdd(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const id = levelId.trim();
+
+    if (id && !skillInfo.available_level_ids.includes(id)) {
+      setSkillInfo((prev) => ({
+        ...prev,
+        available_level_ids: [...prev.available_level_ids, id],
+      }));
+      setLevelId("");
+    } else {
+      toast.error("Please enter a valid unique ID.");
+    }
+  }
+
+  function removeLevelId(id: string) {
+    setSkillInfo((prev) => ({
+      ...prev,
+      available_level_ids: prev.available_level_ids.filter(
+        (level) => level !== id
+      ),
     }));
   }
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    mutate(courseInfo, {
+    mutate(skillInfo, {
       onSuccess: (data) => {
-        toast.success("Course created successfully!", {
+        toast.success("Skill created successfully!", {
           position: "top-right",
           autoClose: 3000,
           hideProgressBar: false,
         });
 
-        setCourseInfo({
+        setIsAssigned(true);
+
+        setSkillInfo({
           code: "",
           title: "",
           description: "",
-          department: "",
+          enrollment_deadline: "",
           price: "",
+          available_level_ids: [],
+          capacity: 0,
         });
 
         setIsCreateCourseModalOpen(false);
@@ -77,125 +112,123 @@ const CreateCourseModal: React.FC<CreateCourseModalProps> = ({
         className="lg:w-[60%] bg-[#D7ECD7] rounded-2xl w-[95%] py-4 flex flex-col items-start justify-center px-[10px]"
       >
         <div className=" w-fit mb-4">
-          <h1 className=" text-xl text-[#379E37]">Create New Course</h1>
+          <h1 className=" text-xl text-[#379E37]">Create New Skill</h1>
           <div className=" h-[2px] bg-[#379E37] w-[30%]"></div>
         </div>
         <form className=" text-[#000] w-full" onSubmit={handleSubmit}>
           <div className=" mb-4">
             <label htmlFor="" className=" block">
-              Course Title:
+              Skill Title:
             </label>
             <input
               type="text"
-              placeholder="Enter the course title (e.g EDD203)"
+              placeholder="Enter the skill title"
               className=" w-full bg-transparent focus:outline-none border-b border-b-[#379e37] text-[#379e37] placeholder:text-[#379e37] mt-2 placeholder:font-thin capitalize"
               name="title"
               onChange={handleChange}
-              value={courseInfo.title}
+              value={skillInfo.title}
             />
           </div>
 
           <div className=" mb-4">
             <label htmlFor="" className=" block">
-              Course Code:
+              Skill Code:
             </label>
             <input
               type="text"
-              placeholder="Enter the course title (e.g EDD203)"
+              placeholder="Enter the skill code"
               className=" w-full bg-transparent focus:outline-none border-b border-b-[#379e37] text-[#379e37] placeholder:text-[#379e37] mt-2 placeholder:font-thin capitalize"
               name="code"
               onChange={handleChange}
-              value={courseInfo.code}
+              value={skillInfo.code}
             />
           </div>
 
           <div className=" mb-4">
             <label htmlFor="" className=" block">
-              Course Description:
+              Skill Description:
             </label>
             <input
               type="text"
-              placeholder="Enter the course title (e.g EDD203)"
+              placeholder="Enter the skill description"
               className=" w-full bg-transparent focus:outline-none border-b border-b-[#379e37] text-[#379e37] placeholder:text-[#379e37] mt-2 placeholder:font-thin capitalize"
               name="description"
               onChange={handleChange}
-              value={courseInfo.description}
+              value={skillInfo.description}
             />
           </div>
 
           <div className=" mb-4">
             <label htmlFor="" className=" block">
-              Course Department:
+              Enrollment Deadline:
             </label>
             <input
-              type="text"
-              placeholder="Enter the course title (e.g EDD203)"
+              type="date"
+              placeholder="Enter enrollment deadline"
               className=" w-full bg-transparent focus:outline-none border-b border-b-[#379e37] text-[#379e37] placeholder:text-[#379e37] mt-2 placeholder:font-thin capitalize"
-              name="department"
+              name="enrollment_deadline"
               onChange={handleChange}
-              value={courseInfo.department}
+              value={skillInfo.enrollment_deadline}
             />
           </div>
 
           <div className=" mb-4">
             <label htmlFor="" className=" block">
-              Course Price:
+              Capacity:
+            </label>
+            <input
+              type="number"
+              placeholder="Enter skill capacity"
+              className=" w-full bg-transparent focus:outline-none border-b border-b-[#379e37] text-[#379e37] placeholder:text-[#379e37] mt-2 placeholder:font-thin capitalize"
+              name="capacity"
+              onChange={handleChange}
+              value={skillInfo.capacity}
+            />
+          </div>
+
+          <div className=" mb-4">
+            <label htmlFor="" className=" block">
+              Skill Price:
             </label>
             <input
               type="text"
-              placeholder="Enter the course title (e.g EDD203)"
+              placeholder="Enter the skill price"
               className=" w-full bg-transparent focus:outline-none border-b border-b-[#379e37] text-[#379e37] placeholder:text-[#379e37] mt-2 placeholder:font-thin capitalize"
               name="price"
               onChange={handleChange}
-              value={courseInfo.price}
+              value={skillInfo.price}
             />
           </div>
 
-          {/* <div className=" mb-4">
-            <label htmlFor="" className=" block">
-              Staff First name:
-            </label>
-            <input
-              type="text"
-              placeholder="Enter the staff first name (e.g John)"
-              className=" w-full bg-transparent focus:outline-none border-b border-b-[#379e37] text-[#379e37] placeholder:text-[#379e37] mt-2 placeholder:font-thin capitalize"
-            />
-          </div> */}
-
-          {/* <div className=" mb-4">
-            <label htmlFor="" className=" block">
-              Staff Last name:
-            </label>
-            <input
-              type="text"
-              placeholder="Enter the staff last name (e.g Doe)"
-              className=" w-full bg-transparent focus:outline-none border-b border-b-[#379e37] text-[#379e37] placeholder:text-[#379e37] mt-2 placeholder:font-thin capitalize"
-            />
-          </div> */}
-
-          <div className=" mb-4">
-            <label htmlFor="" className=" block">
-              Status:
-            </label>
-            {/* <input
-                            type="text"
-                            placeholder='Enter your last name (e.g Doe)'
-                            className=' w-full bg-transparent focus:outline-none border-b border-b-[#379e37] text-[#379e37] placeholder:text-[#379e37] mt-2 placeholder:font-thin capitalize'
-                        /> */}
-            <div className=" flex items-center justify-start">
-              <div
-                onClick={() => setStaffStatus(!staffStatus)}
-                className={`mr-[10px] w-[90px] cursor-pointer h-[40px] px-2 bg-white rounded-full items-center flex ${
-                  staffStatus ? "justify-end" : " justify-start"
-                }`}
+          <div className="mb-4">
+            <label className="block">Available Levels:</label>
+            <div className="flex gap-2">
+              <input
+                type="string"
+                placeholder="Enter level ID"
+                className="w-full bg-transparent focus:outline-none border-b border-b-[#379e37] text-[#379e37] placeholder:text-[#379e37] mt-2 placeholder:font-thin"
+                value={levelId}
+                onChange={(e) => setLevelId(e.target.value)}
+              />
+              <button
+                type="button"
+                className="bg-green-500 px-4 py-2 rounded-md text-white"
+                onClick={handleLevelIdAdd}
               >
+                Add
+              </button>
+            </div>
+
+            <div className="mt-2 flex flex-wrap gap-2">
+              {skillInfo.available_level_ids.map((id) => (
                 <div
-                  className={`${
-                    !staffStatus ? "bg-red-500" : "bg-green-500"
-                  } h-[35px] w-[35px] rounded-full`}
-                ></div>
-              </div>
-              {staffStatus ? <h1>Active</h1> : <h1>Inactive</h1>}
+                  key={id}
+                  className="bg-[#379e37] text-white px-3 py-1 rounded-md cursor-pointer"
+                  onClick={() => removeLevelId(id)}
+                >
+                  {id} ✕
+                </div>
+              ))}
             </div>
           </div>
 
@@ -204,7 +237,7 @@ const CreateCourseModal: React.FC<CreateCourseModalProps> = ({
               className=" bg-green-500 p-2 rounded-md block lg:inline mr-4 hover:p-3 duration-500 text-white"
               disabled={isPending}
             >
-              {isPending ? "Loading..." : "Create Course"}
+              {isPending ? "Loading..." : "Create Skill"}
             </button>
 
             <button
@@ -217,10 +250,6 @@ const CreateCourseModal: React.FC<CreateCourseModalProps> = ({
         </form>
       </div>
     </div>
-    // course title
-    // staff name
-    // status
-    // enrolled students
   );
 };
 

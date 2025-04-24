@@ -23,6 +23,7 @@ import { usePathname } from "next/navigation";
 import { Cloud } from "lucide-react";
 import ManagementModal from "../modals/ManagementModal";
 import QRCodeModal from "../modals/QRCodeModal";
+import { clearAuthData } from "@/lib/useAuth";
 
 // interface AdminSidebarProps {
 //     role: string; // or use a specific type if you have defined roles
@@ -153,7 +154,7 @@ const AdminSidebar = () => {
                   }
                 >
                   <Group className=" mx-2" />
-                  Course Mgt.
+                  Skill Mgt.
                 </div>
               </Link>
 
@@ -178,7 +179,7 @@ const AdminSidebar = () => {
           </div>
 
           <button
-            // onClick={logout}
+            onClick={clearAuthData}
             className=" bg-[#9BCE9B] text-[#0B200B] px-2 rounded-md py-1 hover:px-4 duration-500"
           >
             <LogoutRounded className=" mx-2" /> Logout

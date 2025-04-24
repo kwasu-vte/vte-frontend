@@ -1,24 +1,24 @@
 "use client";
 
-import { useDeleteCourse } from "@/hooks/mutations/useDeleteCourse";
-import { Course } from "@/lib/queries/getCourses";
+import { useDeleteSkill } from "@/hooks/mutations/useDeleteSkill";
+import { Skill } from "@/lib/queries/getSkills";
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 
 interface DeleteModalProps {
   setIsDeleteModal: (isOpen: boolean) => void;
-  selectedCourse: Course | null;
+  selectedCourse: Skill | null;
 }
 const DeleteCourseModal: React.FC<DeleteModalProps> = ({
   setIsDeleteModal,
   selectedCourse,
 }) => {
-  const { mutate, isPending } = useDeleteCourse();
+  const { mutate, isPending } = useDeleteSkill();
 
   const handleDelete = () => {
     mutate(selectedCourse?.id || "", {
       onSuccess: () => {
-        toast.success("Course deleted successfully!", {
+        toast.success("Skill deleted successfully!", {
           position: "top-right",
           autoClose: 3000,
           hideProgressBar: false,
@@ -51,7 +51,7 @@ const DeleteCourseModal: React.FC<DeleteModalProps> = ({
         onClick={(e) => e.stopPropagation()}
       >
         <h1 className=" mb-5">
-          Are you sure you would like to DELETE this course? <br /> This action
+          Are you sure you would like to DELETE this skill? <br /> This action
           cannot be undone
         </h1>
         <div>

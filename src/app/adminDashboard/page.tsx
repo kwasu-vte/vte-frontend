@@ -40,9 +40,13 @@ import { useFetchGroups } from "@/hooks/queries/useFetchGroups";
 import { useCreateGroupSetting } from "@/hooks/mutations/useCreateGroupSetting";
 import { toast } from "react-toastify";
 import { useFetchGroupLimit } from "@/hooks/queries/useFetchGroupLimit";
+import { useFetchSkills } from "@/hooks/queries/useFetchSkills";
+import { useFetchAllPayments } from "@/hooks/queries/useFetchAllPayments";
+import { formatDate } from "@fullcalendar/core/index.js";
+import { useUpdateSkillSetting } from "@/hooks/mutations/useUpdateSkillSetting";
+import { useFetchSkillSetting } from "@/hooks/queries/useFetchSkillSetting";
 
 export default function Page() {
-  // const { user, loading } = useAuth();
   const { userDetails } = useAuth();
   const id = userDetails?.id;
 
@@ -54,38 +58,68 @@ export default function Page() {
   const [isACtivitiesModalOpen, setIsActivitesModalOpen] = useState(false);
   const [autoAddStudents, setAutoAddStudents] = useState(false);
 
-  // var lastName = "";
-  // var firstName = "";
-
-  // if (!loading) {
-  //   lastName = user.last_name;
-  //   firstName = user.first_name;
-  // }
   let d = new Date();
   let currentDate = d.toDateString();
+
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+
+  const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setStartDate(e.target.value);
+    if (endDate && e.target.value > endDate) {
+      setEndDate("");
+    }
+  };
+
+  const handleEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (startDate && e.target.value < startDate) {
+      alert("End date must be after start date");
+    } else {
+      setEndDate(e.target.value);
+    }
+  };
 
   const { data: students, isLoading: isFetchingStudents } = useFetchStudents();
 
   console.log({ students });
 
   const { data: courses, isLoading: isFetchingCourses } = useFetchCourses();
+  const { data: skills, isLoading: isFetchingSkills } = useFetchSkills();
   const { data: mentors, isLoading: isFetchingMentors } = useFetchMentors();
   const { data: groups, isLoading: isFetchingGroups } = useFetchGroups();
   const { data: groupLimits, isLoading: isFetchingGroupLimits } =
     useFetchGroupLimit();
+  const { data: skillSettingData, isLoading: isFetchingSkillSettingData } =
+    useFetchSkillSetting();
 
-  const lastGroupLimit = groupLimits?.data?.length
-    ? groupLimits[groupLimits.length - 1]
-    : null;
+  const lastGroupLimit = groupLimits?.data;
+  const lastSkillSetting = skillSettingData?.data;
+
+  console.log({ groupLimits });
+  console.log({ skillSettingData });
 
   const { mutate, isPending } = useCreateGroupSetting();
+  const { mutate: updateSkillSetting, isPending: isPendingUpdateSkillSetting } =
+    useUpdateSkillSetting();
 
   const [groupSettingInfo, setGroupSettingInfo] = useState({
     practicals_per_day: 0,
     students_per_group: 0,
     staffers_per_group: 0,
     groups_per_day: 0,
+    must_be_in_the_same_level: true,
   });
+
+  console.log({ groupSettingInfo });
+
+  const [skillSettingInfo, setSkillSettingInfo] = useState({
+    max_skills_per_student: 0,
+    allow_300_level_selection: true,
+    enrollment_start_date: "",
+    enrollment_end_date: "",
+  });
+
+  console.log({ skillSettingInfo });
 
   useEffect(() => {
     if (lastGroupLimit) {
@@ -94,9 +128,23 @@ export default function Page() {
         students_per_group: lastGroupLimit?.students_per_group || 0,
         staffers_per_group: lastGroupLimit?.staffers_per_group || 0,
         groups_per_day: lastGroupLimit?.groups_per_day || 0,
+        must_be_in_the_same_level:
+          lastGroupLimit?.must_be_in_the_same_level || true,
       });
     }
   }, [lastGroupLimit]);
+
+  useEffect(() => {
+    if (lastSkillSetting) {
+      setSkillSettingInfo({
+        max_skills_per_student: lastSkillSetting?.max_skills_per_student || 0,
+        enrollment_start_date: lastSkillSetting?.enrollment_start_date || "",
+        enrollment_end_date: lastSkillSetting?.enrollment_end_date || "",
+        allow_300_level_selection:
+          lastSkillSetting?.allow_300_level_selection || true,
+      });
+    }
+  }, [lastSkillSetting]);
 
   function handleChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -108,6 +156,23 @@ export default function Page() {
     }));
   }
 
+  const handleSkillDataChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setSkillSettingInfo((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const toggleGroupLevel = () => {
+    setGroupSettingInfo((prev) => ({
+      ...prev,
+      must_be_in_the_same_level: !prev.must_be_in_the_same_level,
+    }));
+  };
+
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
@@ -116,11 +181,12 @@ export default function Page() {
       students_per_group: Number(groupSettingInfo.students_per_group),
       staffers_per_group: Number(groupSettingInfo.staffers_per_group),
       groups_per_day: Number(groupSettingInfo.groups_per_day),
+      must_be_in_the_same_level: true,
     };
 
     mutate(formattedData, {
       onSuccess: (data) => {
-        toast.success("Limits created successfully!", {
+        toast.success("Group settings updated successfully!", {
           position: "top-right",
           autoClose: 3000,
           hideProgressBar: false,
@@ -131,6 +197,7 @@ export default function Page() {
           students_per_group: 0,
           staffers_per_group: 0,
           groups_per_day: 0,
+          must_be_in_the_same_level: true,
         });
 
         console.log({ data });
@@ -146,6 +213,48 @@ export default function Page() {
       },
     });
   }
+
+  const toggleSelection = () => {
+    setSkillSettingInfo((prev) => ({
+      ...prev,
+      allow_300_level_selection: !prev.allow_300_level_selection,
+    }));
+  };
+
+  const handleUpdateSkillSetting = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const formattedData = {
+      max_skills_per_student: Number(skillSettingInfo.max_skills_per_student),
+      allow_300_level_selection: true,
+      enrollment_start_date: skillSettingInfo.enrollment_start_date,
+      enrollment_end_date: skillSettingInfo.enrollment_end_date,
+    };
+
+    updateSkillSetting(formattedData, {
+      onSuccess: () => {
+        toast.success("Skill settings updated successfully!", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+        });
+      },
+      onError: (error: any) => {
+        console.log({ error });
+
+        toast.error(error?.response?.data?.detail || "Something went wrong!", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+        });
+      },
+    });
+  };
+
+  const { data: payments, isLoading: isLoadingPayments } =
+    useFetchAllPayments();
+
+  console.log({ payments });
 
   return (
     <Protected>
@@ -261,15 +370,15 @@ export default function Page() {
                       />
 
                       <AdminDashboardCard
-                        title="Total Staff"
+                        title="Total Mentors"
                         image={group}
                         number={mentors?.data?.length || "0"}
                       />
 
                       <AdminDashboardCard
-                        title="Courses"
+                        title="Skills"
                         image={group}
-                        number={courses?.data?.length || "0"}
+                        number={skills?.data?.length || "0"}
                       />
 
                       <AdminDashboardCard
@@ -316,18 +425,19 @@ export default function Page() {
 
                 {/* Calendar and Tasks */}
                 <div className="w-full sm:w-[50%]">
-                  <h1 className="font-extrabold text-[#379E37] mb-4">
-                    Calendar and Tasks
-                  </h1>
-                  <div
-                    onClick={() => setIsActivitesModalOpen(true)}
-                    className="bg-white p-3 rounded-lg"
-                  >
-                    <FullCalendar
-                      plugins={[dayGridPlugin]}
-                      initialView="dayGridMonth"
-                      events={[{ title: "Test", date: "2024-09-20" }]}
-                    />
+                  <div>
+                    <h1 className="font-extrabold text-[#379E37] mb-4">
+                      Calendar and Tasks
+                    </h1>
+                    <div className="bg-white p-3 rounded-lg ">
+                      <div onClick={() => setIsActivitesModalOpen(true)}>
+                        <FullCalendar
+                          plugins={[dayGridPlugin]}
+                          initialView="dayGridMonth"
+                          events={[{ title: "Test", date: "2024-09-20" }]}
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -344,24 +454,23 @@ export default function Page() {
                       <TableHead>Course</TableHead>
                       <TableHead>Task Title</TableHead>
                       <TableHead>Description</TableHead>
-                      <TableHead>Time Status</TableHead>
+                      <TableHead>Amount</TableHead>
                       <TableHead>Status</TableHead>
-                      <TableHead>Score</TableHead>
-                      <TableHead className="text-right">Details</TableHead>
+                      <TableHead className="text-right">Time</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {/* Sample Table Row */}
-                    <TableRow>
-                      <TableCell className="font-medium">1</TableCell>
-                      <TableCell>EDD</TableCell>
-                      <TableCell>Breeding Of Tilapia Fish</TableCell>
-                      <TableCell>Choose healthy an...</TableCell>
-                      <TableCell>Submission Open</TableCell>
-                      <TableCell>Not Submitted</TableCell>
-                      <TableCell>---</TableCell>
-                      <TableCell className="text-right">View</TableCell>
-                    </TableRow>
+                    {payments?.data?.map((payment) => (
+                      <TableRow key={payment?.id}>
+                        <TableCell className="font-medium">1</TableCell>
+                        <TableCell>{payment?.reference}</TableCell>
+                        <TableCell>{payment?.paystack_reference}</TableCell>
+                        <TableCell>{payment?.reference}</TableCell>
+                        <TableCell>{payment?.amount}</TableCell>
+                        <TableCell>{payment?.status}</TableCell>
+                        <TableCell>{formatDate(payment?.created_at)}</TableCell>
+                      </TableRow>
+                    ))}
                   </TableBody>
                 </Table>
               </div>
@@ -387,9 +496,6 @@ export default function Page() {
                         {last_name} {first_name}
                       </h1>
                       <div className="flex">
-                        {/* <p className=" uppercase text-[#379E37] text-xs font-bold mr-4">
-                      {level}LVL
-                    </p> */}
                         <select
                           className="text-xs uppercase font-semibold  text-[#B7802C] border-none focus:outline-none"
                           name="course"
@@ -441,7 +547,7 @@ export default function Page() {
                   >
                     Dashboard{" "}
                   </button>{" "}
-                  &gt;&gt; Calendar
+                  &gt;&gt; Configuration
                 </h1>
                 {/* <h1 className="text-2xl sm:text-4xl font-extrabold text-[#379E37] mb-2 sm:mb-0 lg:hidden flex">
                       Welcome back {firstName} {lastName}! 👋🏽
@@ -455,7 +561,7 @@ export default function Page() {
               </div>
 
               <div className=" w-full flex flex-col lg:flex-row items-center justify-between min-h-[90vh]">
-                <div className=" w-[49%] min-h-[95vh] flex flex-col items-start justify-between">
+                {/* <div className=" w-[49%] min-h-[95vh] flex flex-col items-start justify-between">
                   <div className=" w-full h-[44vh] bg-white rounded-lg">
                     <div className="w-full h-[60px] flex items-center justify-between px-3">
                       <h1 className=" text-[#379E37] font-bold text-xl">
@@ -473,7 +579,9 @@ export default function Page() {
                         Assign group to 300 level students
                       </h1>
 
-                      {/* <button className=" px-3 py-2 rounded-sm bg-[#379E37] text-white hover: bg-opacity-95 duration-500">Start Now</button> */}
+                      <button className=" px-3 py-2 rounded-sm bg-[#379E37] text-white hover: bg-opacity-95 duration-500">
+                        Start Now
+                      </button>
                       <div
                         onClick={() => setAutoAddStudents(!autoAddStudents)}
                         className={`cursor-pointer w-[60px] h-[30px] rounded-full flex items-center px-2 ${
@@ -490,13 +598,97 @@ export default function Page() {
                       </div>
                     </div>
                   </div>
+                </div> */}
+
+                <div className="w-[49%] min-h-[95vh] flex flex-col items-start justify-between">
+                  <div className=" w-full mb-6 bg-white rounded-lg pb-4">
+                    <div className="w-full h-[60px] flex items-center justify-between px-3">
+                      <h1 className=" text-[#379E37] font-bold text-xl">
+                        Skill Settings
+                      </h1>
+                    </div>
+                    <form
+                      className=" w-[90%] mx-auto"
+                      onSubmit={handleUpdateSkillSetting}
+                    >
+                      <h1 className=" mb-2">Number of Skills per student</h1>
+                      <input
+                        type="number"
+                        className=" mb-4 w-full focus:outline-none border border-slate-700 p-2 rounded-md placeholder:text-slate-700"
+                        placeholder="Enter the limit"
+                        name="max_skills_per_student"
+                        onChange={handleSkillDataChange}
+                        value={skillSettingInfo.max_skills_per_student}
+                        required
+                      />
+
+                      <h1 className=" mb-2">Enrollment Start Date</h1>
+                      <input
+                        type="date"
+                        className=" mb-4 w-full focus:outline-none border border-slate-700 p-2 rounded-md placeholder:text-slate-700"
+                        placeholder="Choose start date"
+                        name="enrollment_start_date"
+                        onChange={handleSkillDataChange}
+                        value={skillSettingInfo.enrollment_start_date}
+                        required
+                      />
+
+                      <h1 className=" mb-2">Enrollment End Date</h1>
+                      <input
+                        type="date"
+                        className=" mb-4 w-full focus:outline-none border border-slate-700 p-2 rounded-md placeholder:text-slate-700"
+                        placeholder="Choose end date"
+                        name="enrollment_end_date"
+                        onChange={handleSkillDataChange}
+                        value={skillSettingInfo.enrollment_end_date}
+                        required
+                      />
+
+                      <div className="flex items-center justify-between w-full sm:w-[400px] mb-3">
+                        <div>
+                          <h3 className="text-[#1D1D1D] font-semibold">
+                            Skill selection access
+                          </h3>
+                          <span className="text-[#1D1D1D] text-sm">
+                            Allow 300l to select skill
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={toggleSelection}
+                          className={`relative inline-flex items-center h-6 rounded-full w-10 transition-all border-[#C2CBCD] ${
+                            skillSettingInfo.allow_300_level_selection
+                              ? "bg-[#379E37]"
+                              : "bg-[#585555]"
+                          }`}
+                        >
+                          <span
+                            className={`inline-block w-5 h-5 transform bg-white rounded-full transition-transform ${
+                              skillSettingInfo.allow_300_level_selection
+                                ? "translate-x-5"
+                                : "translate-x-1"
+                            }`}
+                          />
+                        </button>
+                      </div>
+
+                      <button
+                        className=" px-3 py-2 rounded-sm bg-[#379E37] text-white hover: bg-opacity-95 duration-500"
+                        disabled={isPendingUpdateSkillSetting}
+                      >
+                        {isPendingUpdateSkillSetting
+                          ? "Loading..."
+                          : "Save changes"}
+                      </button>
+                    </form>
+                  </div>
                 </div>
 
                 <div className=" w-[49%] min-h-[95vh] flex flex-col items-center justify-between">
                   <div className=" w-full mb-6 bg-white rounded-lg pb-4">
                     <div className="w-full h-[60px] flex items-center justify-between px-3">
                       <h1 className=" text-[#379E37] font-bold text-xl">
-                        Limits
+                        Group Settings
                       </h1>
                     </div>
                     <form className=" w-[90%] mx-auto" onSubmit={handleSubmit}>
@@ -545,6 +737,34 @@ export default function Page() {
                         value={groupSettingInfo.groups_per_day}
                         required
                       />
+
+                      <div className="flex items-center justify-between w-full sm:w-[400px] mb-3">
+                        <div>
+                          <h3 className="text-[#1D1D1D] font-semibold">
+                            Group level
+                          </h3>
+                          <span className="text-[#1D1D1D] text-sm">
+                            Students must be in same level
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={toggleGroupLevel}
+                          className={`relative inline-flex items-center h-6 rounded-full w-10 transition-all border-[#C2CBCD] ${
+                            groupSettingInfo.must_be_in_the_same_level
+                              ? "bg-[#379E37]"
+                              : "bg-[#585555]"
+                          }`}
+                        >
+                          <span
+                            className={`inline-block w-5 h-5 transform bg-white rounded-full transition-transform ${
+                              groupSettingInfo.must_be_in_the_same_level
+                                ? "translate-x-5"
+                                : "translate-x-1"
+                            }`}
+                          />
+                        </button>
+                      </div>
 
                       <button
                         className=" px-3 py-2 rounded-sm bg-[#379E37] text-white hover: bg-opacity-95 duration-500"

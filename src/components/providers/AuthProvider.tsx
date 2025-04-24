@@ -15,11 +15,11 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setIsClient(true);
   }, []);
 
-  useEffect(() => {
-    if (isClient && mounted && isLoggedIn === false) {
-      router.replace("/auth/sign_in");
-    }
-  }, [isClient, isLoggedIn, mounted, router]);
+  // useEffect(() => {
+  //   if (isClient && mounted && isLoggedIn === false) {
+  //     router.push("/auth/sign_in");
+  //   }
+  // }, [isClient, isLoggedIn, mounted, router]);
 
   if (!isClient || !mounted) return null;
 

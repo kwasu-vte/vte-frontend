@@ -39,6 +39,7 @@ import { useFetchMentors } from "@/hooks/queries/useFetchMentors";
 import { Mentor } from "@/lib/queries/getMentors";
 import useAuth from "@/lib/useAuth";
 import { useFetchAdminDetails } from "@/hooks/queries/useFetchAdminDetails";
+import { useRouter } from "next/navigation";
 
 const Page = () => {
   // const { loading, user } = useAuth();
@@ -46,9 +47,14 @@ const Page = () => {
   const [isDeleteModal, setIsDeleteModal] = useState(false);
   const [isEditStaffModalOpen, setIsEditStaffModalOpen] = useState(false);
   const [selectedStaff, setSelectedStaff] = useState<Mentor | null>(null);
+  const router = useRouter();
 
-  const { userDetails } = useAuth();
+  const { userDetails, mounted, isLoggedIn } = useAuth();
   const id = userDetails?.id;
+
+  if (mounted && isLoggedIn === false) {
+    router.push("/auth/sign_in");
+  }
 
   const { data, isLoading, error } = useFetchAdminDetails(id ?? "");
   console.log({ data });

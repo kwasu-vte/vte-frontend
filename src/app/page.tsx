@@ -10,14 +10,17 @@ import Sidebar from "./components/Sidebar";
 
 import { Protected } from "@/components/protected";
 import useAuth from "@/lib/useAuth";
+import { useRouter } from "next/navigation";
 
 export default function Page() {
   const { userDetails } = useAuth();
   const [roles, setRoles] = useState("");
+  const { isLoggedIn, mounted } = useAuth();
+  const router = useRouter();
 
-  // let role = "";
-  // if (!loading && user) { role = user.role; }
-  // console.log(role)
+  if (mounted && isLoggedIn === false) {
+    router.push("/auth/sign_in");
+  }
   return (
     <Protected>
       {userDetails?.role === "admin" || roles === "admin" ? (
