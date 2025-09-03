@@ -24,36 +24,45 @@ import "@/app/Calendar.css";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import { FadeInFromBottom } from "../components/FadeInFromBottom";
-import { Protected } from "@/components/protected";
-import useAuth from "@/lib/useAuth";
+// TODO: These imports need to be replaced with new foundation components
+// import { Protected } from "@/components/protected";
+// import useAuth from "@/lib/useAuth";
 import Typewriter from "../components/Typewriter";
 import data from "@/helpers/demodata";
-import ResponsiveAdminSidebar from "../components/ResponsiveAdminSidebar";
+// import ResponsiveAdminSidebar from "../components/ResponsiveAdminSidebar";
 import ActivitiesModal from "../modals/ActivitiesModal";
-import { useFetchStudentDetails } from "@/hooks/queries/useFetchStudentDetails";
-import { useFetchAdminDetails } from "@/hooks/queries/useFetchAdminDetails";
-import { useFetchStudents } from "@/hooks/queries/useFetchStudents";
+// import { useFetchStudentDetails } from "@/hooks/queries/useFetchStudentDetails";
+// import { useFetchAdminDetails } from "@/hooks/queries/useFetchAdminDetails";
+// import { useFetchStudents } from "@/hooks/queries/useFetchStudents";
 import AdminDashboardCard from "../components/AdminDashboardCard";
-import { useFetchCourses } from "@/hooks/queries/useFetchCourses";
-import { useFetchMentors } from "@/hooks/queries/useFetchMentors";
-import { useFetchGroups } from "@/hooks/queries/useFetchGroups";
-import { useCreateGroupSetting } from "@/hooks/mutations/useCreateGroupSetting";
+// import { useFetchCourses } from "@/hooks/queries/useFetchCourses";
+// import { useFetchMentors } from "@/hooks/queries/useFetchMentors";
+// import { useFetchGroups } from "@/hooks/queries/useFetchGroups";
+// import { useCreateGroupSetting } from "@/hooks/mutations/useCreateGroupSetting";
 import { toast } from "react-toastify";
-import { useFetchGroupLimit } from "@/hooks/queries/useFetchGroupLimit";
-import { useFetchSkills } from "@/hooks/queries/useFetchSkills";
-import { useFetchAllPayments } from "@/hooks/queries/useFetchAllPayments";
+// import { useFetchGroupLimit } from "@/hooks/queries/useFetchGroupLimit";
+// import { useFetchSkills } from "@/hooks/queries/useFetchSkills";
+// import { useFetchAllPayments } from "@/hooks/queries/useFetchAllPayments";
 import { formatDate } from "@fullcalendar/core/index.js";
-import { useUpdateSkillSetting } from "@/hooks/mutations/useUpdateSkillSetting";
-import { useFetchSkillSetting } from "@/hooks/queries/useFetchSkillSetting";
+// import { useUpdateSkillSetting } from "@/hooks/mutations/useUpdateSkillSetting";
+// import { useFetchSkillSetting } from "@/hooks/queries/useFetchSkillSetting";
 
 export default function Page() {
-  const { userDetails } = useAuth();
-  const id = userDetails?.id;
+  // TODO: Replace with new authentication system
+  // const { userDetails } = useAuth();
+  // const id = userDetails?.id;
 
-  const { data, isLoading, error } = useFetchAdminDetails(id ?? "");
-  console.log({ data });
+  // const { data, isLoading, error } = useFetchAdminDetails(id ?? "");
+  // console.log({ data });
 
-  const { first_name, last_name, username, email, role } = data?.data || {};
+  // const { first_name, last_name, username, email, role } = data?.data || {};
+  
+  // Temporary placeholder data
+  const first_name = "Admin";
+  const last_name = "User";
+  const username = "admin";
+  const email = "admin@example.com";
+  const role = "Admin";
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isACtivitiesModalOpen, setIsActivitesModalOpen] = useState(false);
   const [autoAddStudents, setAutoAddStudents] = useState(false);
@@ -79,28 +88,50 @@ export default function Page() {
     }
   };
 
-  const { data: students, isLoading: isFetchingStudents } = useFetchStudents();
+  // TODO: Replace with new API service
+  // const { data: students, isLoading: isFetchingStudents } = useFetchStudents();
+  // console.log({ students });
+  // const { data: courses, isLoading: isFetchingCourses } = useFetchCourses();
+  // const { data: skills, isLoading: isFetchingSkills } = useFetchSkills();
+  // const { data: mentors, isLoading: isFetchingMentors } = useFetchMentors();
+  // const { data: groups, isLoading: isFetchingGroups } = useFetchGroups();
+  // const { data: groupLimits, isLoading: isFetchingGroupLimits } = useFetchGroupLimit();
+  // const { data: skillSettingData, isLoading: isFetchingSkillSettingData } = useFetchSkillSetting();
 
-  console.log({ students });
-
-  const { data: courses, isLoading: isFetchingCourses } = useFetchCourses();
-  const { data: skills, isLoading: isFetchingSkills } = useFetchSkills();
-  const { data: mentors, isLoading: isFetchingMentors } = useFetchMentors();
-  const { data: groups, isLoading: isFetchingGroups } = useFetchGroups();
-  const { data: groupLimits, isLoading: isFetchingGroupLimits } =
-    useFetchGroupLimit();
-  const { data: skillSettingData, isLoading: isFetchingSkillSettingData } =
-    useFetchSkillSetting();
-
-  const lastGroupLimit = groupLimits?.data;
-  const lastSkillSetting = skillSettingData?.data;
+  // const lastGroupLimit = groupLimits?.data;
+  // const lastSkillSetting = skillSettingData?.data;
+  
+  // Temporary placeholder data
+  const students = { data: [] as any[] };
+  const courses = { data: [] as any[] };
+  const skills = { data: [] as any[] };
+  const mentors = { data: [] as any[] };
+  const groups = { data: [] as any[] };
+  const groupLimits = { data: null as any };
+  const skillSettingData = { data: null as any };
+  const lastGroupLimit = null as any;
+  const lastSkillSetting = null as any;
 
   console.log({ groupLimits });
   console.log({ skillSettingData });
 
-  const { mutate, isPending } = useCreateGroupSetting();
-  const { mutate: updateSkillSetting, isPending: isPendingUpdateSkillSetting } =
-    useUpdateSkillSetting();
+  // TODO: Replace with new mutation hooks
+  // const { mutate, isPending } = useCreateGroupSetting();
+  // const { mutate: updateSkillSetting, isPending: isPendingUpdateSkillSetting } = useUpdateSkillSetting();
+  
+  // Temporary placeholder functions
+  const mutate = (data: any, options?: any) => {
+    if (options?.onSuccess) {
+      options.onSuccess(data);
+    }
+  };
+  const isPending = false;
+  const updateSkillSetting = (data: any, options?: any) => {
+    if (options?.onSuccess) {
+      options.onSuccess(data);
+    }
+  };
+  const isPendingUpdateSkillSetting = false;
 
   const [groupSettingInfo, setGroupSettingInfo] = useState({
     practicals_per_day: 0,
@@ -185,7 +216,7 @@ export default function Page() {
     };
 
     mutate(formattedData, {
-      onSuccess: (data) => {
+      onSuccess: (data: any) => {
         toast.success("Group settings updated successfully!", {
           position: "top-right",
           autoClose: 3000,
@@ -251,14 +282,16 @@ export default function Page() {
     });
   };
 
-  const { data: payments, isLoading: isLoadingPayments } =
-    useFetchAllPayments();
+  // TODO: Replace with new API service
+  // const { data: payments, isLoading: isLoadingPayments } = useFetchAllPayments();
+  
+  // Temporary placeholder data
+  const payments = { data: [] as any[] };
 
   console.log({ payments });
 
   return (
-    <Protected>
-      <FadeInFromBottom>
+    <FadeInFromBottom>
         {/* Main Content */}
         <div
           className={`w-full h-[100vh] overflow-scroll p-4 sm:pl-[20%] sm:py-2 sm:pr-4 ${
@@ -269,7 +302,8 @@ export default function Page() {
             <>
               {/* Mobile header */}
               <div className=" lg:hidden w-[100vw] h-[60px] px-3 flex items-center justify-between">
-                <ResponsiveAdminSidebar />
+                {/* TODO: Replace with new sidebar component */}
+                <div>Mobile Menu</div>
 
                 <div className=" h-[90%] w-fit bg-white rounded-lg px-2">
                   <div className=" h-full flex items-center justify-center">
@@ -479,7 +513,8 @@ export default function Page() {
             <>
               {/* Mobile header */}
               <div className=" lg:hidden w-[100vw] h-[60px] px-3 flex items-center justify-between">
-                <ResponsiveAdminSidebar />
+                {/* TODO: Replace with new sidebar component */}
+                <div>Mobile Menu</div>
 
                 <div className=" h-[90%] w-fit bg-white rounded-lg px-2">
                   <div className=" h-full flex items-center justify-center">
@@ -792,9 +827,6 @@ export default function Page() {
           )}
         </div>
       </FadeInFromBottom>
-      {/* {
-        isACtivitiesModalOpen && <ActivitiesModal setIsActivitesModalOpen={setIsActivitesModalOpen} />
-      } */}
-    </Protected>
   );
+  {/* TODO: Add ActivitiesModal when needed */}
 }

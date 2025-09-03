@@ -1,120 +1,19 @@
-"use client"
-import React from 'react'
-import {
-    CalendarMonth,
-    CalendarViewDayRounded,
-    Notifications,
-    Search,
-} from "@mui/icons-material";
-import Link from "next/link";
-import {
-    Table,
-    TableBody,
-    TableCaption,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table";
-import { FadeInFromBottom } from '../components/FadeInFromBottom';
+// * Page Purpose: Staff/mentor attendance management for assigned groups.
+// ! Security: Should only render for authenticated mentors under `(authenticated)` layout.
+// ? Data Sources: Group attendance data via `api.ts` methods; attendance updates via Server Actions.
+// TODO: Refactor to new architecture:
+//   - Move under `src/app/(authenticated)/mentor/attendance/page.tsx`.
+//   - Integrate with `AppShell` layout.
+//   - Replace legacy auth with server-side session management.
+//   - Use `StateRenderer` and `DataTable` for attendance list.
+//   - Replace legacy sidebar components with unified `Sidebar`.
+//   - Implement attendance marking via Server Actions or `api.ts` methods.
 
-import StaffSidebar from '../components/StaffSidebar';
-import { Protected } from '@/components/protected';
-import { useAuth } from '@/lib/auth';
-
-const Page = () => {
-    const { user, loading } = useAuth();
-
-    if (loading) return "Loading...";
-    let d = new Date();
-    let currentDate = d.toDateString();
-
-
-    const lastName = user.last_name;
-    const firstName = user.first_name;
-    return (
-        <Protected>
-            <StaffSidebar />
-            <FadeInFromBottom>
-                <div className=" w-full h-[100vh] overflow-scroll pl-[20%] py-2 pr-4">
-                    <div className=" h-[60px] w-full bg-white rounded-md flex items-center justify-between p-2 mb-4">
-                        <div className=" bg-[#BFE7BF7A] h-full w-[30%] px-3">
-                            <Search />
-                            <input
-                                type="text"
-                                className=" h-full bg-transparent px-3 focus:outline-none text-black placeholder:text-black text-sm"
-                                placeholder="Search here..."
-                            />
-                        </div>
-                        <div className=" flex items-center justify-center">
-                            <Link href={"/studentPages/notifications/"}>
-                                <Notifications className=" text-[#379E37] mx-4" />
-                            </Link>
-                            <div className=" h-[50px] w-[50px] bg-green-700 profile rounded-full mx-1"></div>
-                            <div className=" mx-1 h-full flex flex-col items-start justify-center">
-                                <h1 className=" font-bold text-lg">
-                                    {firstName} {lastName}
-                                </h1>
-                                <p className=" uppercase text-[#379E37] text-xs font-bold">
-                                    Staff
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <h1 className=" font-extrabold text-[#379E37] mb-4 text-xl">
-                            Attendance
-                        </h1>
-                    </div>
-
-                    <div className=' w-full h-[80vh] bg-white p-4 rounded-lg'>
-                        <div className=' flex items-center justify-between'>
-                            <h1 className=" font-semibold text-[#379E37] mb-4 text-xl">
-                                Tailoring Group A
-                            </h1>
-                            <div className=" flex items-center justify-center bg-white p-2 rounded-md">
-                                <CalendarMonth className=" text-[#379E37]" />
-                                <select name="" id="" className=" mx-4 appearance-none">
-                                    <option value="">{currentDate}</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div className=' h-[90%] w-full overflow-scroll'>
-                            <Table>
-                                <TableHeader className="">
-                                    <TableRow>
-                                        <TableHead className="">S/N</TableHead>
-                                        <TableHead className="">Full Name</TableHead>
-                                        <TableHead className="">Matriculation Number</TableHead>
-                                        <TableHead className="">Course</TableHead>
-                                        <TableHead>Department</TableHead>
-                                        <TableHead>Action</TableHead>
-                                        {/* <TableHead className="text-right">Details</TableHead> */}
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    <TableRow>
-                                        <TableCell className="font-medium">1</TableCell>
-                                        <TableCell>Olusanmi Pelumi</TableCell>
-                                        <TableCell>Kwas/17/Biol123</TableCell>
-                                        <TableCell>GNS 202</TableCell>
-                                        <TableCell>Biology</TableCell>
-                                        <TableCell>
-                                            <input
-                                                type="checkbox"
-                                            >
-                                            </input>
-                                        </TableCell>
-                                    </TableRow>
-                                </TableBody>
-                            </Table>
-                        </div>
-                    </div>
-                </div>
-            </FadeInFromBottom>
-        </Protected>
-    )
+export default function Page() {
+  return (
+    <div className="p-6">
+      <h1 className="text-2xl font-semibold">Staff Attendance</h1>
+      <p className="mt-4 text-base">This page will be refactored to the new architecture. Legacy dependencies were removed to unblock the build.</p>
+    </div>
+  );
 }
-
-export default Page

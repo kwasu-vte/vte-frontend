@@ -1,198 +1,144 @@
-"use client";
-import Image from "next/image";
-import logo from "@/assets/kwasulogo.png";
-import { FadeInFromLeft } from "@/app/components/FadeInFromLeft";
-import { useState } from "react";
-import "../../globals.css";
-import { Noto_Sans } from "next/font/google";
-import loginImage from "@/assets/form-bg-image.png";
-import male from "@/assets/login-male.png";
-import female from "@/assets/login-female.png";
-import { useRouter } from "next/navigation";
-import { useSignIn } from "@/hooks/mutations/useSignIn";
-import { toast } from "react-toastify";
-import useAuth from "@/lib/useAuth";
+// * Sign-In Page
+// * Secure authentication using Server Actions and NextUI components
+// * No client-side token handling - pure server-side authentication
+// * Uses signInAction from @/lib/actions for secure authentication
 
-const notoSans = Noto_Sans({
-  subsets: ["latin"],
-  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
-});
+'use client';
 
-export default function Page() {
-  const router = useRouter();
-  const { mutate, isPending } = useSignIn();
-  const { userDetails } = useAuth();
-  console.log({ userDetails });
+import React, { useState } from 'react';
+import Image from 'next/image';
+import { Card, CardHeader, CardBody, Input, Button, Link } from '@nextui-org/react';
+import { Eye, EyeOff } from 'lucide-react';
+import { signInAction } from '@/lib/actions';
+import logo from '@/assets/kwasulogo.png';
 
-  const [userInfo, setUserInfo] = useState({
-    email: "",
-    password: "",
-  });
+export default function SignInPage() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isVisible, setIsVisible] = useState(false);
 
-  console.log({ userInfo });
+  const toggleVisibility = () => setIsVisible(!isVisible);
 
-  function handleChange(
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) {
-    const { name, value } = e.target;
-    setUserInfo((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  }
+  async function handleSubmit(formData: FormData) {
+    setIsLoading(true);
+    setError(null);
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-
-    mutate(userInfo, {
-      onSuccess: (data) => {
-        console.log({ data });
-
-        toast.success("User signed in successfully!", {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-        });
-
-        setUserInfo({
-          email: "",
-          password: "",
-        });
-
-        router.push("/");
-      },
-      onError: (error: any) => {
-        toast.error(error?.response?.data?.message || "Something went wrong!", {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-        });
-      },
-    });
+    try {
+      await signInAction(formData);
+      // * Redirect happens in the Server Action
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Authentication failed');
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-[#BFE7BF] login-background">
-      <div className=" w-full h-[100vh] flex items-center justify-center">
-        <FadeInFromLeft>
-          <div className="w-full md:w-[80%] h-full md:h-[90%] lg:bg-white rounded-md flex flex-col md:flex-row items-center justify-center md:justify-between p-4 md:p-[20px]">
-            <div className="w-full lg:w-[45%] flex flex-col items-start justify-start h-full p-[20px]">
-              {/* Logo and Heading */}
-              <div
-                className={`flex items-center justify-center mb-20  ${notoSans.className}`}
-              >
-                <Image
-                  alt="Kwara State University Logo"
-                  src={logo}
-                  className=" w-[30px] md:w-[60px] mr-2"
-                />
-                <div>
-                  <h1 className="text-[#DC9935] font-bold text-lg md:text-medium text-center md:text-left m-0 p-0">
-                    Kwara State
-                  </h1>
-                  <h1
-                    className={` text-[#DC9935] font-extrabold text-medium m-0 p-0 ${notoSans.className}`}
-                  >
-                    University
-                  </h1>
-                </div>
-              </div>
-
-              <div className="text-left mb-6">
-                <h1
-                  className={`font-extrabold text-4xl md:text-5xl ${notoSans.className} mb-3`}
-                >
-                  Welcome back
-                </h1>
-                <p className="text-sm text-[#6E6E6E]">
-                  Don’t have an account?{" "}
-                  <a href="/auth/sign_up" className="text-[#379E37] underline">
-                    Sign up
-                  </a>
-                </p>
-              </div>
-
-              {/* Login Form */}
-              <form
-                onSubmit={handleSubmit}
-                className="w-full mb-4 md:mb-6 px-0"
-              >
-                {/* Matric No Field */}
-                <div className="relative w-full mx-auto mb-4">
-                  <input
-                    type="text"
-                    id="email"
-                    name="email"
-                    className="placeholder:text-sm font-thin block w-full px-4 py-2 text-sm text-gray-900 border border-[#58AE58] rounded-lg focus:outline-none peer"
-                    placeholder="Enter your matric number"
-                    onChange={handleChange}
-                    value={userInfo.email}
-                    required
-                  />
-                  <label className="absolute left-3 -top-2.5 px-1 bg-white rounded-md text-sm text-black font-bold transition-all">
-                    Matric Number or email
-                  </label>
-                </div>
-
-                {/* Password Field */}
-                <div className="relative w-full mx-auto mb-4">
-                  <input
-                    type="password"
-                    id="password"
-                    name="password"
-                    className="placeholder:text-sm font-thin block w-full px-4 py-2 text-sm text-gray-900 border border-[#58AE58] rounded-lg focus:outline-none peer"
-                    placeholder="Enter your password"
-                    onChange={handleChange}
-                    value={userInfo.password}
-                    required
-                  />
-                  <label className="absolute left-3 -top-2.5 px-1 bg-white rounded-md text-sm text-black font-bold transition-all">
-                    Password
-                  </label>
-                </div>
-
-                {/* Login Button */}
-                {isPending ? (
-                  <div className="bg-green-500 w-full text-white text-[0.85rem] duration-150 py-[1rem] font-semibold tracking-wider mt-4 uppercase flex items-center justify-center">
-                    <div className="animate-spin h-5 w-5 border-2 border-white rounded-full border-t-transparent"></div>
-                  </div>
-                ) : (
-                  <button
-                    type="submit"
-                    className="bg-green-500 hover:bg-green-400 w-full text-white text-[0.85rem] duration-150 py-[1rem] font-semibold tracking-wider mt-4 uppercase"
-                  >
-                    Login
-                  </button>
-                )}
-              </form>
-            </div>
-            <div className=" hidden w-[45%] h-full lg:flex items-end justify-center relative">
-              <Image src={loginImage} alt="" className=" max-h-full" />
-              <div className=" z-[50] h-[90%] w-full absolute">
-                <div className=" h-full z-[100] w-[105%] flex flex-col items-center justify-between">
-                  <div className=" h-[70%] flex flex-col items-center justify-center w-full">
-                    <h1
-                      className={`${notoSans.className} font-extrabold text-4xl bg-[#DC9935] p-2 rounded-md text-green-500 mb-6`}
-                    >
-                      Kwasu
-                    </h1>
-                    <p
-                      className={` font-extrabold text-white text-2xl text-center ${notoSans.className}`}
-                    >
-                      Center For <br />
-                      Entrepreneurs <br />
-                      Payment Platform <br />
-                    </p>
-                  </div>
-                  <div className=" flex items-center justify-between w-[600px] overflow-visible">
-                    <Image src={female} alt="" className=" w-[310px]" />
-                    <Image src={male} alt="" className=" w-[400px]" />
-                  </div>
-                </div>
-              </div>
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        {/* * Logo and Brand */}
+        <div className="text-center mb-8">
+          <div className="flex items-center justify-center mb-4">
+            <Image
+              src={logo}
+              alt="Kwara State University Logo"
+              width={48}
+              height={48}
+              className="mr-3"
+            />
+            <div className="text-left">
+              <h1 className="text-2xl font-bold text-primary">Kwara State</h1>
+              <h2 className="text-xl font-bold text-primary">University</h2>
             </div>
           </div>
-        </FadeInFromLeft>
+          <h3 className="text-3xl font-bold text-neutral-900 mb-2">
+            Welcome Back
+          </h3>
+          <p className="text-neutral-600">
+            Sign in to your VTE account
+          </p>
+        </div>
+
+        {/* * Sign-In Form */}
+        <Card className="shadow-xl">
+          <CardHeader className="pb-0">
+            <h4 className="text-xl font-semibold text-neutral-900">
+              Sign In
+            </h4>
+          </CardHeader>
+          <CardBody className="space-y-6">
+            <form action={handleSubmit} className="space-y-4">
+              {/* * Username/Matric Number Field */}
+              <Input
+                name="username"
+                label="Matric Number or Email"
+                placeholder="Enter your matric number or email"
+                variant="bordered"
+                isRequired
+                classNames={{
+                  input: "text-base",
+                  label: "text-neutral-700 font-medium",
+                }}
+              />
+
+              {/* * Password Field */}
+              <Input
+                name="password"
+                label="Password"
+                placeholder="Enter your password"
+                variant="bordered"
+                type={isVisible ? "text" : "password"}
+                isRequired
+                endContent={
+                  <button
+                    type="button"
+                    onClick={toggleVisibility}
+                    className="focus:outline-none"
+                  >
+                    {isVisible ? (
+                      <EyeOff className="w-4 h-4 text-neutral-400" />
+                    ) : (
+                      <Eye className="w-4 h-4 text-neutral-400" />
+                    )}
+                  </button>
+                }
+                classNames={{
+                  input: "text-base",
+                  label: "text-neutral-700 font-medium",
+                }}
+              />
+
+              {/* * Error Display */}
+              {error && (
+                <div className="p-3 bg-danger-50 border border-danger-200 rounded-lg">
+                  <p className="text-sm text-danger-700">{error}</p>
+                </div>
+              )}
+
+              {/* * Submit Button */}
+              <Button
+                type="submit"
+                color="primary"
+                size="lg"
+                className="w-full font-semibold"
+                isLoading={isLoading}
+                disabled={isLoading}
+              >
+                {isLoading ? 'Signing In...' : 'Sign In'}
+              </Button>
+            </form>
+
+            {/* * Sign Up Link */}
+            <div className="text-center">
+              <p className="text-sm text-neutral-600">
+                Don&apos;t have an account?{' '}
+                <Link href="/auth/sign_up" className="text-primary font-medium">
+                  Sign up
+                </Link>
+              </p>
+            </div>
+          </CardBody>
+        </Card>
       </div>
     </div>
   );

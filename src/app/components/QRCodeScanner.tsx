@@ -4,7 +4,7 @@ import QrScanner from 'react-qr-barcode-scanner';
 const QRCodeScanner = () => {
     const [data, setData] = useState(null);
 
-    const handleScan = (err, result) => {
+    const handleScan = (err: any, result: any) => {
         if (result) {
             //TODO: Run qrcode verification function
             setData(result.text);
