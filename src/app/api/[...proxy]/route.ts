@@ -74,10 +74,10 @@ const handleRequest = async (request: NextRequest, { params }: { params: Promise
   }
 
   // * Handle logout specifically
-  if (path === 'auth/logout') {
+  if (path === 'v1/users/auth/logout') {
     await deleteSessionCookie();
     console.info(`[BFF Proxy ${traceId}] User logged out. Session cookie deleted.`);
-    return NextResponse.json({ status: 'ok', message: 'Logged out successfully' });
+    return NextResponse.json({ success: true, message: 'Logged out successfully' });
   }
 
   // * Prepare fetch options
@@ -111,7 +111,7 @@ const handleRequest = async (request: NextRequest, { params }: { params: Promise
     }
 
     // * Special handling for login: extract token and set cookie
-    if (path === 'auth/token' && apiResponse.ok) {
+    if (path === 'v1/users/auth/login' && apiResponse.ok) {
       const responseData = await apiResponse.json();
       const token = responseData?.access_token;
 

@@ -1,7 +1,7 @@
 // * Centralized API Service
 // * Uses proxy pattern: Client → /api/* → Backend
 // * No client-side token handling - all via httpOnly cookies
-// * Follows the exact pattern from sd-frontend
+// * Follows OpenAPI specification exactly
 
 import { 
   User, 
@@ -11,9 +11,16 @@ import {
   Payment, 
   AttendanceRecord, 
   SystemConfig,
+  AcademicSession,
+  StudentProfile,
+  SkillDateRange,
   CreateSkillPayload,
+  UpdateSkillPayload,
+  SkillDateRangePayload,
   CreateGroupPayload,
   CreateUserPayload,
+  CreateStudentProfilePayload,
+  LoginPayload,
   ApiResponse,
   PaginatedResponse 
 } from './types';
@@ -72,38 +79,34 @@ class ApiClient {
   }
 
   // * Authentication Methods
-  async signIn(username: string, password: string): Promise<ApiResponse<{
+  async signIn(loginData: LoginPayload): Promise<ApiResponse<{
     user: User;
-    // Note: accessToken and refreshToken are handled by proxy, not returned to client
+    // Note: access_token and refresh_token are handled by proxy, not returned to client
   }>> {
-    const formData = new URLSearchParams();
-    formData.append('username', username);
-    formData.append('password', password);
-
-    return this.request('auth/token', {
+    return this.request('v1/users/auth/login', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: formData,
+      body: JSON.stringify(loginData),
     });
   }
 
   async signOut(): Promise<void> {
-    return this.request('auth/logout', {
+    return this.request('v1/users/auth/logout', {
       method: 'POST',
     });
   }
 
-  async refreshToken(refreshToken: string): Promise<ApiResponse<{ accessToken: string }>> {
-    return this.request('auth/refresh', {
+  async refreshToken(): Promise<ApiResponse<{ access_token: string }>> {
+    return this.request('v1/users/auth/refresh', {
       method: 'POST',
-      body: JSON.stringify({ refreshToken }),
     });
+  }
+
+  async getCurrentUser(): Promise<ApiResponse<User>> {
+    return this.request('v1/users/auth/me');
   }
 
   async signUp(userData: CreateUserPayload): Promise<ApiResponse<User>> {
-    return this.request('core/register', {
+    return this.request('v1/users/auth/register', {
       method: 'POST',
       body: JSON.stringify(userData),
     });
@@ -111,41 +114,94 @@ class ApiClient {
 
   // * Skills Management
   async getSkills(): Promise<ApiResponse<Skill[]>> {
-    return this.request('skills');
+    return this.request('v1/skills');
+  }
+
+  async getSkill(id: string): Promise<ApiResponse<Skill>> {
+    return this.request(`v1/skills/${id}`);
   }
 
   async createSkill(skillData: CreateSkillPayload): Promise<ApiResponse<Skill>> {
-    return this.request('skills', {
+    return this.request('v1/skills', {
       method: 'POST',
       body: JSON.stringify(skillData),
     });
   }
 
-  async updateSkill(id: string, skillData: Partial<CreateSkillPayload>): Promise<ApiResponse<Skill>> {
-    return this.request(`skills/${id}/edit`, {
+  async updateSkill(id: string, skillData: UpdateSkillPayload): Promise<ApiResponse<Skill>> {
+    return this.request(`v1/skills/${id}`, {
       method: 'PATCH',
       body: JSON.stringify(skillData),
     });
   }
 
   async deleteSkill(id: string): Promise<void> {
-    return this.request(`skills/${id}/delete`, {
+    return this.request(`v1/skills/${id}`, {
       method: 'DELETE',
     });
   }
 
-  async getSkillSettings(): Promise<ApiResponse<SystemConfig>> {
-    return this.request('skills/admin/config');
+  // * Skill Date Range Management
+  async getSkillDateRange(id: string, academicSession?: string): Promise<ApiResponse<SkillDateRange | null>> {
+    const query = academicSession ? `?academic-session=${academicSession}` : '';
+    return this.request(`v1/skills/${id}/date-range${query}`);
   }
 
-  async updateSkillSettings(settings: Partial<SystemConfig>): Promise<ApiResponse<SystemConfig>> {
-    return this.request('skills/admin/config', {
-      method: 'PUT',
-      body: JSON.stringify(settings),
+  async updateSkillDateRange(id: string, dateRange: SkillDateRangePayload): Promise<ApiResponse<SkillDateRange>> {
+    return this.request(`v1/skills/${id}/date-range`, {
+      method: 'POST',
+      body: JSON.stringify(dateRange),
     });
   }
 
-  // * Groups Management
+  // * Academic Sessions Management
+  async getAcademicSessions(): Promise<ApiResponse<AcademicSession[]>> {
+    return this.request('v1/academic-sessions');
+  }
+
+  async createAcademicSession(sessionData: {
+    name: string;
+    starts_at?: string | null;
+    ends_at?: string | null;
+  }): Promise<ApiResponse<AcademicSession>> {
+    return this.request('v1/academic-sessions', {
+      method: 'POST',
+      body: JSON.stringify(sessionData),
+    });
+  }
+
+  async updateAcademicSession(id: number, sessionData: {
+    name?: string;
+    starts_at?: string;
+    ends_at?: string;
+  }): Promise<ApiResponse<AcademicSession>> {
+    return this.request(`v1/academic-sessions/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(sessionData),
+    });
+  }
+
+  async startAcademicSession(id: number): Promise<ApiResponse<AcademicSession>> {
+    return this.request(`v1/academic-sessions/${id}/start`, {
+      method: 'POST',
+    });
+  }
+
+  async endAcademicSession(id: number): Promise<ApiResponse<AcademicSession>> {
+    return this.request(`v1/academic-sessions/${id}/end`, {
+      method: 'POST',
+    });
+  }
+
+  // * Student Profile Management
+  async createStudentProfile(userId: string, profileData: CreateStudentProfilePayload): Promise<ApiResponse<StudentProfile>> {
+    return this.request(`v1/users/${userId}/student`, {
+      method: 'POST',
+      body: JSON.stringify(profileData),
+    });
+  }
+
+  // * Groups Management (Legacy - keeping for backward compatibility)
   async getGroups(): Promise<ApiResponse<Group[]>> {
     return this.request('group/list');
   }
@@ -170,7 +226,7 @@ class ApiClient {
     });
   }
 
-  // * User Management
+  // * User Management (Legacy - keeping for backward compatibility)
   async getStudents(): Promise<ApiResponse<User[]>> {
     return this.request('core/students/all');
   }
@@ -192,12 +248,12 @@ class ApiClient {
     });
   }
 
-  // * Payments
+  // * Payments (Legacy - keeping for backward compatibility)
   async getPayments(): Promise<ApiResponse<Payment[]>> {
     return this.request('payments');
   }
 
-  // * System Configuration
+  // * System Configuration (Legacy - keeping for backward compatibility)
   async getSystemConfig(): Promise<ApiResponse<SystemConfig>> {
     return this.request('skills/admin/config');
   }

@@ -115,12 +115,12 @@ export function Header({ user, onMenuClick }: HeaderProps) {
             <button className="flex items-center space-x-3 p-2 rounded-lg hover:bg-neutral-100 transition-colors">
               <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
                 <span className="text-white text-sm font-semibold">
-                  {user.firstName.charAt(0)}{user.lastName.charAt(0)}
+                  {user.first_name.charAt(0)}{user.last_name.charAt(0)}
                 </span>
               </div>
               <div className="hidden md:block text-left">
                 <p className="text-sm font-medium text-neutral-900">
-                  {user.firstName} {user.lastName}
+                  {user.first_name} {user.last_name}
                 </p>
                 <p className="text-xs text-neutral-600 capitalize">
                   {user.role}
