@@ -9,54 +9,54 @@ export function getUserPermissions(user: User): UserPermissions {
   switch (user.role) {
     case 'Admin':
       return {
-        canManageSkills: true,
-        canManageGroups: true,
-        canManageStudents: true,
-        canManageMentors: true,
-        canViewPayments: true,
-        canManageSystemSettings: true,
-        canEnrollInSkills: false, // Admins don't enroll in skills
-        canViewAttendance: true,
-        canTakeAttendance: false, // Admins don't take attendance
+        can_manage_skills: true,
+        can_manage_groups: true,
+        can_manage_students: true,
+        can_manage_mentors: true,
+        can_view_payments: true,
+        can_manage_system_settings: true,
+        can_enroll_in_skills: false, // Admins don't enroll in skills
+        can_view_attendance: true,
+        can_take_attendance: false, // Admins don't take attendance
       };
 
     case 'Mentor':
       return {
-        canManageSkills: false,
-        canManageGroups: false,
-        canManageStudents: false,
-        canManageMentors: false,
-        canViewPayments: false,
-        canManageSystemSettings: false,
-        canEnrollInSkills: false, // Mentors don't enroll in skills
-        canViewAttendance: true,
-        canTakeAttendance: true, // Mentors can take attendance
+        can_manage_skills: false,
+        can_manage_groups: false,
+        can_manage_students: false,
+        can_manage_mentors: false,
+        can_view_payments: false,
+        can_manage_system_settings: false,
+        can_enroll_in_skills: false, // Mentors don't enroll in skills
+        can_view_attendance: true,
+        can_take_attendance: true, // Mentors can take attendance
       };
 
     case 'Student':
       return {
-        canManageSkills: false,
-        canManageGroups: false,
-        canManageStudents: false,
-        canManageMentors: false,
-        canViewPayments: true, // Students can view their own payments
-        canManageSystemSettings: false,
-        canEnrollInSkills: true, // Students can enroll in skills
-        canViewAttendance: true, // Students can view their own attendance
-        canTakeAttendance: false, // Students don't take attendance
+        can_manage_skills: false,
+        can_manage_groups: false,
+        can_manage_students: false,
+        can_manage_mentors: false,
+        can_view_payments: true, // Students can view their own payments
+        can_manage_system_settings: false,
+        can_enroll_in_skills: true, // Students can enroll in skills
+        can_view_attendance: true, // Students can view their own attendance
+        can_take_attendance: false, // Students don't take attendance
       };
 
     default:
       return {
-        canManageSkills: false,
-        canManageGroups: false,
-        canManageStudents: false,
-        canManageMentors: false,
-        canViewPayments: false,
-        canManageSystemSettings: false,
-        canEnrollInSkills: false,
-        canViewAttendance: false,
-        canTakeAttendance: false,
+        can_manage_skills: false,
+        can_manage_groups: false,
+        can_manage_students: false,
+        can_manage_mentors: false,
+        can_view_payments: false,
+        can_manage_system_settings: false,
+        can_enroll_in_skills: false,
+        can_view_attendance: false,
+        can_take_attendance: false,
       };
   }
 }

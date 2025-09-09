@@ -26,19 +26,19 @@ export async function getSession(): Promise<AuthSession | null> {
     const mockUser: User = {
       id: '1',
       email: 'admin@example.com',
-      firstName: 'Admin',
-      lastName: 'User',
-      matricNumber: null,
+      first_name: 'Admin',
+      last_name: 'User',
+      matric_number: null,
       level: null,
       role: 'Admin',
-      isActive: true,
-      isSuperuser: true,
+      is_active: true,
+      is_superuser: true,
     };
 
     return {
       user: mockUser,
-      accessToken: sessionToken.value,
-      refreshToken: refreshToken.value,
+      access_token: sessionToken.value,
+      refresh_token: refreshToken.value,
     };
   } catch (error) {
     console.error('Error getting session:', error);
@@ -98,18 +98,18 @@ export async function refreshAccessToken(): Promise<string | null> {
       return null;
     }
 
-    const response = await api.refreshToken(refreshToken.value);
+    const response = await api.refreshToken();
     
-    if (response.status) {
+    if (response.success) {
       // * Update the session token cookie
-      cookieStore.set('session_token', response.data.accessToken, {
+      cookieStore.set('session_token', response.data.access_token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
         maxAge: 60 * 60 * 24 * 7, // 7 days
       });
       
-      return response.data.accessToken;
+      return response.data.access_token;
     }
     
     return null;
