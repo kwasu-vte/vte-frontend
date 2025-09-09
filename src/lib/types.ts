@@ -1,55 +1,100 @@
 // * VTE Frontend Canonical Types
 // * This file is the single source of truth for all data models
-// * All API responses will be transformed to match these types
+// * All types match the OpenAPI specification exactly
 
 // --- USER & AUTH ---
 export interface User {
   id: string;
   email: string;
-  firstName: string;
-  lastName: string;
-  matricNumber: string | null;
-  level: '200' | '300' | '400' | null;
+  first_name: string;
+  last_name: string;
+  matric_number: string | null;
+  level: '100' | '200' | '300' | '400' | '500' | null;
   role: 'Admin' | 'Mentor' | 'Student';
-  isActive: boolean;
-  isSuperuser: boolean;
+  is_active: boolean;
+  is_superuser: boolean;
 }
 
 export interface AuthSession {
   user: User;
-  accessToken: string;
-  refreshToken: string;
+  access_token: string;
+  refresh_token: string;
 }
 
 // --- CORE ENTITIES ---
 export interface Skill {
   id: string;
   title: string;
-  description: string;
-  price: number;
-  capacity: number;
-  currentCapacity: number;
-  code: string;
-  enrollmentDeadline: string;
-  availableLevels: { level: string }[];
+  description: string | null;
+  max_groups: number;
+  min_students_per_group: number;
+  max_students_per_group: number | null;
+  date_range_start: string | null;
+  date_range_end: string | null;
+  exclude_weekends: boolean;
+  allowed_levels: string[] | null;
+  meta: string[] | null;
+  created_at: string | null;
+  updated_at: string | null;
+  enrollments_count: number;
+  groups_count: number;
+}
+
+export interface SkillDateRange {
+  id: number;
+  skill_id: string;
+  academic_session_id: number;
+  date_range_start: string;
+  date_range_end: string;
+  created_at: string | null;
+  updated_at: string | null;
+}
+
+export interface AcademicSession {
+  id: number;
+  name: string;
+  starts_at: string | null;
+  ends_at: string | null;
+  active: boolean;
+  created_at: string | null;
+  updated_at: string | null;
+  groups_count?: number;
+}
+
+export interface StudentProfile {
+  id: number;
+  matric_number: string;
+  student_level: string;
+  department: string;
+  faculty: string | null;
+  phone: string | null;
+  gender: string | null;
+  can_enroll: boolean;
+  meta: string[] | null;
+  created_at: string | null;
+  updated_at: string | null;
+  full_name: string;
+  student_level_int: string;
+  attendances_count: string;
+  enrollments_count: string;
 }
 
 export interface Group {
   id: string;
   name: string;
   skill: Pick<Skill, 'id' | 'title'>;
-  mentor: Pick<User, 'id' | 'firstName' | 'lastName'> | null;
-  members: Pick<User, 'id' | 'firstName' | 'lastName'>[];
-  creationDate: string;
-  endDate: string;
+  mentor: Pick<User, 'id' | 'first_name' | 'last_name'> | null;
+  members: Pick<User, 'id' | 'first_name' | 'last_name'>[];
+  creation_date: string;
+  end_date: string;
 }
 
 export interface Activity {
   id: string;
   title: string;
   type: 'class' | 'practical';
-  startTime: string; // ISO Date string
-  endTime: string;   // ISO Date string
+  start_time: string; // ISO Date string
+  end_time: string;   // ISO Date string
   group: Pick<Group, 'id' | 'name'>;
 }
 
@@ -57,42 +102,42 @@ export interface Payment {
   id: string;
   amount: string;
   reference: string;
-  paystackReference: string;
-  paymentUrl: string;
+  paystack_reference: string;
+  payment_url: string;
   status: string;
-  createdAt: string;
-  updatedAt: string;
-  lastVerificationAttempt: string;
+  created_at: string;
+  updated_at: string;
+  last_verification_attempt: string;
   student: string;
   enrollment: string;
 }
 
 export interface AttendanceRecord {
   id: string;
-  student: Pick<User, 'id' | 'firstName' | 'lastName'>;
+  student: Pick<User, 'id' | 'first_name' | 'last_name'>;
   group: Pick<Group, 'id' | 'name'>;
   activity: Pick<Activity, 'id' | 'title'>;
   status: 'present' | 'absent' | 'late';
   timestamp: string;
-  verifiedBy?: Pick<User, 'id' | 'firstName' | 'lastName'>;
+  verified_by?: Pick<User, 'id' | 'first_name' | 'last_name'>;
 }
 
 // --- CONFIGURATION ---
 export interface SystemConfig {
-  semesterStartDate: string;
-  semesterEndDate: string;
-  maxSkillsPerStudent: number;
-  allow300LevelSelection: boolean;
-  enrollmentStartDate: string;
-  enrollmentEndDate: string;
-  maxGroupSize: number;
-  minGroupSize: number;
-  autoAssignmentEnabled: boolean;
+  semester_start_date: string;
+  semester_end_date: string;
+  max_skills_per_student: number;
+  allow_300_level_selection: boolean;
+  enrollment_start_date: string;
+  enrollment_end_date: string;
+  max_group_size: number;
+  min_group_size: number;
+  auto_assignment_enabled: boolean;
 }
 
 // --- API RESPONSE WRAPPERS ---
 export interface ApiResponse<T> {
-  status: boolean;
+  success: boolean;
   message: string;
   data: T;
 }
@@ -106,29 +151,58 @@ export interface PaginatedResponse<T> {
 
 // --- FORM PAYLOADS ---
 export interface CreateSkillPayload {
-  code: string;
   title: string;
-  description: string;
-  price: string;
-  availableLevelIds: string[];
-  capacity: number;
+  description?: string | null;
+  max_groups: number;
+  min_students_per_group: number;
+  max_students_per_group?: number | null;
+  date_range_start: string;
+  date_range_end: string;
+  meta?: string[] | null;
+  allowed_levels: string[];
+}
+
+export interface UpdateSkillPayload {
+  title?: string;
+  description?: string;
+  max_groups?: number;
+  min_students_per_group?: number;
+  max_students_per_group?: number;
+  meta?: string[] | null;
+  allowed_levels?: string[];
+}
+
+export interface SkillDateRangePayload {
+  date_range_start: string;
+  date_range_end: string;
 }
 
 export interface CreateGroupPayload {
-  skillId: string;
+  skill_id: string;
   force: boolean;
 }
 
 export interface CreateUserPayload {
-  username: string;
+  first_name: string;
+  last_name: string;
   email: string;
   password: string;
-  password2: string;
-  firstName: string;
-  lastName: string;
-  matricNumber: string;
-  level: string;
-  role: string;
+  password_confirmation: string;
+}
+
+export interface CreateStudentProfilePayload {
+  matric_number: string;
+  student_level: string;
+  department: string;
+  faculty: string;
+  phone: string;
+  gender: 'male' | 'female';
+  meta?: string | null;
+}
+
+export interface LoginPayload {
+  email: string;
+  password: string;
 }
 
 // --- NAVIGATION ---
@@ -142,13 +216,13 @@ export interface NavigationItem {
 
 // --- PERMISSIONS ---
 export interface UserPermissions {
-  canManageSkills: boolean;
-  canManageGroups: boolean;
-  canManageStudents: boolean;
-  canManageMentors: boolean;
-  canViewPayments: boolean;
-  canManageSystemSettings: boolean;
-  canEnrollInSkills: boolean;
-  canViewAttendance: boolean;
-  canTakeAttendance: boolean;
+  can_manage_skills: boolean;
+  can_manage_groups: boolean;
+  can_manage_students: boolean;
+  can_manage_mentors: boolean;
+  can_view_payments: boolean;
+  can_manage_system_settings: boolean;
+  can_enroll_in_skills: boolean;
+  can_view_attendance: boolean;
+  can_take_attendance: boolean;
 }
