@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VTE Auth Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 20px; border: 1px solid #ccc; border-radius: 8px; }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+    </style>
+</head>
+<body>
+    <h1>VTE Frontend Authentication Test</h1>
+    
+    <div class="test-section">
+        <h2>Server Status Test</h2>
+        <div id="server-status">Testing...</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Authentication Pages Test</h2>
+        <div id="auth-pages">Testing...</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>API Proxy Test</h2>
+        <div id="api-proxy">Testing...</div>
+    </div>
+
+    <script>
+        // Test server status
+        fetch('http://localhost:3000')
+            .then(response => {
+                document.getElementById('server-status').innerHTML = 
+                    '<span class="success">✓ Server is running on port 3000</span>';
+            })
+            .catch(error => {
+                document.getElementById('server-status').innerHTML = 
+                    '<span class="error">✗ Server not responding: ' + error.message + '</span>';
+            });
+
+        // Test auth pages
+        Promise.all([
+            fetch('http://localhost:3000/auth/sign_in'),
+            fetch('http://localhost:3000/auth/sign_up')
+        ])
+        .then(responses => {
+            const allOk = responses.every(r => r.ok);
+            document.getElementById('auth-pages').innerHTML = 
+                allOk ? 
+                '<span class="success">✓ Sign-in and Sign-up pages are accessible</span>' :
+                '<span class="error">✗ Some auth pages are not accessible</span>';
+        })
+        .catch(error => {
+            document.getElementById('auth-pages').innerHTML = 
+                '<span class="error">✗ Error accessing auth pages: ' + error.message + '</span>';
+        });
+
+        // Test API proxy
+        fetch('http://localhost:3000/api/test')
+            .then(response => {
+                document.getElementById('api-proxy').innerHTML = 
+                    '<span class="info">ℹ API proxy is responding (status: ' + response.status + ')</span>';
+            })
+            .catch(error => {
+                document.getElementById('api-proxy').innerHTML = 
+                    '<span class="error">✗ API proxy error: ' + error.message + '</span>';
+            });
+    </script>
+</body>
+</html>
