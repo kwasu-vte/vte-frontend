@@ -57,11 +57,13 @@ export default function Page() {
 
   // const { first_name, last_name, username, email, role } = data?.data || {};
   
-  // Temporary placeholder data
-  const first_name = "Admin";
-  const last_name = "User";
-  const username = "admin";
-  const email = "admin@example.com";
+  // ! SECURITY: Hardcoded credentials removed - use server-side authentication
+  // * This page should be refactored to use the new authentication system
+  // * User data should come from server-side session via AppShell
+  const first_name = "Loading...";
+  const last_name = "";
+  const username = "";
+  const email = "";
   const role = "Admin";
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isACtivitiesModalOpen, setIsActivitesModalOpen] = useState(false);

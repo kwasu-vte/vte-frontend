@@ -22,12 +22,13 @@ export async function getSession(): Promise<AuthSession | null> {
     // * For now, we'll return a mock session
     // * In production, this should verify the token's validity
     
-    // * Mock user data - replace with actual API call
+    // ! SECURITY: Hardcoded credentials removed
+    // * Mock user data - replace with actual API call to getCurrentUser()
     const mockUser: User = {
       id: '1',
-      email: 'admin@example.com',
-      first_name: 'Admin',
-      last_name: 'User',
+      email: 'user@example.com',
+      first_name: 'User',
+      last_name: 'Name',
       matric_number: null,
       level: null,
       role: 'Admin',
