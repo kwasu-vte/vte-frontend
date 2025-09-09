@@ -64,8 +64,9 @@ export function AppProvider({ children, initialTheme = 'system' }: AppProviderPr
   // * Notifications State
   const [notifications, setNotifications] = useState<Notification[]>([]);
   
-  // * Theme State
-  const [theme, setTheme] = useState<Theme>(initialTheme);
+  // * Theme State - Hydration Safe
+  const [theme, setTheme] = useState<Theme>('light'); // Default to light to prevent hydration mismatch
+  const [isHydrated, setIsHydrated] = useState(false);
   
   // * Sidebar State
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -118,8 +119,17 @@ export function AppProvider({ children, initialTheme = 'system' }: AppProviderPr
     setActiveModal(null);
   };
 
-  // * Theme Effect
+  // * Hydration Effect
   React.useEffect(() => {
+    setIsHydrated(true);
+    setTheme(initialTheme);
+  }, [initialTheme]);
+
+  // * Theme Effect - Hydration Safe
+  React.useEffect(() => {
+    // * Only run after hydration to prevent hydration mismatch
+    if (!isHydrated || typeof window === 'undefined') return;
+    
     if (theme === 'system') {
       const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
       const handleChange = (e: MediaQueryListEvent) => {
@@ -133,7 +143,7 @@ export function AppProvider({ children, initialTheme = 'system' }: AppProviderPr
     } else {
       document.documentElement.classList.toggle('dark', theme === 'dark');
     }
-  }, [theme]);
+  }, [theme, isHydrated]);
 
   const value: AppContextType = {
     notifications,
