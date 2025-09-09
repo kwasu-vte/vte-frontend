@@ -19,7 +19,9 @@ import {
   UserCheck,
   GraduationCap,
   Home,
-  LogOut
+  LogOut,
+  School,
+  UserPlus
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -70,6 +72,18 @@ const navigationItems: NavigationItem[] = [
     href: '/admin/payments',
     label: 'Payment Records',
     icon: CreditCard,
+    role: ['Admin'],
+  },
+  {
+    href: '/academicSessions',
+    label: 'Academic Sessions',
+    icon: School,
+    role: ['Admin'],
+  },
+  {
+    href: '/studentProfiles',
+    label: 'Student Profiles',
+    icon: UserPlus,
     role: ['Admin'],
   },
   {
@@ -169,12 +183,12 @@ export function Sidebar({ isOpen, user }: SidebarProps) {
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
               <span className="text-white font-semibold">
-                {user.firstName.charAt(0)}{user.lastName.charAt(0)}
+                {user.first_name.charAt(0)}{user.last_name.charAt(0)}
               </span>
             </div>
             <div>
               <p className="font-medium text-neutral-900">
-                {user.firstName} {user.lastName}
+                {user.first_name} {user.last_name}
               </p>
               <p className="text-sm text-neutral-600 capitalize">
                 {user.role}
