@@ -10,3 +10,6 @@
 - Feature: Core patterns & template page implementation; AppShell integration & role-based dashboards
 - Docs: Update progress tracking for AppShell integration; Add 2025-09-09 daily summary
 
+## 2025-09-09 (continued)
+- Cleanup: Remove unnecessary legacy files
+
