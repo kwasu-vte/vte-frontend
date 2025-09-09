@@ -264,6 +264,20 @@ class ApiClient {
       body: JSON.stringify(config),
     });
   }
+
+  // * Payment Methods
+  async makePayment({ course, specialization }: { course: string, specialization: string | null }): Promise<ApiResponse<{ authorization_url: string }>> {
+    return this.request('api/auth/register_course', {
+      method: 'POST',
+      body: JSON.stringify({ course, specialization }),
+    });
+  }
+
+  async activateCourse({ reference }: { reference: string }): Promise<ApiResponse<{ msg: string }>> {
+    return this.request(`api/auth/activate?reference=${reference}`, {
+      method: 'POST',
+    });
+  }
 }
 
 // * Export singleton instance

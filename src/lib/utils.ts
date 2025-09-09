@@ -1,15 +1,11 @@
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
-import { redirect } from "next/navigation";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export const Logout = async () => {
-  localStorage.removeItem("access_token");
-  localStorage.removeItem("refresh_token");
-  localStorage.removeItem("role");
-  sessionStorage.removeItem("login_status")
-  redirect("/auth/sign_in")
-}
+// ! SECURITY: Client-side token storage removed
+// * Logout functionality moved to Server Actions in lib/actions.ts
+// * All authentication now uses httpOnly cookies via server-side
+// * Use signOutAction() from lib/actions.ts instead
