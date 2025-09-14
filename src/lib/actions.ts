@@ -52,6 +52,7 @@ export async function signUpAction(formData: FormData) {
     email: formData.get('email') as string,
     password: formData.get('password') as string,
     password_confirmation: formData.get('password2') as string,
+    role: 'Student', // Default role for sign up
   };
   
   // * Validate required fields

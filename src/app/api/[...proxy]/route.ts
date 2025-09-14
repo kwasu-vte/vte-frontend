@@ -93,7 +93,6 @@ const handleRequest = async (request: NextRequest, { params }: { params: Promise
   // * Add body for non-GET requests
   if (request.method !== 'GET' && request.method !== 'HEAD') {
     fetchOptions.body = request.body;
-    fetchOptions.duplex = 'half';
   }
 
   try {

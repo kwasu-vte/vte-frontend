@@ -12,25 +12,9 @@ import { signUpAction } from '@/lib/actions';
 import logo from '@/assets/kwasulogo.png';
 
 export default function SignUpPage() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [isVisible, setIsVisible] = useState(false);
 
   const toggleVisibility = () => setIsVisible(!isVisible);
-
-  async function handleSubmit(formData: FormData) {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      await signUpAction(formData);
-      // * Redirect happens in the Server Action
-    } catch (error) {
-      setError(error instanceof Error ? error.message : 'Registration failed');
-    } finally {
-      setIsLoading(false);
-    }
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex items-center justify-center p-4">
@@ -66,7 +50,7 @@ export default function SignUpPage() {
             </h4>
           </CardHeader>
           <CardBody className="space-y-6">
-            <form action={handleSubmit} className="space-y-4">
+            <form action={signUpAction} className="space-y-4">
               {/* * Name Fields */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Input
@@ -211,23 +195,14 @@ export default function SignUpPage() {
                 />
               </div>
 
-              {/* * Error Display */}
-              {error && (
-                <div className="p-3 bg-danger-50 border border-danger-200 rounded-lg">
-                  <p className="text-sm text-danger-700">{error}</p>
-                </div>
-              )}
-
               {/* * Submit Button */}
               <Button
                 type="submit"
                 color="primary"
                 size="lg"
                 className="w-full font-semibold"
-                isLoading={isLoading}
-                disabled={isLoading}
               >
-                {isLoading ? 'Creating Account...' : 'Create Account'}
+                Create Account
               </Button>
             </form>
 
