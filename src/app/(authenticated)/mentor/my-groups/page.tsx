@@ -182,7 +182,7 @@ export default function MentorMyGroupsPage() {
                 <Calendar className="w-6 h-6 text-orange-600" />
               </div>
               <div className="flex-1">
-                <h3 className="text-lg font-semibold text-neutral-900">Today's Schedule</h3>
+                <h3 className="text-lg font-semibold text-neutral-900">Today&apos;s Schedule</h3>
                 <p className="text-sm text-neutral-600">View your classes and sessions for today</p>
               </div>
               <Button
