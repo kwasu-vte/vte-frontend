@@ -45,7 +45,7 @@ export default function SignUpPage() {
         {/* * Sign-Up Form */}
         <Card className="shadow-xl">
           <CardHeader className="pb-0">
-            <h4 className="text-xl font-semibold text-neutral-900">
+            <h4 className="text-xl font-semibold text-foreground">
               Sign Up
             </h4>
           </CardHeader>
@@ -61,7 +61,7 @@ export default function SignUpPage() {
                   isRequired
                   classNames={{
                     input: "text-base",
-                    label: "text-neutral-700 font-medium",
+                    label: "font-medium",
                   }}
                 />
                 <Input
@@ -72,7 +72,7 @@ export default function SignUpPage() {
                   isRequired
                   classNames={{
                     input: "text-base",
-                    label: "text-neutral-700 font-medium",
+                    label: "font-medium",
                   }}
                 />
               </div>
@@ -87,7 +87,7 @@ export default function SignUpPage() {
                   isRequired
                   classNames={{
                     input: "text-base",
-                    label: "text-neutral-700 font-medium",
+                    label: "font-medium",
                   }}
                 />
                 <Input
@@ -99,7 +99,7 @@ export default function SignUpPage() {
                   isRequired
                   classNames={{
                     input: "text-base",
-                    label: "text-neutral-700 font-medium",
+                    label: "font-medium",
                   }}
                 />
               </div>
@@ -114,7 +114,7 @@ export default function SignUpPage() {
                   isRequired
                   classNames={{
                     input: "text-base",
-                    label: "text-neutral-700 font-medium",
+                    label: "font-medium",
                   }}
                 />
                 <Select
@@ -124,8 +124,10 @@ export default function SignUpPage() {
                   variant="bordered"
                   isRequired
                   classNames={{
-                    trigger: "text-base",
-                    label: "text-neutral-700 font-medium",
+                    trigger: "",
+                    label: "font-medium",
+                    value: "",
+                    popoverContent: "",
                   }}
                 >
                   <SelectItem key="100" value="100">100 Level</SelectItem>
@@ -145,8 +147,10 @@ export default function SignUpPage() {
                 variant="bordered"
                 isRequired
                 classNames={{
-                  trigger: "text-base",
-                  label: "text-neutral-700 font-medium",
+                  trigger: "",
+                  label: "font-medium",
+                  value: "",
+                  popoverContent: "",
                 }}
               >
                 <SelectItem key="Student" value="Student">Student</SelectItem>
@@ -170,15 +174,15 @@ export default function SignUpPage() {
                       className="focus:outline-none"
                     >
                       {isVisible ? (
-                        <EyeOff className="w-4 h-4 text-neutral-400" />
+                        <EyeOff className="w-4 h-4 text-default-400" />
                       ) : (
-                        <Eye className="w-4 h-4 text-neutral-400" />
+                        <Eye className="w-4 h-4 text-default-400" />
                       )}
                     </button>
                   }
                   classNames={{
                     input: "text-base",
-                    label: "text-neutral-700 font-medium",
+                    label: "font-medium",
                   }}
                 />
                 <Input
@@ -190,7 +194,7 @@ export default function SignUpPage() {
                   isRequired
                   classNames={{
                     input: "text-base",
-                    label: "text-neutral-700 font-medium",
+                    label: "font-medium",
                   }}
                 />
               </div>

@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { AppProvider } from "@/context/AppContext";
 import { QueryProvider } from "@/components/providers/QueryProvider";
+import { Providers } from "./providers";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,13 +18,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" className="light">
       <body className={inter.className}>
-        <QueryProvider>
-          <AppProvider>
-            {children}
-          </AppProvider>
-        </QueryProvider>
+        <Providers>
+          <QueryProvider>
+            <AppProvider>
+              {children}
+            </AppProvider>
+          </QueryProvider>
+        </Providers>
       </body>
     </html>
   );

@@ -2,7 +2,6 @@ import { nextui } from "@nextui-org/react";
 import type { Config } from "tailwindcss";
 
 const config: Config = {
-  darkMode: ["class"],
   content: [
     './pages/**/*.{ts,tsx,js,jsx}',
     './components/**/*.{ts,tsx,js,jsx}',
@@ -81,33 +80,7 @@ const config: Config = {
   },
   plugins: [
     require("tailwindcss-animate"), 
-    nextui({
-      prefix: "nextui",
-      themes: {
-        light: {
-          layout: {
-            boxShadow: {
-              small: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
-              medium: "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
-            }
-          },
-          colors: {
-            background: "#f8fafc",      // Our --color-neutral-50
-            foreground: "#475569",      // Our --color-neutral-600
-            primary: {
-              DEFAULT: "#3b82f6",      // Our --color-primary-500
-              foreground: "#ffffff",
-            },
-            danger: {
-              DEFAULT: "#ef4444",       // Our --color-error
-              foreground: "#ffffff",
-            },
-            success: "#10b981",         // Our --color-success
-            warning: "#f59e0b",         // Our --color-warning
-          },
-        },
-      },
-    })
+    nextui()
   ],
 };
 

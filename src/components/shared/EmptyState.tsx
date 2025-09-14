@@ -68,7 +68,7 @@ export function EmptyState({
     },
     illustrated: {
       container: 'bg-gradient-to-br from-neutral-50 to-neutral-100 border border-neutral-200 rounded-xl',
-      iconColor: 'text-primary-400',
+      iconColor: 'text-primary-600',
       titleColor: 'text-neutral-900',
       descriptionColor: 'text-neutral-600',
     },

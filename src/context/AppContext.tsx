@@ -1,5 +1,5 @@
 // * Application Context
-// * Manages global UI state (notifications, theme, etc.)
+// * Manages global UI state (notifications, sidebar, modals, etc.)
 // * Separate from authentication concerns
 
 'use client';
@@ -19,9 +19,6 @@ export interface Notification {
   };
 }
 
-// * Theme Types
-export type Theme = 'light' | 'dark' | 'system';
-
 // * App Context Type
 interface AppContextType {
   // * Notifications
@@ -29,10 +26,6 @@ interface AppContextType {
   addNotification: (notification: Omit<Notification, 'id'>) => void;
   removeNotification: (id: string) => void;
   clearNotifications: () => void;
-  
-  // * Theme
-  theme: Theme;
-  setTheme: (theme: Theme) => void;
   
   // * Sidebar State
   isSidebarOpen: boolean;
@@ -57,16 +50,11 @@ export function useApp() {
 
 interface AppProviderProps {
   children: React.ReactNode;
-  initialTheme?: Theme;
 }
 
-export function AppProvider({ children, initialTheme = 'system' }: AppProviderProps) {
+export function AppProvider({ children }: AppProviderProps) {
   // * Notifications State
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  
-  // * Theme State - Hydration Safe
-  const [theme, setTheme] = useState<Theme>('light'); // Default to light to prevent hydration mismatch
-  const [isHydrated, setIsHydrated] = useState(false);
   
   // * Sidebar State
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -119,39 +107,11 @@ export function AppProvider({ children, initialTheme = 'system' }: AppProviderPr
     setActiveModal(null);
   };
 
-  // * Hydration Effect
-  React.useEffect(() => {
-    setIsHydrated(true);
-    setTheme(initialTheme);
-  }, [initialTheme]);
-
-  // * Theme Effect - Hydration Safe
-  React.useEffect(() => {
-    // * Only run after hydration to prevent hydration mismatch
-    if (!isHydrated || typeof window === 'undefined') return;
-    
-    if (theme === 'system') {
-      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-      const handleChange = (e: MediaQueryListEvent) => {
-        document.documentElement.classList.toggle('dark', e.matches);
-      };
-      
-      mediaQuery.addEventListener('change', handleChange);
-      document.documentElement.classList.toggle('dark', mediaQuery.matches);
-      
-      return () => mediaQuery.removeEventListener('change', handleChange);
-    } else {
-      document.documentElement.classList.toggle('dark', theme === 'dark');
-    }
-  }, [theme, isHydrated]);
-
   const value: AppContextType = {
     notifications,
     addNotification,
     removeNotification,
     clearNotifications,
-    theme,
-    setTheme,
     isSidebarOpen,
     toggleSidebar,
     closeSidebar,
