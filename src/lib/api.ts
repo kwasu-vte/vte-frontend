@@ -203,79 +203,79 @@ class ApiClient {
 
   // * Groups Management (Legacy - keeping for backward compatibility)
   async getGroups(): Promise<ApiResponse<Group[]>> {
-    return this.request('group/list');
+    return this.request('v1/groups');
   }
 
   async createGroup(groupData: CreateGroupPayload): Promise<ApiResponse<Group>> {
-    return this.request('group/create-group', {
+    return this.request('v1/groups', {
       method: 'POST',
       body: JSON.stringify(groupData),
     });
   }
 
   async updateGroup(id: string, groupData: Partial<Group>): Promise<ApiResponse<Group>> {
-    return this.request(`group/${id}/edit`, {
+    return this.request(`v1/groups/${id}`, {
       method: 'PATCH',
       body: JSON.stringify(groupData),
     });
   }
 
   async deleteGroup(id: string): Promise<void> {
-    return this.request(`grouping/groups/${id}`, {
+    return this.request(`v1/groups/${id}`, {
       method: 'DELETE',
     });
   }
 
   // * User Management (Legacy - keeping for backward compatibility)
   async getStudents(): Promise<ApiResponse<User[]>> {
-    return this.request('core/students/all');
+    return this.request('v1/users/students');
   }
 
   async getMentors(): Promise<ApiResponse<User[]>> {
-    return this.request('core/mentors/all');
+    return this.request('v1/users/mentors');
   }
 
   async updateUser(id: string, userData: Partial<CreateUserPayload>): Promise<ApiResponse<User>> {
-    return this.request(`core/register/${id}/edit`, {
+    return this.request(`v1/users/${id}`, {
       method: 'PATCH',
       body: JSON.stringify(userData),
     });
   }
 
   async deleteUser(id: string): Promise<void> {
-    return this.request(`core/register/${id}`, {
+    return this.request(`v1/users/${id}`, {
       method: 'DELETE',
     });
   }
 
   // * Payments (Legacy - keeping for backward compatibility)
   async getPayments(): Promise<ApiResponse<Payment[]>> {
-    return this.request('payments');
+    return this.request('v1/payments');
   }
 
   // * System Configuration (Legacy - keeping for backward compatibility)
   async getSystemConfig(): Promise<ApiResponse<SystemConfig>> {
-    return this.request('skills/admin/config');
+    return this.request('v1/system/config');
   }
 
   async updateSystemConfig(config: Partial<SystemConfig>): Promise<ApiResponse<SystemConfig>> {
-    return this.request('skills/admin/config', {
-      method: 'PUT',
+    return this.request('v1/system/config', {
+      method: 'PATCH',
       body: JSON.stringify(config),
     });
   }
 
   // * Payment Methods
   async makePayment({ course, specialization }: { course: string, specialization: string | null }): Promise<ApiResponse<{ authorization_url: string }>> {
-    return this.request('api/auth/register_course', {
+    return this.request('v1/payments/initiate', {
       method: 'POST',
       body: JSON.stringify({ course, specialization }),
     });
   }
 
   async activateCourse({ reference }: { reference: string }): Promise<ApiResponse<{ msg: string }>> {
-    return this.request(`api/auth/activate?reference=${reference}`, {
-      method: 'POST',
+    return this.request(`v1/payments/verify?reference=${reference}`, {
+      method: 'GET',
     });
   }
 }
