@@ -13,6 +13,10 @@ export interface User {
   role: 'Admin' | 'Mentor' | 'Student';
   is_active: boolean;
   is_superuser: boolean;
+  specialization?: string | null;
+  experience?: string | null;
+  bio?: string | null;
+  groups?: Group[];
 }
 
 export interface AuthSession {
@@ -108,22 +112,77 @@ export interface Payment {
   created_at: string;
   updated_at: string;
   last_verification_attempt: string;
-  student: string;
+  student: Pick<User, 'id' | 'first_name' | 'last_name' | 'email'>;
   enrollment: string;
+  payment_method?: string | null;
+  transaction_id?: string | null;
+  notes?: string | null;
 }
 
 export interface AttendanceRecord {
   id: string;
-  student: Pick<User, 'id' | 'first_name' | 'last_name'>;
-  group: Pick<Group, 'id' | 'name'>;
-  activity: Pick<Activity, 'id' | 'title'>;
-  status: 'present' | 'absent' | 'late';
-  timestamp: string;
-  verified_by?: Pick<User, 'id' | 'first_name' | 'last_name'>;
+  student: Pick<User, 'id' | 'first_name' | 'last_name' | 'email'>;
+  group: Pick<Group, 'id' | 'name'> & { skill: Pick<Skill, 'id' | 'title'> };
+  date: string;
+  status: 'present' | 'absent' | 'late' | 'excused';
+  notes?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateAttendanceRecordPayload {
+  student_id: string;
+  group_id: string;
+  date: string;
+  status: 'present' | 'absent' | 'late' | 'excused';
+  notes?: string | null;
+}
+
+export interface UpdateAttendanceRecordPayload {
+  student_id?: string;
+  group_id?: string;
+  date?: string;
+  status?: 'present' | 'absent' | 'late' | 'excused';
+  notes?: string | null;
+}
+
+// --- PAYMENT TYPES ---
+export interface CreatePaymentPayload {
+  student_id: string;
+  amount: number;
+  payment_method?: string | null;
+  status: 'completed' | 'pending' | 'failed' | 'refunded';
+  transaction_id?: string | null;
+  notes?: string | null;
+}
+
+export interface UpdatePaymentPayload {
+  student_id?: string;
+  amount?: number;
+  payment_method?: string | null;
+  status?: 'completed' | 'pending' | 'failed' | 'refunded';
+  transaction_id?: string | null;
+  notes?: string | null;
 }
 
 // --- CONFIGURATION ---
 export interface SystemConfig {
+  system_name?: string;
+  system_description?: string;
+  admin_email?: string;
+  support_email?: string;
+  max_file_size?: number;
+  session_timeout?: string;
+  email_daily_limit?: number;
+  enable_registration?: boolean;
+  enable_notifications?: boolean;
+  enable_analytics?: boolean;
+  enable_backups?: boolean;
+  maintenance_mode?: boolean;
+  last_backup?: string;
+  email_provider?: string;
+  version?: string;
+  environment?: string;
   semester_start_date: string;
   semester_end_date: string;
   max_skills_per_student: number;
@@ -133,6 +192,21 @@ export interface SystemConfig {
   max_group_size: number;
   min_group_size: number;
   auto_assignment_enabled: boolean;
+}
+
+export interface UpdateSystemConfigPayload {
+  system_name?: string;
+  system_description?: string;
+  admin_email?: string;
+  support_email?: string;
+  max_file_size?: number;
+  session_timeout?: string;
+  email_daily_limit?: number;
+  enable_registration?: boolean;
+  enable_notifications?: boolean;
+  enable_analytics?: boolean;
+  enable_backups?: boolean;
+  maintenance_mode?: boolean;
 }
 
 // --- API RESPONSE WRAPPERS ---
@@ -182,12 +256,33 @@ export interface CreateGroupPayload {
   force: boolean;
 }
 
+export interface UpdateGroupPayload {
+  skill_id?: string;
+  force?: boolean;
+}
+
 export interface CreateUserPayload {
   first_name: string;
   last_name: string;
   email: string;
   password: string;
   password_confirmation: string;
+  role: 'Admin' | 'Mentor' | 'Student';
+  specialization?: string | null;
+  experience?: string | null;
+  bio?: string | null;
+}
+
+export interface UpdateUserPayload {
+  first_name?: string;
+  last_name?: string;
+  email?: string;
+  password?: string;
+  password_confirmation?: string;
+  role?: 'Admin' | 'Mentor' | 'Student';
+  specialization?: string | null;
+  experience?: string | null;
+  bio?: string | null;
 }
 
 export interface CreateStudentProfilePayload {

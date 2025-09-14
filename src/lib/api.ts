@@ -20,6 +20,11 @@ import {
   CreateGroupPayload,
   CreateUserPayload,
   CreateStudentProfilePayload,
+  CreateAttendanceRecordPayload,
+  UpdateAttendanceRecordPayload,
+  CreatePaymentPayload,
+  UpdatePaymentPayload,
+  UpdateSystemConfigPayload,
   LoginPayload,
   ApiResponse,
   PaginatedResponse 
@@ -235,6 +240,18 @@ class ApiClient {
     return this.request('v1/users/mentors');
   }
 
+  async getUsers(params?: { role?: string }): Promise<ApiResponse<User[]>> {
+    const query = params?.role ? `?role=${params.role}` : '';
+    return this.request(`v1/users${query}`);
+  }
+
+  async createUser(userData: CreateUserPayload): Promise<ApiResponse<User>> {
+    return this.request('v1/users', {
+      method: 'POST',
+      body: JSON.stringify(userData),
+    });
+  }
+
   async updateUser(id: string, userData: Partial<CreateUserPayload>): Promise<ApiResponse<User>> {
     return this.request(`v1/users/${id}`, {
       method: 'PATCH',
@@ -251,6 +268,52 @@ class ApiClient {
   // * Payments (Legacy - keeping for backward compatibility)
   async getPayments(): Promise<ApiResponse<Payment[]>> {
     return this.request('v1/payments');
+  }
+
+  // * Attendance Management
+  async getAttendanceRecords(): Promise<ApiResponse<AttendanceRecord[]>> {
+    return this.request('v1/attendance');
+  }
+
+  async createAttendanceRecord(data: CreateAttendanceRecordPayload): Promise<ApiResponse<AttendanceRecord>> {
+    return this.request('v1/attendance', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async updateAttendanceRecord(id: string, data: UpdateAttendanceRecordPayload): Promise<ApiResponse<AttendanceRecord>> {
+    return this.request(`v1/attendance/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async deleteAttendanceRecord(id: string): Promise<void> {
+    return this.request(`v1/attendance/${id}`, {
+      method: 'DELETE',
+    });
+  }
+
+  // * Payment Management
+  async createPayment(data: CreatePaymentPayload): Promise<ApiResponse<Payment>> {
+    return this.request('v1/payments', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async updatePayment(id: string, data: UpdatePaymentPayload): Promise<ApiResponse<Payment>> {
+    return this.request(`v1/payments/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async deletePayment(id: string): Promise<void> {
+    return this.request(`v1/payments/${id}`, {
+      method: 'DELETE',
+    });
   }
 
   // * System Configuration (Legacy - keeping for backward compatibility)
