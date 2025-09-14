@@ -67,16 +67,20 @@ export default function StudentSkillsPage() {
             enrollments_count: 15,
             allowed_levels: ['200', '300', '400'],
             date_range_start: '2024-01-01',
-            date_range_end: '2024-06-30'
+            date_range_end: '2024-06-30',
+            exclude_weekends: false,
+            meta: null,
+            created_at: '2024-01-01T00:00:00Z',
+            updated_at: '2024-01-01T00:00:00Z'
           },
           group: {
             id: 'group-1',
             name: 'Group A',
             skill: { id: 'skill-1', title: 'Web Development' },
-            mentor: { id: 'mentor-1', firstName: 'John', lastName: 'Smith' },
+            mentor: { id: 'mentor-1', first_name: 'John', last_name: 'Smith' },
             members: [],
-            schedule_start: '2024-01-15',
-            schedule_end: '2024-06-15'
+            creation_date: '2024-01-01T00:00:00Z',
+            end_date: '2024-06-30T23:59:59Z'
           },
           enrollmentDate: '2024-01-10',
           status: 'enrolled',
@@ -263,7 +267,7 @@ export default function StudentSkillsPage() {
                             </div>
                             <div className="flex items-center gap-2">
                               <Clock className="w-4 h-4 text-neutral-400" />
-                              <span>Duration: {enrollment.group.schedule_start} - {enrollment.group.schedule_end}</span>
+                              <span>Duration: {enrollment.group.creation_date} - {enrollment.group.end_date}</span>
                             </div>
                           </div>
                           
