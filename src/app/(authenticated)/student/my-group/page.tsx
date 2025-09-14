@@ -10,7 +10,7 @@ import { StateRenderer, DefaultLoadingComponent, DefaultErrorComponent, DefaultE
 import { api } from '@/lib/api';
 import { Group, User } from '@/lib/types';
 import { Button, Card, CardBody, CardHeader, Chip, Avatar, AvatarGroup, Progress, Divider } from '@nextui-org/react';
-import { Users, Calendar, Clock, MapPin, BookOpen, User, MessageCircle, Phone, Mail } from 'lucide-react';
+import { Users, Calendar, Clock, MapPin, BookOpen, User as UserIcon, MessageCircle, Phone, Mail } from 'lucide-react';
 
 interface GroupMember {
   id: string;
@@ -297,7 +297,7 @@ export default function StudentMyGroupPage() {
                 <Card>
                   <CardHeader className="flex items-center gap-3">
                     <div className="p-2 bg-green-100 rounded-lg">
-                      <User className="w-5 h-5 text-green-600" />
+                      <UserIcon className="w-5 h-5 text-green-600" />
                     </div>
                     <div>
                       <h3 className="text-lg font-semibold">Mentor</h3>
