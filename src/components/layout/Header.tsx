@@ -114,7 +114,7 @@ export function Header({ user, onMenuClick }: HeaderProps) {
           <div className="relative">
             <button className="flex items-center space-x-3 p-2 rounded-lg hover:bg-neutral-100 transition-colors">
               <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-                <span className="text-white text-sm font-semibold">
+                <span className="text-primary-foreground text-sm font-semibold">
                   {user.first_name.charAt(0)}{user.last_name.charAt(0)}
                 </span>
               </div>

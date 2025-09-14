@@ -44,9 +44,9 @@ export default function SignInPage() {
         </div>
 
         {/* * Sign-In Form */}
-        <Card className="shadow-xl bg-neutral-800 border-neutral-700">
+        <Card className="shadow-xl">
           <CardHeader className="pb-0">
-            <h4 className="text-xl font-semibold text-white">
+            <h4 className="text-xl font-semibold text-foreground">
               Sign In
             </h4>
           </CardHeader>
@@ -60,9 +60,8 @@ export default function SignInPage() {
                 variant="bordered"
                 isRequired
                 classNames={{
-                  input: "text-base text-white bg-neutral-700 border-neutral-600",
-                  label: "text-neutral-300 font-medium",
-                  inputWrapper: "bg-neutral-700 border-neutral-600",
+                  input: "text-base",
+                  label: "font-medium",
                 }}
               />
 
@@ -81,16 +80,15 @@ export default function SignInPage() {
                     className="focus:outline-none"
                   >
                     {isVisible ? (
-                      <EyeOff className="w-4 h-4 text-neutral-400" />
+                      <EyeOff className="w-4 h-4 text-default-400" />
                     ) : (
-                      <Eye className="w-4 h-4 text-neutral-400" />
+                      <Eye className="w-4 h-4 text-default-400" />
                     )}
                   </button>
                 }
                 classNames={{
-                  input: "text-base text-white bg-neutral-700 border-neutral-600",
-                  label: "text-neutral-300 font-medium",
-                  inputWrapper: "bg-neutral-700 border-neutral-600",
+                  input: "text-base",
+                  label: "font-medium",
                 }}
               />
 

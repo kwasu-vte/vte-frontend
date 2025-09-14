@@ -182,7 +182,7 @@ export function Sidebar({ isOpen, user }: SidebarProps) {
         <div className="px-6 py-4 border-b border-neutral-200">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
-              <span className="text-white font-semibold">
+              <span className="text-primary-foreground font-semibold">
                 {user.first_name.charAt(0)}{user.last_name.charAt(0)}
               </span>
             </div>
@@ -210,7 +210,7 @@ export function Sidebar({ isOpen, user }: SidebarProps) {
                 className={`
                   flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors
                   ${isActive 
-                    ? 'bg-primary text-white' 
+                    ? 'bg-primary text-primary-foreground' 
                     : 'text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900'
                   }
                 `}
