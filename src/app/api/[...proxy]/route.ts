@@ -49,7 +49,10 @@ const handleRequest = async (request: NextRequest, { params }: { params: Promise
     return NextResponse.json({ error: 'API endpoint configuration error.' }, { status: 500 });
   }
 
-  const targetUrl = `${apiBaseUrl}/${path}${request.nextUrl.search}`;
+  // * Ensure proper URL construction regardless of trailing slash
+  const baseUrl = apiBaseUrl.endsWith('/') ? apiBaseUrl.slice(0, -1) : apiBaseUrl;
+  const pathWithSlash = path.startsWith('/') ? path : `/${path}`;
+  const targetUrl = `${baseUrl}${pathWithSlash}${request.nextUrl.search}`;
   console.debug(`[BFF Proxy ${traceId}] Target URL: ${targetUrl}`);
 
   // * Prepare headers for the real API
@@ -90,6 +93,7 @@ const handleRequest = async (request: NextRequest, { params }: { params: Promise
   // * Add body for non-GET requests
   if (request.method !== 'GET' && request.method !== 'HEAD') {
     fetchOptions.body = request.body;
+    fetchOptions.duplex = 'half';
   }
 
   try {
@@ -104,11 +108,11 @@ const handleRequest = async (request: NextRequest, { params }: { params: Promise
     
     // * Copy safe headers from API response
     const headersToExclude = ['set-cookie', 'content-encoding', 'content-length', 'transfer-encoding'];
-    for (const [key, value] of apiResponse.headers) {
+    apiResponse.headers.forEach((value, key) => {
       if (!headersToExclude.includes(key.toLowerCase())) {
         responseHeaders.set(key, value);
       }
-    }
+    });
 
     // * Special handling for login: extract token and set cookie
     if (path === 'v1/users/auth/login' && apiResponse.ok) {

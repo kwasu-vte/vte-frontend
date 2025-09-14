@@ -1,5 +1,37 @@
 # Changelog
 
+## [Phase 4 Testing Complete] - Backend Integration & API Testing
+
+### ✅ COMPLETED
+- **Backend Integration:**
+  - Updated API endpoint to new backend: `https://timadey.alwaysdata.net/api`
+  - Fixed API proxy issues including double slash URL construction
+  - Resolved duplex option error for request bodies (502 errors)
+  - Updated all API service endpoints to use `/v1/` prefix structure
+
+- **API Documentation:**
+  - Added complete VTE API documentation (vte-api.json)
+  - OpenAPI 3.1 specification with all endpoints documented
+  - Includes authentication, skills, users, enrollments, and academic sessions
+
+- **Testing & Validation:**
+  - Verified authentication flow with proper form rendering
+  - Tested middleware protection (redirects unauthenticated users)
+  - Confirmed API proxy successfully forwards requests to backend
+  - Validated NextUI components and form structure
+
+- **Technical Fixes:**
+  - Fixed Headers iteration using forEach instead of for...of loop
+  - Ensured proper URL construction regardless of API base URL format
+  - Updated API service to match new backend structure
+  - Maintained backward compatibility with existing service interface
+
+### 🔧 TECHNICAL DETAILS
+- **API Proxy**: Now handles both trailing slash and non-trailing slash base URLs
+- **Request Bodies**: Added `duplex: 'half'` option for proper Node.js fetch compatibility
+- **Endpoint Updates**: All endpoints now use `/v1/` prefix matching backend specification
+- **Error Handling**: Improved error handling and logging in proxy layer
+
 ## [Phase 3 Complete] - Core Patterns & Template Page
 
 ### ✅ COMPLETED
@@ -88,3 +120,4 @@
 
 ---
 
+## [Phase 4 Testing Complete] - Backend Integration & API Testing
