@@ -7,6 +7,9 @@ import { AppShell } from '@/components/layout/AppShell';
 import { getCurrentUser } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 
+// * Force dynamic rendering for authenticated routes
+export const dynamic = 'force-dynamic';
+
 interface AuthenticatedLayoutProps {
   children: React.ReactNode;
 }

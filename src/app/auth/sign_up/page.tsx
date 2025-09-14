@@ -43,9 +43,9 @@ export default function SignUpPage() {
         </div>
 
         {/* * Sign-Up Form */}
-        <Card className="shadow-xl">
+        <Card className="shadow-xl bg-neutral-800 border-neutral-700">
           <CardHeader className="pb-0">
-            <h4 className="text-xl font-semibold text-neutral-900">
+            <h4 className="text-xl font-semibold text-white">
               Sign Up
             </h4>
           </CardHeader>
@@ -60,8 +60,9 @@ export default function SignUpPage() {
                   variant="bordered"
                   isRequired
                   classNames={{
-                    input: "text-base",
-                    label: "text-neutral-700 font-medium",
+                    input: "text-base text-white bg-neutral-700 border-neutral-600",
+                    label: "text-neutral-300 font-medium",
+                    inputWrapper: "bg-neutral-700 border-neutral-600",
                   }}
                 />
                 <Input
@@ -71,8 +72,9 @@ export default function SignUpPage() {
                   variant="bordered"
                   isRequired
                   classNames={{
-                    input: "text-base",
-                    label: "text-neutral-700 font-medium",
+                    input: "text-base text-white bg-neutral-700 border-neutral-600",
+                    label: "text-neutral-300 font-medium",
+                    inputWrapper: "bg-neutral-700 border-neutral-600",
                   }}
                 />
               </div>
@@ -86,8 +88,9 @@ export default function SignUpPage() {
                   variant="bordered"
                   isRequired
                   classNames={{
-                    input: "text-base",
-                    label: "text-neutral-700 font-medium",
+                    input: "text-base text-white bg-neutral-700 border-neutral-600",
+                    label: "text-neutral-300 font-medium",
+                    inputWrapper: "bg-neutral-700 border-neutral-600",
                   }}
                 />
                 <Input
@@ -98,8 +101,9 @@ export default function SignUpPage() {
                   variant="bordered"
                   isRequired
                   classNames={{
-                    input: "text-base",
-                    label: "text-neutral-700 font-medium",
+                    input: "text-base text-white bg-neutral-700 border-neutral-600",
+                    label: "text-neutral-300 font-medium",
+                    inputWrapper: "bg-neutral-700 border-neutral-600",
                   }}
                 />
               </div>
@@ -113,8 +117,9 @@ export default function SignUpPage() {
                   variant="bordered"
                   isRequired
                   classNames={{
-                    input: "text-base",
-                    label: "text-neutral-700 font-medium",
+                    input: "text-base text-white bg-neutral-700 border-neutral-600",
+                    label: "text-neutral-300 font-medium",
+                    inputWrapper: "bg-neutral-700 border-neutral-600",
                   }}
                 />
                 <Select
@@ -124,8 +129,10 @@ export default function SignUpPage() {
                   variant="bordered"
                   isRequired
                   classNames={{
-                    trigger: "text-base",
-                    label: "text-neutral-700 font-medium",
+                    trigger: "text-base text-white bg-neutral-700 border-neutral-600",
+                    label: "text-neutral-300 font-medium",
+                    value: "text-white",
+                    popoverContent: "bg-neutral-800 border-neutral-700",
                   }}
                 >
                   <SelectItem key="100" value="100">100 Level</SelectItem>
@@ -145,8 +152,10 @@ export default function SignUpPage() {
                 variant="bordered"
                 isRequired
                 classNames={{
-                  trigger: "text-base",
-                  label: "text-neutral-700 font-medium",
+                  trigger: "text-base text-white bg-neutral-700 border-neutral-600",
+                  label: "text-neutral-300 font-medium",
+                  value: "text-white",
+                  popoverContent: "bg-neutral-800 border-neutral-700",
                 }}
               >
                 <SelectItem key="Student" value="Student">Student</SelectItem>
@@ -177,8 +186,9 @@ export default function SignUpPage() {
                     </button>
                   }
                   classNames={{
-                    input: "text-base",
-                    label: "text-neutral-700 font-medium",
+                    input: "text-base text-white bg-neutral-700 border-neutral-600",
+                    label: "text-neutral-300 font-medium",
+                    inputWrapper: "bg-neutral-700 border-neutral-600",
                   }}
                 />
                 <Input
@@ -189,8 +199,9 @@ export default function SignUpPage() {
                   type="password"
                   isRequired
                   classNames={{
-                    input: "text-base",
-                    label: "text-neutral-700 font-medium",
+                    input: "text-base text-white bg-neutral-700 border-neutral-600",
+                    label: "text-neutral-300 font-medium",
+                    inputWrapper: "bg-neutral-700 border-neutral-600",
                   }}
                 />
               </div>
