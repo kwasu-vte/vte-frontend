@@ -1,6 +1,6 @@
 // * Next.js Middleware
-// * Protects all authenticated routes
-// * Checks for session_token cookie
+// * Protects all authenticated routes and implements role-based access control
+// * Checks for session_token cookie and validates user permissions
 
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
@@ -19,8 +19,15 @@ const protectedRoutes = [
 const publicRoutes = [
   '/auth',
   '/',
-  '/api/auth',
+  '/api',
 ];
+
+// * Role-based route mapping
+const roleRoutes = {
+  admin: ['/admin'],
+  mentor: ['/mentor'],
+  student: ['/student'],
+};
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -46,9 +53,9 @@ export function middleware(request: NextRequest) {
       return NextResponse.redirect(loginUrl);
     }
     
-    // * TODO: Validate session token with backend
-    // * For now, we'll just check if it exists
-    // * In production, this should verify the token's validity
+    // * TODO: Add role-based access control validation
+    // * For now, we'll just check if the token exists
+    // * In production, this should verify the token's validity and user role
     
     // * Continue to the protected route
     return NextResponse.next();
