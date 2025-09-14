@@ -18,29 +18,39 @@ export async function getSession(): Promise<AuthSession | null> {
       return null;
     }
 
-    // * TODO: Validate session token with backend
-    // * For now, we'll return a mock session
-    // * In production, this should verify the token's validity
-    
-    // ! SECURITY: Hardcoded credentials removed
-    // * Mock user data - replace with actual API call to getCurrentUser()
-    const mockUser: User = {
-      id: '1',
-      email: 'user@example.com',
-      first_name: 'User',
-      last_name: 'Name',
-      matric_number: null,
-      level: null,
-      role: 'Admin',
-      is_active: true,
-      is_superuser: true,
-    };
-
-    return {
-      user: mockUser,
-      access_token: sessionToken.value,
-      refresh_token: refreshToken.value,
-    };
+    // * Validate session token with backend by calling getCurrentUser
+    try {
+      const response = await api.getCurrentUser();
+      
+      if (response.success && response.data) {
+        return {
+          user: response.data,
+          access_token: sessionToken.value,
+          refresh_token: refreshToken.value,
+        };
+      } else {
+        // * Token is invalid, try to refresh if refresh token exists
+        if (refreshToken) {
+          const newToken = await refreshAccessToken();
+          if (newToken) {
+            // * Retry getCurrentUser with new token
+            const retryResponse = await api.getCurrentUser();
+            if (retryResponse.success && retryResponse.data) {
+              return {
+                user: retryResponse.data,
+                access_token: newToken,
+                refresh_token: refreshToken.value,
+              };
+            }
+          }
+        }
+        return null;
+      }
+    } catch (error) {
+      // * API call failed, token might be invalid
+      console.error('Failed to validate session token:', error);
+      return null;
+    }
   } catch (error) {
     console.error('Error getting session:', error);
     return null;
