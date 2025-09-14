@@ -55,12 +55,15 @@ export default function MentorAttendancePage() {
           group: {
             id: 'group-1',
             name: 'Group A',
-            skill: { title: 'Web Development' },
+            skill: { id: 'skill-1', title: 'Web Development' },
+            mentor: { id: 'mentor-1', first_name: 'John', last_name: 'Smith' },
             members: [
-              { id: 'student-1', firstName: 'John', lastName: 'Doe', email: 'john@example.com' },
-              { id: 'student-2', firstName: 'Jane', lastName: 'Smith', email: 'jane@example.com' },
-              { id: 'student-3', firstName: 'Bob', lastName: 'Johnson', email: 'bob@example.com' }
-            ]
+              { id: 'student-1', first_name: 'John', last_name: 'Doe' },
+              { id: 'student-2', first_name: 'Jane', last_name: 'Smith' },
+              { id: 'student-3', first_name: 'Bob', last_name: 'Johnson' }
+            ],
+            creation_date: '2024-01-01T00:00:00Z',
+            end_date: '2024-06-30T23:59:59Z'
           },
           date: '2024-01-15',
           startTime: '09:00',
@@ -73,11 +76,14 @@ export default function MentorAttendancePage() {
           group: {
             id: 'group-2',
             name: 'Group B',
-            skill: { title: 'Mobile Development' },
+            skill: { id: 'skill-2', title: 'Mobile Development' },
+            mentor: { id: 'mentor-2', first_name: 'Jane', last_name: 'Doe' },
             members: [
-              { id: 'student-4', firstName: 'Alice', lastName: 'Brown', email: 'alice@example.com' },
-              { id: 'student-5', firstName: 'Charlie', lastName: 'Wilson', email: 'charlie@example.com' }
-            ]
+              { id: 'student-4', first_name: 'Alice', last_name: 'Brown' },
+              { id: 'student-5', first_name: 'Charlie', last_name: 'Wilson' }
+            ],
+            creation_date: '2024-01-01T00:00:00Z',
+            end_date: '2024-06-30T23:59:59Z'
           },
           date: '2024-01-15',
           startTime: '14:00',
@@ -113,8 +119,8 @@ export default function MentorAttendancePage() {
     // Initialize attendance data
     const initialData = session.group.members?.map(member => ({
       studentId: member.id,
-      studentName: `${member.firstName} ${member.lastName}`,
-      studentEmail: member.email,
+      studentName: `${member.first_name} ${member.last_name}`,
+      studentEmail: `${member.first_name.toLowerCase()}.${member.last_name.toLowerCase()}@example.com`, // Mock email
       isPresent: true, // Default to present
       notes: ''
     })) || [];
@@ -155,7 +161,7 @@ export default function MentorAttendancePage() {
         student_id: student.studentId,
         group_id: selectedSession.group.id,
         date: selectedSession.date,
-        status: student.isPresent ? 'present' : 'absent',
+        status: (student.isPresent ? 'present' : 'absent') as 'present' | 'absent' | 'late' | 'excused',
         notes: student.notes || null
       }));
       
