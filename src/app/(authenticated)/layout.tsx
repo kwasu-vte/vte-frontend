@@ -20,7 +20,7 @@ export default async function AuthenticatedLayout({ children }: AuthenticatedLay
   
   // * Redirect to sign-in if not authenticated
   if (!user) {
-    redirect('/auth/sign-in');
+    redirect('/auth/sign_in');
   }
 
   return <AppShell user={user}>{children}</AppShell>;

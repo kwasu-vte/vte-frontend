@@ -46,7 +46,7 @@ export async function middleware(request: NextRequest) {
   if (isProtectedRoute) {
     const sessionToken = request.cookies.get('session_token');
     if (!sessionToken) {
-      const loginUrl = new URL('/auth/sign-in', request.url);
+      const loginUrl = new URL('/auth/sign_in', request.url);
       loginUrl.searchParams.set('redirect', pathname);
       return NextResponse.redirect(loginUrl);
     }
@@ -58,7 +58,7 @@ export async function middleware(request: NextRequest) {
         // Next.js will forward cookies automatically from the incoming request to this internal fetch
       });
       if (!meRes.ok) {
-        const loginUrl = new URL('/auth/sign-in', request.url);
+        const loginUrl = new URL('/auth/sign_in', request.url);
         loginUrl.searchParams.set('redirect', pathname);
         return NextResponse.redirect(loginUrl);
       }
@@ -76,7 +76,7 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL('/', request.url));
       }
     } catch (_) {
-      const loginUrl = new URL('/auth/sign-in', request.url);
+      const loginUrl = new URL('/auth/sign_in', request.url);
       loginUrl.searchParams.set('redirect', pathname);
       return NextResponse.redirect(loginUrl);
     }

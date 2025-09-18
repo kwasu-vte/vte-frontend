@@ -43,10 +43,10 @@ export async function signOutAction() {
   try {
     await api.signOut();
     // * Proxy has already cleared httpOnly cookies
-    redirect('/auth/sign-in');
+    redirect('/auth/sign_in');
   } catch (error) {
     // * Even if API call fails, redirect to sign-in
-    redirect('/auth/sign-in');
+    redirect('/auth/sign_in');
   }
 }
 
