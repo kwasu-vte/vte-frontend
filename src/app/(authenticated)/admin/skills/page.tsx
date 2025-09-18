@@ -12,7 +12,7 @@ import { SkillModal } from '@/components/features/admin/SkillModal';
 import { api } from '@/lib/api';
 import { Skill, CreateSkillPayload, UpdateSkillPayload } from '@/lib/types';
 import { Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@nextui-org/react';
-import { Plus, AlertTriangle } from 'lucide-react';
+import { Plus, AlertTriangle, Eye } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { getErrorMessage, getErrorTitle, getSuccessTitle, getSuccessMessage } from '@/lib/error-handling';
 
@@ -21,6 +21,7 @@ export default function AdminSkillsPage() {
   
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -165,6 +166,12 @@ export default function AdminSkillsPage() {
     console.log('🎯 Modal state set to true');
   };
 
+  // * Open view modal
+  const openViewModal = (skill: Skill) => {
+    setSelectedSkill(skill);
+    setIsViewModalOpen(true);
+  };
+
   // * Open edit modal
   const openEditModal = (skill: Skill) => {
     setSelectedSkill(skill);
@@ -181,6 +188,7 @@ export default function AdminSkillsPage() {
   const closeModals = () => {
     setIsCreateModalOpen(false);
     setIsEditModalOpen(false);
+    setIsViewModalOpen(false);
     setIsDeleteModalOpen(false);
     setSelectedSkill(null);
   };
@@ -213,10 +221,7 @@ export default function AdminSkillsPage() {
           onEdit={openEditModal}
           onDelete={openDeleteModal}
           onCreate={openCreateModal}
-          onView={(skill) => {
-            // TODO: Navigate to skill details page
-            console.log('View skill:', skill);
-          }}
+          onView={openViewModal}
           onManageGroups={(skill) => {
             // TODO: Navigate to groups management for this skill
             console.log('Manage groups for skill:', skill);
@@ -244,6 +249,92 @@ export default function AdminSkillsPage() {
         skill={selectedSkill}
         isLoading={isSubmitting}
       />
+
+      {/* * View Skill Modal */}
+      <Modal
+        isOpen={isViewModalOpen}
+        onClose={closeModals}
+        size="lg"
+      >
+        <ModalContent>
+          <ModalHeader className="flex flex-col gap-1">
+            <div className="flex items-center gap-2">
+              <Eye className="w-5 h-5 text-blue-500" />
+              <h2 className="text-lg font-semibold">Skill Details</h2>
+            </div>
+          </ModalHeader>
+          <ModalBody>
+            {selectedSkill && (
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-lg font-semibold text-neutral-900 mb-2">
+                    {selectedSkill.title}
+                  </h3>
+                  {selectedSkill.description && (
+                    <p className="text-neutral-600 mb-4">
+                      {selectedSkill.description}
+                    </p>
+                  )}
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <span className="font-medium text-neutral-700">Max Students per Group:</span>
+                    <p className="text-neutral-600">{selectedSkill.max_students_per_group}</p>
+                  </div>
+                  <div>
+                    <span className="font-medium text-neutral-700">Created:</span>
+                    <p className="text-neutral-600">
+                      {new Date(selectedSkill.created_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
+
+                {selectedSkill.meta_tags && selectedSkill.meta_tags.length > 0 && (
+                  <div>
+                    <span className="font-medium text-neutral-700 mb-2 block">Tags:</span>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedSkill.meta_tags.map((tag, index) => (
+                        <span
+                          key={index}
+                          className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </ModalBody>
+          <ModalFooter>
+            <Button color="default" variant="light" onClick={closeModals}>
+              Close
+            </Button>
+            <Button 
+              color="primary" 
+              variant="light"
+              onClick={() => {
+                closeModals();
+                openEditModal(selectedSkill!);
+              }}
+            >
+              Edit
+            </Button>
+            <Button 
+              color="danger" 
+              variant="light"
+              onClick={() => {
+                closeModals();
+                openDeleteModal(selectedSkill!);
+              }}
+            >
+              Delete
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
 
       {/* * Delete Confirmation Modal */}
       <Modal

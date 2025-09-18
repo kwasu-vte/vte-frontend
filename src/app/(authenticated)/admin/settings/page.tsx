@@ -43,6 +43,7 @@ export default function AdminSettingsPage() {
   // * State for modals
   const [isCreateSessionModalOpen, setIsCreateSessionModalOpen] = useState(false);
   const [isEditSessionModalOpen, setIsEditSessionModalOpen] = useState(false);
+  const [isViewSessionModalOpen, setIsViewSessionModalOpen] = useState(false);
   const [selectedSession, setSelectedSession] = useState<AcademicSession | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -222,13 +223,19 @@ export default function AdminSettingsPage() {
     setIsCreateSessionModalOpen(true);
   };
 
+  // * Open view modal
+  const openViewModal = (session: AcademicSession) => {
+    setSelectedSession(session);
+    setIsViewSessionModalOpen(true);
+  };
+
   // * Open edit modal
   const openEditModal = (session: AcademicSession) => {
     setSelectedSession(session);
     setSessionForm({
       name: session.name,
-      starts_at: session.starts_at ? new Date(session.starts_at).toISOString().slice(0, 16) : '',
-      ends_at: session.ends_at ? new Date(session.ends_at).toISOString().slice(0, 16) : ''
+      starts_at: session.starts_at ? new Date(session.starts_at).toISOString().slice(0, 10) : '',
+      ends_at: session.ends_at ? new Date(session.ends_at).toISOString().slice(0, 10) : ''
     });
     setIsEditSessionModalOpen(true);
   };
@@ -237,6 +244,7 @@ export default function AdminSettingsPage() {
   const closeModals = () => {
     setIsCreateSessionModalOpen(false);
     setIsEditSessionModalOpen(false);
+    setIsViewSessionModalOpen(false);
     setSelectedSession(null);
     setSessionForm({ name: '', starts_at: '', ends_at: '' });
   };
@@ -488,7 +496,7 @@ export default function AdminSettingsPage() {
                           size="sm"
                           variant="light"
                           startContent={<Eye className="w-3 h-3" />}
-                          onClick={() => openEditModal(session)}
+                          onClick={() => openViewModal(session)}
                         >
                           View
                         </Button>
@@ -610,13 +618,13 @@ export default function AdminSettingsPage() {
               />
               <Input
                 label="Start Date"
-                type="datetime-local"
+                type="date"
                 value={sessionForm.starts_at}
                 onChange={(e) => setSessionForm(prev => ({ ...prev, starts_at: e.target.value }))}
               />
               <Input
                 label="End Date"
-                type="datetime-local"
+                type="date"
                 value={sessionForm.ends_at}
                 onChange={(e) => setSessionForm(prev => ({ ...prev, ends_at: e.target.value }))}
               />
@@ -663,13 +671,13 @@ export default function AdminSettingsPage() {
               />
               <Input
                 label="Start Date"
-                type="datetime-local"
+                type="date"
                 value={sessionForm.starts_at}
                 onChange={(e) => setSessionForm(prev => ({ ...prev, starts_at: e.target.value }))}
               />
               <Input
                 label="End Date"
-                type="datetime-local"
+                type="date"
                 value={sessionForm.ends_at}
                 onChange={(e) => setSessionForm(prev => ({ ...prev, ends_at: e.target.value }))}
               />
@@ -691,6 +699,110 @@ export default function AdminSettingsPage() {
             >
               Update Session
             </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* * View Session Modal */}
+      <Modal
+        isOpen={isViewSessionModalOpen}
+        onClose={closeModals}
+        size="lg"
+      >
+        <ModalContent>
+          <ModalHeader className="flex flex-col gap-1">
+            <div className="flex items-center gap-2">
+              <Eye className="w-5 h-5 text-blue-500" />
+              <h2 className="text-lg font-semibold">Session Details</h2>
+            </div>
+          </ModalHeader>
+          <ModalBody>
+            {selectedSession && (
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-lg font-semibold text-neutral-900 mb-2">
+                    {selectedSession.name}
+                  </h3>
+                  <div className="flex items-center gap-2 mb-4">
+                    <Chip 
+                      color={selectedSession.active ? "success" : "default"} 
+                      size="sm" 
+                      variant="flat"
+                    >
+                      {selectedSession.active ? "Active" : "Inactive"}
+                    </Chip>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <span className="font-medium text-neutral-700">Start Date:</span>
+                    <p className="text-neutral-600">
+                      {selectedSession.starts_at ? new Date(selectedSession.starts_at).toLocaleDateString() : 'Not set'}
+                    </p>
+                  </div>
+                  <div>
+                    <span className="font-medium text-neutral-700">End Date:</span>
+                    <p className="text-neutral-600">
+                      {selectedSession.ends_at ? new Date(selectedSession.ends_at).toLocaleDateString() : 'Not set'}
+                    </p>
+                  </div>
+                  <div>
+                    <span className="font-medium text-neutral-700">Created:</span>
+                    <p className="text-neutral-600">
+                      {new Date(selectedSession.created_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <div>
+                    <span className="font-medium text-neutral-700">Updated:</span>
+                    <p className="text-neutral-600">
+                      {new Date(selectedSession.updated_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </ModalBody>
+          <ModalFooter>
+            <Button color="default" variant="light" onClick={closeModals}>
+              Close
+            </Button>
+            <Button 
+              color="primary" 
+              variant="light"
+              onClick={() => {
+                closeModals();
+                openEditModal(selectedSession!);
+              }}
+            >
+              Update
+            </Button>
+            {!selectedSession?.active && (
+              <Button 
+                color="success" 
+                variant="light"
+                onClick={() => {
+                  closeModals();
+                  handleStartSession(selectedSession!.id);
+                }}
+                isLoading={startSessionMutation.isPending}
+              >
+                Start Session
+              </Button>
+            )}
+            {selectedSession?.active && (
+              <Button 
+                color="danger" 
+                variant="light"
+                onClick={() => {
+                  closeModals();
+                  handleEndSession(selectedSession!.id);
+                }}
+                isLoading={endSessionMutation.isPending}
+              >
+                End Session
+              </Button>
+            )}
           </ModalFooter>
         </ModalContent>
       </Modal>

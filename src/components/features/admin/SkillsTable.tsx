@@ -78,7 +78,7 @@ export function SkillsTable({
     },
     {
       key: 'groups',
-      label: 'Groups',
+      label: 'Max Groups',
       render: (skill: Skill) => (
         <div className="text-center">
           <div className="font-medium text-neutral-900">
@@ -131,20 +131,6 @@ export function SkillsTable({
       render: (skill: Skill) => (
         <div className="text-sm text-neutral-600">
           {formatAllowedLevels(skill.allowed_levels)}
-        </div>
-      ),
-    },
-    {
-      key: 'date_range',
-      label: 'Date Range',
-      render: (skill: Skill) => (
-        <div className="space-y-1">
-          <div className="text-sm text-neutral-900">
-            {formatDate(skill.date_range_start)}
-          </div>
-          <div className="text-xs text-neutral-500">
-            to {formatDate(skill.date_range_end)}
-          </div>
         </div>
       ),
     },

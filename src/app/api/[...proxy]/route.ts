@@ -192,6 +192,15 @@ const handleRequest = async (request: NextRequest, { params }: { params: Promise
 
     // * For all other requests, return the API response
     const responseBody = await apiResponse.text();
+    
+    // * Handle 204 No Content responses
+    if (apiResponse.status === 204) {
+      return new NextResponse(null, {
+        status: 204,
+        headers: responseHeaders,
+      });
+    }
+    
     return new NextResponse(responseBody, {
       status: apiResponse.status,
       statusText: apiResponse.statusText,

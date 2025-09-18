@@ -27,18 +27,19 @@ import {
   UpdateSystemConfigPayload,
   LoginPayload,
   ApiResponse,
-  PaginatedResponse 
+  PaginatedResponse
 } from './types';
 
 // * API Error Class
 export class ApiError extends Error {
-  constructor(
-    message: string,
-    public status: number,
-    public data?: any
-  ) {
+  public status: number;
+  public data?: any;
+
+  constructor(message: string, status: number, data?: any) {
     super(message);
     this.name = 'ApiError';
+    this.status = status;
+    this.data = data;
   }
 }
 
@@ -349,34 +350,6 @@ class ApiClient {
     });
   }
 
-  // * Skills Management
-  async getSkills(): Promise<ApiResponse<Skill[]>> {
-    return this.request('v1/skills');
-  }
-
-  async getSkill(id: string): Promise<ApiResponse<Skill>> {
-    return this.request(`v1/skills/${id}`);
-  }
-
-  async createSkill(data: CreateSkillPayload): Promise<ApiResponse<Skill>> {
-    return this.request('v1/skills', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
-  }
-
-  async updateSkill(id: string, data: UpdateSkillPayload): Promise<ApiResponse<Skill>> {
-    return this.request(`v1/skills/${id}`, {
-      method: 'PATCH',
-      body: JSON.stringify(data),
-    });
-  }
-
-  async deleteSkill(id: string): Promise<void> {
-    return this.request(`v1/skills/${id}`, {
-      method: 'DELETE',
-    });
-  }
 
   // * Payment Management
   async createPayment(data: CreatePaymentPayload): Promise<ApiResponse<Payment>> {
