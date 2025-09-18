@@ -7,6 +7,14 @@ import { redirect } from 'next/navigation';
 import { User, AuthSession } from './types';
 import { api } from './api';
 
+// * Normalize backend role casing to frontend canonical type
+function normalizeUserRole(role: any): 'Admin' | 'Mentor' | 'Student' {
+  const r = String(role || '').toLowerCase();
+  if (r === 'admin' || r === 'superadmin') return 'Admin';
+  if (r === 'mentor') return 'Mentor';
+  return 'Student';
+}
+
 // * Get the current user session from cookies
 export async function getSession(): Promise<AuthSession | null> {
   try {
@@ -22,24 +30,23 @@ export async function getSession(): Promise<AuthSession | null> {
       const response = await api.getCurrentUser();
       
       if (response.success && response.data) {
+        const normalizedUser = { ...response.data, role: normalizeUserRole((response as any)?.data?.role) } as User;
         return {
-          user: response.data,
+          user: normalizedUser,
           access_token: sessionToken.value,
-          refresh_token: refreshToken.value,
         };
       } else {
-        // * Token is invalid, try to refresh if refresh token exists
-        if (refreshToken) {
-          const newToken = await refreshAccessToken();
-          if (newToken) {
-            // * Retry getCurrentUser with new token
-            const retryResponse = await api.getCurrentUser();
-            if (retryResponse.success && retryResponse.data) {
-              return {
-                user: retryResponse.data,
-                access_token: newToken,
-              };
-            }
+        // * Token invalid; attempt refresh via API
+        const newToken = await refreshAccessToken();
+        if (newToken) {
+          // * Retry getCurrentUser with new token
+          const retryResponse = await api.getCurrentUser();
+          if (retryResponse.success && retryResponse.data) {
+            const normalizedUser = { ...retryResponse.data, role: normalizeUserRole((retryResponse as any)?.data?.role) } as User;
+            return {
+              user: normalizedUser,
+              access_token: newToken,
+            };
           }
         }
         return null;

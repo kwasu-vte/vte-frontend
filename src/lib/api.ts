@@ -50,6 +50,12 @@ class ApiClient {
   ): Promise<T> {
     // * All requests go through our proxy at /api/*
     const proxyUrl = `/api/${endpoint}`;
+    const isServer = typeof window === 'undefined';
+    const origin = isServer
+      ? (process.env.NEXT_PUBLIC_APP_URL
+          || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000'))
+      : '';
+    const url = isServer ? `${origin}${proxyUrl}` : proxyUrl;
     
     const config: RequestInit = {
       headers: {
@@ -60,7 +66,7 @@ class ApiClient {
     };
 
     try {
-      const response = await fetch(proxyUrl, config);
+      const response = await fetch(url, config);
       
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));

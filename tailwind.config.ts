@@ -85,15 +85,6 @@ const config: Config = {
       addCommonColors: true,
       themes: {
         light: {
-          layout: {
-            borderRadius: {
-              medium: "0.5rem",
-            },
-            boxShadow: {
-              small: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
-              medium: "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
-            },
-          },
           colors: {
             // Map to our globals.css tokens (light theme)
             background: "#f8fafc", // neutral-50
@@ -104,10 +95,6 @@ const config: Config = {
               foreground: "#ffffff",
             },
             secondary: {
-              DEFAULT: "#f1f5f9", // neutral-100
-              foreground: "#0f172a",
-            },
-            accent: {
               DEFAULT: "#f1f5f9", // neutral-100
               foreground: "#0f172a",
             },
