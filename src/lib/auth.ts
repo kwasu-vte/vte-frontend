@@ -83,7 +83,7 @@ export async function hasAnyRole(requiredRoles: User['role'][]): Promise<boolean
 export async function requireAuth(): Promise<User> {
   const user = await getCurrentUser();
   if (!user) {
-    redirect('/auth/sign-in');
+    redirect('/auth/sign_in');
   }
   return user;
 }

@@ -11,7 +11,7 @@ export default async function Page() {
   
   if (!user) {
     // * User is not authenticated, redirect to sign-in
-    redirect('/auth/sign-in');
+    redirect('/auth/sign_in');
   }
   
   // * User is authenticated, redirect based on role
@@ -26,6 +26,6 @@ export default async function Page() {
       redirect('/student/dashboard');
     default:
       // * Unknown role, redirect to sign-in
-      redirect('/auth/sign-in');
+      redirect('/auth/sign_in');
   }
 }

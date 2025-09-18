@@ -153,7 +153,7 @@ This is the phased, step-by-step guide for the entire refactoring process.
 2.  **Implement New Authentication Core:**
     -   **Task:** Create `middleware.ts`, `lib/auth.ts`, `context/AuthContext.tsx`, and Server Actions in `lib/actions.ts` for `signIn` and `signOut`.
 3.  **Rebuild Auth Pages:**
-    -   **Task:** Rebuild `/auth/sign-in` and `/auth/sign-up` using NextUI components that call the new Server Actions.
+    -   **Task:** Rebuild `/auth/sign_in` and `/auth/sign-up` using NextUI components that call the new Server Actions.
         -   **`SignInForm`/`SignUpForm` Spec:** Client components using `react-hook-form` and `Zod`. UI is built with NextUI `<Card>`, `<Input>`, and `<Button>`. The submit button must show an `isLoading` state. Any errors from the Server Action are displayed in an `<Alert>` component.
 
 ### **Phase 2: Unify Layout & API**

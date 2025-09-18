@@ -74,7 +74,7 @@
   - Admin → `/admin/dashboard`
   - Mentor → `/mentor/dashboard`
   - Student → `/student/dashboard`
-  - Unauthenticated → `/auth/sign-in`
+  - Unauthenticated → `/auth/sign_in`
 - **Token Management:** Integrated automatic token refresh in authentication flow
 
 ### ✅ COMPLETED - Middleware Enhancement

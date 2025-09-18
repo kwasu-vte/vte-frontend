@@ -8,7 +8,7 @@
 
 ## **Pages to Rebuild**
 
-### **1. Sign-In Page (`/auth/sign-in`)**
+### **1. Sign-In Page (`/auth/sign_in`)**
 - **Current:** Uses old authentication system with hardcoded credentials
 - **Target:** NextUI components + Server Actions + httpOnly cookies
 - **Security:** Eliminate client-side token storage

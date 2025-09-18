@@ -78,7 +78,7 @@ export async function signUpAction(formData: FormData) {
     
     if (response.success) {
       // * Redirect to sign in after successful registration
-      redirect('/auth/sign-in?message=Registration successful. Please sign in.');
+      redirect('/auth/sign_in?message=Registration successful. Please sign in.');
     } else {
       throw new Error(response.message || 'Registration failed');
     }

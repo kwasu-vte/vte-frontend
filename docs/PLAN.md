@@ -241,7 +241,7 @@ This is the step-by-step guide for the refactoring.
     -   **Task:** Create `src/context/AuthContext.tsx` to hold the user profile state.
     -   **Task:** Create Server Actions in `src/lib/actions.ts` for `signIn` and `signOut`.
 3.  **Refactor Login/Signup Pages:**
-    -   **Task:** Rebuild the `/auth/sign-in` and `/auth/sign-up` pages using NextUI components that call the new Server Actions.
+    -   **Task:** Rebuild the `/auth/sign_in` and `/auth/sign-up` pages using NextUI components that call the new Server Actions.
 
 ### **Phase 2: Unify Layout & UI**
 1.  **Implement Design System:**
