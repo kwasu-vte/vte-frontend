@@ -29,7 +29,7 @@ const roleRoutes = {
   student: ['/student'],
 };
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   
   // * Check if the route requires authentication
@@ -45,19 +45,42 @@ export function middleware(request: NextRequest) {
   // * If it's a protected route, check for authentication
   if (isProtectedRoute) {
     const sessionToken = request.cookies.get('session_token');
-    
-    // * No session token found, redirect to login
     if (!sessionToken) {
       const loginUrl = new URL('/auth/sign-in', request.url);
       loginUrl.searchParams.set('redirect', pathname);
       return NextResponse.redirect(loginUrl);
     }
-    
-    // * TODO: Add role-based access control validation
-    // * For now, we'll just check if the token exists
-    // * In production, this should verify the token's validity and user role
-    
-    // * Continue to the protected route
+
+    // * Validate session and enforce RBAC via /api/v1/users/auth/me
+    try {
+      const meRes = await fetch(`${request.nextUrl.origin}/api/v1/users/auth/me`, {
+        headers: { 'Accept': 'application/json' },
+        // Next.js will forward cookies automatically from the incoming request to this internal fetch
+      });
+      if (!meRes.ok) {
+        const loginUrl = new URL('/auth/sign-in', request.url);
+        loginUrl.searchParams.set('redirect', pathname);
+        return NextResponse.redirect(loginUrl);
+      }
+      const meJson = await meRes.json();
+      const role: string = String(meJson?.data?.role || '').toLowerCase();
+
+      // * RBAC: ensure path matches role root
+      if (pathname.startsWith('/admin') && role !== 'admin') {
+        return NextResponse.redirect(new URL('/', request.url));
+      }
+      if (pathname.startsWith('/mentor') && role !== 'mentor') {
+        return NextResponse.redirect(new URL('/', request.url));
+      }
+      if (pathname.startsWith('/student') && role !== 'student') {
+        return NextResponse.redirect(new URL('/', request.url));
+      }
+    } catch (_) {
+      const loginUrl = new URL('/auth/sign-in', request.url);
+      loginUrl.searchParams.set('redirect', pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+
     return NextResponse.next();
   }
   

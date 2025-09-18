@@ -21,14 +21,19 @@ export async function signInAction(formData: FormData) {
   try {
     const response = await api.signIn({ email: username, password });
     
-    if (response.success) {
-      // * Proxy has already set httpOnly cookies
-      // * Redirect based on user role
-      const role = response.data.user.role.toLowerCase();
-      redirect(`/${role}/dashboard`);
-    } else {
+    if (!response.success) {
       throw new Error(response.message || 'Authentication failed');
     }
+
+    // * After login, proxy has set the session cookie. Fetch current user to determine role
+    const me = await api.getCurrentUser();
+    if (!me.success || !me.data) {
+      throw new Error(me.message || 'Failed to fetch user after login');
+    }
+
+    const role = String(me.data.role || '').toLowerCase();
+    const target = role === 'admin' || role === 'mentor' || role === 'student' ? `/${role}/dashboard` : '/';
+    redirect(target);
   } catch (error) {
     throw new Error(error instanceof Error ? error.message : 'Authentication failed');
   }

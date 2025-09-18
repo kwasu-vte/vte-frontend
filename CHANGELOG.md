@@ -1,5 +1,13 @@
 # Changelog
 
+## 2025-09-18
+- Auth: Standardized cookie-based auth to align with api.json
+  - Proxy sets/refreshes `session_token` on login/refresh and clears it on logout
+  - Removed `refresh_token` requirement in app; API only provides access token
+  - `signInAction` now fetches `/v1/users/auth/me` after login and redirects by role
+  - Middleware validates session via `/api/v1/users/auth/me` and enforces RBAC for `/admin`, `/mentor`, `/student`
+  - `auth.ts` simplified to rely on `session_token` and refresh endpoint
+
 ## [Phase 7 Complete] - Progressive Web App (PWA) Implementation
 
 ### ✅ COMPLETED - Comprehensive PWA Setup

@@ -76,11 +76,14 @@ const handleRequest = async (request: NextRequest, { params }: { params: Promise
     console.debug(`[BFF Proxy ${traceId}] Attached Bearer token from cookie.`);
   }
 
-  // * Handle logout specifically
+  // * Handle logout specifically (fire-and-forget to API, clear cookie regardless)
   if (path === 'v1/users/auth/logout') {
+    try {
+      await fetch(targetUrl, { method: 'POST', headers: requestHeaders });
+    } catch (_) {}
     await deleteSessionCookie();
     console.info(`[BFF Proxy ${traceId}] User logged out. Session cookie deleted.`);
-    return NextResponse.json({ success: true, message: 'Logged out successfully' });
+    return NextResponse.json({ success: true, message: 'Successfully logged out' });
   }
 
   // * Prepare fetch options
@@ -113,19 +116,28 @@ const handleRequest = async (request: NextRequest, { params }: { params: Promise
       }
     });
 
-    // * Special handling for login: extract token and set cookie
-    if (path === 'v1/users/auth/login' && apiResponse.ok) {
-      const responseData = await apiResponse.json();
-      const token = responseData?.access_token;
-
-      if (token) {
-        await setSessionCookie(token, 60 * 60 * 24 * 30); // 30 days
+    // * Special handling for login: extract token from spec shape and set cookie
+    if (path === 'v1/users/auth/login') {
+      const json = await apiResponse.json().catch(() => null);
+      const token = json?.data?.access_token ?? json?.access_token;
+      const expiresIn = Number(json?.data?.expires_in ?? 60 * 60 * 24 * 30);
+      if (apiResponse.ok && token) {
+        await setSessionCookie(token, isNaN(expiresIn) ? 60 * 60 * 24 * 30 : expiresIn);
         console.info(`[BFF Proxy ${traceId}] Login successful. Session cookie set.`);
       }
-      
-      // * Return response without sensitive token data
-      const { access_token, refresh_token, ...safeData } = responseData;
-      return NextResponse.json(safeData, { headers: responseHeaders });
+      return NextResponse.json(json ?? {}, { status: apiResponse.status, headers: responseHeaders });
+    }
+
+    // * Special handling for refresh: extract token from spec shape and update cookie
+    if (path === 'v1/users/auth/refresh') {
+      const json = await apiResponse.json().catch(() => null);
+      const token = json?.data?.access_token ?? json?.access_token;
+      const expiresIn = Number(json?.data?.expires_in ?? 60 * 60 * 24 * 7);
+      if (apiResponse.ok && token) {
+        await setSessionCookie(token, isNaN(expiresIn) ? 60 * 60 * 24 * 7 : expiresIn);
+        console.info(`[BFF Proxy ${traceId}] Token refresh successful. Session cookie updated.`);
+      }
+      return NextResponse.json(json ?? {}, { status: apiResponse.status, headers: responseHeaders });
     }
 
     // * For all other requests, return the API response

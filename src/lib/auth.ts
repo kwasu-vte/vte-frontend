@@ -12,9 +12,8 @@ export async function getSession(): Promise<AuthSession | null> {
   try {
     const cookieStore = await cookies();
     const sessionToken = cookieStore.get('session_token');
-    const refreshToken = cookieStore.get('refresh_token');
 
-    if (!sessionToken || !refreshToken) {
+    if (!sessionToken) {
       return null;
     }
 
@@ -39,7 +38,6 @@ export async function getSession(): Promise<AuthSession | null> {
               return {
                 user: retryResponse.data,
                 access_token: newToken,
-                refresh_token: refreshToken.value,
               };
             }
           }
@@ -102,25 +100,12 @@ export async function requireRole(requiredRole: User['role']): Promise<User> {
 // * Refresh the access token using refresh token
 export async function refreshAccessToken(): Promise<string | null> {
   try {
-    const cookieStore = await cookies();
-    const refreshToken = cookieStore.get('refresh_token');
-
-    if (!refreshToken) {
-      return null;
-    }
-
     const response = await api.refreshToken();
     
     if (response.success) {
-      // * Update the session token cookie
-      cookieStore.set('session_token', response.data.access_token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        maxAge: 60 * 60 * 24 * 7, // 7 days
-      });
-      
-      return response.data.access_token;
+      // * Proxy updates cookie; return token for immediate use if needed
+      const token = (response as any)?.data?.access_token ?? (response as any)?.access_token;
+      return token || null;
     }
     
     return null;
@@ -134,7 +119,6 @@ export async function refreshAccessToken(): Promise<string | null> {
 export async function clearAuthCookies(): Promise<void> {
   const cookieStore = await cookies();
   cookieStore.delete('session_token');
-  cookieStore.delete('refresh_token');
 }
 
 // * Validate and decode JWT token (placeholder for production)
