@@ -115,28 +115,28 @@ export function MentorsTable({
                   <DropdownItem
                     key="view"
                     startContent={<Eye className="w-4 h-4" />}
-                    onPress={() => onView(mentor)}
+                    onClick={() => onView(mentor)}
                   >
                     View Details
                   </DropdownItem>
                   <DropdownItem
                     key="edit"
                     startContent={<Edit className="w-4 h-4" />}
-                    onPress={() => onEdit(mentor)}
+                    onClick={() => onEdit(mentor)}
                   >
                     Edit Mentor
                   </DropdownItem>
                   <DropdownItem
                     key="profile"
                     startContent={<UserIcon className="w-4 h-4" />}
-                    onPress={() => onManageProfile(mentor)}
+                    onClick={() => onManageProfile(mentor)}
                   >
                     Manage Profile
                   </DropdownItem>
                   <DropdownItem
                     key="groups"
                     startContent={<Users className="w-4 h-4" />}
-                    onPress={() => onManageGroups(mentor)}
+                    onClick={() => onManageGroups(mentor)}
                   >
                     Manage Groups
                   </DropdownItem>
@@ -145,7 +145,7 @@ export function MentorsTable({
                     className="text-danger"
                     color="danger"
                     startContent={<Trash2 className="w-4 h-4" />}
-                    onPress={() => onDelete(mentor)}
+                    onClick={() => onDelete(mentor)}
                   >
                     Delete Mentor
                   </DropdownItem>

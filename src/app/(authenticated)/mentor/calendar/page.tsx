@@ -77,6 +77,7 @@ export default function MentorCalendarPage() {
         }
       ] as CalendarEvent[];
     },
+    enabled: typeof window !== 'undefined', // * Only enable on client side
   });
 
   // * Navigation functions
@@ -150,14 +151,14 @@ export default function MentorCalendarPage() {
           <Button
             color="secondary"
             variant="light"
-            onPress={() => setViewMode(viewMode === 'week' ? 'month' : 'week')}
+            onClick={() => setViewMode(viewMode === 'week' ? 'month' : 'week')}
           >
             {viewMode === 'week' ? 'Month View' : 'Week View'}
           </Button>
           <Button
             color="primary"
             startContent={<Plus className="w-4 h-4" />}
-            onPress={() => {
+            onClick={() => {
               // TODO: Open create event modal
               console.log('Create new event');
             }}
@@ -175,7 +176,7 @@ export default function MentorCalendarPage() {
               <Button
                 isIconOnly
                 variant="light"
-                onPress={goToPreviousWeek}
+                onClick={goToPreviousWeek}
               >
                 <ChevronLeft className="w-4 h-4" />
               </Button>
@@ -188,7 +189,7 @@ export default function MentorCalendarPage() {
               <Button
                 isIconOnly
                 variant="light"
-                onPress={goToNextWeek}
+                onClick={goToNextWeek}
               >
                 <ChevronRight className="w-4 h-4" />
               </Button>
@@ -196,7 +197,7 @@ export default function MentorCalendarPage() {
             <Button
               color="primary"
               variant="light"
-              onPress={goToToday}
+              onClick={goToToday}
             >
               Today
             </Button>
@@ -231,7 +232,7 @@ export default function MentorCalendarPage() {
                   <Button
                     color="primary"
                     startContent={<Plus className="w-4 h-4" />}
-                    onPress={() => console.log('Create event')}
+                    onClick={() => console.log('Create event')}
                   >
                     Add Event
                   </Button>

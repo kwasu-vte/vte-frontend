@@ -8,6 +8,11 @@
   - Middleware validates session via `/api/v1/users/auth/me` and enforces RBAC for `/admin`, `/mentor`, `/student`
   - `auth.ts` simplified to rely on `session_token` and refresh endpoint
 
+- Fix: SSR auth cookie forwarding
+  - Use relative `/api/...` URLs on server to ensure Next forwards cookies
+  - Avoid building absolute origins in `ApiClient` to prevent missing `session_token`
+  - Result: `/api/v1/users/auth/me` now receives Authorization from cookie during SSR
+
 ## [Phase 7 Complete] - Progressive Web App (PWA) Implementation
 
 ### ✅ COMPLETED - Comprehensive PWA Setup
@@ -318,3 +323,29 @@
 ---
 
 ## [Phase 4 Testing Complete] - Backend Integration & API Testing
+
+- Fix: Authentication infinite redirect loop
+  - Resolved server-side cookie forwarding issue causing auth validation failures
+  - Updated middleware to exclude self-authenticating routes (root page) from middleware checks
+  - Enhanced BFF proxy to properly forward Cookie headers in server-to-server requests
+  - Added support for 'superadmin' role in role-based access control
+  - Optimized authentication flow to prevent redirect loops after successful login
+  - Result: Users can now successfully authenticate and be redirected to appropriate dashboards based on role
+
+
+- Fix: Client Component props error in AppShell
+  - Converted AppShell to client component to resolve event handler prop passing
+  - Integrated with AppContext for sidebar state management
+  - Fixed server-client component boundary violation
+  - Result: Admin dashboard now loads without errors and sidebar toggle works properly
+
+
+- Feature: Announcement Pages for All User Roles
+  - Created comprehensive announcement management system
+  - Admin announcements: Full CRUD operations with stats dashboard
+  - Mentor announcements: View announcements + create group announcements
+  - Student announcements: Read-only view with urgent alerts and filtering
+  - Added announcement navigation items to sidebar for all roles
+  - Implemented role-based announcement filtering and display
+  - Result: Complete announcement system with role-appropriate functionality
+

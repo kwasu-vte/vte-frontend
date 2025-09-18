@@ -205,7 +205,7 @@ export function AttendanceModal({
           <ModalFooter>
             <Button
               variant="light"
-              onPress={onClose}
+              onClick={onClose}
               isDisabled={isLoading}
             >
               Cancel

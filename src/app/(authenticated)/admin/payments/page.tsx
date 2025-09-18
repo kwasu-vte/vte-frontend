@@ -23,7 +23,7 @@ export default function AdminPaymentsPage() {
 
   const queryClient = useQueryClient();
 
-  // * React Query for data fetching
+  // * React Query for data fetching - only run on client
   const {
     data: payments,
     isLoading,
@@ -35,6 +35,7 @@ export default function AdminPaymentsPage() {
       const response = await api.getPayments();
       return response.data;
     },
+    enabled: typeof window !== 'undefined', // * Only enable on client side
   });
 
   // * Create payment mutation
@@ -164,14 +165,14 @@ export default function AdminPaymentsPage() {
           <Button
             color="secondary"
             startContent={<Download className="w-4 h-4" />}
-            onPress={handleExportPayments}
+            onClick={handleExportPayments}
           >
             Export Data
           </Button>
           <Button
             color="primary"
             startContent={<Plus className="w-4 h-4" />}
-            onPress={openCreateModal}
+            onClick={openCreateModal}
           >
             Add Payment
           </Button>
@@ -248,7 +249,7 @@ export default function AdminPaymentsPage() {
                   <Button
                     color="primary"
                     startContent={<Plus className="w-4 h-4" />}
-                    onPress={openCreateModal}
+                    onClick={openCreateModal}
                   >
                     Add Payment
                   </Button>
@@ -314,14 +315,14 @@ export default function AdminPaymentsPage() {
           <ModalFooter>
             <Button
               variant="light"
-              onPress={closeModals}
+              onClick={closeModals}
               isDisabled={isSubmitting}
             >
               Cancel
             </Button>
             <Button
               color="danger"
-              onPress={handleDeletePayment}
+              onClick={handleDeletePayment}
               isLoading={isSubmitting}
               isDisabled={isSubmitting}
             >

@@ -226,11 +226,9 @@ export interface PaginatedResponse<T> {
 export interface CreateSkillPayload {
   title: string;
   description?: string | null;
-  max_groups: number;
+  max_groups?: number | null;
   min_students_per_group: number;
   max_students_per_group?: number | null;
-  date_range_start: string;
-  date_range_end: string;
   meta?: string[] | null;
   allowed_levels: string[];
 }

@@ -125,21 +125,21 @@ export function AttendanceTable({
                   <DropdownItem
                     key="view"
                     startContent={<Eye className="w-4 h-4" />}
-                    onPress={() => onView(record)}
+                    onClick={() => onView(record)}
                   >
                     View Details
                   </DropdownItem>
                   <DropdownItem
                     key="edit"
                     startContent={<Edit className="w-4 h-4" />}
-                    onPress={() => onEdit(record)}
+                    onClick={() => onEdit(record)}
                   >
                     Edit Record
                   </DropdownItem>
                   <DropdownItem
                     key="present"
                     startContent={<CheckCircle className="w-4 h-4" />}
-                    onPress={() => onMarkPresent(record)}
+                    onClick={() => onMarkPresent(record)}
                     className={record.status === 'present' ? 'text-success' : ''}
                   >
                     Mark Present
@@ -147,7 +147,7 @@ export function AttendanceTable({
                   <DropdownItem
                     key="absent"
                     startContent={<XCircle className="w-4 h-4" />}
-                    onPress={() => onMarkAbsent(record)}
+                    onClick={() => onMarkAbsent(record)}
                     className={record.status === 'absent' ? 'text-danger' : ''}
                   >
                     Mark Absent
@@ -157,7 +157,7 @@ export function AttendanceTable({
                     className="text-danger"
                     color="danger"
                     startContent={<Trash2 className="w-4 h-4" />}
-                    onPress={() => onDelete(record)}
+                    onClick={() => onDelete(record)}
                   >
                     Delete Record
                   </DropdownItem>

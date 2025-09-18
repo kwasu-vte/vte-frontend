@@ -18,8 +18,12 @@ const protectedRoutes = [
 // * Routes that are always public
 const publicRoutes = [
   '/auth',
-  '/',
   '/api',
+];
+
+// * Routes that handle their own authentication (not checked by middleware)
+const selfAuthenticatingRoutes = [
+  '/',
 ];
 
 // * Role-based route mapping
@@ -42,6 +46,16 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith(route)
   );
   
+  // * Check if the route handles its own authentication
+  const isSelfAuthenticatingRoute = selfAuthenticatingRoutes.some(route => 
+    pathname === route || pathname.startsWith(route + '/')
+  );
+  
+  // * Skip middleware for self-authenticating routes
+  if (isSelfAuthenticatingRoute) {
+    return NextResponse.next();
+  }
+  
   // * If it's a protected route, check for authentication
   if (isProtectedRoute) {
     const sessionToken = request.cookies.get('session_token');
@@ -53,9 +67,12 @@ export async function middleware(request: NextRequest) {
 
     // * Validate session and enforce RBAC via /api/v1/users/auth/me
     try {
+      const bearer = `Bearer ${sessionToken.value}`;
       const meRes = await fetch(`${request.nextUrl.origin}/api/v1/users/auth/me`, {
-        headers: { 'Accept': 'application/json' },
-        // Next.js will forward cookies automatically from the incoming request to this internal fetch
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': bearer,
+        },
       });
       if (!meRes.ok) {
         const loginUrl = new URL('/auth/sign_in', request.url);
@@ -66,7 +83,7 @@ export async function middleware(request: NextRequest) {
       const role: string = String(meJson?.data?.role || '').toLowerCase();
 
       // * RBAC: ensure path matches role root
-      if (pathname.startsWith('/admin') && role !== 'admin') {
+      if (pathname.startsWith('/admin') && role !== 'admin' && role !== 'superadmin') {
         return NextResponse.redirect(new URL('/', request.url));
       }
       if (pathname.startsWith('/mentor') && role !== 'mentor') {

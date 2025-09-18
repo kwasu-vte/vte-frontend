@@ -40,6 +40,7 @@ export default function StudentSkillsPage() {
       const response = await api.getSkills();
       return response.data;
     },
+    enabled: typeof window !== 'undefined', // * Only enable on client side
   });
 
   // * React Query for enrolled skills
@@ -88,6 +89,7 @@ export default function StudentSkillsPage() {
         }
       ] as EnrolledSkill[];
     },
+    enabled: typeof window !== 'undefined', // * Only enable on client side
   });
 
   // * Enroll in skill mutation
@@ -292,7 +294,7 @@ export default function StudentSkillsPage() {
                             variant="light"
                             size="sm"
                             startContent={<Eye className="w-4 h-4" />}
-                            onPress={() => handleViewSkill(enrollment.skill)}
+                            onClick={() => handleViewSkill(enrollment.skill)}
                           >
                             View Details
                           </Button>
@@ -385,7 +387,7 @@ export default function StudentSkillsPage() {
                               variant="light"
                               size="sm"
                               startContent={<Eye className="w-4 h-4" />}
-                              onPress={() => handleViewSkill(skill)}
+                              onClick={() => handleViewSkill(skill)}
                             >
                               View Details
                             </Button>
@@ -394,7 +396,7 @@ export default function StudentSkillsPage() {
                                 color="primary"
                                 size="sm"
                                 startContent={<Plus className="w-4 h-4" />}
-                                onPress={() => handleEnrollSkill(skill)}
+                                onClick={() => handleEnrollSkill(skill)}
                               >
                                 Enroll
                               </Button>
@@ -457,7 +459,7 @@ export default function StudentSkillsPage() {
           <ModalFooter>
             <Button
               variant="light"
-              onPress={closeModals}
+              onClick={closeModals}
               isDisabled={isSubmitting}
             >
               Cancel
@@ -465,7 +467,7 @@ export default function StudentSkillsPage() {
             <Button
               color="primary"
               startContent={<Plus className="w-4 h-4" />}
-              onPress={handleConfirmEnrollment}
+              onClick={handleConfirmEnrollment}
               isLoading={isSubmitting}
               isDisabled={isSubmitting}
             >

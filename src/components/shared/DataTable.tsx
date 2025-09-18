@@ -22,6 +22,7 @@ interface DataTableProps<T> {
   loadingComponent?: React.ReactNode;
   errorComponent?: React.ReactNode;
   emptyComponent?: React.ReactNode;
+  emptyActionButton?: React.ReactNode;
 }
 
 export function DataTable<T>({
@@ -34,6 +35,7 @@ export function DataTable<T>({
   loadingComponent,
   errorComponent,
   emptyComponent,
+  emptyActionButton,
 }: DataTableProps<T>) {
   return (
     <StateRenderer
@@ -42,7 +44,7 @@ export function DataTable<T>({
       error={error}
       loadingComponent={loadingComponent || <DefaultLoadingComponent />}
       errorComponent={errorComponent || <DefaultErrorComponent error={error!} />}
-      emptyComponent={emptyComponent || <DefaultEmptyComponent message={emptyMessage} />}
+      emptyComponent={emptyComponent || <DefaultEmptyComponent message={emptyMessage} actionButton={emptyActionButton} />}
     >
       {(items) => (
         <Table

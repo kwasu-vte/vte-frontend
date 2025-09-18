@@ -93,6 +93,7 @@ export default function MentorAttendancePage() {
         }
       ] as AttendanceSession[];
     },
+    enabled: typeof window !== 'undefined', // * Only enable on client side
   });
 
   // * Create attendance mutation
@@ -271,7 +272,7 @@ export default function MentorAttendancePage() {
                   <Button
                     color="primary"
                     startContent={<Users className="w-4 h-4" />}
-                    onPress={() => window.location.href = '/mentor/my-groups'}
+                    onClick={() => window.location.href = '/mentor/my-groups'}
                   >
                     View My Groups
                   </Button>
@@ -335,7 +336,7 @@ export default function MentorAttendancePage() {
                         <Button
                           color="primary"
                           size="sm"
-                          onPress={() => handleTakeAttendance(session)}
+                          onClick={() => handleTakeAttendance(session)}
                           isDisabled={session.status === 'completed'}
                         >
                           {session.status === 'completed' ? 'Completed' : 'Take Attendance'}
@@ -431,7 +432,7 @@ export default function MentorAttendancePage() {
           <ModalFooter>
             <Button
               variant="light"
-              onPress={closeModals}
+              onClick={closeModals}
               isDisabled={isSubmitting}
             >
               Cancel
@@ -439,7 +440,7 @@ export default function MentorAttendancePage() {
             <Button
               color="primary"
               startContent={<Save className="w-4 h-4" />}
-              onPress={handleSaveAttendance}
+              onClick={handleSaveAttendance}
               isLoading={isSubmitting}
               isDisabled={isSubmitting}
             >

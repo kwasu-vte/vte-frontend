@@ -1,4 +1,9 @@
-// public/service-worker.js
+// * public/service-worker.js - TEMPORARILY DISABLED
+// * This service worker was causing JavaScript errors because it references
+// * workbox without importing it, which breaks the entire page
+// * TODO: Fix this service worker or remove it completely
+
+/*
 self.addEventListener('install', (event) => {
     console.log('Service Worker installing.');
   });
@@ -36,4 +41,7 @@ self.addEventListener('install', (event) => {
       ],
     })
   );
-  
+*/
+
+// * Minimal service worker to prevent errors
+console.log('Service Worker: Disabled workbox functionality');

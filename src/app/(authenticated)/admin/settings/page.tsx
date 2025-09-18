@@ -1,73 +1,248 @@
 // * Admin Settings Page
-// * Template page demonstrating StateRenderer + React Query pattern
-// * This follows the same pattern as other admin pages
+// * Comprehensive settings page with user profile and academic session management
 
 'use client';
 
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { StateRenderer, DefaultLoadingComponent, DefaultErrorComponent, DefaultEmptyComponent } from '@/components/shared/StateRenderer';
-import { SettingsForm } from '@/components/features/admin/SettingsForm';
 import { api } from '@/lib/api';
-import { SystemConfig, UpdateSystemConfigPayload } from '@/lib/types';
-import { Button, Card, CardBody, CardHeader } from '@nextui-org/react';
-import { Save, RefreshCw, Settings, Database, Mail, Shield } from 'lucide-react';
+import { User, AcademicSession } from '@/lib/types';
+import { 
+  Button, 
+  Card, 
+  CardBody, 
+  CardHeader, 
+  Modal, 
+  ModalContent, 
+  ModalHeader, 
+  ModalBody, 
+  ModalFooter,
+  Input,
+  Textarea,
+  Accordion,
+  AccordionItem,
+  Chip,
+  Divider
+} from '@nextui-org/react';
+import { 
+  User as UserIcon, 
+  Calendar, 
+  Plus, 
+  Play, 
+  Square, 
+  Edit, 
+  Eye,
+  Clock,
+  CheckCircle,
+  AlertCircle
+} from 'lucide-react';
+import { useApp } from '@/context/AppContext';
+import { getErrorMessage, getErrorTitle, getSuccessTitle, getSuccessMessage } from '@/lib/error-handling';
 
 export default function AdminSettingsPage() {
+  // * State for modals
+  const [isCreateSessionModalOpen, setIsCreateSessionModalOpen] = useState(false);
+  const [isEditSessionModalOpen, setIsEditSessionModalOpen] = useState(false);
+  const [selectedSession, setSelectedSession] = useState<AcademicSession | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [hasChanges, setHasChanges] = useState(false);
+
+  // * Form state for creating academic session
+  const [sessionForm, setSessionForm] = useState({
+    name: '',
+    starts_at: '',
+    ends_at: ''
+  });
 
   const queryClient = useQueryClient();
+  const { addNotification } = useApp();
 
-  // * React Query for data fetching
+  // * Get current user
   const {
-    data: systemConfig,
-    isLoading,
-    error,
-    refetch
+    data: currentUser,
+    isLoading: userLoading,
+    error: userError
   } = useQuery({
-    queryKey: ['systemConfig'],
+    queryKey: ['currentUser'],
     queryFn: async () => {
-      const response = await api.getSystemConfig();
+      const response = await api.getCurrentUser();
       return response.data;
+    },
+    enabled: typeof window !== 'undefined',
+  });
+
+  // * Get academic sessions
+  const {
+    data: academicSessions,
+    isLoading: sessionsLoading,
+    error: sessionsError,
+    refetch: refetchSessions
+  } = useQuery({
+    queryKey: ['academicSessions'],
+    queryFn: async () => {
+      const response = await api.getAcademicSessions();
+      return response.data;
+    },
+    enabled: typeof window !== 'undefined',
+  });
+
+  // * Create academic session mutation
+  const createSessionMutation = useMutation({
+    mutationFn: async (data: { name: string; starts_at?: string; ends_at?: string }) => {
+      const response = await api.createAcademicSession(data);
+      return response;
+    },
+    onSuccess: (response) => {
+      queryClient.invalidateQueries({ queryKey: ['academicSessions'] });
+      setIsCreateSessionModalOpen(false);
+      setSessionForm({ name: '', starts_at: '', ends_at: '' });
+      addNotification({
+        type: 'success',
+        title: getSuccessTitle('create', 'academic session'),
+        message: getSuccessMessage(response, 'Academic session created successfully.'),
+      });
+    },
+    onError: (error: any) => {
+      console.error('Error creating academic session:', error);
+      addNotification({
+        type: 'error',
+        title: getErrorTitle('create', 'academic session'),
+        message: getErrorMessage(error, 'An unexpected error occurred while creating the academic session.'),
+      });
     },
   });
 
-  // * Update system config mutation
-  const updateConfigMutation = useMutation({
-    mutationFn: async (data: UpdateSystemConfigPayload) => {
-      const response = await api.updateSystemConfig(data);
-      return response.data;
+  // * Update academic session mutation
+  const updateSessionMutation = useMutation({
+    mutationFn: async (data: { name?: string; starts_at?: string; ends_at?: string }) => {
+      if (!selectedSession) throw new Error('No session selected');
+      const response = await api.updateAcademicSession(selectedSession.id, data);
+      return response;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['systemConfig'] });
-      setHasChanges(false);
+    onSuccess: (response) => {
+      queryClient.invalidateQueries({ queryKey: ['academicSessions'] });
+      setIsEditSessionModalOpen(false);
+      setSelectedSession(null);
+      addNotification({
+        type: 'success',
+        title: getSuccessTitle('update', 'academic session'),
+        message: getSuccessMessage(response, 'Academic session updated successfully.'),
+      });
     },
-    onError: (error) => {
-      console.error('Error updating system config:', error);
+    onError: (error: any) => {
+      console.error('Error updating academic session:', error);
+      addNotification({
+        type: 'error',
+        title: getErrorTitle('update', 'academic session'),
+        message: getErrorMessage(error, 'An unexpected error occurred while updating the academic session.'),
+      });
     },
   });
 
-  // * Handle save settings
-  const handleSaveSettings = async (data: UpdateSystemConfigPayload) => {
+  // * Start academic session mutation
+  const startSessionMutation = useMutation({
+    mutationFn: async (sessionId: number) => {
+      const response = await api.startAcademicSession(sessionId);
+      return response;
+    },
+    onSuccess: (response) => {
+      queryClient.invalidateQueries({ queryKey: ['academicSessions'] });
+      addNotification({
+        type: 'success',
+        title: 'Session Started',
+        message: getSuccessMessage(response, 'Academic session started successfully.'),
+      });
+    },
+    onError: (error: any) => {
+      console.error('Error starting academic session:', error);
+      addNotification({
+        type: 'error',
+        title: 'Failed to Start Session',
+        message: getErrorMessage(error, 'An unexpected error occurred while starting the academic session.'),
+      });
+    },
+  });
+
+  // * End academic session mutation
+  const endSessionMutation = useMutation({
+    mutationFn: async (sessionId: number) => {
+      const response = await api.endAcademicSession(sessionId);
+      return response;
+    },
+    onSuccess: (response) => {
+      queryClient.invalidateQueries({ queryKey: ['academicSessions'] });
+      addNotification({
+        type: 'success',
+        title: 'Session Ended',
+        message: getSuccessMessage(response, 'Academic session ended successfully.'),
+      });
+    },
+    onError: (error: any) => {
+      console.error('Error ending academic session:', error);
+      addNotification({
+        type: 'error',
+        title: 'Failed to End Session',
+        message: getErrorMessage(error, 'An unexpected error occurred while ending the academic session.'),
+      });
+    },
+  });
+
+  // * Handle create session
+  const handleCreateSession = async () => {
     setIsSubmitting(true);
     try {
-      await updateConfigMutation.mutateAsync(data);
+      await createSessionMutation.mutateAsync(sessionForm);
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // * Handle form change
-  const handleFormChange = () => {
-    setHasChanges(true);
+  // * Handle update session
+  const handleUpdateSession = async () => {
+    setIsSubmitting(true);
+    try {
+      await updateSessionMutation.mutateAsync(sessionForm);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  // * Reset form
-  const handleResetForm = () => {
-    setHasChanges(false);
-    refetch();
+  // * Handle start session
+  const handleStartSession = async (sessionId: number) => {
+    await startSessionMutation.mutateAsync(sessionId);
   };
+
+  // * Handle end session
+  const handleEndSession = async (sessionId: number) => {
+    await endSessionMutation.mutateAsync(sessionId);
+  };
+
+  // * Open create modal
+  const openCreateModal = () => {
+    setSessionForm({ name: '', starts_at: '', ends_at: '' });
+    setIsCreateSessionModalOpen(true);
+  };
+
+  // * Open edit modal
+  const openEditModal = (session: AcademicSession) => {
+    setSelectedSession(session);
+    setSessionForm({
+      name: session.name,
+      starts_at: session.starts_at ? new Date(session.starts_at).toISOString().slice(0, 16) : '',
+      ends_at: session.ends_at ? new Date(session.ends_at).toISOString().slice(0, 16) : ''
+    });
+    setIsEditSessionModalOpen(true);
+  };
+
+  // * Close modals
+  const closeModals = () => {
+    setIsCreateSessionModalOpen(false);
+    setIsEditSessionModalOpen(false);
+    setSelectedSession(null);
+    setSessionForm({ name: '', starts_at: '', ends_at: '' });
+  };
+
+  // * Get current active session
+  const currentSession = academicSessions?.find(session => session.active);
 
   return (
     <div className="space-y-6">
@@ -76,174 +251,449 @@ export default function AdminSettingsPage() {
         <div>
           <h1 className="text-3xl font-bold text-neutral-900">System Settings</h1>
           <p className="text-neutral-600 mt-1">
-            Configure system-wide settings and preferences
+            Manage your profile and academic sessions
           </p>
         </div>
-        <div className="flex gap-2">
-          <Button
-            color="secondary"
-            startContent={<RefreshCw className="w-4 h-4" />}
-            onPress={handleResetForm}
-            isDisabled={isLoading}
-          >
-            Reset
-          </Button>
-          <Button
-            color="primary"
-            startContent={<Save className="w-4 h-4" />}
-            onPress={() => {
-              // This will be handled by the SettingsForm component
-              const form = document.getElementById('settings-form') as HTMLFormElement;
-              if (form) form.requestSubmit();
-            }}
-            isLoading={isSubmitting}
-            isDisabled={!hasChanges || isSubmitting}
-          >
-            Save Changes
-          </Button>
-        </div>
+        <Button
+          color="primary"
+          startContent={<Plus className="w-4 h-4" />}
+          onClick={openCreateModal}
+        >
+          Create Academic Session
+        </Button>
       </div>
 
-      {/* * Settings Sections */}
+      {/* * Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* * General Settings */}
+        {/* * Current User Profile */}
         <Card>
           <CardHeader className="flex items-center gap-3">
             <div className="p-2 bg-blue-100 rounded-lg">
-              <Settings className="w-5 h-5 text-blue-600" />
+              <UserIcon className="w-5 h-5 text-blue-600" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold">General Settings</h3>
-              <p className="text-sm text-neutral-600">Basic system configuration</p>
+              <h3 className="text-lg font-semibold">Current User Profile</h3>
+              <p className="text-sm text-neutral-600">Your account information</p>
             </div>
           </CardHeader>
           <CardBody>
-            <div className="space-y-4">
-              <div className="text-sm text-neutral-600">
-                <p><strong>System Name:</strong> {systemConfig?.system_name || 'VTE Platform'}</p>
-                <p><strong>Version:</strong> {systemConfig?.version || '1.0.0'}</p>
-                <p><strong>Environment:</strong> {systemConfig?.environment || 'production'}</p>
+            {userLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
               </div>
-            </div>
+            ) : userError ? (
+              <div className="text-center py-8">
+                <AlertCircle className="w-8 h-8 text-red-500 mx-auto mb-2" />
+                <p className="text-red-600">Failed to load user profile</p>
+                <p className="text-xs text-gray-500 mt-2">Error: {userError.message}</p>
+              </div>
+            ) : currentUser ? (
+              <div className="space-y-4">
+                {/* * Profile Header */}
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                    <span className="text-blue-600 font-semibold text-lg">
+                      {currentUser.first_name?.[0]}{currentUser.last_name?.[0]}
+                    </span>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-neutral-900">
+                      {currentUser.full_name || `${currentUser.first_name} ${currentUser.last_name}`}
+                    </h4>
+                    <p className="text-sm text-neutral-600">{currentUser.email}</p>
+                  </div>
+                </div>
+
+                <Divider />
+
+                {/* * Profile Details */}
+                <div className="space-y-3 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-neutral-600">Role:</span>
+                    <Chip color="primary" size="sm" variant="flat">
+                      {currentUser.role === 'superadmin' ? 'Super Admin' : 
+                       currentUser.role === 'Admin' ? 'Administrator' :
+                       currentUser.role?.charAt(0).toUpperCase() + currentUser.role?.slice(1) || 'User'}
+                    </Chip>
+                  </div>
+                  
+                  <div className="flex justify-between">
+                    <span className="text-neutral-600">Status:</span>
+                    <Chip color="success" size="sm" variant="flat">
+                      Active
+                    </Chip>
+                  </div>
+
+                  {currentUser.matric_number && (
+                    <div className="flex justify-between">
+                      <span className="text-neutral-600">Matric Number:</span>
+                      <span className="font-medium">{currentUser.matric_number}</span>
+                    </div>
+                  )}
+
+                  {currentUser.level && (
+                    <div className="flex justify-between">
+                      <span className="text-neutral-600">Academic Level:</span>
+                      <span className="font-medium">{currentUser.level} Level</span>
+                    </div>
+                  )}
+
+                  {currentUser.created_at && (
+                    <div className="flex justify-between">
+                      <span className="text-neutral-600">Member Since:</span>
+                      <span className="font-medium">
+                        {new Date(currentUser.created_at).toLocaleDateString()}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <p className="text-neutral-600">No user data available</p>
+              </div>
+            )}
           </CardBody>
         </Card>
 
-        {/* * Database Settings */}
+        {/* * Current Academic Session */}
         <Card>
           <CardHeader className="flex items-center gap-3">
             <div className="p-2 bg-green-100 rounded-lg">
-              <Database className="w-5 h-5 text-green-600" />
+              <Calendar className="w-5 h-5 text-green-600" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold">Database Settings</h3>
-              <p className="text-sm text-neutral-600">Database configuration</p>
+              <h3 className="text-lg font-semibold">Current Academic Session</h3>
+              <p className="text-sm text-neutral-600">Active session information</p>
             </div>
           </CardHeader>
           <CardBody>
-            <div className="space-y-4">
-              <div className="text-sm text-neutral-600">
-                <p><strong>Status:</strong> <span className="text-green-600">Connected</span></p>
-                <p><strong>Type:</strong> PostgreSQL</p>
-                <p><strong>Last Backup:</strong> {systemConfig?.last_backup || 'Never'}</p>
+            {sessionsLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
               </div>
-            </div>
-          </CardBody>
-        </Card>
-
-        {/* * Email Settings */}
-        <Card>
-          <CardHeader className="flex items-center gap-3">
-            <div className="p-2 bg-yellow-100 rounded-lg">
-              <Mail className="w-5 h-5 text-yellow-600" />
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold">Email Settings</h3>
-              <p className="text-sm text-neutral-600">Email configuration</p>
-            </div>
-          </CardHeader>
-          <CardBody>
-            <div className="space-y-4">
-              <div className="text-sm text-neutral-600">
-                <p><strong>Provider:</strong> {systemConfig?.email_provider || 'SMTP'}</p>
-                <p><strong>Status:</strong> <span className="text-green-600">Active</span></p>
-                <p><strong>Daily Limit:</strong> {systemConfig?.email_daily_limit || '1000'}</p>
+            ) : sessionsError ? (
+              <div className="text-center py-8">
+                <AlertCircle className="w-8 h-8 text-red-500 mx-auto mb-2" />
+                <p className="text-red-600">Failed to load academic sessions</p>
               </div>
-            </div>
-          </CardBody>
-        </Card>
-
-        {/* * Security Settings */}
-        <Card>
-          <CardHeader className="flex items-center gap-3">
-            <div className="p-2 bg-red-100 rounded-lg">
-              <Shield className="w-5 h-5 text-red-600" />
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold">Security Settings</h3>
-              <p className="text-sm text-neutral-600">Security configuration</p>
-            </div>
-          </CardHeader>
-          <CardBody>
-            <div className="space-y-4">
-              <div className="text-sm text-neutral-600">
-                <p><strong>SSL:</strong> <span className="text-green-600">Enabled</span></p>
-                <p><strong>Rate Limiting:</strong> <span className="text-green-600">Active</span></p>
-                <p><strong>Session Timeout:</strong> {systemConfig?.session_timeout || '24 hours'}</p>
+            ) : currentSession ? (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-semibold text-neutral-900">{currentSession.name}</h4>
+                    <p className="text-sm text-neutral-600">Active Session</p>
+                  </div>
+                  <Chip color="success" size="sm" variant="flat">
+                    <CheckCircle className="w-3 h-3 mr-1" />
+                    Active
+                  </Chip>
+                </div>
+                <Divider />
+                <div className="space-y-2 text-sm">
+                  {currentSession.starts_at && (
+                    <div className="flex items-center gap-2">
+                      <Clock className="w-4 h-4 text-neutral-500" />
+                      <span className="text-neutral-600">Started:</span>
+                      <span>{new Date(currentSession.starts_at).toLocaleDateString()}</span>
+                    </div>
+                  )}
+                  {currentSession.ends_at && (
+                    <div className="flex items-center gap-2">
+                      <Clock className="w-4 h-4 text-neutral-500" />
+                      <span className="text-neutral-600">Ends:</span>
+                      <span>{new Date(currentSession.ends_at).toLocaleDateString()}</span>
+                    </div>
+                  )}
+                </div>
+                <div className="flex gap-2 pt-2">
+                  <Button
+                    size="sm"
+                    color="secondary"
+                    startContent={<Edit className="w-3 h-3" />}
+                    onClick={() => openEditModal(currentSession)}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    size="sm"
+                    color="danger"
+                    startContent={<Square className="w-3 h-3" />}
+                    onClick={() => handleEndSession(currentSession.id)}
+                    isLoading={endSessionMutation.isPending}
+                  >
+                    End Session
+                  </Button>
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="text-center py-8">
+                <AlertCircle className="w-8 h-8 text-yellow-500 mx-auto mb-2" />
+                <p className="text-neutral-600 mb-4">No active academic session</p>
+                <Button
+                  size="sm"
+                  color="primary"
+                  startContent={<Plus className="w-3 h-3" />}
+                  onClick={openCreateModal}
+                >
+                  Create Session
+                </Button>
+              </div>
+            )}
           </CardBody>
         </Card>
       </div>
 
-      {/* * Settings Form with StateRenderer */}
-      <div className="bg-white rounded-lg shadow-sm border border-neutral-200">
-        <StateRenderer
-          data={systemConfig}
-          isLoading={isLoading}
-          error={error}
-          loadingComponent={
-            <div className="p-6">
-              <DefaultLoadingComponent />
+      {/* * All Academic Sessions */}
+      <Card>
+        <CardHeader className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-purple-100 rounded-lg">
+              <Calendar className="w-5 h-5 text-purple-600" />
             </div>
-          }
-          errorComponent={
-            <div className="p-6">
-              <DefaultErrorComponent 
-                error={error!} 
-                onRetry={() => refetch()} 
-              />
+            <div>
+              <h3 className="text-lg font-semibold">All Academic Sessions</h3>
+              <p className="text-sm text-neutral-600">Manage all academic sessions</p>
             </div>
-          }
-          emptyComponent={
-            <div className="p-6">
-              <DefaultEmptyComponent 
-                message="No system configuration found. Please contact support."
-              />
+          </div>
+        </CardHeader>
+        <CardBody>
+          {sessionsLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
             </div>
-          }
-        >
-          {(data) => (
-            <SettingsForm
-              config={data}
-              onSubmit={handleSaveSettings}
-              onChange={handleFormChange}
-              isLoading={isSubmitting}
-            />
+          ) : sessionsError ? (
+            <div className="text-center py-8">
+              <AlertCircle className="w-8 h-8 text-red-500 mx-auto mb-2" />
+              <p className="text-red-600">Failed to load academic sessions</p>
+            </div>
+          ) : academicSessions && academicSessions.length > 0 ? (
+            <Accordion>
+              {academicSessions.map((session) => (
+                <AccordionItem
+                  key={session.id}
+                  title={
+                    <div className="flex items-center justify-between w-full">
+                      <div className="flex items-center gap-3">
+                        <span className="font-medium">{session.name}</span>
+                        {session.active && (
+                          <Chip color="success" size="sm" variant="flat">
+                            <CheckCircle className="w-3 h-3 mr-1" />
+                            Active
+                          </Chip>
+                        )}
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          variant="light"
+                          startContent={<Eye className="w-3 h-3" />}
+                          onClick={() => openEditModal(session)}
+                        >
+                          View
+                        </Button>
+                        {!session.active && (
+                          <Button
+                            size="sm"
+                            color="success"
+                            startContent={<Play className="w-3 h-3" />}
+                            onClick={() => handleStartSession(session.id)}
+                            isLoading={startSessionMutation.isPending}
+                          >
+                            Start
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  }
+                >
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <span className="text-neutral-600">Session ID:</span>
+                        <span className="ml-2 font-mono">{session.id}</span>
+                      </div>
+                      <div>
+                        <span className="text-neutral-600">Status:</span>
+                        <Chip 
+                          color={session.active ? "success" : "default"} 
+                          size="sm" 
+                          variant="flat"
+                          className="ml-2"
+                        >
+                          {session.active ? "Active" : "Inactive"}
+                        </Chip>
+                      </div>
+                      {session.starts_at && (
+                        <div>
+                          <span className="text-neutral-600">Start Date:</span>
+                          <span className="ml-2">{new Date(session.starts_at).toLocaleDateString()}</span>
+                        </div>
+                      )}
+                      {session.ends_at && (
+                        <div>
+                          <span className="text-neutral-600">End Date:</span>
+                          <span className="ml-2">{new Date(session.ends_at).toLocaleDateString()}</span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex gap-2 pt-2">
+                      <Button
+                        size="sm"
+                        color="primary"
+                        startContent={<Edit className="w-3 h-3" />}
+                        onClick={() => openEditModal(session)}
+                      >
+                        Edit Session
+                      </Button>
+                      {!session.active && (
+                        <Button
+                          size="sm"
+                          color="success"
+                          startContent={<Play className="w-3 h-3" />}
+                          onClick={() => handleStartSession(session.id)}
+                          isLoading={startSessionMutation.isPending}
+                        >
+                          Start Session
+                        </Button>
+                      )}
+                      {session.active && (
+                        <Button
+                          size="sm"
+                          color="danger"
+                          startContent={<Square className="w-3 h-3" />}
+                          onClick={() => handleEndSession(session.id)}
+                          isLoading={endSessionMutation.isPending}
+                        >
+                          End Session
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          ) : (
+            <div className="text-center py-8">
+              <Calendar className="w-12 h-12 text-neutral-400 mx-auto mb-4" />
+              <p className="text-neutral-600 mb-4">No academic sessions found</p>
+              <Button
+                color="primary"
+                startContent={<Plus className="w-4 h-4" />}
+                onClick={openCreateModal}
+              >
+                Create First Session
+              </Button>
+            </div>
           )}
-        </StateRenderer>
-      </div>
+        </CardBody>
+      </Card>
 
-      {/* * Debug Information */}
-      <div className="bg-neutral-50 p-4 rounded-lg">
-        <h3 className="font-semibold text-neutral-900 mb-2">Debug Information</h3>
-        <div className="text-sm text-neutral-600 space-y-1">
-          <p><strong>Loading:</strong> {isLoading ? 'Yes' : 'No'}</p>
-          <p><strong>Error:</strong> {error ? error.message : 'None'}</p>
-          <p><strong>Has Changes:</strong> {hasChanges ? 'Yes' : 'No'}</p>
-          <p><strong>Query Key:</strong> [&apos;systemConfig&apos;]</p>
-          <p><strong>Mutation:</strong> Update: {updateConfigMutation.isPending ? 'Pending' : 'Idle'}</p>
-        </div>
-      </div>
+      {/* * Create Academic Session Modal */}
+      <Modal
+        isOpen={isCreateSessionModalOpen}
+        onClose={closeModals}
+        size="md"
+      >
+        <ModalContent>
+          <ModalHeader>
+            <h2 className="text-lg font-semibold">Create Academic Session</h2>
+          </ModalHeader>
+          <ModalBody>
+            <div className="space-y-4">
+              <Input
+                label="Session Name"
+                placeholder="e.g., 2024/2025 Academic Year"
+                value={sessionForm.name}
+                onChange={(e) => setSessionForm(prev => ({ ...prev, name: e.target.value }))}
+                isRequired
+              />
+              <Input
+                label="Start Date"
+                type="datetime-local"
+                value={sessionForm.starts_at}
+                onChange={(e) => setSessionForm(prev => ({ ...prev, starts_at: e.target.value }))}
+              />
+              <Input
+                label="End Date"
+                type="datetime-local"
+                value={sessionForm.ends_at}
+                onChange={(e) => setSessionForm(prev => ({ ...prev, ends_at: e.target.value }))}
+              />
+            </div>
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              variant="light"
+              onClick={closeModals}
+              isDisabled={isSubmitting}
+            >
+              Cancel
+            </Button>
+            <Button
+              color="primary"
+              onClick={handleCreateSession}
+              isLoading={isSubmitting}
+              isDisabled={!sessionForm.name.trim() || isSubmitting}
+            >
+              Create Session
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* * Edit Academic Session Modal */}
+      <Modal
+        isOpen={isEditSessionModalOpen}
+        onClose={closeModals}
+        size="md"
+      >
+        <ModalContent>
+          <ModalHeader>
+            <h2 className="text-lg font-semibold">Edit Academic Session</h2>
+          </ModalHeader>
+          <ModalBody>
+            <div className="space-y-4">
+              <Input
+                label="Session Name"
+                placeholder="e.g., 2024/2025 Academic Year"
+                value={sessionForm.name}
+                onChange={(e) => setSessionForm(prev => ({ ...prev, name: e.target.value }))}
+                isRequired
+              />
+              <Input
+                label="Start Date"
+                type="datetime-local"
+                value={sessionForm.starts_at}
+                onChange={(e) => setSessionForm(prev => ({ ...prev, starts_at: e.target.value }))}
+              />
+              <Input
+                label="End Date"
+                type="datetime-local"
+                value={sessionForm.ends_at}
+                onChange={(e) => setSessionForm(prev => ({ ...prev, ends_at: e.target.value }))}
+              />
+            </div>
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              variant="light"
+              onClick={closeModals}
+              isDisabled={isSubmitting}
+            >
+              Cancel
+            </Button>
+            <Button
+              color="primary"
+              onClick={handleUpdateSession}
+              isLoading={isSubmitting}
+              isDisabled={!sessionForm.name.trim() || isSubmitting}
+            >
+              Update Session
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </div>
   );
 }

@@ -21,7 +21,8 @@ import {
   Home,
   LogOut,
   School,
-  UserPlus
+  UserPlus,
+  Megaphone
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -40,50 +41,44 @@ const navigationItems: NavigationItem[] = [
   },
   {
     href: '/admin/skills',
-    label: 'Skills Management',
+    label: 'Skills',
     icon: BookOpen,
     role: ['Admin'],
   },
   {
     href: '/admin/groups',
-    label: 'Groups Management',
+    label: 'Groups',
     icon: Users,
     role: ['Admin'],
   },
   {
     href: '/admin/students',
-    label: 'Student Management',
+    label: 'Students',
     icon: GraduationCap,
     role: ['Admin'],
   },
   {
     href: '/admin/mentors',
-    label: 'Mentor Management',
+    label: 'Mentors',
     icon: UserCheck,
     role: ['Admin'],
   },
   {
     href: '/admin/attendance',
-    label: 'Attendance Records',
+    label: 'Attendance',
     icon: Calendar,
     role: ['Admin'],
   },
   {
     href: '/admin/payments',
-    label: 'Payment Records',
+    label: 'Payments',
     icon: CreditCard,
     role: ['Admin'],
   },
   {
-    href: '/academicSessions',
-    label: 'Academic Sessions',
-    icon: School,
-    role: ['Admin'],
-  },
-  {
-    href: '/studentProfiles',
-    label: 'Student Profiles',
-    icon: UserPlus,
+    href: '/admin/announcements',
+    label: 'Announcements',
+    icon: Megaphone,
     role: ['Admin'],
   },
   {
@@ -118,6 +113,12 @@ const navigationItems: NavigationItem[] = [
     icon: UserCheck,
     role: ['Mentor'],
   },
+  {
+    href: '/mentor/announcements',
+    label: 'Announcements',
+    icon: Megaphone,
+    role: ['Mentor'],
+  },
 
   // * Student Navigation
   {
@@ -133,9 +134,9 @@ const navigationItems: NavigationItem[] = [
     role: ['Student'],
   },
   {
-    href: '/student/payment',
-    label: 'Payment',
-    icon: CreditCard,
+    href: '/student/courses',
+    label: 'My Courses',
+    icon: School,
     role: ['Student'],
   },
   {
@@ -145,15 +146,15 @@ const navigationItems: NavigationItem[] = [
     role: ['Student'],
   },
   {
-    href: '/student/attendance',
-    label: 'Attendance',
-    icon: UserCheck,
+    href: '/student/payment',
+    label: 'Payment',
+    icon: CreditCard,
     role: ['Student'],
   },
   {
-    href: '/student/profile',
-    label: 'Profile',
-    icon: GraduationCap,
+    href: '/student/announcements',
+    label: 'Announcements',
+    icon: Megaphone,
     role: ['Student'],
   },
 ];

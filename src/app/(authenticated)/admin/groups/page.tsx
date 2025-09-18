@@ -23,7 +23,7 @@ export default function AdminGroupsPage() {
 
   const queryClient = useQueryClient();
 
-  // * React Query for data fetching
+  // * React Query for data fetching - only run on client
   const {
     data: groups,
     isLoading,
@@ -35,6 +35,7 @@ export default function AdminGroupsPage() {
       const response = await api.getGroups();
       return response.data;
     },
+    enabled: typeof window !== 'undefined', // * Only enable on client side
   });
 
   // * Create group mutation
@@ -154,7 +155,7 @@ export default function AdminGroupsPage() {
         <Button
           color="primary"
           startContent={<Plus className="w-4 h-4" />}
-          onPress={openCreateModal}
+          onClick={openCreateModal}
         >
           Create Group
         </Button>
@@ -187,7 +188,7 @@ export default function AdminGroupsPage() {
                   <Button
                     color="primary"
                     startContent={<Plus className="w-4 h-4" />}
-                    onPress={openCreateModal}
+                    onClick={openCreateModal}
                   >
                     Create Group
                   </Button>
@@ -257,14 +258,14 @@ export default function AdminGroupsPage() {
           <ModalFooter>
             <Button
               variant="light"
-              onPress={closeModals}
+              onClick={closeModals}
               isDisabled={isSubmitting}
             >
               Cancel
             </Button>
             <Button
               color="danger"
-              onPress={handleDeleteGroup}
+              onClick={handleDeleteGroup}
               isLoading={isSubmitting}
               isDisabled={isSubmitting}
             >

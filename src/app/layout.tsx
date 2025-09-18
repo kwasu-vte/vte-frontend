@@ -96,7 +96,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="light">
+    <html lang="en" className="light" suppressHydrationWarning>
       <head>
         {/* * PWA Meta Tags */}
         <meta name="application-name" content="KWASU VTE" />
@@ -112,13 +112,13 @@ export default function RootLayout({
         <link rel="apple-touch-startup-image" href="/icons/apple-splash-1170-2532.jpg" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3)" />
         <link rel="apple-touch-startup-image" href="/icons/apple-splash-1536-2048.jpg" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2)" />
       </head>
-      <body className={inter.className}>
+      <body className={inter.className} suppressHydrationWarning>
         <Providers>
           <QueryProvider>
             <AppProvider>
-              <PWAManager>
+              {/* <PWAManager> */}
                 {children}
-              </PWAManager>
+              {/* </PWAManager> */}
             </AppProvider>
           </QueryProvider>
         </Providers>

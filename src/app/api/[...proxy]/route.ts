@@ -16,7 +16,7 @@ const setSessionCookie = async (token: string, maxAgeSeconds: number) => {
     path: '/',
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
+    sameSite: 'lax',
     maxAge: maxAgeSeconds,
   });
 };
@@ -28,7 +28,7 @@ const deleteSessionCookie = async () => {
     path: '/',
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
+    sameSite: 'lax',
     maxAge: 0,
   });
 };
@@ -58,8 +58,8 @@ const handleRequest = async (request: NextRequest, { params }: { params: Promise
   // * Prepare headers for the real API
   const requestHeaders = new Headers();
   
-  // * Copy safe headers from client request
-  const safeHeaders = ['Content-Type', 'Accept'];
+  // * Copy safe headers from client request (and Authorization if provided)
+  const safeHeaders = ['Content-Type', 'Accept', 'Authorization'];
   for (const headerName of safeHeaders) {
     if (request.headers.has(headerName)) {
       requestHeaders.set(headerName, request.headers.get(headerName)!);
@@ -69,11 +69,31 @@ const handleRequest = async (request: NextRequest, { params }: { params: Promise
   // * Get session token from secure cookie
   const cookieStore = await cookies();
   const sessionToken = cookieStore.get('session_token');
+  console.debug(`[BFF Proxy ${traceId}] session_token cookie present: ${sessionToken ? 'yes' : 'no'}`);
 
-  // * Add Authorization header if token exists
-  if (sessionToken) {
+  // * Handle Cookie header forwarding for server-to-server requests
+  if (request.headers.has('Cookie')) {
+    // * Forward Cookie header from client request
+    requestHeaders.set('Cookie', request.headers.get('Cookie')!);
+    console.debug(`[BFF Proxy ${traceId}] Forwarding Cookie header from client.`);
+  } else if (sessionToken) {
+    // * Set session cookie if no Cookie header present
+    requestHeaders.set('Cookie', `session_token=${sessionToken.value}`);
+    console.debug(`[BFF Proxy ${traceId}] Setting session cookie from secure storage.`);
+  }
+
+  // * Add Authorization header from cookie only if not already provided
+  if (!requestHeaders.has('Authorization') && sessionToken) {
     requestHeaders.set('Authorization', `Bearer ${sessionToken.value}`);
     console.debug(`[BFF Proxy ${traceId}] Attached Bearer token from cookie.`);
+  }
+
+  // * Debug auth header presence and origin
+  if (requestHeaders.has('Authorization')) {
+    const authPreview = (requestHeaders.get('Authorization') || '').slice(0, 20);
+    console.debug(`[BFF Proxy ${traceId}] Authorization header present: ${authPreview}...`);
+  } else {
+    console.debug(`[BFF Proxy ${traceId}] No Authorization header present on upstream request.`);
   }
 
   // * Handle logout specifically (fire-and-forget to API, clear cookie regardless)
@@ -96,6 +116,10 @@ const handleRequest = async (request: NextRequest, { params }: { params: Promise
   // * Add body for non-GET requests
   if (request.method !== 'GET' && request.method !== 'HEAD') {
     fetchOptions.body = request.body;
+    // * Required by Node.js fetch when sending a ReadableStream body
+    // * Prevents: RequestInit: duplex option is required when sending a body
+    // @ts-expect-error Node fetch extension
+    (fetchOptions as any).duplex = 'half';
   }
 
   try {
@@ -119,13 +143,39 @@ const handleRequest = async (request: NextRequest, { params }: { params: Promise
     // * Special handling for login: extract token from spec shape and set cookie
     if (path === 'v1/users/auth/login') {
       const json = await apiResponse.json().catch(() => null);
-      const token = json?.data?.access_token ?? json?.access_token;
-      const expiresIn = Number(json?.data?.expires_in ?? 60 * 60 * 24 * 30);
+      const candidateKeys = [
+        'data.access_token',
+        'access_token',
+        'data.token',
+        'token',
+        'data.access?.token',
+        'access?.token'
+      ];
+      // Resolve token across common shapes
+      const token = json?.data?.access_token
+        ?? json?.access_token
+        ?? json?.data?.token
+        ?? json?.token
+        ?? json?.data?.access?.token
+        ?? json?.access?.token
+        ?? null;
+      const expiresIn = Number(
+        json?.data?.expires_in
+        ?? json?.expires_in
+        ?? json?.data?.access?.expires_in
+        ?? 60 * 60 * 24 * 30
+      );
+      const tokenPreview = typeof token === 'string' ? `${token.slice(0, 8)}...${token.slice(-4)}` : 'none';
+      console.info(`[BFF Proxy ${traceId}] Login response keys: ${json ? Object.keys(json).join(',') : 'null'}`);
+      console.info(`[BFF Proxy ${traceId}] Token detection → present: ${!!token}, preview: ${tokenPreview}`);
       if (apiResponse.ok && token) {
         await setSessionCookie(token, isNaN(expiresIn) ? 60 * 60 * 24 * 30 : expiresIn);
         console.info(`[BFF Proxy ${traceId}] Login successful. Session cookie set.`);
+      } else {
+        console.warn(`[BFF Proxy ${traceId}] Login success=${apiResponse.ok} but no token extracted; cannot set session cookie.`);
       }
-      return NextResponse.json(json ?? {}, { status: apiResponse.status, headers: responseHeaders });
+      // Echo back minimal safe data
+      return NextResponse.json({ success: apiResponse.ok, data: { access_token: token } }, { status: apiResponse.status, headers: responseHeaders });
     }
 
     // * Special handling for refresh: extract token from spec shape and update cookie

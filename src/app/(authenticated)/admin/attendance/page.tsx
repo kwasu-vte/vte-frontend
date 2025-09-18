@@ -23,7 +23,7 @@ export default function AdminAttendancePage() {
 
   const queryClient = useQueryClient();
 
-  // * React Query for data fetching
+  // * React Query for data fetching - only run on client
   const {
     data: attendanceRecords,
     isLoading,
@@ -35,6 +35,7 @@ export default function AdminAttendancePage() {
       const response = await api.getAttendanceRecords();
       return response.data;
     },
+    enabled: typeof window !== 'undefined', // * Only enable on client side
   });
 
   // * Create attendance record mutation
@@ -161,14 +162,14 @@ export default function AdminAttendancePage() {
           <Button
             color="secondary"
             startContent={<Download className="w-4 h-4" />}
-            onPress={handleExportAttendance}
+            onClick={handleExportAttendance}
           >
             Export Data
           </Button>
           <Button
             color="primary"
             startContent={<Plus className="w-4 h-4" />}
-            onPress={openCreateModal}
+            onClick={openCreateModal}
           >
             Add Record
           </Button>
@@ -202,7 +203,7 @@ export default function AdminAttendancePage() {
                   <Button
                     color="primary"
                     startContent={<Plus className="w-4 h-4" />}
-                    onPress={openCreateModal}
+                    onClick={openCreateModal}
                   >
                     Add Record
                   </Button>
@@ -272,14 +273,14 @@ export default function AdminAttendancePage() {
           <ModalFooter>
             <Button
               variant="light"
-              onPress={closeModals}
+              onClick={closeModals}
               isDisabled={isSubmitting}
             >
               Cancel
             </Button>
             <Button
               color="danger"
-              onPress={handleDeleteAttendance}
+              onClick={handleDeleteAttendance}
               isLoading={isSubmitting}
               isDisabled={isSubmitting}
             >

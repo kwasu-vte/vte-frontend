@@ -40,7 +40,7 @@ export function StateRenderer<T>({
   }
 
   // * State 4: Success - Render the data
-  return <>{children(data as NonNullable<T>)}</>;
+  return children(data as NonNullable<T>);
 }
 
 // * Default Components for Common States

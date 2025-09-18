@@ -150,6 +150,7 @@ export default function StudentMyGroupPage() {
         ]
       } as GroupDetails;
     },
+    enabled: typeof window !== 'undefined', // * Only enable on client side
   });
 
   // * Format date for display
@@ -209,7 +210,7 @@ export default function StudentMyGroupPage() {
                   <Button
                     color="primary"
                     startContent={<Users className="w-4 h-4" />}
-                    onPress={() => window.location.href = '/student/skills'}
+                    onClick={() => window.location.href = '/student/skills'}
                   >
                     Browse Skills
                   </Button>
@@ -366,7 +367,7 @@ export default function StudentMyGroupPage() {
                               isIconOnly
                               size="sm"
                               variant="light"
-                              onPress={() => {
+                              onClick={() => {
                                 // TODO: Open chat with member
                                 console.log('Chat with', member.firstName);
                               }}
@@ -432,7 +433,7 @@ export default function StudentMyGroupPage() {
                 color="primary"
                 variant="light"
                 size="sm"
-                onPress={() => {
+                onClick={() => {
                   // TODO: Navigate to course materials
                   console.log('View course materials');
                 }}
@@ -457,7 +458,7 @@ export default function StudentMyGroupPage() {
                 color="primary"
                 variant="light"
                 size="sm"
-                onPress={() => {
+                onClick={() => {
                   // TODO: Open group chat
                   console.log('Open group chat');
                 }}
@@ -482,7 +483,7 @@ export default function StudentMyGroupPage() {
                 color="primary"
                 variant="light"
                 size="sm"
-                onPress={() => {
+                onClick={() => {
                   // TODO: Navigate to schedule
                   console.log('View schedule');
                 }}

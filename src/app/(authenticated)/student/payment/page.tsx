@@ -74,6 +74,7 @@ export default function StudentPaymentPage() {
         }
       ] as PaymentHistory[];
     },
+    enabled: typeof window !== 'undefined', // * Only enable on client side
   });
 
   // * React Query for available skills
@@ -87,6 +88,7 @@ export default function StudentPaymentPage() {
       const response = await api.getSkills();
       return response.data;
     },
+    enabled: typeof window !== 'undefined', // * Only enable on client side
   });
 
   // * Make payment mutation
@@ -191,7 +193,7 @@ export default function StudentPaymentPage() {
         <Button
           color="primary"
           startContent={<CreditCard className="w-4 h-4" />}
-          onPress={() => setIsPaymentModalOpen(true)}
+          onClick={() => setIsPaymentModalOpen(true)}
         >
           Make Payment
         </Button>
@@ -269,7 +271,7 @@ export default function StudentPaymentPage() {
                     <Button
                       color="primary"
                       startContent={<CreditCard className="w-4 h-4" />}
-                      onPress={() => setIsPaymentModalOpen(true)}
+                      onClick={() => setIsPaymentModalOpen(true)}
                     >
                       Make Payment
                     </Button>
@@ -326,7 +328,7 @@ export default function StudentPaymentPage() {
                               variant="light"
                               size="sm"
                               startContent={<ExternalLink className="w-4 h-4" />}
-                              onPress={() => {
+                              onClick={() => {
                                 // TODO: Open payment gateway for pending payment
                                 console.log('Complete payment:', payment.reference);
                               }}
@@ -413,7 +415,7 @@ export default function StudentPaymentPage() {
           <ModalFooter>
             <Button
               variant="light"
-              onPress={closeModals}
+              onClick={closeModals}
               isDisabled={isSubmitting}
             >
               Cancel
@@ -421,7 +423,7 @@ export default function StudentPaymentPage() {
             <Button
               color="primary"
               startContent={<CreditCard className="w-4 h-4" />}
-              onPress={handlePaymentSubmit}
+              onClick={handlePaymentSubmit}
               isLoading={isSubmitting}
               isDisabled={!paymentForm.skillId || isSubmitting}
             >

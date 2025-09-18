@@ -51,6 +51,8 @@ class ApiClient {
     // * All requests go through our proxy at /api/*
     const proxyUrl = `/api/${endpoint}`;
     const isServer = typeof window === 'undefined';
+    
+    // * For server-side requests, we need to use absolute URLs
     const origin = isServer
       ? (process.env.NEXT_PUBLIC_APP_URL
           || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000'))
@@ -60,10 +62,30 @@ class ApiClient {
     const config: RequestInit = {
       headers: {
         'Content-Type': 'application/json',
+        'Accept': 'application/json',
         ...options.headers,
       },
       ...options,
     };
+
+    // * For server-side requests, we need to manually forward cookies
+    if (isServer) {
+      try {
+        const { cookies } = await import('next/headers');
+        const cookieStore = await cookies();
+        const sessionToken = cookieStore.get('session_token');
+        
+        if (sessionToken && !config.headers?.['Authorization']) {
+          config.headers = {
+            ...config.headers,
+            'Cookie': `session_token=${sessionToken.value}`,
+          };
+        }
+      } catch (error) {
+        // * If we can't get cookies, continue without them
+        console.warn('Failed to get cookies for server-side request:', error);
+      }
+    }
 
     try {
       const response = await fetch(url, config);
@@ -113,7 +135,33 @@ class ApiClient {
   }
 
   async getCurrentUser(): Promise<ApiResponse<User>> {
-    return this.request('v1/users/auth/me');
+    try {
+      // Spec says GET
+      return await this.request('v1/users/auth/me');
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 405) {
+        // Fallback to POST if server is configured that way
+        return this.request('v1/users/auth/me', { method: 'POST' });
+      }
+      throw err;
+    }
+  }
+
+  // * Get current user using an explicit Bearer token (for same-request flows after login)
+  async getCurrentUserWithToken(token: string): Promise<ApiResponse<User>> {
+    try {
+      return await this.request('v1/users/auth/me', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 405) {
+        return this.request('v1/users/auth/me', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      }
+      throw err;
+    }
   }
 
   async signUp(userData: CreateUserPayload): Promise<ApiResponse<User>> {
@@ -297,6 +345,35 @@ class ApiClient {
 
   async deleteAttendanceRecord(id: string): Promise<void> {
     return this.request(`v1/attendance/${id}`, {
+      method: 'DELETE',
+    });
+  }
+
+  // * Skills Management
+  async getSkills(): Promise<ApiResponse<Skill[]>> {
+    return this.request('v1/skills');
+  }
+
+  async getSkill(id: string): Promise<ApiResponse<Skill>> {
+    return this.request(`v1/skills/${id}`);
+  }
+
+  async createSkill(data: CreateSkillPayload): Promise<ApiResponse<Skill>> {
+    return this.request('v1/skills', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async updateSkill(id: string, data: UpdateSkillPayload): Promise<ApiResponse<Skill>> {
+    return this.request(`v1/skills/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async deleteSkill(id: string): Promise<void> {
+    return this.request(`v1/skills/${id}`, {
       method: 'DELETE',
     });
   }

@@ -5,6 +5,7 @@
 
 'use server';
 
+import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { api } from './api';
 import { CreateSkillPayload, UpdateSkillPayload, CreateGroupPayload, CreateUserPayload, CreateStudentProfilePayload } from './types';
@@ -18,6 +19,8 @@ export async function signInAction(formData: FormData) {
     throw new Error('Username and password are required');
   }
 
+  let target: string | null = null;
+  let token: string | null = null;
   try {
     const response = await api.signIn({ email: username, password });
     
@@ -25,29 +28,50 @@ export async function signInAction(formData: FormData) {
       throw new Error(response.message || 'Authentication failed');
     }
 
-    // * After login, proxy has set the session cookie. Fetch current user to determine role
-    const me = await api.getCurrentUser();
+    // * Get token from response; cookie will be set via /auth/callback (browser route)
+    token = (response as any)?.data?.access_token || null;
+    const me = token ? await api.getCurrentUserWithToken(token) : await api.getCurrentUser();
     if (!me.success || !me.data) {
       throw new Error(me.message || 'Failed to fetch user after login');
     }
 
     const role = String(me.data.role || '').toLowerCase();
-    const target = role === 'admin' || role === 'mentor' || role === 'student' ? `/${role}/dashboard` : '/';
-    redirect(target);
+    target = role === 'admin' || role === 'mentor' || role === 'student' ? `/${role}/dashboard` : '/';
   } catch (error) {
+    // Fallback for legacy/edge cases of redirect signals
+    if ((error as any)?.digest === 'NEXT_REDIRECT' || String((error as any)?.message || '').includes('NEXT_REDIRECT')) {
+      throw error as Error;
+    }
     throw new Error(error instanceof Error ? error.message : 'Authentication failed');
+  }
+
+  if (target) {
+    const params = new URLSearchParams();
+    if (token) params.set('token', token);
+    params.set('target', target);
+    redirect(`/auth/callback?${params.toString()}`);
   }
 }
 
 export async function signOutAction() {
   try {
     await api.signOut();
-    // * Proxy has already cleared httpOnly cookies
-    redirect('/auth/sign_in');
-  } catch (error) {
-    // * Even if API call fails, redirect to sign-in
-    redirect('/auth/sign_in');
+  } catch (_) {
+    // * Ignore API errors - proceed to redirect
   }
+  // * Ensure local cookie is cleared as well
+  try {
+    const cookieStore = await cookies();
+    cookieStore.set('session_token', '', {
+      path: '/',
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 0,
+    });
+  } catch (_) {}
+  // * Proxy has already cleared httpOnly cookies (if success); ensure navigation regardless
+  redirect('/auth/sign_in');
 }
 
 export async function signUpAction(formData: FormData) {
@@ -73,17 +97,22 @@ export async function signUpAction(formData: FormData) {
     throw new Error('Passwords do not match');
   }
   
+  let shouldRedirect = false;
   try {
     const response = await api.signUp(userData);
     
     if (response.success) {
-      // * Redirect to sign in after successful registration
-      redirect('/auth/sign_in?message=Registration successful. Please sign in.');
+      // * Mark for redirect to sign in after successful registration
+      shouldRedirect = true;
     } else {
       throw new Error(response.message || 'Registration failed');
     }
   } catch (error) {
     throw new Error(error instanceof Error ? error.message : 'Registration failed');
+  }
+
+  if (shouldRedirect) {
+    redirect('/auth/sign_in?message=Registration successful. Please sign in.');
   }
 }
 

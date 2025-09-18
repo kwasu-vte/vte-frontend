@@ -25,8 +25,9 @@ export async function getSession(): Promise<AuthSession | null> {
       return null;
     }
 
-    // * Validate session token with backend by calling getCurrentUser
+    // * Validate session token with backend
     try {
+      // * Use the regular getCurrentUser API call which properly handles cookies
       const response = await api.getCurrentUser();
       
       if (response.success && response.data) {
@@ -36,10 +37,11 @@ export async function getSession(): Promise<AuthSession | null> {
           access_token: sessionToken.value,
         };
       } else {
-        // * Token invalid; attempt refresh via API
+        // * Session invalid, try refresh
+        console.log('Session validation failed, attempting refresh...');
         const newToken = await refreshAccessToken();
         if (newToken) {
-          // * Retry getCurrentUser with new token
+          // * Retry getCurrentUser after refresh
           const retryResponse = await api.getCurrentUser();
           if (retryResponse.success && retryResponse.data) {
             const normalizedUser = { ...retryResponse.data, role: normalizeUserRole((retryResponse as any)?.data?.role) } as User;
@@ -49,11 +51,30 @@ export async function getSession(): Promise<AuthSession | null> {
             };
           }
         }
+        console.log('Session refresh failed, session is invalid');
         return null;
       }
     } catch (error) {
-      // * API call failed, token might be invalid
-      console.error('Failed to validate session token:', error);
+      // * API call failed, session might be invalid
+      console.error('Failed to validate session:', error);
+      
+      // * Try refresh as last resort
+      try {
+        const newToken = await refreshAccessToken();
+        if (newToken) {
+          const retryResponse = await api.getCurrentUser();
+          if (retryResponse.success && retryResponse.data) {
+            const normalizedUser = { ...retryResponse.data, role: normalizeUserRole((retryResponse as any)?.data?.role) } as User;
+            return {
+              user: normalizedUser,
+              access_token: newToken,
+            };
+          }
+        }
+      } catch (refreshError) {
+        console.error('Failed to refresh session:', refreshError);
+      }
+      
       return null;
     }
   } catch (error) {

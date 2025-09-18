@@ -170,7 +170,7 @@ export function GroupModal({
           <ModalFooter>
             <Button
               variant="light"
-              onPress={onClose}
+              onClick={onClose}
               isDisabled={isLoading}
             >
               Cancel

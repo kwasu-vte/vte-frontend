@@ -113,28 +113,28 @@ export function GroupsTable({
                   <DropdownItem
                     key="view"
                     startContent={<Eye className="w-4 h-4" />}
-                    onPress={() => onView(group)}
+                    onClick={() => onView(group)}
                   >
                     View Details
                   </DropdownItem>
                   <DropdownItem
                     key="edit"
                     startContent={<Edit className="w-4 h-4" />}
-                    onPress={() => onEdit(group)}
+                    onClick={() => onEdit(group)}
                   >
                     Edit Group
                   </DropdownItem>
                   <DropdownItem
                     key="members"
                     startContent={<Users className="w-4 h-4" />}
-                    onPress={() => onManageMembers(group)}
+                    onClick={() => onManageMembers(group)}
                   >
                     Manage Members
                   </DropdownItem>
                   <DropdownItem
                     key="attendance"
                     startContent={<Calendar className="w-4 h-4" />}
-                    onPress={() => onManageAttendance(group)}
+                    onClick={() => onManageAttendance(group)}
                   >
                     Manage Attendance
                   </DropdownItem>
@@ -143,7 +143,7 @@ export function GroupsTable({
                     className="text-danger"
                     color="danger"
                     startContent={<Trash2 className="w-4 h-4" />}
-                    onPress={() => onDelete(group)}
+                    onClick={() => onDelete(group)}
                   >
                     Delete Group
                   </DropdownItem>

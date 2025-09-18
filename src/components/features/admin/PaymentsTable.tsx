@@ -143,14 +143,14 @@ export function PaymentsTable({
                     <DropdownItem
                       key="view"
                       startContent={<Eye className="w-4 h-4" />}
-                      onPress={() => onView(payment)}
+                      onClick={() => onView(payment)}
                     >
                       View Details
                     </DropdownItem>,
                     <DropdownItem
                       key="edit"
                       startContent={<Edit className="w-4 h-4" />}
-                      onPress={() => onEdit(payment)}
+                      onClick={() => onEdit(payment)}
                     >
                       Edit Payment
                     </DropdownItem>,
@@ -158,7 +158,7 @@ export function PaymentsTable({
                       <DropdownItem
                         key="refund"
                         startContent={<RefreshCw className="w-4 h-4" />}
-                        onPress={() => onProcessRefund(payment)}
+                        onClick={() => onProcessRefund(payment)}
                         className="text-warning"
                       >
                         Process Refund
@@ -169,7 +169,7 @@ export function PaymentsTable({
                       className="text-danger"
                       color="danger"
                       startContent={<Trash2 className="w-4 h-4" />}
-                      onPress={() => onDelete(payment)}
+                      onClick={() => onDelete(payment)}
                     >
                       Delete Payment
                     </DropdownItem>

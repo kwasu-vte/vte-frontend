@@ -23,7 +23,7 @@ export default function AdminMentorsPage() {
 
   const queryClient = useQueryClient();
 
-  // * React Query for data fetching
+  // * React Query for data fetching - only run on client
   const {
     data: mentors,
     isLoading,
@@ -35,6 +35,7 @@ export default function AdminMentorsPage() {
       const response = await api.getUsers({ role: 'Mentor' });
       return response.data;
     },
+    enabled: typeof window !== 'undefined', // * Only enable on client side
   });
 
   // * Create mentor mutation
@@ -154,7 +155,7 @@ export default function AdminMentorsPage() {
         <Button
           color="primary"
           startContent={<Plus className="w-4 h-4" />}
-          onPress={openCreateModal}
+          onClick={openCreateModal}
         >
           Add Mentor
         </Button>
@@ -187,7 +188,7 @@ export default function AdminMentorsPage() {
                   <Button
                     color="primary"
                     startContent={<Plus className="w-4 h-4" />}
-                    onPress={openCreateModal}
+                    onClick={openCreateModal}
                   >
                     Add Mentor
                   </Button>
@@ -257,14 +258,14 @@ export default function AdminMentorsPage() {
           <ModalFooter>
             <Button
               variant="light"
-              onPress={closeModals}
+              onClick={closeModals}
               isDisabled={isSubmitting}
             >
               Cancel
             </Button>
             <Button
               color="danger"
-              onPress={handleDeleteMentor}
+              onClick={handleDeleteMentor}
               isLoading={isSubmitting}
               isDisabled={isSubmitting}
             >

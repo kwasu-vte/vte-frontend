@@ -6,24 +6,25 @@
 
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { StateRenderer, DefaultLoadingComponent, DefaultErrorComponent, DefaultEmptyComponent } from '@/components/shared/StateRenderer';
 import { StudentsTable } from '@/components/features/admin/StudentsTable';
 import { StudentModal } from '@/components/features/admin/StudentModal';
 import { api } from '@/lib/api';
 import { User, CreateUserPayload, UpdateUserPayload } from '@/lib/types';
 import { Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@nextui-org/react';
-import { Plus, AlertTriangle } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
+import { useApp } from '@/context/AppContext';
+import { getErrorMessage, getErrorTitle, getSuccessTitle, getSuccessMessage } from '@/lib/error-handling';
 
 export default function AdminStudentsPage() {
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState<User | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const queryClient = useQueryClient();
+  const { addNotification } = useApp();
 
-  // * React Query for data fetching
+  // * React Query for data fetching - only run on client
   const {
     data: students,
     isLoading,
@@ -32,24 +33,11 @@ export default function AdminStudentsPage() {
   } = useQuery({
     queryKey: ['students'],
     queryFn: async () => {
-      const response = await api.getUsers({ role: 'Student' });
-      return response.data;
+      const response = await api.getStudents();
+      // * Extract items array from paginated response
+      return response.data?.items || [];
     },
-  });
-
-  // * Create student mutation
-  const createStudentMutation = useMutation({
-    mutationFn: async (data: CreateUserPayload) => {
-      const response = await api.createUser(data);
-      return response.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['students'] });
-      setIsCreateModalOpen(false);
-    },
-    onError: (error) => {
-      console.error('Error creating student:', error);
-    },
+    enabled: typeof window !== 'undefined', // * Only enable on client side
   });
 
   // * Update student mutation
@@ -57,42 +45,53 @@ export default function AdminStudentsPage() {
     mutationFn: async (data: UpdateUserPayload) => {
       if (!selectedStudent) throw new Error('No student selected');
       const response = await api.updateUser(selectedStudent.id, data);
-      return response.data;
+      return response;
     },
-    onSuccess: () => {
+    onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ['students'] });
       setIsEditModalOpen(false);
       setSelectedStudent(null);
+      addNotification({
+        type: 'success',
+        title: getSuccessTitle('update', 'student'),
+        message: getSuccessMessage(response, 'The student has been updated successfully.'),
+      });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error('Error updating student:', error);
+      addNotification({
+        type: 'error',
+        title: getErrorTitle('update', 'student'),
+        message: getErrorMessage(error, 'An unexpected error occurred while updating the student.'),
+      });
     },
   });
 
   // * Delete student mutation
   const deleteStudentMutation = useMutation({
     mutationFn: async (studentId: string) => {
-      await api.deleteUser(studentId);
+      const response = await api.deleteUser(studentId);
+      return response;
     },
-    onSuccess: () => {
+    onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ['students'] });
       setIsDeleteModalOpen(false);
       setSelectedStudent(null);
+      addNotification({
+        type: 'success',
+        title: getSuccessTitle('delete', 'student'),
+        message: getSuccessMessage(response, 'The student has been deleted successfully.'),
+      });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error('Error deleting student:', error);
+      addNotification({
+        type: 'error',
+        title: getErrorTitle('delete', 'student'),
+        message: getErrorMessage(error, 'An unexpected error occurred while deleting the student.'),
+      });
     },
   });
-
-  // * Handle create student
-  const handleCreateStudent = async (data: CreateUserPayload | UpdateUserPayload) => {
-    setIsSubmitting(true);
-    try {
-      await createStudentMutation.mutateAsync(data as CreateUserPayload);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
   // * Handle edit student
   const handleEditStudent = async (data: CreateUserPayload | UpdateUserPayload) => {
@@ -115,12 +114,6 @@ export default function AdminStudentsPage() {
     }
   };
 
-  // * Open create modal
-  const openCreateModal = () => {
-    setSelectedStudent(null);
-    setIsCreateModalOpen(true);
-  };
-
   // * Open edit modal
   const openEditModal = (student: User) => {
     setSelectedStudent(student);
@@ -135,7 +128,6 @@ export default function AdminStudentsPage() {
 
   // * Close all modals
   const closeModals = () => {
-    setIsCreateModalOpen(false);
     setIsEditModalOpen(false);
     setIsDeleteModalOpen(false);
     setSelectedStudent(null);
@@ -144,87 +136,33 @@ export default function AdminStudentsPage() {
   return (
     <div className="space-y-6">
       {/* * Page Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-neutral-900">Students Management</h1>
-          <p className="text-neutral-600 mt-1">
-            Manage student accounts and profiles
-          </p>
-        </div>
-        <Button
-          color="primary"
-          startContent={<Plus className="w-4 h-4" />}
-          onPress={openCreateModal}
-        >
-          Add Student
-        </Button>
+      <div>
+        <h1 className="text-3xl font-bold text-neutral-900">Students Management</h1>
+        <p className="text-neutral-600 mt-1">
+          Manage student accounts and profiles
+        </p>
       </div>
 
-      {/* * Students Table with StateRenderer */}
+      {/* * Students Table */}
       <div className="bg-white rounded-lg shadow-sm border border-neutral-200">
-        <StateRenderer
-          data={students}
-          isLoading={isLoading}
-          error={error}
-          loadingComponent={
-            <div className="p-6">
-              <DefaultLoadingComponent />
-            </div>
-          }
-          errorComponent={
-            <div className="p-6">
-              <DefaultErrorComponent 
-                error={error!} 
-                onRetry={() => refetch()} 
-              />
-            </div>
-          }
-          emptyComponent={
-            <div className="p-6">
-              <DefaultEmptyComponent 
-                message="No students found. Add your first student to get started."
-                actionButton={
-                  <Button
-                    color="primary"
-                    startContent={<Plus className="w-4 h-4" />}
-                    onPress={openCreateModal}
-                  >
-                    Add Student
-                  </Button>
-                }
-              />
-            </div>
-          }
-        >
-          {(data) => (
-            <StudentsTable
-              students={data}
-              onEdit={openEditModal}
-              onDelete={openDeleteModal}
-              onView={(student) => {
-                // TODO: Navigate to student details page
-                console.log('View student:', student);
-              }}
-              onManageProfile={(student) => {
-                // TODO: Navigate to student profile management
-                console.log('Manage profile for student:', student);
-              }}
-              onManageEnrollments={(student) => {
-                // TODO: Navigate to student enrollments management
-                console.log('Manage enrollments for student:', student);
-              }}
-            />
-          )}
-        </StateRenderer>
+        <StudentsTable
+          students={students || []}
+          onEdit={openEditModal}
+          onDelete={openDeleteModal}
+          onView={(student) => {
+            // TODO: Navigate to student details page
+            console.log('View student:', student);
+          }}
+          onManageProfile={(student) => {
+            // TODO: Navigate to student profile management
+            console.log('Manage profile for student:', student);
+          }}
+          onManageEnrollments={(student) => {
+            // TODO: Navigate to student enrollments management
+            console.log('Manage enrollments for student:', student);
+          }}
+        />
       </div>
-
-      {/* * Create Student Modal */}
-      <StudentModal
-        isOpen={isCreateModalOpen}
-        onClose={closeModals}
-        onSubmit={handleCreateStudent}
-        isLoading={isSubmitting}
-      />
 
       {/* * Edit Student Modal */}
       <StudentModal
@@ -257,14 +195,14 @@ export default function AdminStudentsPage() {
           <ModalFooter>
             <Button
               variant="light"
-              onPress={closeModals}
+              onClick={closeModals}
               isDisabled={isSubmitting}
             >
               Cancel
             </Button>
             <Button
               color="danger"
-              onPress={handleDeleteStudent}
+              onClick={handleDeleteStudent}
               isLoading={isSubmitting}
               isDisabled={isSubmitting}
             >
@@ -282,7 +220,7 @@ export default function AdminStudentsPage() {
           <p><strong>Error:</strong> {error ? error.message : 'None'}</p>
           <p><strong>Data Count:</strong> {students?.length || 0}</p>
           <p><strong>Query Key:</strong> [&apos;students&apos;]</p>
-          <p><strong>Mutations:</strong> Create: {createStudentMutation.isPending ? 'Pending' : 'Idle'}, Update: {updateStudentMutation.isPending ? 'Pending' : 'Idle'}, Delete: {deleteStudentMutation.isPending ? 'Pending' : 'Idle'}</p>
+          <p><strong>Mutations:</strong> Update: {updateStudentMutation.isPending ? 'Pending' : 'Idle'}, Delete: {deleteStudentMutation.isPending ? 'Pending' : 'Idle'}</p>
         </div>
       </div>
     </div>

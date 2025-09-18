@@ -124,7 +124,7 @@ export function EmptySkillsState({ onCreateSkill }: { onCreateSkill: () => void 
       actionButton={
         <Button
           color="primary"
-          onPress={onCreateSkill}
+          onClick={onCreateSkill}
         >
           Create First Skill
         </Button>
@@ -142,7 +142,7 @@ export function EmptyStudentsState({ onAddStudent }: { onAddStudent: () => void 
       actionButton={
         <Button
           color="primary"
-          onPress={onAddStudent}
+          onClick={onAddStudent}
         >
           Add Students
         </Button>
@@ -160,7 +160,7 @@ export function EmptyGroupsState({ onCreateGroup }: { onCreateGroup: () => void 
       actionButton={
         <Button
           color="primary"
-          onPress={onCreateGroup}
+          onClick={onCreateGroup}
         >
           Create Group
         </Button>
@@ -178,7 +178,7 @@ export function EmptyAttendanceState({ onTakeAttendance }: { onTakeAttendance: (
       actionButton={
         <Button
           color="primary"
-          onPress={onTakeAttendance}
+          onClick={onTakeAttendance}
         >
           Take Attendance
         </Button>
@@ -196,7 +196,7 @@ export function EmptyPaymentsState({ onViewPayments }: { onViewPayments: () => v
       actionButton={
         <Button
           color="primary"
-          onPress={onViewPayments}
+          onClick={onViewPayments}
         >
           View All Payments
         </Button>
@@ -221,7 +221,7 @@ export function EmptySearchState({
       actionButton={
         <Button
           variant="light"
-          onPress={onClearSearch}
+          onClick={onClearSearch}
         >
           Clear Search
         </Button>
@@ -245,7 +245,7 @@ export function EmptyErrorState({
       actionButton={
         <Button
           color="primary"
-          onPress={onRetry}
+          onClick={onRetry}
         >
           Try Again
         </Button>

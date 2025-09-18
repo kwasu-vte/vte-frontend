@@ -34,6 +34,7 @@ export default function MentorMyGroupsPage() {
       const response = await api.getGroups();
       return response.data;
     },
+    enabled: typeof window !== 'undefined', // * Only enable on client side
   });
 
   // * Filter groups for current mentor (placeholder logic)
@@ -151,7 +152,7 @@ export default function MentorMyGroupsPage() {
                   <Button
                     color="primary"
                     startContent={<Users className="w-4 h-4" />}
-                    onPress={() => window.location.href = '/admin/groups'}
+                    onClick={() => window.location.href = '/admin/groups'}
                   >
                     View All Groups
                   </Button>
@@ -188,7 +189,7 @@ export default function MentorMyGroupsPage() {
               <Button
                 color="primary"
                 variant="light"
-                onPress={() => window.location.href = '/mentor/calendar'}
+                onClick={() => window.location.href = '/mentor/calendar'}
               >
                 View Calendar
               </Button>
@@ -209,7 +210,7 @@ export default function MentorMyGroupsPage() {
               <Button
                 color="primary"
                 variant="light"
-                onPress={() => window.location.href = '/mentor/attendance'}
+                onClick={() => window.location.href = '/mentor/attendance'}
               >
                 Take Attendance
               </Button>
@@ -252,13 +253,13 @@ export default function MentorMyGroupsPage() {
           <ModalFooter>
             <Button
               variant="light"
-              onPress={closeModals}
+              onClick={closeModals}
             >
               Close
             </Button>
             <Button
               color="primary"
-              onPress={() => {
+              onClick={() => {
                 closeModals();
                 window.location.href = '/mentor/attendance';
               }}
