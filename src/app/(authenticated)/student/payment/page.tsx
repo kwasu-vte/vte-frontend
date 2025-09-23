@@ -86,7 +86,8 @@ export default function StudentPaymentPage() {
     queryKey: ['payment-skills'],
     queryFn: async () => {
       const response = await api.getSkills();
-      return response.data;
+      // * Extract items from paginated response
+      return response.data?.items || [];
     },
     enabled: typeof window !== 'undefined', // * Only enable on client side
   });

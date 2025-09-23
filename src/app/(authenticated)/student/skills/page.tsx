@@ -5,7 +5,8 @@
 'use client';
 
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useClientQuery } from '@/lib/hooks/useClientQuery';
 import { StateRenderer, DefaultLoadingComponent, DefaultErrorComponent, DefaultEmptyComponent } from '@/components/shared/StateRenderer';
 import { api } from '@/lib/api';
 import { Skill, Group } from '@/lib/types';
@@ -34,13 +35,13 @@ export default function StudentSkillsPage() {
     isLoading: skillsLoading,
     error: skillsError,
     refetch: refetchSkills
-  } = useQuery({
+  } = useClientQuery({
     queryKey: ['available-skills'],
     queryFn: async () => {
       const response = await api.getSkills();
-      return response.data;
+      // * Extract items from paginated response
+      return response.data?.items || [];
     },
-    enabled: typeof window !== 'undefined', // * Only enable on client side
   });
 
   // * React Query for enrolled skills
@@ -49,7 +50,7 @@ export default function StudentSkillsPage() {
     isLoading: enrolledLoading,
     error: enrolledError,
     refetch: refetchEnrolled
-  } = useQuery({
+  } = useClientQuery({
     queryKey: ['enrolled-skills'],
     queryFn: async () => {
       // TODO: Implement student enrolled skills endpoint
@@ -89,7 +90,6 @@ export default function StudentSkillsPage() {
         }
       ] as EnrolledSkill[];
     },
-    enabled: typeof window !== 'undefined', // * Only enable on client side
   });
 
   // * Enroll in skill mutation

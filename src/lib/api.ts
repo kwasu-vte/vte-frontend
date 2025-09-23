@@ -27,13 +27,37 @@ import {
   UpdateSystemConfigPayload,
   LoginPayload,
   ApiResponse,
-  PaginatedResponse
+  PaginatedResponse,
+  // * New API Types
+  Enrollment,
+  CreateEnrollmentPayload,
+  EnrollmentPaymentPayload,
+  EnrollmentPaymentResponse,
+  GroupQrCode,
+  GroupQrCodeBatch,
+  GenerateGroupQrCodePayload,
+  BulkGenerateQrCodePayload,
+  QrScanHistory,
+  AttendanceReport,
+  SkillGroup,
+  CreateSkillGroupPayload,
+  AssignStudentPayload,
+  GroupStatistics,
+  AutoAssignPayload,
+  AutoAssignResponse,
+  MentorProfile,
+  CreateMentorProfilePayload,
+  AssignSkillPayload,
+  RemoveSkillPayload,
+  SkillMentor,
+  ProcessQrScanPayload,
+  QrScanResponse
 } from './types';
 
 // * API Error Class
 export class ApiError extends Error {
-  public status: number;
-  public data?: any;
+  status: number;
+  data?: any;
 
   constructor(message: string, status: number, data?: any) {
     super(message);
@@ -261,140 +285,225 @@ class ApiClient {
     });
   }
 
-  // * Groups Management (Legacy - keeping for backward compatibility)
-  async getGroups(): Promise<ApiResponse<Group[]>> {
-    return this.request('v1/groups');
+  // * Skill Groups Management (New API)
+  async getSkillGroups(params?: { 
+    skill_id?: number; 
+    academic_session_id?: number; 
+    has_capacity?: boolean; 
+    per_page?: number 
+  }): Promise<ApiResponse<PaginatedResponse<SkillGroup>>> {
+    const query = new URLSearchParams();
+    if (params?.skill_id) query.append('skill_id', params.skill_id.toString());
+    if (params?.academic_session_id) query.append('academic_session_id', params.academic_session_id.toString());
+    if (params?.has_capacity !== undefined) query.append('has_capacity', params.has_capacity.toString());
+    if (params?.per_page) query.append('per_page', params.per_page.toString());
+    
+    const queryString = query.toString();
+    return this.request(`v1/skill-groups${queryString ? `?${queryString}` : ''}`);
   }
 
-  async createGroup(groupData: CreateGroupPayload): Promise<ApiResponse<Group>> {
-    return this.request('v1/groups', {
+  async createSkillGroup(groupData: CreateSkillGroupPayload): Promise<ApiResponse<SkillGroup>> {
+    return this.request('v1/skill-groups', {
       method: 'POST',
       body: JSON.stringify(groupData),
     });
   }
 
-  async updateGroup(id: string, groupData: Partial<Group>): Promise<ApiResponse<Group>> {
-    return this.request(`v1/groups/${id}`, {
-      method: 'PATCH',
-      body: JSON.stringify(groupData),
-    });
+  async getSkillGroup(id: number): Promise<ApiResponse<SkillGroup>> {
+    return this.request(`v1/skill-groups/${id}`);
   }
 
-  async deleteGroup(id: string): Promise<void> {
-    return this.request(`v1/groups/${id}`, {
+  async deleteSkillGroup(id: number): Promise<void> {
+    return this.request(`v1/skill-groups/${id}`, {
       method: 'DELETE',
     });
   }
 
-  // * User Management (Legacy - keeping for backward compatibility)
-  async getStudents(): Promise<ApiResponse<User[]>> {
+  async assignStudentToGroup(groupId: number, data: AssignStudentPayload): Promise<ApiResponse<{ group: SkillGroup; enrollment_id: string }>> {
+    return this.request(`v1/skill-groups/${groupId}/assign-student`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async removeStudentFromGroup(groupId: number, enrollmentId: number): Promise<ApiResponse<{ group: SkillGroup; enrollment_id: string }>> {
+    return this.request(`v1/skill-groups/${groupId}/remove-student?enrollment_id=${enrollmentId}`, {
+      method: 'DELETE',
+    });
+  }
+
+  async getGroupStatistics(params?: { skill_id?: number; academic_session_id?: number }): Promise<ApiResponse<GroupStatistics>> {
+    const query = new URLSearchParams();
+    if (params?.skill_id) query.append('skill_id', params.skill_id.toString());
+    if (params?.academic_session_id) query.append('academic_session_id', params.academic_session_id.toString());
+    
+    const queryString = query.toString();
+    return this.request(`v1/skill-groups/statistics/overview${queryString ? `?${queryString}` : ''}`);
+  }
+
+  // * Student Management
+  async getStudents(): Promise<ApiResponse<PaginatedResponse<StudentProfile>>> {
     return this.request('v1/users/students');
   }
 
-  async getMentors(): Promise<ApiResponse<User[]>> {
-    return this.request('v1/users/mentors');
+  async getStudentProfile(userId: string): Promise<ApiResponse<StudentProfile>> {
+    return this.request(`v1/users/${userId}/student`);
   }
 
-  async getUsers(params?: { role?: string }): Promise<ApiResponse<User[]>> {
-    const query = params?.role ? `?role=${params.role}` : '';
-    return this.request(`v1/users${query}`);
+  async getAvailableSkills(userId: string): Promise<ApiResponse<Skill[]>> {
+    return this.request(`v1/users/${userId}/student/available-skills`);
   }
 
-  async createUser(userData: CreateUserPayload): Promise<ApiResponse<User>> {
-    return this.request('v1/users', {
-      method: 'POST',
-      body: JSON.stringify(userData),
-    });
+  // * Enrollment Management
+  async getEnrollment(userId: string): Promise<ApiResponse<Enrollment | null>> {
+    return this.request(`v1/users/${userId}/enrollment`);
   }
 
-  async updateUser(id: string, userData: Partial<CreateUserPayload>): Promise<ApiResponse<User>> {
-    return this.request(`v1/users/${id}`, {
-      method: 'PATCH',
-      body: JSON.stringify(userData),
-    });
-  }
-
-  async deleteUser(id: string): Promise<void> {
-    return this.request(`v1/users/${id}`, {
-      method: 'DELETE',
-    });
-  }
-
-  // * Payments (Legacy - keeping for backward compatibility)
-  async getPayments(): Promise<ApiResponse<Payment[]>> {
-    return this.request('v1/payments');
-  }
-
-  // * Attendance Management
-  async getAttendanceRecords(): Promise<ApiResponse<AttendanceRecord[]>> {
-    return this.request('v1/attendance');
-  }
-
-  async createAttendanceRecord(data: CreateAttendanceRecordPayload): Promise<ApiResponse<AttendanceRecord>> {
-    return this.request('v1/attendance', {
+  async createEnrollment(userId: string, data: CreateEnrollmentPayload): Promise<ApiResponse<Enrollment>> {
+    return this.request(`v1/users/${userId}/enrollment`, {
       method: 'POST',
       body: JSON.stringify(data),
     });
   }
 
-  async updateAttendanceRecord(id: string, data: UpdateAttendanceRecordPayload): Promise<ApiResponse<AttendanceRecord>> {
-    return this.request(`v1/attendance/${id}`, {
-      method: 'PATCH',
-      body: JSON.stringify(data),
+  async payForEnrollment(userId: string, data?: EnrollmentPaymentPayload): Promise<ApiResponse<EnrollmentPaymentResponse>> {
+    return this.request(`v1/users/${userId}/enrollment/pay`, {
+      method: 'POST',
+      body: JSON.stringify(data || {}),
     });
   }
 
-  async deleteAttendanceRecord(id: string): Promise<void> {
-    return this.request(`v1/attendance/${id}`, {
-      method: 'DELETE',
-    });
+  async getAllEnrollments(params?: { 
+    academic_session_id?: number; 
+    skill_id?: string; 
+    per_page?: number 
+  }): Promise<ApiResponse<PaginatedResponse<Enrollment>>> {
+    const query = new URLSearchParams();
+    if (params?.academic_session_id) query.append('academic_session_id', params.academic_session_id.toString());
+    if (params?.skill_id) query.append('skill_id', params.skill_id);
+    if (params?.per_page) query.append('per_page', params.per_page.toString());
+    
+    const queryString = query.toString();
+    return this.request(`v1/enrollments${queryString ? `?${queryString}` : ''}`);
   }
 
+  async getEnrollmentById(enrollmentId: number): Promise<ApiResponse<Enrollment>> {
+    return this.request(`v1/enrollments/${enrollmentId}`);
+  }
 
-  // * Payment Management
-  async createPayment(data: CreatePaymentPayload): Promise<ApiResponse<Payment>> {
-    return this.request('v1/payments', {
+  // * QR Code Management
+  async generateGroupQrCodes(groupId: number, data: GenerateGroupQrCodePayload): Promise<ApiResponse<GroupQrCodeBatch>> {
+    return this.request(`v1/qr-codes/groups/${groupId}/generate`, {
       method: 'POST',
       body: JSON.stringify(data),
     });
   }
 
-  async updatePayment(id: string, data: UpdatePaymentPayload): Promise<ApiResponse<Payment>> {
-    return this.request(`v1/payments/${id}`, {
-      method: 'PATCH',
+  async bulkGenerateQrCodes(data: BulkGenerateQrCodePayload): Promise<ApiResponse<{ estimated_completion: string }>> {
+    return this.request('v1/qr-codes/bulk-generate', {
+      method: 'POST',
       body: JSON.stringify(data),
     });
   }
 
-  async deletePayment(id: string): Promise<void> {
-    return this.request(`v1/payments/${id}`, {
-      method: 'DELETE',
-    });
+  async getQrScanHistory(qrToken: string, perPage?: number): Promise<ApiResponse<QrScanHistory>> {
+    const query = perPage ? `?per_page=${perPage}` : '';
+    return this.request(`v1/qr-codes/scan-history/${qrToken}${query}`);
   }
 
-  // * System Configuration (Legacy - keeping for backward compatibility)
-  async getSystemConfig(): Promise<ApiResponse<SystemConfig>> {
-    return this.request('v1/system/config');
+  async getGroupAttendanceReport(groupId: number): Promise<ApiResponse<AttendanceReport>> {
+    return this.request(`v1/qr-codes/groups/${groupId}/attendance-report`);
   }
 
-  async updateSystemConfig(config: Partial<SystemConfig>): Promise<ApiResponse<SystemConfig>> {
-    return this.request('v1/system/config', {
-      method: 'PATCH',
-      body: JSON.stringify(config),
-    });
+  async listGroupQrCodes(groupId: number, params?: { 
+    per_page?: number; 
+    status?: 'active' | 'expired' | 'all' 
+  }): Promise<ApiResponse<PaginatedResponse<GroupQrCode>>> {
+    const query = new URLSearchParams();
+    if (params?.per_page) query.append('per_page', params.per_page.toString());
+    if (params?.status) query.append('status', params.status);
+    
+    const queryString = query.toString();
+    return this.request(`v1/qr-codes/groups/${groupId}/list${queryString ? `?${queryString}` : ''}`);
   }
 
-  // * Payment Methods
-  async makePayment({ course, specialization }: { course: string, specialization: string | null }): Promise<ApiResponse<{ authorization_url: string }>> {
-    return this.request('v1/payments/initiate', {
+  // * Attendance Scanning
+  async processQrScan(data: ProcessQrScanPayload): Promise<ApiResponse<QrScanResponse>> {
+    return this.request('v1/attendance/scan', {
       method: 'POST',
-      body: JSON.stringify({ course, specialization }),
+      body: JSON.stringify(data),
     });
   }
 
-  async activateCourse({ reference }: { reference: string }): Promise<ApiResponse<{ msg: string }>> {
-    return this.request(`v1/payments/verify?reference=${reference}`, {
-      method: 'GET',
+  // * Mentor Management
+  async getMentors(params?: { 
+    search?: string; 
+    specialization?: string; 
+    is_available?: string; 
+    is_active?: string; 
+    per_page?: string 
+  }): Promise<ApiResponse<MentorProfile[]>> {
+    const query = new URLSearchParams();
+    if (params?.search) query.append('search', params.search);
+    if (params?.specialization) query.append('specialization', params.specialization);
+    if (params?.is_available) query.append('is_available', params.is_available);
+    if (params?.is_active) query.append('is_active', params.is_active);
+    if (params?.per_page) query.append('per_page', params.per_page);
+    
+    const queryString = query.toString();
+    return this.request(`v1/mentors${queryString ? `?${queryString}` : ''}`);
+  }
+
+  async createMentor(data: CreateMentorProfilePayload): Promise<ApiResponse<{ user: string; profile: MentorProfile }>> {
+    return this.request('v1/mentors', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async assignSkillToMentor(mentorProfileId: number, data: AssignSkillPayload): Promise<ApiResponse<SkillMentor>> {
+    return this.request(`v1/mentors/${mentorProfileId}/assign-skill`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async removeSkillFromMentor(mentorProfileId: number, data: RemoveSkillPayload): Promise<ApiResponse<string>> {
+    return this.request(`v1/mentors/${mentorProfileId}/remove-skill`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async getMentorProfile(userId: string): Promise<ApiResponse<MentorProfile>> {
+    return this.request(`v1/${userId}/mentors`);
+  }
+
+  async getMentorAssignedSkills(userId: string): Promise<ApiResponse<Skill[]>> {
+    return this.request(`v1/${userId}/mentors/get-assigned-skills`);
+  }
+
+  async getMentorSkillGroups(userId: string): Promise<ApiResponse<SkillGroup[]>> {
+    return this.request(`v1/${userId}/mentors/get-skill-groups`);
+  }
+
+  // * Skills Extended Management
+  async getGroupsBySkill(skillId: string, params?: { 
+    academic_session_id?: number; 
+    include_full?: boolean 
+  }): Promise<ApiResponse<SkillGroup[]>> {
+    const query = new URLSearchParams();
+    if (params?.academic_session_id) query.append('academic_session_id', params.academic_session_id.toString());
+    if (params?.include_full !== undefined) query.append('include_full', params.include_full.toString());
+    
+    const queryString = query.toString();
+    return this.request(`v1/skills/${skillId}/groups${queryString ? `?${queryString}` : ''}`);
+  }
+
+  async autoAssignStudentsToGroups(skillId: string, data: AutoAssignPayload): Promise<ApiResponse<AutoAssignResponse>> {
+    return this.request(`v1/skills/${skillId}/groups/auto-assign`, {
+      method: 'POST',
+      body: JSON.stringify(data),
     });
   }
 }

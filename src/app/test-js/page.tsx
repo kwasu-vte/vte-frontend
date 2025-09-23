@@ -69,7 +69,7 @@ export default function TestJSPage() {
         <ul>
           <li>If the buttons work, JavaScript is functioning</li>
           <li>Check browser console for any errors</li>
-          <li>If buttons don't work, there's a fundamental issue</li>
+          <li>If buttons don&apos;t work, there&apos;s a fundamental issue</li>
         </ul>
       </div>
     </div>

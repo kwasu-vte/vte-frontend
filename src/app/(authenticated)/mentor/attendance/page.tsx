@@ -5,7 +5,8 @@
 'use client';
 
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useClientQuery } from '@/lib/hooks/useClientQuery';
 import { StateRenderer, DefaultLoadingComponent, DefaultErrorComponent, DefaultEmptyComponent } from '@/components/shared/StateRenderer';
 import { api } from '@/lib/api';
 import { Group, AttendanceRecord, CreateAttendanceRecordPayload } from '@/lib/types';
@@ -44,7 +45,7 @@ export default function MentorAttendancePage() {
     isLoading,
     error,
     refetch
-  } = useQuery({
+  } = useClientQuery({
     queryKey: ['mentor-attendance-sessions'],
     queryFn: async () => {
       // TODO: Implement mentor attendance sessions endpoint
@@ -93,7 +94,6 @@ export default function MentorAttendancePage() {
         }
       ] as AttendanceSession[];
     },
-    enabled: typeof window !== 'undefined', // * Only enable on client side
   });
 
   // * Create attendance mutation

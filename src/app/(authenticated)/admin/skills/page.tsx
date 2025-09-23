@@ -5,7 +5,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useClientQuery } from '@/lib/hooks/useClientQuery';
 import { StateRenderer, DefaultLoadingComponent, DefaultErrorComponent, DefaultEmptyComponent } from '@/components/shared/StateRenderer';
 import { SkillsTable } from '@/components/features/admin/SkillsTable';
 import { SkillModal } from '@/components/features/admin/SkillModal';
@@ -35,13 +36,13 @@ export default function AdminSkillsPage() {
     isLoading,
     error,
     refetch
-  } = useQuery({
+  } = useClientQuery({
     queryKey: ['skills'],
     queryFn: async () => {
       const response = await api.getSkills();
-      return response.data;
+      // * Extract items from paginated response
+      return response.data?.items || [];
     },
-    enabled: typeof window !== 'undefined', // * Only enable on client side
   });
 
   // * Create skill mutation

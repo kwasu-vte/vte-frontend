@@ -5,7 +5,8 @@
 'use client';
 
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useClientQuery } from '@/lib/hooks/useClientQuery';
 import { StateRenderer, DefaultLoadingComponent, DefaultErrorComponent, DefaultEmptyComponent } from '@/components/shared/StateRenderer';
 import { GroupsTable } from '@/components/features/admin/GroupsTable';
 import { api } from '@/lib/api';
@@ -26,15 +27,15 @@ export default function MentorMyGroupsPage() {
     isLoading,
     error,
     refetch
-  } = useQuery({
+  } = useClientQuery({
     queryKey: ['mentor-groups'],
     queryFn: async () => {
       // TODO: Implement mentor-specific groups endpoint
       // For now, get all groups and filter client-side
       const response = await api.getGroups();
-      return response.data;
+      // * Extract items from paginated response
+      return response.data?.items || [];
     },
-    enabled: typeof window !== 'undefined', // * Only enable on client side
   });
 
   // * Filter groups for current mentor (placeholder logic)

@@ -34,12 +34,14 @@ export function StateRenderer<T>({
     return <>{errorComponent}</>;
   }
 
-  // * State 3: Empty
-  if (!data || (Array.isArray(data) && data.length === 0)) {
+  // * State 3: Empty - Only show empty state for explicitly empty arrays
+  // * Don't show empty state for undefined data (which happens during initial load)
+  if (Array.isArray(data) && data.length === 0) {
     return <>{emptyComponent}</>;
   }
 
-  // * State 4: Success - Render the data
+  // * State 4: Success - Render the data (including undefined/null data)
+  // * Let the child component handle undefined/null data gracefully
   return children(data as NonNullable<T>);
 }
 

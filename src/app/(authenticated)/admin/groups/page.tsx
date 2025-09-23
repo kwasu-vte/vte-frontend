@@ -33,7 +33,8 @@ export default function AdminGroupsPage() {
     queryKey: ['groups'],
     queryFn: async () => {
       const response = await api.getGroups();
-      return response.data;
+      // * Extract items from paginated response
+      return response.data?.items || [];
     },
     enabled: typeof window !== 'undefined', // * Only enable on client side
   });

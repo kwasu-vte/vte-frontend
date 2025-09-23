@@ -33,7 +33,8 @@ export default function AdminMentorsPage() {
     queryKey: ['mentors'],
     queryFn: async () => {
       const response = await api.getUsers({ role: 'Mentor' });
-      return response.data;
+      // * Extract items from paginated response
+      return response.data?.items || [];
     },
     enabled: typeof window !== 'undefined', // * Only enable on client side
   });

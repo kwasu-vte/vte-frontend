@@ -15,29 +15,38 @@ export async function signInAction(formData: FormData) {
   const username = formData.get('username') as string;
   const password = formData.get('password') as string;
   
+  console.log(`[SignIn Action] Attempting login for user: ${username}`);
+  
   if (!username || !password) {
+    console.error('[SignIn Action] Missing username or password');
     throw new Error('Username and password are required');
   }
 
   let target: string | null = null;
   let token: string | null = null;
   try {
+    console.log('[SignIn Action] Calling API signIn...');
     const response = await api.signIn({ email: username, password });
     
     if (!response.success) {
+      console.error(`[SignIn Action] API signIn failed: ${response.message}`);
       throw new Error(response.message || 'Authentication failed');
     }
 
+    console.log('[SignIn Action] API signIn successful, getting user data...');
     // * Get token from response; cookie will be set via /auth/callback (browser route)
     token = (response as any)?.data?.access_token || null;
     const me = token ? await api.getCurrentUserWithToken(token) : await api.getCurrentUser();
     if (!me.success || !me.data) {
+      console.error(`[SignIn Action] Failed to get user data: ${me.message}`);
       throw new Error(me.message || 'Failed to fetch user after login');
     }
 
     const role = String(me.data.role || '').toLowerCase();
     target = role === 'admin' || role === 'mentor' || role === 'student' ? `/${role}/dashboard` : '/';
+    console.log(`[SignIn Action] User role: ${role}, target: ${target}`);
   } catch (error) {
+    console.error('[SignIn Action] Error during authentication:', error);
     // Fallback for legacy/edge cases of redirect signals
     if ((error as any)?.digest === 'NEXT_REDIRECT' || String((error as any)?.message || '').includes('NEXT_REDIRECT')) {
       throw error as Error;
@@ -45,11 +54,16 @@ export async function signInAction(formData: FormData) {
     throw new Error(error instanceof Error ? error.message : 'Authentication failed');
   }
 
-  if (target) {
+  if (target && token) {
     const params = new URLSearchParams();
-    if (token) params.set('token', token);
+    params.set('token', token);
     params.set('target', target);
-    redirect(`/auth/callback?${params.toString()}`);
+    const callbackUrl = `/auth/callback?${params.toString()}`;
+    console.log(`[SignIn Action] Redirecting to callback: ${callbackUrl}`);
+    redirect(callbackUrl);
+  } else {
+    console.error('[SignIn Action] Missing target or token, cannot redirect');
+    throw new Error('Authentication completed but redirect failed');
   }
 }
 
