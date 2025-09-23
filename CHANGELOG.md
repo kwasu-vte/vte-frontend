@@ -1,8 +1,15 @@
 ## [Unreleased]
 
+### Added
+- Split monolithic `src/lib/api.ts` into domain-specific services under `src/lib/api/`
+  - Added: `academic-sessions.ts`, `enrollments.ts`, `qr-codes.ts`, `skill-groups.ts`, `mentors.ts`, `students.ts`
+  - Added: shared `base.ts` and `index.ts`
+- Introduced new types modules under `src/lib/types/`
+  - Added: `api-types.ts`, `enrollment-types.ts`, `qr-types.ts`, `group-types.ts`, `index.ts` (re-exports)
+
 ### Changed
 - Admin Groups page is now read-only; removed create/edit/delete UI and mutations.
- - Added Admin Sessions page under `/admin/sessions` for session management.
+- Added Admin Sessions page under `/admin/sessions` for session management.
 
 ### Planned
 - Admin Sessions page for managing academic sessions.

@@ -4,14 +4,18 @@
 
 'use client';
 
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { StateRenderer, DefaultLoadingComponent, DefaultErrorComponent, DefaultEmptyComponent } from '@/components/shared/StateRenderer';
 import { GroupsTable } from '@/components/features/admin/GroupsTable';
 import { api } from '@/lib/api';
-import { Button } from '@nextui-org/react';
+import { Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@nextui-org/react';
 import { Eye } from 'lucide-react';
+import type { Group } from '@/lib/types';
 
 export default function AdminGroupsPage() {
+  const [viewGroup, setViewGroup] = useState<Group | null>(null);
+  const [isViewOpen, setIsViewOpen] = useState(false);
 
   // * React Query for data fetching - only run on client
   const {
@@ -29,10 +33,14 @@ export default function AdminGroupsPage() {
     enabled: typeof window !== 'undefined', // * Only enable on client side
   });
 
-  // * Read-only page: only view navigation handlers
-  const handleView = (groupId: string) => {
-    // TODO: Navigate to admin skill group detail page when available
-    console.log('View group', groupId);
+  // * Read-only view: open details modal
+  const handleView = (group: Group) => {
+    setViewGroup(group);
+    setIsViewOpen(true);
+  };
+  const closeView = () => {
+    setIsViewOpen(false);
+    setViewGroup(null);
   };
 
   return (
@@ -77,7 +85,7 @@ export default function AdminGroupsPage() {
           {(data) => (
             <GroupsTable
               groups={data}
-              onView={(group) => handleView(group.id)}
+              onView={(group) => handleView(group)}
             />
           )}
         </StateRenderer>
@@ -94,6 +102,70 @@ export default function AdminGroupsPage() {
           <p><strong>Mode:</strong> Read-only</p>
         </div>
       </div>
+
+      {/* * View Group Modal (read-only) */}
+      <Modal isOpen={isViewOpen} onClose={closeView} size="lg" scrollBehavior="inside">
+        <ModalContent>
+          <ModalHeader className="flex flex-col gap-1">
+            <div className="flex items-center gap-2">
+              <Eye className="w-5 h-5 text-blue-500" />
+              <h2 className="text-lg font-semibold">Group Details</h2>
+            </div>
+          </ModalHeader>
+          <ModalBody>
+            {viewGroup && (
+              <div className="space-y-4">
+                <div className="bg-neutral-50 p-4 rounded-lg">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                    <div>
+                      <span className="text-neutral-600">Name:</span>
+                      <span className="ml-2 font-medium">{viewGroup.name}</span>
+                    </div>
+                    <div>
+                      <span className="text-neutral-600">ID:</span>
+                      <span className="ml-2 font-medium">{viewGroup.id}</span>
+                    </div>
+                    <div>
+                      <span className="text-neutral-600">Skill:</span>
+                      <span className="ml-2 font-medium">{viewGroup.skill.title}</span>
+                    </div>
+                    <div>
+                      <span className="text-neutral-600">Mentor:</span>
+                      <span className="ml-2 font-medium">{viewGroup.mentor ? `${viewGroup.mentor.first_name} ${viewGroup.mentor.last_name}` : '—'}</span>
+                    </div>
+                    <div>
+                      <span className="text-neutral-600">Created:</span>
+                      <span className="ml-2 font-medium">{viewGroup.creation_date}</span>
+                    </div>
+                    <div>
+                      <span className="text-neutral-600">Ends:</span>
+                      <span className="ml-2 font-medium">{viewGroup.end_date}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="font-medium text-neutral-900 mb-2">Members ({viewGroup.members?.length || 0})</h3>
+                  <div className="space-y-2">
+                    {(viewGroup.members || []).map((m) => (
+                      <div key={m.id} className="flex items-center justify-between text-sm bg-white border border-neutral-200 rounded p-2">
+                        <span className="font-medium text-neutral-900">{m.first_name} {m.last_name}</span>
+                        <span className="text-neutral-500">{m.id}</span>
+                      </div>
+                    ))}
+                    {(!viewGroup.members || viewGroup.members.length === 0) && (
+                      <div className="text-sm text-neutral-500 italic">No members yet.</div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="light" onClick={closeView}>Close</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </div>
   );
 }
