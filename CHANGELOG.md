@@ -6,6 +6,13 @@
   - Added: shared `base.ts` and `index.ts`
 - Introduced new types modules under `src/lib/types/`
   - Added: `api-types.ts`, `enrollment-types.ts`, `qr-types.ts`, `group-types.ts`, `index.ts` (re-exports)
+- Scaffolded components with TODOs:
+  - Admin: `SessionsTable`, `SessionModal`, `SessionStatusBadge`, `SkillDateRangeModal`, `SkillLevelSelector`, `GroupCapacityIndicator`, `GroupStudentsList`, `EnrollmentsTable`, `EnrollmentStatusBadge`, `EnrollmentFilters`, `QRGenerationForm`, `QRDistributionTracker`, `MentorQRAssignment`
+  - Mentor: `MentorSkillAssignment`, `MentorWorkloadView`, `MyQRCodesDisplay`, `QRScanReport`, `PracticalQRCard`, `MentorGroupsList`, `GroupStudentsRoster`, `GroupScheduleCard`
+  - Student: `StudentQRScanner`, `ScanResultModal`, `ScanProgressIndicator`, `ScanConfirmationModal`, `AttendanceCompletionBadge`, `AttendanceReport`, `ManualAttendance`, `ProfileForm`, `ProfileView`, `ProfileCompletionAlert`, `SkillSelectionGrid`, `EnrollmentStatus`, `PaymentRedirect`, `GroupAssignmentCard`, `PracticalCalendar`, `UpcomingPracticals`
+- Added utility placeholders under `src/lib/utils/`: `print.ts`, `qr.ts`, `attendance.ts`, `enrollment.ts`, `groups.ts`, `dates.ts`
+- Added contexts: `src/context/SessionContext.tsx`, `src/context/EnrollmentContext.tsx`
+- Added Zustand stores: `src/lib/stores/sessionStore.ts`, `enrollmentStore.ts`, `groupStore.ts`, `qrStore.ts`
 
 ### Changed
 - Admin Groups page is now read-only; removed create/edit/delete UI and mutations.
