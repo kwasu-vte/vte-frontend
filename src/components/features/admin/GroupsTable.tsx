@@ -10,11 +10,11 @@ import { MoreVertical, Edit, Trash2, Eye, Users, Calendar } from 'lucide-react';
 
 interface GroupsTableProps {
   groups: Group[];
-  onEdit: (group: Group) => void;
-  onDelete: (group: Group) => void;
-  onView: (group: Group) => void;
-  onManageMembers: (group: Group) => void;
-  onManageAttendance: (group: Group) => void;
+  onView?: (group: Group) => void;
+  onEdit?: (group: Group) => void;
+  onDelete?: (group: Group) => void;
+  onManageMembers?: (group: Group) => void;
+  onManageAttendance?: (group: Group) => void;
 }
 
 export function GroupsTable({
@@ -110,43 +110,53 @@ export function GroupsTable({
                   </Button>
                 </DropdownTrigger>
                 <DropdownMenu aria-label="Group actions">
-                  <DropdownItem
-                    key="view"
-                    startContent={<Eye className="w-4 h-4" />}
-                    onClick={() => onView(group)}
-                  >
-                    View Details
-                  </DropdownItem>
-                  <DropdownItem
-                    key="edit"
-                    startContent={<Edit className="w-4 h-4" />}
-                    onClick={() => onEdit(group)}
-                  >
-                    Edit Group
-                  </DropdownItem>
-                  <DropdownItem
-                    key="members"
-                    startContent={<Users className="w-4 h-4" />}
-                    onClick={() => onManageMembers(group)}
-                  >
-                    Manage Members
-                  </DropdownItem>
-                  <DropdownItem
-                    key="attendance"
-                    startContent={<Calendar className="w-4 h-4" />}
-                    onClick={() => onManageAttendance(group)}
-                  >
-                    Manage Attendance
-                  </DropdownItem>
-                  <DropdownItem
-                    key="delete"
-                    className="text-danger"
-                    color="danger"
-                    startContent={<Trash2 className="w-4 h-4" />}
-                    onClick={() => onDelete(group)}
-                  >
-                    Delete Group
-                  </DropdownItem>
+                  {onView && (
+                    <DropdownItem
+                      key="view"
+                      startContent={<Eye className="w-4 h-4" />}
+                      onClick={() => onView(group)}
+                    >
+                      View Details
+                    </DropdownItem>
+                  )}
+                  {onEdit && (
+                    <DropdownItem
+                      key="edit"
+                      startContent={<Edit className="w-4 h-4" />}
+                      onClick={() => onEdit(group)}
+                    >
+                      Edit Group
+                    </DropdownItem>
+                  )}
+                  {onManageMembers && (
+                    <DropdownItem
+                      key="members"
+                      startContent={<Users className="w-4 h-4" />}
+                      onClick={() => onManageMembers(group)}
+                    >
+                      Manage Members
+                    </DropdownItem>
+                  )}
+                  {onManageAttendance && (
+                    <DropdownItem
+                      key="attendance"
+                      startContent={<Calendar className="w-4 h-4" />}
+                      onClick={() => onManageAttendance(group)}
+                    >
+                      Manage Attendance
+                    </DropdownItem>
+                  )}
+                  {onDelete && (
+                    <DropdownItem
+                      key="delete"
+                      className="text-danger"
+                      color="danger"
+                      startContent={<Trash2 className="w-4 h-4" />}
+                      onClick={() => onDelete(group)}
+                    >
+                      Delete Group
+                    </DropdownItem>
+                  )}
                 </DropdownMenu>
               </Dropdown>
             </TableCell>

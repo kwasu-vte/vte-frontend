@@ -1,3 +1,19 @@
+## [Unreleased]
+
+### Changed
+- Admin Groups page is now read-only; removed create/edit/delete UI and mutations.
+ - Added Admin Sessions page under `/admin/sessions` for session management.
+
+### Planned
+- Admin Sessions page for managing academic sessions.
+- Admin Skills: add date range management and nested routes (`[skillId]/page`, `groups/page`, `date-range/page`).
+- Mentor: rename `my-groups` to `my-skills`, add groups pages, rename `calendar` to `schedule`.
+  - Implemented: `mentor/calendar` → `mentor/schedule` route rename.
+  - Implemented: `mentor/my-groups` → `mentor/my-skills` route rename.
+- Mentor Attendance: restructure into QR scanner flow and group detail attendance.
+- Admin: add `enrollments` page; add `qr-codes` pages (list, print, history).
+- Student: add `profile` (view/create), restructure `skills` and add `skills/enroll`, add `enrollment` status page, simplify `my-group`, add `schedule`, make `payment` a redirect.
+- Remove deprecated pages later (but keep announcements pages for now).
 # Changelog
 
 ## 2025-09-18

@@ -4,24 +4,14 @@
 
 'use client';
 
-import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { StateRenderer, DefaultLoadingComponent, DefaultErrorComponent, DefaultEmptyComponent } from '@/components/shared/StateRenderer';
 import { GroupsTable } from '@/components/features/admin/GroupsTable';
-import { GroupModal } from '@/components/features/admin/GroupModal';
 import { api } from '@/lib/api';
-import { Group, CreateGroupPayload } from '@/lib/types';
-import { Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@nextui-org/react';
-import { Plus, AlertTriangle } from 'lucide-react';
+import { Button } from '@nextui-org/react';
+import { Eye } from 'lucide-react';
 
 export default function AdminGroupsPage() {
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const queryClient = useQueryClient();
 
   // * React Query for data fetching - only run on client
   const {
@@ -39,108 +29,10 @@ export default function AdminGroupsPage() {
     enabled: typeof window !== 'undefined', // * Only enable on client side
   });
 
-  // * Create group mutation
-  const createGroupMutation = useMutation({
-    mutationFn: async (data: CreateGroupPayload) => {
-      const response = await api.createGroup(data);
-      return response.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['groups'] });
-      setIsCreateModalOpen(false);
-    },
-    onError: (error) => {
-      console.error('Error creating group:', error);
-    },
-  });
-
-  // * Update group mutation
-  const updateGroupMutation = useMutation({
-    mutationFn: async (data: Partial<Group>) => {
-      if (!selectedGroup) throw new Error('No group selected');
-      const response = await api.updateGroup(selectedGroup.id, data);
-      return response.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['groups'] });
-      setIsEditModalOpen(false);
-      setSelectedGroup(null);
-    },
-    onError: (error) => {
-      console.error('Error updating group:', error);
-    },
-  });
-
-  // * Delete group mutation
-  const deleteGroupMutation = useMutation({
-    mutationFn: async (groupId: string) => {
-      await api.deleteGroup(groupId);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['groups'] });
-      setIsDeleteModalOpen(false);
-      setSelectedGroup(null);
-    },
-    onError: (error) => {
-      console.error('Error deleting group:', error);
-    },
-  });
-
-  // * Handle create group
-  const handleCreateGroup = async (data: CreateGroupPayload | Partial<Group>) => {
-    setIsSubmitting(true);
-    try {
-      await createGroupMutation.mutateAsync(data as CreateGroupPayload);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  // * Handle edit group
-  const handleEditGroup = async (data: CreateGroupPayload | Partial<Group>) => {
-    setIsSubmitting(true);
-    try {
-      await updateGroupMutation.mutateAsync(data as Partial<Group>);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  // * Handle delete group
-  const handleDeleteGroup = async () => {
-    if (!selectedGroup) return;
-    setIsSubmitting(true);
-    try {
-      await deleteGroupMutation.mutateAsync(selectedGroup.id);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  // * Open create modal
-  const openCreateModal = () => {
-    setSelectedGroup(null);
-    setIsCreateModalOpen(true);
-  };
-
-  // * Open edit modal
-  const openEditModal = (group: Group) => {
-    setSelectedGroup(group);
-    setIsEditModalOpen(true);
-  };
-
-  // * Open delete modal
-  const openDeleteModal = (group: Group) => {
-    setSelectedGroup(group);
-    setIsDeleteModalOpen(true);
-  };
-
-  // * Close all modals
-  const closeModals = () => {
-    setIsCreateModalOpen(false);
-    setIsEditModalOpen(false);
-    setIsDeleteModalOpen(false);
-    setSelectedGroup(null);
+  // * Read-only page: only view navigation handlers
+  const handleView = (groupId: string) => {
+    // TODO: Navigate to admin skill group detail page when available
+    console.log('View group', groupId);
   };
 
   return (
@@ -148,18 +40,11 @@ export default function AdminGroupsPage() {
       {/* * Page Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-neutral-900">Groups Management</h1>
+          <h1 className="text-3xl font-bold text-neutral-900">Groups</h1>
           <p className="text-neutral-600 mt-1">
-            Manage student groups and enrollments
+            View groups and their status. Creation and editing are disabled.
           </p>
         </div>
-        <Button
-          color="primary"
-          startContent={<Plus className="w-4 h-4" />}
-          onClick={openCreateModal}
-        >
-          Create Group
-        </Button>
       </div>
 
       {/* * Groups Table with StateRenderer */}
@@ -184,16 +69,7 @@ export default function AdminGroupsPage() {
           emptyComponent={
             <div className="p-6">
               <DefaultEmptyComponent 
-                message="No groups found. Create your first group to get started."
-                actionButton={
-                  <Button
-                    color="primary"
-                    startContent={<Plus className="w-4 h-4" />}
-                    onClick={openCreateModal}
-                  >
-                    Create Group
-                  </Button>
-                }
+                message="No groups found."
               />
             </div>
           }
@@ -201,80 +77,11 @@ export default function AdminGroupsPage() {
           {(data) => (
             <GroupsTable
               groups={data}
-              onEdit={openEditModal}
-              onDelete={openDeleteModal}
-              onView={(group) => {
-                // TODO: Navigate to group details page
-                console.log('View group:', group);
-              }}
-              onManageMembers={(group) => {
-                // TODO: Navigate to members management for this group
-                console.log('Manage members for group:', group);
-              }}
-              onManageAttendance={(group) => {
-                // TODO: Navigate to attendance management for this group
-                console.log('Manage attendance for group:', group);
-              }}
+              onView={(group) => handleView(group.id)}
             />
           )}
         </StateRenderer>
       </div>
-
-      {/* * Create Group Modal */}
-      <GroupModal
-        isOpen={isCreateModalOpen}
-        onClose={closeModals}
-        onSubmit={handleCreateGroup}
-        isLoading={isSubmitting}
-      />
-
-      {/* * Edit Group Modal */}
-      <GroupModal
-        isOpen={isEditModalOpen}
-        onClose={closeModals}
-        onSubmit={handleEditGroup}
-        group={selectedGroup}
-        isLoading={isSubmitting}
-      />
-
-      {/* * Delete Confirmation Modal */}
-      <Modal
-        isOpen={isDeleteModalOpen}
-        onClose={closeModals}
-        size="md"
-      >
-        <ModalContent>
-          <ModalHeader className="flex flex-col gap-1">
-            <div className="flex items-center gap-2">
-              <AlertTriangle className="w-5 h-5 text-red-500" />
-              <h2 className="text-lg font-semibold">Delete Group</h2>
-            </div>
-          </ModalHeader>
-          <ModalBody>
-            <p className="text-neutral-600">
-              Are you sure you want to delete <strong>{selectedGroup?.name}</strong>? 
-              This action cannot be undone and will remove all associated members and attendance records.
-            </p>
-          </ModalBody>
-          <ModalFooter>
-            <Button
-              variant="light"
-              onClick={closeModals}
-              isDisabled={isSubmitting}
-            >
-              Cancel
-            </Button>
-            <Button
-              color="danger"
-              onClick={handleDeleteGroup}
-              isLoading={isSubmitting}
-              isDisabled={isSubmitting}
-            >
-              Delete Group
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
 
       {/* * Debug Information */}
       <div className="bg-neutral-50 p-4 rounded-lg">
@@ -284,7 +91,7 @@ export default function AdminGroupsPage() {
           <p><strong>Error:</strong> {error ? error.message : 'None'}</p>
           <p><strong>Data Count:</strong> {groups?.length || 0}</p>
           <p><strong>Query Key:</strong> [&apos;groups&apos;]</p>
-          <p><strong>Mutations:</strong> Create: {createGroupMutation.isPending ? 'Pending' : 'Idle'}, Update: {updateGroupMutation.isPending ? 'Pending' : 'Idle'}, Delete: {deleteGroupMutation.isPending ? 'Pending' : 'Idle'}</p>
+          <p><strong>Mode:</strong> Read-only</p>
         </div>
       </div>
     </div>
