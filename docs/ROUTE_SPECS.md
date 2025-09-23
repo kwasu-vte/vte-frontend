@@ -6,6 +6,8 @@ Conventions
 - All requests go through `/api/*` proxy; no client token handling.
 - Use `api` singleton methods exactly as named here.
 - When an ideal endpoint does not exist, a fallback approach is specified.
+- Pagination defaults: `per_page=25` unless stated otherwise. QR list `status in ['active','expired','all']`.
+- Guards: Global RBAC via `middleware.ts`; page-level protection via `requireAuth()` / `requireRole()` in `src/lib/auth.ts`.
 
 ---
 
@@ -28,6 +30,8 @@ Guards/Redirects
 Acceptance
 - Field validation errors render inline
 - Success redirects correctly
+Components
+- shared/NotificationContainer
 
 ### `/auth/sign_up`
 - Purpose: Student registration only
@@ -45,6 +49,8 @@ Guards/Redirects
 Acceptance
 - Password confirm enforced client-side
 - Duplicate email shows server error inline
+Components
+- shared/NotificationContainer
 
 ---
 
@@ -68,6 +74,9 @@ Guards/Redirects
 Acceptance
 - Empty states show for no data
 - Quick actions navigate correctly
+Components
+- layout/AppShell, layout/Header, layout/Sidebar
+- shared/StatCard, shared/StateRenderer, shared/EmptyState, shared/ErrorState, shared/NotificationContainer
 
 ### `/admin/sessions`
 - Purpose: Manage academic sessions
@@ -88,6 +97,11 @@ Guards/Redirects
 Acceptance
 - Starting one session deactivates others visually
 - Warning banner when no active session
+Components
+- features/admin/SessionsTable
+- features/admin/SessionModal
+- features/admin/SessionStatusBadge
+- shared/StateRenderer, shared/NotificationContainer, shared/EmptyState
 
 ### `/admin/skills`
 - Purpose: Manage skills & configurations
@@ -106,6 +120,12 @@ Page Content & Layout
 Acceptance
 - Date range validation enforced
 - Delete requires confirmation dialog
+Components
+- features/admin/SkillsTable
+- features/admin/SkillModal
+- features/admin/SkillDateRangeModal
+- features/admin/SkillLevelSelector
+- shared/StateRenderer, shared/NotificationContainer
 
 ### `/admin/skills/[skillId]/groups`
 - Purpose: View groups for a skill
@@ -121,6 +141,11 @@ Page Content & Layout
 Acceptance
 - Export produces CSV/XLS via util
 - Manual reassignment available if allowed
+Components
+- features/admin/GroupsTable
+- features/admin/GroupCapacityIndicator
+- features/admin/GroupStudentsList
+- shared/DataTable, shared/StateRenderer, shared/NotificationContainer
 
 ### `/admin/enrollments`
 - Purpose: Manage enrollments
@@ -139,6 +164,11 @@ Page Content & Layout
 Acceptance
 - Auto-assign shows toast and refresh
 - Empty state with helpful CTA
+Components
+- features/admin/EnrollmentsTable
+- features/admin/EnrollmentFilters
+- features/admin/EnrollmentStatusBadge
+- shared/StateRenderer, shared/NotificationContainer
 
 ### `/admin/students`
 - Purpose: View/manage students
@@ -155,6 +185,11 @@ Page Content & Layout
 Acceptance
 - Search filters results (server if possible, else client note)
 - Attendance rate shown when report available
+Components
+- features/admin/StudentsTable
+- features/admin/StudentModal
+- features/student/ProfileView (read-only within modal if needed)
+- shared/StateRenderer, shared/NotificationContainer
 
 ### `/admin/mentors`
 - Purpose: Manage mentors & skills
@@ -173,6 +208,12 @@ Page Content & Layout
 Acceptance
 - Assign/remove skill updates table immediately
 - Availability toggle persists
+Components
+- features/admin/MentorsTable
+- features/admin/MentorModal
+- features/mentor/MentorSkillAssignment
+- features/mentor/MentorWorkloadView
+- shared/StateRenderer, shared/NotificationContainer
 
 ### `/admin/qr-codes`
 - Purpose: Generate and track QR codes
@@ -189,6 +230,11 @@ Page Content & Layout
 Acceptance
 - Successful generation shows print link
 - Invalid params blocked inline
+Components
+- features/admin/QRGenerationForm
+- features/admin/QRDistributionTracker (as history/tracker UI)
+- features/mentor/MyQRCodesDisplay (optional preview)
+- shared/StateRenderer, shared/NotificationContainer
 
 ### `/admin/qr-codes/print`
 - Purpose: Print QR codes
@@ -203,6 +249,10 @@ Page Content & Layout
 Acceptance
 - Browser print dialog uses optimized layout
 - Distribution status captured (temporary storage)
+Components
+- features/mentor/PracticalQRCard (for print tiles)
+- features/admin/QRDistributionTracker (mark printed/distributed UI)
+- shared/NotificationContainer
 
 ### `/admin/qr-codes/distribution`
 - Purpose: Track distribution to mentors
@@ -215,6 +265,9 @@ Page Content & Layout
 - Actions: Add record (Modal), Print receipt
 Acceptance
 - Records persist per current approach until API exists
+Components
+- features/admin/QRDistributionTracker
+- shared/StateRenderer, shared/NotificationContainer
 
 ### `/admin/reports`
 - Purpose: Reporting & analytics
@@ -230,6 +283,9 @@ Page Content & Layout
 Acceptance
 - Generate disables controls while loading
 - Exports download files
+Components
+- features/student/AttendanceReport (reuse for group-level view)
+- shared/StatCard, shared/StateRenderer, shared/NotificationContainer
 
 ---
 
@@ -251,6 +307,12 @@ Page Content & Layout
 Acceptance
 - Shows empty states when no data
 - Only active QR codes are shown
+Components
+- features/mentor/MentorGroupsList (for today)
+- features/mentor/MyQRCodesDisplay
+- features/mentor/QRScanReport
+- features/mentor/GroupScheduleCard
+- shared/StateRenderer, shared/NotificationContainer
 
 ### `/mentor/my-skills`
 - Purpose: View assigned skills & groups
@@ -263,6 +325,10 @@ Page Content & Layout
 - Grid of AssignedSkillsGrid cards; expand to SkillGroupsOverview
 Acceptance
 - Primary skills visually distinct; counts accurate
+Components
+- features/mentor/MentorSkillAssignment
+- features/mentor/MentorGroupsList
+- shared/StateRenderer, shared/NotificationContainer
 
 ### `/mentor/groups`
 - Purpose: Group list & rosters
@@ -278,6 +344,11 @@ Page Content & Layout
 - Details: GroupStudentsRoster; link/section for AttendanceHistory
 Acceptance
 - Roster search filters quickly; export available
+Components
+- features/mentor/MentorGroupsList
+- features/mentor/GroupStudentsRoster
+- features/mentor/GroupScheduleCard
+- shared/StateRenderer, shared/NotificationContainer
 
 ### `/mentor/my-qr-codes`
 - Purpose: Access QR codes
@@ -291,6 +362,11 @@ Page Content & Layout
 - Side panel: QRScanReport for selected token
 Acceptance
 - Expired codes indicated; print/download works
+Components
+- features/mentor/MyQRCodesDisplay
+- features/mentor/PracticalQRCard
+- features/mentor/QRScanReport
+- shared/StateRenderer, shared/NotificationContainer
 
 ### `/mentor/attendance/reports`
 - Purpose: Attendance reports
@@ -304,6 +380,9 @@ Page Content & Layout
 - Report: AttendanceReport + AttendanceStats
 Acceptance
 - Counts match group report; export if enabled
+Components
+- features/student/AttendanceReport
+- shared/StatCard, shared/StateRenderer, shared/NotificationContainer
 
 ### `/mentor/schedule`
 - Purpose: Practical schedule
@@ -317,6 +396,10 @@ Page Content & Layout
 - Detail Drawer: SessionDetails on click
 Acceptance
 - Times are timezone-safe; ordering correct
+Components
+- features/student/PracticalCalendar (shared calendar)
+- features/mentor/GroupScheduleCard
+- shared/StateRenderer, shared/NotificationContainer
 
 ---
 
@@ -335,6 +418,12 @@ Page Content & Layout
 - Grid: EnrollmentStatusCard, NextPracticalCard, QuickActions
 Acceptance
 - Countdown updates; quick actions navigate correctly
+Components
+- features/student/ProfileCompletionAlert
+- features/student/EnrollmentStatus
+- features/student/GroupAssignmentCard
+- features/student/UpcomingPracticals
+- shared/NotificationContainer
 
 ### `/student/profile/create`
 - Purpose: One-time profile creation
@@ -346,6 +435,9 @@ Page Content & Layout
 - FormStepper around ProfileForm; permanent fields warning
 Acceptance
 - Validation per field; success redirects to dashboard
+Components
+- features/student/ProfileForm
+- shared/NotificationContainer
 
 ### `/student/profile`
 - Purpose: View profile
@@ -359,6 +451,10 @@ Page Content & Layout
 - Bottom: EnrollmentHistory, AttendanceSummary
 Acceptance
 - History paginated; summary matches report
+Components
+- features/student/ProfileView
+- features/student/AttendanceReport (summary mode)
+- shared/StateRenderer, shared/NotificationContainer
 
 ### `/student/skills`
 - Purpose: Browse/enroll in skills
@@ -372,6 +468,10 @@ Page Content & Layout
 - Modal: SkillDetailModal with EnrollButton
 Acceptance
 - Enroll respects capacity and redirects to payment when needed
+Components
+- features/student/SkillSelectionGrid
+- features/admin/GroupCapacityIndicator (inline capacity cues)
+- shared/StateRenderer, shared/NotificationContainer
 
 ### `/student/enrollment`
 - Purpose: Current enrollment status
@@ -385,6 +485,11 @@ Page Content & Layout
 - Cards: EnrollmentStatus, PaymentRedirect, GroupAssignmentCard
 Acceptance
 - Status updates after payment; group card appears when assigned
+Components
+- features/student/EnrollmentStatus
+- features/student/PaymentRedirect
+- features/student/GroupAssignmentCard
+- shared/NotificationContainer
 
 ### `/student/payment`
 - Purpose: Payment handling
@@ -397,6 +502,9 @@ Page Content & Layout
 - Action: PaymentRedirect Button
 Acceptance
 - Redirect/return handled; status refreshed
+Components
+- features/student/PaymentRedirect
+- shared/NotificationContainer
 
 ### `/student/scan-qr`
 - Purpose: Scan mentor QR for attendance
@@ -410,6 +518,12 @@ Page Content & Layout
 - Modal: ScanConfirmationModal, ScanResultModal
 Acceptance
 - Invalid token error; successful scan updates progress
+Components
+- features/student/StudentQRScanner
+- features/student/ScanProgressIndicator
+- features/student/ScanConfirmationModal
+- features/student/ScanResultModal
+- shared/NotificationContainer
 
 ### `/student/my-group`
 - Purpose: View assigned group
@@ -424,6 +538,11 @@ Page Content & Layout
 - Schedule: PracticalSchedule
 Acceptance
 - Members paginated; schedule matches date range
+Components
+- features/student/GroupAssignmentCard (header)
+- features/admin/GroupStudentsList (reused read-only)
+- features/student/PracticalCalendar
+- shared/StateRenderer, shared/NotificationContainer
 
 ### `/student/attendance`
 - Purpose: View own attendance
@@ -438,6 +557,11 @@ Page Content & Layout
 - Calendar: AttendanceCalendar
 Acceptance
 - Percentage matches; calendar marks attendance
+Components
+- features/student/AttendanceCompletionBadge
+- features/student/AttendanceReport
+- features/student/PracticalCalendar (calendar view)
+- shared/StateRenderer, shared/NotificationContainer
 
 ### `/student/schedule`
 - Purpose: Practical schedule
@@ -450,6 +574,10 @@ Page Content & Layout
 - Card: SessionCard for selection
 Acceptance
 - Upcoming list sorted by date
+Components
+- features/student/PracticalCalendar
+- features/student/UpcomingPracticals
+- shared/NotificationContainer
 
 ---
 
