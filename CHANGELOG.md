@@ -12,6 +12,10 @@
   - Student: `StudentQRScanner`, `ScanResultModal`, `ScanProgressIndicator`, `ScanConfirmationModal`, `AttendanceCompletionBadge`, `AttendanceReport`, `ManualAttendance`, `ProfileForm`, `ProfileView`, `ProfileCompletionAlert`, `SkillSelectionGrid`, `EnrollmentStatus`, `PaymentRedirect`, `GroupAssignmentCard`, `PracticalCalendar`, `UpcomingPracticals`
 - Added utility placeholders under `src/lib/utils/`: `print.ts`, `qr.ts`, `attendance.ts`, `enrollment.ts`, `groups.ts`, `dates.ts`
 - Added contexts: `src/context/SessionContext.tsx`, `src/context/EnrollmentContext.tsx`
+
+### Docs
+- Added `docs/COMPONENT_POPULATION_PLAN.md` detailing phased population plan and required NextUI components per feature.
+- Added `docs/ROUTE_SPECS.md` documenting complete route/page specifications mapped to `src/lib/api.ts` methods and realistic fallbacks.
 - Added Zustand stores: `src/lib/stores/sessionStore.ts`, `enrollmentStore.ts`, `groupStore.ts`, `qrStore.ts`
 
 ### Changed
