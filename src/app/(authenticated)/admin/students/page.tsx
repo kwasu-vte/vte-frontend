@@ -4,41 +4,51 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { StudentsTable } from '@/components/features/admin/StudentsTable';
-import { StudentModal } from '@/components/features/admin/StudentModal';
+// import { StudentModal } from '@/components/features/admin/StudentModal';
+import { StudentProfileModal } from '@/components/features/admin/StudentProfileModal';
 import { api } from '@/lib/api';
-import { User, CreateUserPayload, UpdateUserPayload } from '@/lib/types';
-import { Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@nextui-org/react';
-import { AlertTriangle } from 'lucide-react';
+import { StudentProfile } from '@/lib/types';
+import { Button, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@nextui-org/react';
+import { AlertTriangle, Search } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { getErrorMessage, getErrorTitle, getSuccessTitle, getSuccessMessage } from '@/lib/error-handling';
 
 export default function AdminStudentsPage() {
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [selectedStudent, setSelectedStudent] = useState<User | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  // const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  // const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [selectedStudent, setSelectedStudent] = useState<StudentProfile | null>(null);
+  // const [isSubmitting, setIsSubmitting] = useState(false);
+  const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
 
   const queryClient = useQueryClient();
   const { addNotification } = useApp();
 
   // * React Query for data fetching - only run on client
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(search.trim()), 300);
+    return () => clearTimeout(timer);
+  }, [search]);
+
   const {
-    data: students,
+    data: studentsResponse,
     isLoading,
     error,
-    refetch
+    refetch,
   } = useQuery({
-    queryKey: ['students'],
+    queryKey: ['students', { search: debouncedSearch }],
     queryFn: async () => {
-      const response = await api.getStudents();
-      // * Extract items array from paginated response
-      return response.data?.items || [];
+      const response = await api.getStudents({ search: debouncedSearch || undefined, per_page: 25 });
+      return response.data;
     },
-    enabled: typeof window !== 'undefined', // * Only enable on client side
+    enabled: typeof window !== 'undefined',
   });
+
+  const students = useMemo(() => studentsResponse?.results ?? [], [studentsResponse]);
 
   // * Update student mutation
   const updateStudentMutation = useMutation({
@@ -115,112 +125,77 @@ export default function AdminStudentsPage() {
   };
 
   // * Open edit modal
-  const openEditModal = (student: User) => {
-    setSelectedStudent(student);
-    setIsEditModalOpen(true);
-  };
+  // const openEditModal = (student: StudentProfile) => {
+  //   setSelectedStudent(student);
+  //   setIsEditModalOpen(true);
+  // };
 
   // * Open delete modal
-  const openDeleteModal = (student: User) => {
+  // const openDeleteModal = (student: StudentProfile) => {
+  //   setSelectedStudent(student);
+  //   setIsDeleteModalOpen(true);
+  // };
+
+  const openProfileModal = (student: StudentProfile) => {
     setSelectedStudent(student);
-    setIsDeleteModalOpen(true);
+    setIsProfileModalOpen(true);
   };
 
   // * Close all modals
   const closeModals = () => {
-    setIsEditModalOpen(false);
-    setIsDeleteModalOpen(false);
     setSelectedStudent(null);
   };
 
   return (
     <div className="space-y-6">
       {/* * Page Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-neutral-900">Students Management</h1>
-        <p className="text-neutral-600 mt-1">
-          Manage student accounts and profiles
-        </p>
+      <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-neutral-900">Students</h1>
+          <p className="text-neutral-600 mt-1">Search and manage student profiles and enrollments</p>
+        </div>
+        <div className="w-full md:w-80">
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            startContent={<Search className="w-4 h-4 text-neutral-400" />}
+            placeholder="Search by name or matric number"
+            variant="bordered"
+          />
+        </div>
       </div>
 
       {/* * Students Table */}
       <div className="bg-white rounded-lg shadow-sm border border-neutral-200">
         <StudentsTable
-          students={students || []}
-          onEdit={openEditModal}
-          onDelete={openDeleteModal}
-          onView={(student) => {
-            // TODO: Navigate to student details page
-            console.log('View student:', student);
-          }}
-          onManageProfile={(student) => {
-            // TODO: Navigate to student profile management
-            console.log('Manage profile for student:', student);
-          }}
+          students={students}
+          isLoading={isLoading}
+          error={error as Error | null}
+          onView={openProfileModal}
+          onManageProfile={openProfileModal}
           onManageEnrollments={(student) => {
-            // TODO: Navigate to student enrollments management
             console.log('Manage enrollments for student:', student);
           }}
         />
       </div>
 
-      {/* * Edit Student Modal */}
-      <StudentModal
-        isOpen={isEditModalOpen}
-        onClose={closeModals}
-        onSubmit={handleEditStudent}
-        student={selectedStudent}
-        isLoading={isSubmitting}
-      />
+      {/* * Edit/Delete deferred per route specs */}
 
-      {/* * Delete Confirmation Modal */}
-      <Modal
-        isOpen={isDeleteModalOpen}
-        onClose={closeModals}
-        size="md"
-      >
-        <ModalContent>
-          <ModalHeader className="flex flex-col gap-1">
-            <div className="flex items-center gap-2">
-              <AlertTriangle className="w-5 h-5 text-red-500" />
-              <h2 className="text-lg font-semibold">Delete Student</h2>
-            </div>
-          </ModalHeader>
-          <ModalBody>
-            <p className="text-neutral-600">
-              Are you sure you want to delete <strong>{selectedStudent?.first_name} {selectedStudent?.last_name}</strong>? 
-              This action cannot be undone and will remove all associated data.
-            </p>
-          </ModalBody>
-          <ModalFooter>
-            <Button
-              variant="light"
-              onClick={closeModals}
-              isDisabled={isSubmitting}
-            >
-              Cancel
-            </Button>
-            <Button
-              color="danger"
-              onClick={handleDeleteStudent}
-              isLoading={isSubmitting}
-              isDisabled={isSubmitting}
-            >
-              Delete Student
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+      {/* * Student Profile Modal */}
+      <StudentProfileModal
+        isOpen={isProfileModalOpen}
+        onClose={() => setIsProfileModalOpen(false)}
+        userId={selectedStudent?.id ? String(selectedStudent.id) : null}
+      />
 
       {/* * Debug Information */}
       <div className="bg-neutral-50 p-4 rounded-lg">
         <h3 className="font-semibold text-neutral-900 mb-2">Debug Information</h3>
         <div className="text-sm text-neutral-600 space-y-1">
           <p><strong>Loading:</strong> {isLoading ? 'Yes' : 'No'}</p>
-          <p><strong>Error:</strong> {error ? error.message : 'None'}</p>
+          <p><strong>Error:</strong> {error ? (error as Error).message : 'None'}</p>
           <p><strong>Data Count:</strong> {students?.length || 0}</p>
-          <p><strong>Query Key:</strong> [&apos;students&apos;]</p>
-          <p><strong>Mutations:</strong> Update: {updateStudentMutation.isPending ? 'Pending' : 'Idle'}, Delete: {deleteStudentMutation.isPending ? 'Pending' : 'Idle'}</p>
+          <p><strong>Query Key:</strong> ['students', {{}}]</p>
         </div>
       </div>
     </div>

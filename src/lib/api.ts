@@ -56,11 +56,12 @@ import {
 
 // * API Error Class
 export class ApiError extends Error {
-  status: number;
-  data?: any;
+  public status: number;
+  public data?: unknown;
 
-  constructor(message: string, status: number, data?: any) {
+  constructor(message: string, status: number, data?: unknown) {
     super(message);
+    Object.setPrototypeOf(this, new.target.prototype);
     this.name = 'ApiError';
     this.status = status;
     this.data = data;
@@ -342,8 +343,13 @@ class ApiClient {
   }
 
   // * Student Management
-  async getStudents(): Promise<ApiResponse<PaginatedResponse<StudentProfile>>> {
-    return this.request('v1/users/students');
+  async getStudents(params?: { search?: string; per_page?: number; page?: number }): Promise<ApiResponse<PaginatedResponse<StudentProfile>>> {
+    const query = new URLSearchParams();
+    if (params?.search) query.append('search', params.search);
+    if (params?.per_page) query.append('per_page', params.per_page.toString());
+    if (params?.page) query.append('page', params.page.toString());
+    const queryString = query.toString();
+    return this.request(`v1/users/students${queryString ? `?${queryString}` : ''}`);
   }
 
   async getStudentProfile(userId: string): Promise<ApiResponse<StudentProfile>> {

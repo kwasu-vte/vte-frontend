@@ -6,13 +6,13 @@
 
 import { useState, useEffect } from 'react';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, Select, SelectItem } from '@nextui-org/react';
-import { User, CreateUserPayload, UpdateUserPayload } from '@/lib/types';
+import { CreateUserPayload, UpdateUserPayload, StudentProfile } from '@/lib/types';
 
 interface StudentModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (data: CreateUserPayload | UpdateUserPayload) => void;
-  student?: User | null;
+  student?: StudentProfile | null;
   isLoading?: boolean;
 }
 
