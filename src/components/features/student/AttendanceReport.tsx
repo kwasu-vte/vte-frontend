@@ -1,11 +1,12 @@
 "use client"
 import React from "react"
-import { Button, Chip } from "@nextui-org/react"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Button, Chip, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Card, CardBody, CardHeader, Divider } from "@nextui-org/react"
+import { Download, Calendar } from "lucide-react"
 
 /**
  * * AttendanceReport
  * Tabular attendance report for a group with export options.
+ * Follows design guide with NextUI components and proper styling.
  *
  * Props:
  * - groupId: string
@@ -23,54 +24,70 @@ export default function AttendanceReport({ groupId, dateRange, attendanceData }:
   const end = new Date(dateRange.end).toLocaleDateString()
 
   return (
-    <div className="w-full space-y-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm text-neutral-600">Group</p>
-          <p className="text-xl font-medium leading-normal">{groupId}</p>
-          <p className="text-sm text-neutral-600">{start} – {end}</p>
+    <Card shadow="sm" className="w-full">
+      <CardHeader className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Calendar className="h-5 w-5 text-primary" />
+          <div>
+            <p className="text-xl font-medium leading-normal">Attendance Report</p>
+            <p className="text-sm text-neutral-600">Group {groupId} • {start} – {end}</p>
+          </div>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="bordered">Export CSV</Button>
-          <Button variant="bordered">Export PDF</Button>
+          <Button 
+            variant="bordered" 
+            size="sm"
+            startContent={<Download className="h-4 w-4" />}
+          >
+            Export CSV
+          </Button>
+          <Button 
+            variant="bordered" 
+            size="sm"
+            startContent={<Download className="h-4 w-4" />}
+          >
+            Export PDF
+          </Button>
         </div>
-      </div>
-
-      <div className="w-full rounded-lg border border-neutral-200">
-        <Table>
+      </CardHeader>
+      
+      <Divider />
+      
+      <CardBody className="p-0">
+        <Table aria-label="Attendance report table">
           <TableHeader>
-            <TableRow>
-              <TableHead>Student</TableHead>
-              <TableHead className="text-right">Scans</TableHead>
-              <TableHead className="text-right">Points</TableHead>
-              <TableHead className="text-right">Completion</TableHead>
-            </TableRow>
+            <TableColumn>STUDENT</TableColumn>
+            <TableColumn className="text-right">SCANS</TableColumn>
+            <TableColumn className="text-right">POINTS</TableColumn>
+            <TableColumn className="text-right">COMPLETION</TableColumn>
           </TableHeader>
-          <TableBody>
-            {attendanceData.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={4}>
-                  <p className="text-sm text-neutral-600 text-center py-6">No attendance records found for the selected range.</p>
+          <TableBody emptyContent="No attendance records found for the selected range.">
+            {attendanceData.map((row, idx) => (
+              <TableRow key={`${row.student}-${idx}`}>
+                <TableCell>
+                  <span className="font-medium text-neutral-900">{row.student}</span>
+                </TableCell>
+                <TableCell className="text-right">
+                  <span className="text-neutral-600">{row.scans}</span>
+                </TableCell>
+                <TableCell className="text-right">
+                  <span className="text-neutral-600">{row.points}</span>
+                </TableCell>
+                <TableCell className="text-right">
+                  <Chip 
+                    color={row.percentage >= 75 ? "success" : row.percentage >= 50 ? "warning" : "danger"} 
+                    variant="flat"
+                    size="sm"
+                  >
+                    {row.percentage}%
+                  </Chip>
                 </TableCell>
               </TableRow>
-            ) : (
-              attendanceData.map((row, idx) => (
-                <TableRow key={`${row.student}-${idx}`}>
-                  <TableCell>{row.student}</TableCell>
-                  <TableCell className="text-right">{row.scans}</TableCell>
-                  <TableCell className="text-right">{row.points}</TableCell>
-                  <TableCell className="text-right">
-                    <Chip color={row.percentage >= 75 ? "success" : row.percentage >= 50 ? "warning" : "danger"} variant="flat">
-                      {row.percentage}%
-                    </Chip>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
+            ))}
           </TableBody>
         </Table>
-      </div>
-    </div>
+      </CardBody>
+    </Card>
   )
 }
 
