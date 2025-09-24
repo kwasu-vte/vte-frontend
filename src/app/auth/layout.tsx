@@ -29,8 +29,14 @@ export default async function AuthLayout({ children }: AuthLayoutProps) {
   } catch (error) {
     console.error('Auth layout: Failed to get current user, clearing session:', error);
     // * Clear the invalid session cookie
-    const response = new Response();
-    response.cookies.delete('session_token');
+    const cookieStoreOnError = await cookies();
+    cookieStoreOnError.set('session_token', '', {
+      path: '/',
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 0,
+    });
     return <>{children}</>;
   }
   

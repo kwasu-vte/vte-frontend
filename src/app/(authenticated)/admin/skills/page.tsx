@@ -300,16 +300,16 @@ export default function AdminSkillsPage() {
                   <div>
                     <span className="font-medium text-neutral-700">Created:</span>
                     <p className="text-neutral-600">
-                      {new Date(selectedSkill.created_at).toLocaleDateString()}
+                      {selectedSkill.created_at ? new Date(selectedSkill.created_at).toLocaleDateString() : '—'}
                     </p>
                   </div>
                 </div>
 
-                {selectedSkill.meta_tags && selectedSkill.meta_tags.length > 0 && (
+                {selectedSkill.meta && selectedSkill.meta.length > 0 && (
                   <div>
                     <span className="font-medium text-neutral-700 mb-2 block">Tags:</span>
                     <div className="flex flex-wrap gap-2">
-                      {selectedSkill.meta_tags.map((tag, index) => (
+                      {selectedSkill.meta.map((tag, index) => (
                         <span
                           key={index}
                           className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"

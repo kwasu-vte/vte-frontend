@@ -217,7 +217,7 @@ export default function StudentAnnouncementsPage() {
           isLoading={isLoading}
           error={error}
           loadingComponent={<DefaultLoadingComponent />}
-          errorComponent={<DefaultErrorComponent onRetry={refetch} />}
+          errorComponent={<DefaultErrorComponent error={error as Error} onRetry={() => { void refetch() }} />}
           emptyComponent={
             <div className="p-12 text-center">
               <Megaphone className="w-12 h-12 text-neutral-400 mx-auto mb-4" />

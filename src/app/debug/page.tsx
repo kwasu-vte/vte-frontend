@@ -32,7 +32,8 @@ export default function DebugPage() {
       alert('Caches cleared! Please refresh the page.');
     } catch (error) {
       console.error('❌ Error clearing caches:', error);
-      alert('Error clearing caches: ' + error.message);
+      const message = error instanceof Error ? error.message : String(error);
+      alert('Error clearing caches: ' + message);
     }
   };
 

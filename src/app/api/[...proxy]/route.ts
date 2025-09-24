@@ -118,7 +118,6 @@ const handleRequest = async (request: NextRequest, { params }: { params: Promise
     fetchOptions.body = request.body;
     // * Required by Node.js fetch when sending a ReadableStream body
     // * Prevents: RequestInit: duplex option is required when sending a body
-    // @ts-expect-error Node fetch extension
     (fetchOptions as any).duplex = 'half';
   }
 

@@ -39,8 +39,8 @@ export default function StudentSkillsPage() {
     queryKey: ['available-skills'],
     queryFn: async () => {
       const response = await api.getSkills();
-      // * Extract items from paginated response
-      return response.data?.items || [];
+      // * api.getSkills returns Skill[] directly
+      return response.data ?? [];
     },
   });
 
