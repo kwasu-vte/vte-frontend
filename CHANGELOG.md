@@ -1,5 +1,13 @@
 ## [Unreleased]
 
+### Changed
+- NextUI theme hardened in `tailwind.config.ts` per DESIGN_GUIDE: added `layout.borderRadius.medium=0.5rem`, `layout.boxShadow.small/medium`, and aligned `colors.foreground` to neutral-600.
+
+## [Unreleased] - 2025-09-24
+### Changed
+- Align `/auth/sign_in` page content & layout to ROUTE_SPECS and DESIGN_GUIDE (NextUI-themed, neutral bg, Card shadow=sm, inline errors, a11y).
+- Align `/auth/sign_up` page content & layout to ROUTE_SPECS and DESIGN_GUIDE (NextUI-themed, neutral bg, Card shadow=sm, inline errors, a11y, autocomplete).
+
 - Admin Dashboard: Implemented server-side data fetch for sessions, group statistics, and enrollments; added StatCard grid, Recent Activity list, and Quick Actions panel with resilient fallbacks per docs/ROUTE_SPECS.md and docs/DESIGN_GUIDE.md.
 - Admin: Added Enrollments page with filters/table; added nested Skills → Groups page; added QR Codes (main/print/distribution) pages; added Reports page; updated Sidebar with Enrollments, QR Codes, Reports links.
 
@@ -420,3 +428,14 @@
 - Finalized PracticalQRCard for token display/print.
 - Implemented QRScanReport with history/report tabs and refresh.
 
+
+## [Unreleased] - 2025-09-24
+### Changed
+- Align  page content & layout to ROUTE_SPECS and DESIGN_GUIDE (NextUI-themed, neutral bg,  shadow=sm, inline errors, a11y).
+- Align  page content & layout to ROUTE_SPECS and DESIGN_GUIDE (NextUI-themed, neutral bg,  shadow=sm, inline errors, a11y, autocomplete).
+
+
+## [Unreleased] - 2025-09-24
+### Changed
+- Align  page content & layout to ROUTE_SPECS and DESIGN_GUIDE (NextUI-themed, neutral bg, Card shadow=sm, inline errors, a11y).
+- Align  page content & layout to ROUTE_SPECS and DESIGN_GUIDE (NextUI-themed, neutral bg, Card shadow=sm, inline errors, a11y, autocomplete).

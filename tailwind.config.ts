@@ -85,10 +85,19 @@ const config: Config = {
       addCommonColors: true,
       themes: {
         light: {
+          layout: {
+            borderRadius: {
+              medium: "0.5rem",
+            },
+            boxShadow: {
+              small: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+              medium: "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
+            },
+          },
           colors: {
             // Map to our globals.css tokens (light theme)
             background: "#f8fafc", // neutral-50
-            foreground: "#0f172a", // neutral-900
+            foreground: "#475569", // neutral-600 per DESIGN_GUIDE
 
             primary: {
               DEFAULT: "#3b82f6", // primary-500

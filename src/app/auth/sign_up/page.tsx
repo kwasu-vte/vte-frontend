@@ -42,7 +42,7 @@ export default function SignUpPage() {
   const toggleVisibility = () => setIsVisible(!isVisible);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-neutral-50 flex items-center justify-center p-6">
       <div className="w-full max-w-xl">
         <NotificationContainer />
         {/* * Logo and Brand */}
@@ -69,7 +69,7 @@ export default function SignUpPage() {
         </div>
 
         {/* * Sign-Up Form */}
-        <Card className="shadow-xl">
+        <Card shadow="sm">
           <CardHeader className="pb-0">
             <h4 className="text-xl font-semibold text-foreground">
               Sign Up
@@ -108,6 +108,7 @@ export default function SignUpPage() {
                   placeholder="Enter your first name"
                   variant="bordered"
                   isRequired
+                  autoComplete="given-name"
                   classNames={{
                     input: "text-base",
                     label: "font-medium",
@@ -119,6 +120,7 @@ export default function SignUpPage() {
                   placeholder="Enter your last name"
                   variant="bordered"
                   isRequired
+                  autoComplete="family-name"
                   classNames={{
                     input: "text-base",
                     label: "font-medium",
@@ -134,6 +136,7 @@ export default function SignUpPage() {
                 type="email"
                 variant="bordered"
                 isRequired
+                autoComplete="email"
                 classNames={{
                   input: "text-base",
                   label: "font-medium",
@@ -153,6 +156,7 @@ export default function SignUpPage() {
                   variant="bordered"
                   type={isVisible ? "text" : "password"}
                   isRequired
+                  autoComplete="new-password"
                   endContent={
                     <button
                       type="button"
@@ -178,6 +182,7 @@ export default function SignUpPage() {
                   variant="bordered"
                   type="password"
                   isRequired
+                  autoComplete="new-password"
                   classNames={{
                     input: "text-base",
                     label: "font-medium",
@@ -187,12 +192,12 @@ export default function SignUpPage() {
 
               {/* * Inline error */}
               {clientError ? (
-                <div className="text-sm text-danger-600" role="alert">
+                <div className="text-sm text-danger-600" role="alert" aria-live="assertive">
                   {clientError}
                 </div>
               ) : null}
               {formState?.error ? (
-                <div className="text-sm text-danger-600" role="alert">
+                <div className="text-sm text-danger-600" role="alert" aria-live="assertive">
                   {formState.error}
                 </div>
               ) : null}

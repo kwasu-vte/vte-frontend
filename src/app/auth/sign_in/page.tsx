@@ -5,7 +5,7 @@
 
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import { Card, CardHeader, CardBody, Input, Button, Link, Spinner, Checkbox } from '@nextui-org/react';
 import { Eye, EyeOff } from 'lucide-react';
@@ -13,6 +13,7 @@ import { signInActionSafe } from '@/lib/actions';
 import logo from '@/assets/kwasulogo.png';
 import { NotificationContainer } from '@/components/shared/NotificationContainer';
 import { useFormState, useFormStatus } from 'react-dom';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -34,14 +35,38 @@ export default function SignInPage() {
   const [isVisible, setIsVisible] = useState(false);
   const [formState, formAction] = useFormState(signInActionSafe as any, { error: null });
   const [clientError, setClientError] = useState<string | null>(null);
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
   const toggleVisibility = () => setIsVisible(!isVisible);
 
   const usernameLabel = useMemo(() => 'Matric Number or Email', []);
   const passwordLabel = useMemo(() => 'Password', []);
 
+  // * If already authenticated, redirect by role (public page guard)
+  useEffect(() => {
+    let isMounted = true;
+    const checkAuth = async () => {
+      try {
+        const res = await fetch('/api/v1/users/auth/me', { headers: { Accept: 'application/json' } });
+        if (!res.ok) return;
+        const json = await res.json();
+        const role = String(json?.data?.role || '').toLowerCase();
+        const target = role === 'admin' || role === 'mentor' || role === 'student' ? `/${role}/dashboard` : '/';
+        if (isMounted) {
+          const redirectParam = searchParams.get('redirect');
+          router.replace(redirectParam || target);
+        }
+      } catch (_) {
+        // * Silent: user likely unauthenticated
+      }
+    };
+    checkAuth();
+    return () => { isMounted = false; };
+  }, [router, searchParams]);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-neutral-50 flex items-center justify-center p-6">
       <div className="w-full max-w-md">
         <NotificationContainer />
         {/* * Logo and Brand */}
@@ -68,7 +93,7 @@ export default function SignInPage() {
         </div>
 
         {/* * Sign-In Form */}
-        <Card className="shadow-xl">
+        <Card shadow="sm">
           <CardHeader className="pb-0">
             <h4 className="text-xl font-semibold text-foreground">
               Sign In
@@ -97,6 +122,9 @@ export default function SignInPage() {
                 placeholder="Enter your matric number or email"
                 variant="bordered"
                 isRequired
+                isInvalid={!!clientError && !String((document.activeElement as HTMLElement)?.getAttribute?.('name'))}
+                errorMessage={clientError || undefined}
+                autoComplete="username email"
                 classNames={{
                   input: "text-base",
                   label: "font-medium",
@@ -111,6 +139,7 @@ export default function SignInPage() {
                 variant="bordered"
                 type={isVisible ? "text" : "password"}
                 isRequired
+                autoComplete="current-password"
                 endContent={
                   <button
                     type="button"
@@ -142,12 +171,12 @@ export default function SignInPage() {
 
               {/* * Inline error */}
               {clientError ? (
-                <div className="text-sm text-danger-600" role="alert">
+                <div className="text-sm text-danger-600" role="alert" aria-live="assertive">
                   {clientError}
                 </div>
               ) : null}
               {formState?.error ? (
-                <div className="text-sm text-danger-600" role="alert">
+                <div className="text-sm text-danger-600" role="alert" aria-live="assertive">
                   {formState.error}
                 </div>
               ) : null}
