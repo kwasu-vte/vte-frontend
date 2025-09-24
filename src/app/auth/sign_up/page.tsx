@@ -4,7 +4,7 @@
 
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import { Card, CardHeader, CardBody, Input, Button, Link, Spinner } from '@nextui-org/react';
 import { Eye, EyeOff } from 'lucide-react';
@@ -12,6 +12,7 @@ import { signUpActionSafe } from '@/lib/actions';
 import logo from '@/assets/kwasulogo.png';
 import { NotificationContainer } from '@/components/shared/NotificationContainer';
 import { useFormState, useFormStatus } from 'react-dom';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -33,6 +34,8 @@ export default function SignUpPage() {
   const [isVisible, setIsVisible] = useState(false);
   const [formState, formAction] = useFormState(signUpActionSafe as any, { error: null });
   const [clientError, setClientError] = useState<string | null>(null);
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const firstNameLabel = useMemo(() => 'First Name', []);
   const lastNameLabel = useMemo(() => 'Last Name', []);
   const emailLabel = useMemo(() => 'Email', []);
@@ -40,6 +43,28 @@ export default function SignUpPage() {
   const confirmPasswordLabel = useMemo(() => 'Confirm Password', []);
 
   const toggleVisibility = () => setIsVisible(!isVisible);
+
+  // * If already authenticated, redirect by role (public page guard)
+  useEffect(() => {
+    let isMounted = true;
+    const checkAuth = async () => {
+      try {
+        const res = await fetch('/api/v1/users/auth/me', { headers: { Accept: 'application/json' } });
+        if (!res.ok) return;
+        const json = await res.json();
+        const role = String(json?.data?.role || '').toLowerCase();
+        const target = role === 'admin' || role === 'mentor' || role === 'student' ? `/${role}/dashboard` : '/';
+        if (isMounted) {
+          const redirectParam = searchParams.get('redirect');
+          router.replace(redirectParam || target);
+        }
+      } catch (_) {
+        // * Silent: user likely unauthenticated
+      }
+    };
+    checkAuth();
+    return () => { isMounted = false; };
+  }, [router, searchParams]);
 
   return (
     <div className="min-h-screen bg-neutral-50 flex items-center justify-center p-6">
