@@ -15,9 +15,25 @@ export type EnrollmentStatusBadgeProps = {
   showTooltip?: boolean
 }
 
-export default function EnrollmentStatusBadge(_props: EnrollmentStatusBadgeProps) {
-  // TODO: Render styled badge and optional tooltip
-  return <span>{/* TODO: Enrollment status badge */}</span>
+export default function EnrollmentStatusBadge({ status, showTooltip = false }: EnrollmentStatusBadgeProps) {
+  const lower = status.toLowerCase() as 'pending' | 'paid' | 'assigned' | 'completed'
+
+  const color: 'default' | 'warning' | 'success' | 'primary' =
+    lower === 'pending' ? 'warning' : lower === 'paid' ? 'primary' : lower === 'assigned' ? 'success' : 'success'
+
+  const label =
+    lower === 'pending' ? 'Pending' : lower === 'paid' ? 'Paid' : lower === 'assigned' ? 'Assigned' : 'Completed'
+
+  const Chip = require('@nextui-org/react').Chip as React.ComponentType<any>
+  const Tooltip = require('@nextui-org/react').Tooltip as React.ComponentType<any>
+
+  const chip = <Chip color={color} variant="flat" size="sm">{label}</Chip>
+
+  if (!showTooltip) return chip
+
+  return (
+    <Tooltip content={`Status: ${label}`}>{chip}</Tooltip>
+  )
 }
 
 

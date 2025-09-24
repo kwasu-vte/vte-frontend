@@ -5,5 +5,6 @@ export { qrCodesApi } from './qr-codes';
 export { skillGroupsApi } from './skill-groups';
 export { mentorsApi } from './mentors';
 export { studentsApi } from './students';
+export { skillsApi } from './skills';
 
 

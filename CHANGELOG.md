@@ -324,14 +324,14 @@
 
 ### ✅ COMPLETED
 - **Created Missing Shared Components:**
-  -  - Displays key metrics and statistics with trend indicators
-  -  - Calendar component for events and activities with navigation
-  -  - Comprehensive empty state component with predefined variants
-  -  - Error handling component with retry functionality and variants
+  - `StatCard` - Displays key metrics and statistics with trend indicators
+  - `CalendarView` - Calendar component for events and activities with navigation
+  - `EmptyState` - Comprehensive empty state component with predefined variants
+  - `ErrorState` - Error handling component with retry functionality and variants
 
 - **Completed Skills Management Template:**
-  -  - Full-featured modal for creating/editing skills with form validation
-  -  - Specialized table component with actions dropdown
+  - `SkillModal` - Full-featured modal for creating/editing skills with form validation
+  - `SkillsTable` - Specialized table component with actions dropdown
   - Updated skills page with complete CRUD workflow using React Query mutations
   - Added delete confirmation modal with proper error handling
 
@@ -348,7 +348,7 @@
 - **Shared Components:** Complete set of reusable UI components
 - **Build System:** Stable and error-free
 
-### �� NEXT STEPS
+### 📋 NEXT STEPS
 - Begin Phase 4: Full-Scale Migration
 - Start migrating remaining admin pages using the established template pattern
 - Implement mentor and student page migrations
@@ -385,8 +385,15 @@
 
 
 ## 2025-09-24 - Phase 1 Component Population (NextUI + React Query)
-- Implemented \`SessionsTable\` with start/end actions, status, and robust states.
-- Implemented \`SessionModal\` with Zod validation and create/update mutations.
-- Implemented \`SessionStatusBadge\` with semantic colors and derived labels.
-- Implemented \`SkillDateRangeModal\` with bounds validation and success callback.
-- Implemented \`SkillLevelSelector\` controlled multiselect with optional counts.
+- Implemented `SessionsTable` with start/end actions, status, and robust states.
+- Implemented `SessionModal` with Zod validation and create/update mutations.
+- Implemented `SessionStatusBadge` with semantic colors and derived labels.
+- Implemented `SkillDateRangeModal` with bounds validation and success callback.
+- Implemented `SkillLevelSelector` controlled multiselect with optional counts.
+
+## [0.2.1] - 2025-09-24
+### Added
+- skillsApi client (`src/lib/api/skills.ts`) and export wiring.
+- EnrollmentStatusBadge with NextUI Chip and optional tooltip.
+- EnrollmentFilters using NextUI Select and React Query for sessions/skills.
+- EnrollmentsTable with DataTable wrapper, server pagination, and loading/empty states.
