@@ -12,8 +12,8 @@ import { CreateSkillPayload, UpdateSkillPayload, CreateGroupPayload, CreateUserP
 
 // * Authentication Actions
 export async function signInAction(formData: FormData) {
-  const username = formData.get('username') as string;
-  const password = formData.get('password') as string;
+  const username = String(formData.get('username') ?? '');
+  const password = String(formData.get('password') ?? '');
   
   console.log(`[SignIn Action] Attempting login for user: ${username}`);
   
@@ -65,6 +65,48 @@ export async function signInAction(formData: FormData) {
     console.error('[SignIn Action] Missing target or token, cannot redirect');
     throw new Error('Authentication completed but redirect failed');
   }
+}
+
+// * Authentication Action (Safe): returns inline error instead of throwing
+// * Intended for use with useFormState on the client to render errors inline
+export async function signInActionSafe(_prevState: { error?: string | null } | undefined, formData: FormData) {
+  const username = String(formData.get('username') ?? '');
+  const password = String(formData.get('password') ?? '');
+
+  if (!username || !password) {
+    return { error: 'Username and password are required' };
+  }
+
+  let target: string | null = null;
+  let token: string | null = null;
+  try {
+    const response = await api.signIn({ email: username, password });
+    if (!response.success) {
+      return { error: response.message || 'Authentication failed' };
+    }
+
+    token = (response as any)?.data?.access_token || null;
+    const me = token ? await api.getCurrentUserWithToken(token) : await api.getCurrentUser();
+    if (!me.success || !me.data) {
+      return { error: me.message || 'Failed to fetch user after login' };
+    }
+
+    const role = String(me.data.role || '').toLowerCase();
+    target = role === 'admin' || role === 'mentor' || role === 'student' ? `/${role}/dashboard` : '/';
+  } catch (error) {
+    // * Do not throw; return message so client can render inline
+    return { error: error instanceof Error ? error.message : 'Authentication failed' };
+  }
+
+  if (target && token) {
+    const params = new URLSearchParams();
+    params.set('token', token);
+    params.set('target', target);
+    const callbackUrl = `/auth/callback?${params.toString()}`;
+    redirect(callbackUrl);
+  }
+
+  return { error: 'Authentication completed but redirect failed' };
 }
 
 export async function signOutAction() {
@@ -126,8 +168,39 @@ export async function signUpAction(formData: FormData) {
   }
 
   if (shouldRedirect) {
-    redirect('/auth/sign_in?message=Registration successful. Please sign in.');
+    redirect('/student/profile/create');
   }
+}
+
+// * Sign Up (Safe): returns error for inline display; success redirects
+export async function signUpActionSafe(_prevState: { error?: string | null } | undefined, formData: FormData) {
+  const userData: CreateUserPayload = {
+    first_name: String(formData.get('firstName') ?? ''),
+    last_name: String(formData.get('lastName') ?? ''),
+    email: String(formData.get('email') ?? ''),
+    password: String(formData.get('password') ?? ''),
+    password_confirmation: String(formData.get('password2') ?? ''),
+    role: 'Student',
+  };
+
+  // * Basic validation
+  if (!userData.first_name || !userData.last_name || !userData.email || !userData.password || !userData.password_confirmation) {
+    return { error: 'All fields are required' };
+  }
+  if (userData.password !== userData.password_confirmation) {
+    return { error: 'Passwords do not match' };
+  }
+
+  try {
+    const response = await api.signUp(userData);
+    if (!response.success) {
+      return { error: response.message || 'Registration failed' };
+    }
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : 'Registration failed' };
+  }
+
+  redirect('/student/profile/create');
 }
 
 // * Skill Management Actions

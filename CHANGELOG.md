@@ -19,6 +19,10 @@
 - Added Zustand stores: `src/lib/stores/sessionStore.ts`, `enrollmentStore.ts`, `groupStore.ts`, `qrStore.ts`
 
 ### Changed
+### Authentication
+- Sign-in page: added client-side validation (required fields), NextUI `Checkbox` for "Remember me", and consolidated inline error display. Composition aligns with DESIGN_GUIDE (props for variants, Tailwind for layout).
+- Sign-up page: added client-side validation including password confirmation check and unified inline error display per DESIGN_GUIDE. Kept server actions and redirects per ROUTE_SPECS.
+
 - Admin Groups page is now read-only; removed create/edit/delete UI and mutations.
 - Added Admin Sessions page under `/admin/sessions` for session management.
 
