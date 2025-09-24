@@ -37,8 +37,8 @@ export function AttendanceModal({
   const { data: students } = useQuery({
     queryKey: ['students'],
     queryFn: async () => {
-      const response = await api.getUsers({ role: 'Student' });
-      return response.data;
+      const response = await api.getStudents({ per_page: 100 });
+      return response.data?.results ?? [];
     },
   });
 
@@ -46,8 +46,13 @@ export function AttendanceModal({
   const { data: groups } = useQuery({
     queryKey: ['groups'],
     queryFn: async () => {
-      const response = await api.getGroups();
-      return response.data;
+      const response = await api.getSkillGroups({ per_page: 100 });
+      // Map to minimal shape for the Select usage below
+      return (response.data?.results ?? []).map((g: any) => ({
+        id: String(g.id),
+        name: g.group_display_name || `Group ${g.group_number}`,
+        skill: { title: g.skill?.title ?? 'Unknown' },
+      }));
     },
   });
 
@@ -139,9 +144,9 @@ export function AttendanceModal({
                 isRequired
                 variant="bordered"
               >
-                {students?.map((student) => (
-                  <SelectItem key={student.id} value={student.id}>
-                    {student.first_name} {student.last_name} ({student.email})
+                {students?.map((student: any) => (
+                  <SelectItem key={String(student.id)} value={String(student.id)}>
+                    {student.full_name ?? student.matric_number ?? String(student.id)}
                   </SelectItem>
                 )) || []}
               </Select>

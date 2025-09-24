@@ -2,8 +2,8 @@
 import React from "react"
 import { Input, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Skeleton, Chip, Avatar, Button } from "@nextui-org/react"
 import { useQuery } from "@tanstack/react-query"
-import { api } from "@/src/lib/api"
-import type { SkillGroup, User } from "@/src/lib/types"
+import { api } from "@/lib/api"
+import type { SkillGroup, User } from "@/lib/types"
 
 /**
  * * GroupStudentsRoster

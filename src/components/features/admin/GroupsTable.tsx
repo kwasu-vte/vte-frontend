@@ -110,53 +110,48 @@ export function GroupsTable({
                   </Button>
                 </DropdownTrigger>
                 <DropdownMenu aria-label="Group actions">
-                  {onView && (
-                    <DropdownItem
-                      key="view"
-                      startContent={<Eye className="w-4 h-4" />}
-                      onClick={() => onView(group)}
-                    >
-                      View Details
-                    </DropdownItem>
-                  )}
-                  {onEdit && (
-                    <DropdownItem
-                      key="edit"
-                      startContent={<Edit className="w-4 h-4" />}
-                      onClick={() => onEdit(group)}
-                    >
-                      Edit Group
-                    </DropdownItem>
-                  )}
-                  {onManageMembers && (
-                    <DropdownItem
-                      key="members"
-                      startContent={<Users className="w-4 h-4" />}
-                      onClick={() => onManageMembers(group)}
-                    >
-                      Manage Members
-                    </DropdownItem>
-                  )}
-                  {onManageAttendance && (
-                    <DropdownItem
-                      key="attendance"
-                      startContent={<Calendar className="w-4 h-4" />}
-                      onClick={() => onManageAttendance(group)}
-                    >
-                      Manage Attendance
-                    </DropdownItem>
-                  )}
-                  {onDelete && (
-                    <DropdownItem
-                      key="delete"
-                      className="text-danger"
-                      color="danger"
-                      startContent={<Trash2 className="w-4 h-4" />}
-                      onClick={() => onDelete(group)}
-                    >
-                      Delete Group
-                    </DropdownItem>
-                  )}
+                  <DropdownItem
+                    key="view"
+                    startContent={<Eye className="w-4 h-4" />}
+                    onClick={() => onView?.(group)}
+                    isDisabled={!onView}
+                  >
+                    View Details
+                  </DropdownItem>
+                  <DropdownItem
+                    key="edit"
+                    startContent={<Edit className="w-4 h-4" />}
+                    onClick={() => onEdit?.(group)}
+                    isDisabled={!onEdit}
+                  >
+                    Edit Group
+                  </DropdownItem>
+                  <DropdownItem
+                    key="members"
+                    startContent={<Users className="w-4 h-4" />}
+                    onClick={() => onManageMembers?.(group)}
+                    isDisabled={!onManageMembers}
+                  >
+                    Manage Members
+                  </DropdownItem>
+                  <DropdownItem
+                    key="attendance"
+                    startContent={<Calendar className="w-4 h-4" />}
+                    onClick={() => onManageAttendance?.(group)}
+                    isDisabled={!onManageAttendance}
+                  >
+                    Manage Attendance
+                  </DropdownItem>
+                  <DropdownItem
+                    key="delete"
+                    className="text-danger"
+                    color="danger"
+                    startContent={<Trash2 className="w-4 h-4" />}
+                    onClick={() => onDelete?.(group)}
+                    isDisabled={!onDelete}
+                  >
+                    Delete Group
+                  </DropdownItem>
                 </DropdownMenu>
               </Dropdown>
             </TableCell>

@@ -1,7 +1,7 @@
 "use client"
 import React from "react"
 import { Card, CardBody, CardHeader, Button, Input, Spinner } from "@nextui-org/react"
-import { api } from "@/src/lib/api"
+import { api } from "@/lib/api"
 import ScanResultModal from "./ScanResultModal"
 import ScanConfirmationModal from "./ScanConfirmationModal"
 import ScanProgressIndicator from "./ScanProgressIndicator"

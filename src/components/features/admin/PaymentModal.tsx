@@ -38,8 +38,8 @@ export function PaymentModal({
   const { data: students } = useQuery({
     queryKey: ['students'],
     queryFn: async () => {
-      const response = await api.getUsers({ role: 'Student' });
-      return response.data;
+      const response = await api.getStudents({ per_page: 100 });
+      return response.data?.results ?? [];
     },
   });
 
@@ -141,9 +141,9 @@ export function PaymentModal({
                 isRequired
                 variant="bordered"
               >
-                {students?.map((student) => (
-                  <SelectItem key={student.id} value={student.id}>
-                    {student.first_name} {student.last_name} ({student.email})
+                {students?.map((student: any) => (
+                  <SelectItem key={String(student.id)} value={String(student.id)}>
+                    {student.full_name ?? `${student.last_name ?? ''} ${student.first_name ?? ''}`.trim()} ({student.matric_number ?? 'N/A'})
                   </SelectItem>
                 )) || []}
               </Select>

@@ -5,8 +5,8 @@ import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { academicSessionsApi } from "@/src/lib/api/academic-sessions"
-import type { AcademicSession, SkillDateRange } from "@/src/lib/types"
+import { api } from "@/lib/api"
+import type { AcademicSession, SkillDateRange } from "@/lib/types"
 
 export type SkillDateRangeModalProps = {
   isOpen: boolean
@@ -34,8 +34,7 @@ export default function SkillDateRangeModal({ isOpen, skillId, academicSessionId
   const { data: sessions } = useQuery({
     queryKey: ["academic-sessions", "list"],
     queryFn: async (): Promise<AcademicSession[]> => {
-      const res = await academicSessionsApi.getAll()
-      if (!res.success) throw new Error(res.message || 'Failed to load sessions')
+      const res = await api.getAcademicSessions()
       return res.data
     },
   })

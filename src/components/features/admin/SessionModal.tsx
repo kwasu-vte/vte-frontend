@@ -5,8 +5,8 @@ import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { academicSessionsApi } from "@/src/lib/api/academic-sessions"
-import type { AcademicSession } from "@/src/lib/types"
+import { api } from "@/lib/api"
+import type { AcademicSession } from "@/lib/types"
 
 /**
  * * SessionModal
@@ -52,8 +52,7 @@ export default function SessionModal({ isOpen, mode, session, onClose }: Session
 
   const createMutation = useMutation({
     mutationFn: async (payload: FormValues) => {
-      const res = await academicSessionsApi.create({ name: payload.name, starts_at: payload.starts_at || null, ends_at: payload.ends_at || null })
-      if (!res.success) throw new Error(res.message || 'Failed to create session')
+      const res = await api.createAcademicSession({ name: payload.name, starts_at: payload.starts_at || null, ends_at: payload.ends_at || null })
       return res.data
     },
     onSuccess: () => {
@@ -65,9 +64,8 @@ export default function SessionModal({ isOpen, mode, session, onClose }: Session
   const updateMutation = useMutation({
     mutationFn: async (payload: FormValues) => {
       if (!session?.id && mode === 'edit') throw new Error('Missing session id')
-      const res = await academicSessionsApi.update(session!.id, { name: payload.name, starts_at: payload.starts_at || undefined, ends_at: payload.ends_at || undefined })
-      if (!res.success) throw new Error(res.message || 'Failed to update session')
-      return res.data
+      const res = await api.updateAcademicSession(session!.id, { name: payload.name, starts_at: payload.starts_at || undefined, ends_at: payload.ends_at || undefined })
+      return res
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["academic-sessions", "list"] })

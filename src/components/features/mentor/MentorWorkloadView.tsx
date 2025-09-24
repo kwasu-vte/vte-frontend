@@ -2,9 +2,9 @@
 import React from "react"
 import { Card, CardBody } from "@nextui-org/react"
 import { useQuery } from "@tanstack/react-query"
-import { api } from "@/src/lib/api"
-import type { GroupStatistics } from "@/src/lib/types"
-import { StatCard, StatCardGrid } from "@/src/components/shared/StatCard"
+import { api } from "@/lib/api"
+import type { GroupStatistics } from "@/lib/types"
+import { StatCard, StatCardGrid } from "@/components/shared/StatCard"
 
 /**
  * * MentorWorkloadView

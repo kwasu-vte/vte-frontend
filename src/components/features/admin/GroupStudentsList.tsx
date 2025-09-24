@@ -2,8 +2,8 @@
 import React from "react"
 import { useMemo, useState } from "react"
 import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tooltip } from "@nextui-org/react"
-import { useClientQuery } from "@/src/lib/hooks/useClientQuery"
-import { enrollmentsApi } from "@/src/lib/api"
+import { useClientQuery } from "@/lib/hooks/useClientQuery"
+import { api } from "@/lib/api"
 
 /**
  * * GroupStudentsList
@@ -32,20 +32,20 @@ export default function GroupStudentsList(props: GroupStudentsListProps) {
   const { data, isLoading, isError } = useClientQuery({
     queryKey: ["group-students", groupId],
     queryFn: async () => {
-      const res = await enrollmentsApi.getAll({ per_page: 1000 })
-      return res
+      const res = await api.getAllEnrollments({ per_page: 1000 })
+      return res.data
     },
     enabled: shouldFetch,
   })
 
   const list = useMemo(() => {
     const base = shouldFetch
-      ? (data?.data?.data || [])
+      ? (data?.results || [])
           .filter((e: any) => String(e.group?.id ?? e.skill_group_id) === String(groupId))
           .map((e: any) => ({
             id: String(e.student?.id || e.student_id),
-            matric: e.student?.matric || e.student?.matric_no || "",
-            name: e.student?.name || e.student?.full_name || "",
+            matric: e.student?.matric_number || e.student?.matric || e.student?.matric_no || "",
+            name: e.student?.full_name || `${e.student?.last_name ?? ''} ${e.student?.first_name ?? ''}`.trim(),
             status: e.status || "unknown",
           }))
       : students
@@ -84,7 +84,7 @@ export default function GroupStudentsList(props: GroupStudentsListProps) {
               <TableColumn>Matric</TableColumn>
               <TableColumn>Name</TableColumn>
               <TableColumn>Status</TableColumn>
-              {canManage && <TableColumn className="w-[120px]">Actions</TableColumn>}
+              <TableColumn className="w-[120px]">Actions</TableColumn>
             </TableHeader>
             <TableBody>
               {list.map((s) => (
@@ -96,8 +96,8 @@ export default function GroupStudentsList(props: GroupStudentsListProps) {
                       {s.status}
                     </Chip>
                   </TableCell>
-                  {canManage && (
-                    <TableCell>
+                  <TableCell>
+                    {canManage ? (
                       <div className="flex gap-2">
                         <Tooltip content="View profile">
                           <Button size="sm" variant="ghost">View</Button>
@@ -110,8 +110,8 @@ export default function GroupStudentsList(props: GroupStudentsListProps) {
                           </Tooltip>
                         )}
                       </div>
-                    </TableCell>
-                  )}
+                    ) : null}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>

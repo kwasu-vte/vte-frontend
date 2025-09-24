@@ -24,7 +24,7 @@ export default function MentorMyQRCodesView(props: { userId: string }) {
 
   React.useEffect(() => {
     if (!selectedGroupId && groups && groups.length > 0) {
-      setSelectedGroupId(groups[0].id)
+      setSelectedGroupId(Number(groups[0].id))
     }
   }, [groups, selectedGroupId])
 
@@ -44,7 +44,7 @@ export default function MentorMyQRCodesView(props: { userId: string }) {
     const map = new Map<string, GroupQrCode[]>()
     const items = codes?.results ?? []
     for (const c of items) {
-      const d = c.expires_at ? new Date(c.expires_at) : new Date(c.created_at)
+      const d = c.expires_at ? new Date(c.expires_at) : new Date()
       const key = new Date(d.getFullYear(), d.getMonth(), d.getDate()).toISOString()
       if (!map.has(key)) map.set(key, [])
       map.get(key)!.push(c)
@@ -78,7 +78,7 @@ export default function MentorMyQRCodesView(props: { userId: string }) {
               >
                 {groups.map((g) => (
                   <SelectItem key={String(g.id)} value={String(g.id)}>
-                    {g.name ?? `Group ${g.group_number ?? g.id}`} — {g.skill?.name ?? g.skill?.title}
+                    {(g as any).group_display_name ?? `Group ${g.group_number ?? g.id}`} — {g.skill?.title}
                   </SelectItem>
                 ))}
               </Select>
@@ -117,7 +117,7 @@ export default function MentorMyQRCodesView(props: { userId: string }) {
             ) : (
               <Tabs aria-label="QR Report" variant="underlined">
                 <Tab key="report" title="History & Report">
-                  <QRScanReport qrToken={selectedToken} groupId={selectedGroupId} perPage={25} />
+                  <QRScanReport qrToken={selectedToken} groupId={Number(selectedGroupId)} perPage={25} />
                 </Tab>
               </Tabs>
             )}

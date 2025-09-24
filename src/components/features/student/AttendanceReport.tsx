@@ -1,7 +1,7 @@
 "use client"
 import React from "react"
 import { Button, Chip } from "@nextui-org/react"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/src/components/ui/table"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 
 /**
  * * AttendanceReport

@@ -98,12 +98,12 @@ export default function MentorGroupsList(props: MentorGroupsListProps) {
           shadow="sm"
           className={isGrid ? "" : ""}
           isPressable={!!onSelectGroup}
-          onPress={() => onSelectGroup?.(group.id)}
+          onPress={() => onSelectGroup?.(Number(group.id))}
         >
           <CardHeader className="flex items-center justify-between">
             <div>
-              <p className="text-xl font-medium text-neutral-900">{group.name ?? `Group ${group.group_number ?? group.id}`}</p>
-              <p className="text-sm text-neutral-500">{group.skill?.name ?? "Unknown Skill"}</p>
+              <p className="text-xl font-medium text-neutral-900">{group.group_display_name ?? `Group ${group.group_number ?? group.id}`}</p>
+              <p className="text-sm text-neutral-500">{group.skill?.title ?? "Unknown Skill"}</p>
             </div>
             <Chip color="primary" variant="flat" size="sm">
               {group.group_number ? `#${group.group_number}` : `ID: ${group.id}`}
@@ -115,25 +115,25 @@ export default function MentorGroupsList(props: MentorGroupsListProps) {
                 Capacity
               </div>
               <div className="text-sm font-medium text-neutral-900">
-                {Number(group.current_count ?? group.members_count ?? 0)}/{Number(group.capacity ?? group.max_members ?? 0) || 0}
+                {Number(group.current_student_count ?? 0)}/{Number(group.max_student_capacity ?? 0)}
               </div>
             </div>
             <GroupCapacityIndicator
-              current={Number(group.current_count ?? group.members_count ?? 0)}
-              max={Number(group.capacity ?? group.max_members ?? 0) || 0}
+              current={Number(group.current_student_count ?? 0)}
+              max={Number(group.max_student_capacity ?? 0)}
               size="md"
             />
-            {group.next_practical_at && (
+            {(group as any)?.next_practical_at && (
               <div className="flex items-center justify-between">
                 <span className="text-sm text-neutral-600">Next practical</span>
                 <span className="text-sm font-medium text-neutral-900">
-                  {new Date(group.next_practical_at).toLocaleString()}
+                  {new Date((group as any).next_practical_at as string).toLocaleString()}
                 </span>
               </div>
             )}
             {onSelectGroup && (
               <div className="flex justify-end">
-                <Button color="primary" variant="bordered" onPress={() => onSelectGroup(group.id)}>
+                <Button color="primary" variant="bordered" onPress={() => onSelectGroup(Number(group.id))}>
                   View Roster
                 </Button>
               </div>

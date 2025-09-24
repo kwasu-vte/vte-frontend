@@ -35,12 +35,12 @@ export default function MentorGroupsPageView(props: { userId: string }) {
 
   const filteredGroups = React.useMemo(() => {
     const list = (groups ?? []) as SkillGroup[]
-    const bySkill = skillFilter ? list.filter((g) => String(g.skill?.id ?? g.skill_id) === String(skillFilter)) : list
+    const bySkill = skillFilter ? list.filter((g) => String(g.skill?.id) === String(skillFilter)) : list
     if (!search.trim()) return bySkill
     const q = search.trim().toLowerCase()
     return bySkill.filter((g) => {
-      const name = (g.name ?? g.group_display_name ?? `Group ${g.group_number ?? g.id}`).toLowerCase()
-      const skillName = (g.skill?.name ?? g.skill?.title ?? "").toLowerCase()
+      const name = (g.group_display_name ?? `Group ${g.group_number ?? g.id}`).toLowerCase()
+      const skillName = (g.skill?.title ?? "").toLowerCase()
       return name.includes(q) || skillName.includes(q)
     })
   }, [groups, skillFilter, search])
@@ -50,7 +50,7 @@ export default function MentorGroupsPageView(props: { userId: string }) {
     queryKey: ["group-attendance-report", selectedGroupId],
     queryFn: async () => {
       if (!selectedGroupId) return null as AttendanceReport | null
-      const res = await api.getGroupAttendanceReport(selectedGroupId)
+      const res = await api.getGroupAttendanceReport(Number(selectedGroupId))
       return (res?.data ?? null) as AttendanceReport | null
     },
     enabled: !!selectedGroupId,

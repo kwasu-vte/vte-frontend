@@ -77,8 +77,9 @@ export function StudentsTable({
       label: 'Enrollment Status',
       render: (student: StudentProfile) => {
         const enrolled = Number(student.enrollments_count || 0) > 0;
+        const chipColor: 'success' | 'warning' = enrolled ? 'success' : 'warning';
         return (
-          <Chip color={(enrolled ? 'success' : 'warning') as any} variant="flat" size="sm">
+          <Chip color={chipColor} variant="flat" size="sm">
             {enrolled ? 'Enrolled' : 'Not Enrolled'}
           </Chip>
         );
@@ -87,42 +88,57 @@ export function StudentsTable({
     {
       key: 'actions',
       label: 'Actions',
-      render: (student: StudentProfile) => (
-        <Dropdown>
-          <DropdownTrigger>
-            <Button isIconOnly size="sm" variant="light">
-              <MoreVertical className="w-4 h-4" />
-            </Button>
-          </DropdownTrigger>
-          <DropdownMenu aria-label="Student actions">
+      render: (student: StudentProfile) => {
+        const actionItems: React.ReactElement[] = [
+          (
             <DropdownItem key="view" startContent={<Eye className="w-4 h-4" />} onClick={() => onView(student)}>
               View Details
             </DropdownItem>
-            {onEdit && (
-              <DropdownItem key="edit" startContent={<Edit className="w-4 h-4" />} onClick={() => onEdit(student)}>
-                Edit Student
-              </DropdownItem>
-            )}
+          ),
+          (
             <DropdownItem key="profile" startContent={<UserIcon className="w-4 h-4" />} onClick={() => onManageProfile(student)}>
               Manage Profile
             </DropdownItem>
+          ),
+          (
             <DropdownItem key="enrollments" startContent={<BookOpen className="w-4 h-4" />} onClick={() => onManageEnrollments(student)}>
               Manage Enrollments
             </DropdownItem>
-            {onDelete && (
-              <DropdownItem
-                key="delete"
-                className="text-danger"
-                color="danger"
-                startContent={<Trash2 className="w-4 h-4" />}
-                onClick={() => onDelete(student)}
-              >
-                Delete Student
-              </DropdownItem>
-            )}
-          </DropdownMenu>
-        </Dropdown>
-      ),
+          ),
+        ];
+
+        if (onEdit) {
+          actionItems.splice(1, 0,
+            <DropdownItem key="edit" startContent={<Edit className="w-4 h-4" />} onClick={() => onEdit(student)}>
+              Edit Student
+            </DropdownItem>
+          );
+        }
+        if (onDelete) {
+          actionItems.push(
+            <DropdownItem
+              key="delete"
+              className="text-danger"
+              color="danger"
+              startContent={<Trash2 className="w-4 h-4" />}
+              onClick={() => onDelete(student)}
+            >
+              Delete Student
+            </DropdownItem>
+          );
+        }
+
+        return (
+          <Dropdown>
+            <DropdownTrigger>
+              <Button isIconOnly size="sm" variant="light">
+                <MoreVertical className="w-4 h-4" />
+              </Button>
+            </DropdownTrigger>
+            <DropdownMenu aria-label="Student actions">{actionItems}</DropdownMenu>
+          </Dropdown>
+        );
+      },
     },
   ];
 

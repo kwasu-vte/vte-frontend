@@ -2,9 +2,9 @@
 import React, { useMemo } from "react"
 import { Button, Chip } from "@nextui-org/react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { academicSessionsApi } from "@/src/lib/api/academic-sessions"
-import type { AcademicSession } from "@/src/lib/types"
-import { DataTable } from "@/src/components/shared/DataTable"
+import { api } from "@/lib/api"
+import type { AcademicSession } from "@/lib/types"
+import { DataTable } from "@/components/shared/DataTable"
 import SessionStatusBadge from "./SessionStatusBadge"
 
 /**
@@ -23,8 +23,7 @@ export default function SessionsTable({ onEdit }: SessionsTableProps) {
   const { data, isLoading, error } = useQuery({
     queryKey: ["academic-sessions", "list"],
     queryFn: async () => {
-      const res = await academicSessionsApi.getAll()
-      if (!res.success) throw new Error(res.message || "Failed to fetch sessions")
+      const res = await api.getAcademicSessions()
       return res.data
     },
   })
@@ -34,8 +33,7 @@ export default function SessionsTable({ onEdit }: SessionsTableProps) {
   // * Mutations: start/end session
   const startMutation = useMutation({
     mutationFn: async (id: number) => {
-      const res = await academicSessionsApi.start(id)
-      if (!res.success) throw new Error(res.message || "Failed to start session")
+      const res = await api.startAcademicSession(id)
       return res.data
     },
     onSuccess: () => {
@@ -45,8 +43,7 @@ export default function SessionsTable({ onEdit }: SessionsTableProps) {
 
   const endMutation = useMutation({
     mutationFn: async (id: number) => {
-      const res = await academicSessionsApi.end(id)
-      if (!res.success) throw new Error(res.message || "Failed to end session")
+      const res = await api.endAcademicSession(id)
       return res.data
     },
     onSuccess: () => {

@@ -38,15 +38,17 @@ export function StudentModal({
   useEffect(() => {
     if (isOpen) {
       if (student) {
+        const fullName = (student as any).full_name as string | undefined
+        const [ln = '', fn = ''] = fullName ? fullName.split(' ').length > 1 ? [fullName.split(' ')[0], fullName.split(' ').slice(1).join(' ')] : [fullName, ''] : ['', '']
         setFormData({
-          first_name: student.first_name,
-          last_name: student.last_name,
-          email: student.email,
+          first_name: fn,
+          last_name: ln,
+          email: '',
           password: '',
           password_confirmation: '',
           matric_number: student.matric_number || '',
-          level: student.level || '',
-          role: student.role
+          level: (student as any).student_level || '',
+          role: 'Student'
         });
       } else {
         setFormData({

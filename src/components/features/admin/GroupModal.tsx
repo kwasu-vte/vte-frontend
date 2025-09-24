@@ -154,7 +154,7 @@ export function GroupModal({
             >
               {mentors?.map((mentor) => (
                 <SelectItem key={mentor.id} value={mentor.id}>
-                  {mentor.first_name} {mentor.last_name}
+                  {mentor.full_name || mentor.user?.first_name + ' ' + mentor.user?.last_name || String(mentor.id)}
                 </SelectItem>
               )) || []}
             </Select>

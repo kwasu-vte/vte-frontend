@@ -2,8 +2,8 @@
 import React from "react"
 import { Tabs, Tab, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Button, Skeleton } from "@nextui-org/react"
 import { useQuery } from "@tanstack/react-query"
-import { api } from "@/src/lib/api"
-import type { AttendanceReport, QrScanHistory } from "@/src/lib/types"
+import { api } from "@/lib/api"
+import type { AttendanceReport, QrScanHistory } from "@/lib/types"
 
 export type QRScanReportProps = {
   qrToken: string
@@ -78,14 +78,16 @@ export default function QRScanReport(props: QRScanReportProps) {
             <TableColumn>Practical Date</TableColumn>
           </TableHeader>
           <TableBody>
-            {report && (
-              <TableRow key={report.group_info.id}>
-                <TableCell>#{report.group_info.group_number}</TableCell>
-                <TableCell>{report.group_info.skill_title}</TableCell>
-                <TableCell>{report.group_info.total_enrolled}</TableCell>
-                <TableCell>{report.group_info.practical_date ? new Date(report.group_info.practical_date).toLocaleDateString() : '—'}</TableCell>
-              </TableRow>
-            )}
+            {report ? [
+              (
+                <TableRow key={report.group_info.id}>
+                  <TableCell>#{report.group_info.group_number}</TableCell>
+                  <TableCell>{report.group_info.skill_title}</TableCell>
+                  <TableCell>{report.group_info.total_enrolled}</TableCell>
+                  <TableCell>{report.group_info.practical_date ? new Date(report.group_info.practical_date).toLocaleDateString() : '—'}</TableCell>
+                </TableRow>
+              )
+            ] : []}
           </TableBody>
         </Table>
       </Tab>

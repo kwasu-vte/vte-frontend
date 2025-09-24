@@ -1,7 +1,7 @@
 "use client"
 import React, { useMemo } from "react"
 import { Chip } from "@nextui-org/react"
-import type { AcademicSession } from "@/src/lib/types"
+import type { AcademicSession } from "@/lib/types"
 
 /**
  * * SessionStatusBadge

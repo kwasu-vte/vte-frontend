@@ -122,11 +122,13 @@ export function MentorsTable({
                   >
                     Manage Groups
                   </DropdownItem>
-                  {onAssignSkills && (
-                    <DropdownItem key="assign" onClick={() => onAssignSkills(mentor)}>
-                      Assign Skills
-                    </DropdownItem>
-                  )}
+                  <DropdownItem
+                    key="assign"
+                    onClick={() => onAssignSkills?.(mentor)}
+                    isDisabled={!onAssignSkills}
+                  >
+                    Assign Skills
+                  </DropdownItem>
                 </DropdownMenu>
               </Dropdown>
             </TableCell>

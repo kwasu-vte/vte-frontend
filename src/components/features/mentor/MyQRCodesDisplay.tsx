@@ -2,8 +2,8 @@
 import React from "react"
 import { Card, CardBody, CardHeader, Button, Chip, Skeleton } from "@nextui-org/react"
 import { useQuery } from "@tanstack/react-query"
-import { api } from "@/src/lib/api"
-import type { PaginatedResponse, GroupQrCode } from "@/src/lib/types"
+import { api } from "@/lib/api"
+import type { PaginatedResponse, GroupQrCode } from "@/lib/types"
 
 /**
  * * MyQRCodesDisplay

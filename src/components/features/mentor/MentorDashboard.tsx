@@ -48,7 +48,7 @@ export default function MentorDashboard(props: MentorDashboardProps) {
     queries: qrGroups.map((g) => ({
       queryKey: ["group-qr-codes", g.id, "active"],
       queryFn: async () => {
-        const res = await api.listGroupQrCodes(g.id, { status: "active", per_page: 20 })
+        const res = await api.listGroupQrCodes(Number(g.id), { status: "active", per_page: 20 })
         return { groupId: g.id, data: (res?.data as PaginatedResponse<GroupQrCode>) ?? null }
       },
       enabled: !!g?.id,
@@ -73,7 +73,7 @@ export default function MentorDashboard(props: MentorDashboardProps) {
     queryKey: ["group-attendance-report", primaryGroup?.id],
     queryFn: async () => {
       if (!primaryGroup?.id) return null as AttendanceReport | null
-      const res = await api.getGroupAttendanceReport(primaryGroup.id)
+      const res = await api.getGroupAttendanceReport(Number(primaryGroup.id))
       return (res?.data ?? null) as AttendanceReport | null
     },
     enabled: !!primaryGroup?.id && !selectedActiveToken,
@@ -117,8 +117,8 @@ export default function MentorDashboard(props: MentorDashboardProps) {
                       <Card key={g.id} shadow="sm" className="p-4">
                         <CardHeader className="flex items-center justify-between">
                           <div>
-                            <p className="text-base font-medium text-neutral-900">{g.name ?? `Group ${g.group_number ?? g.id}`}</p>
-                            <p className="text-sm text-neutral-500">{g.skill?.name ?? "Unknown Skill"}</p>
+                            <p className="text-base font-medium text-neutral-900">{(g as any).group_display_name ?? `Group ${g.group_number ?? g.id}`}</p>
+                            <p className="text-sm text-neutral-500">{g.skill?.title ?? "Unknown Skill"}</p>
                           </div>
                           <Chip size="sm" color="primary" variant="flat">#{g.group_number ?? g.id}</Chip>
                         </CardHeader>
@@ -142,7 +142,7 @@ export default function MentorDashboard(props: MentorDashboardProps) {
             </CardHeader>
             <CardBody>
               {selectedActiveToken && primaryGroup ? (
-                <QRScanReport qrToken={selectedActiveToken} groupId={primaryGroup.id} perPage={10} />
+                <QRScanReport qrToken={selectedActiveToken} groupId={Number(primaryGroup.id)} perPage={10} />
               ) : loadingReport ? (
                 <div className="space-y-4">
                   <Skeleton className="h-8 w-48 rounded-md" />
@@ -198,10 +198,10 @@ export default function MentorDashboard(props: MentorDashboardProps) {
                     <div key={g.id} className="border rounded-md p-3 bg-neutral-50">
                       <div className="flex items-center justify-between mb-2">
                         <p className="text-sm font-medium text-neutral-900">Group #{g.group_number ?? g.id}</p>
-                        <Chip size="sm" variant="flat">{g.skill?.name ?? "Skill"}</Chip>
+                        <Chip size="sm" variant="flat">{g.skill?.title ?? "Skill"}</Chip>
                       </div>
                       {/* Reuse existing display component scoped by group */}
-                      <MyQRCodesDisplay groupId={g.id} />
+                      <MyQRCodesDisplay groupId={Number(g.id)} />
                     </div>
                   ))}
                 </div>
@@ -215,7 +215,11 @@ export default function MentorDashboard(props: MentorDashboardProps) {
               <p className="text-base font-medium text-neutral-900">Upcoming Calendar</p>
             </CardHeader>
             <CardBody>
-              <PracticalCalendar />
+              <PracticalCalendar
+                practicalDates={(groups ?? []).flatMap((g) =>
+                  (g.practical_dates ?? []).map((d) => ({ date: d }))
+                )}
+              />
             </CardBody>
           </Card>
         </div>
