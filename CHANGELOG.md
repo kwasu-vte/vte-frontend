@@ -397,3 +397,6 @@
 - EnrollmentStatusBadge with NextUI Chip and optional tooltip.
 - EnrollmentFilters using NextUI Select and React Query for sessions/skills.
 - EnrollmentsTable with DataTable wrapper, server pagination, and loading/empty states.
+
+## [Unreleased] - 2025-09-24
+- Implement Phase 3 admin components per DESIGN_GUIDE: GroupCapacityIndicator, GroupStudentsList, QRGenerationForm, QRDistributionTracker, MentorQRAssignment
