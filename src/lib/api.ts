@@ -85,12 +85,14 @@ class ApiClient {
       : '';
     const url = isServer ? `${origin}${proxyUrl}` : proxyUrl;
     
+    const baseHeaders: Record<string, string> = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      ...(options.headers as Record<string, string> | undefined),
+    };
+
     const config: RequestInit = {
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        ...options.headers,
-      },
+      headers: baseHeaders,
       ...options,
     };
 
@@ -100,12 +102,10 @@ class ApiClient {
         const { cookies } = await import('next/headers');
         const cookieStore = await cookies();
         const sessionToken = cookieStore.get('session_token');
-        
-        if (sessionToken && !config.headers?.['Authorization']) {
-          config.headers = {
-            ...config.headers,
-            'Cookie': `session_token=${sessionToken.value}`,
-          };
+        const headers = config.headers as Record<string, string>;
+        if (sessionToken && !('Authorization' in headers)) {
+          headers['Cookie'] = `session_token=${sessionToken.value}`;
+          config.headers = headers;
         }
       } catch (error) {
         // * If we can't get cookies, continue without them

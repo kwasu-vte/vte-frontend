@@ -1,3 +1,3 @@
-export { SkillGroup, CreateSkillGroupPayload, AssignStudentPayload, GroupStatistics, AutoAssignPayload, AutoAssignResponse } from '../types';
+export type { SkillGroup, CreateSkillGroupPayload, AssignStudentPayload, GroupStatistics, AutoAssignPayload, AutoAssignResponse } from '../types';
 
 

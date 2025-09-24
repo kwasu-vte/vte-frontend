@@ -8,7 +8,7 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { api } from './api';
-import { CreateSkillPayload, UpdateSkillPayload, CreateGroupPayload, CreateUserPayload, CreateStudentProfilePayload } from './types';
+import { CreateSkillPayload, UpdateSkillPayload, CreateSkillGroupPayload, CreateUserPayload, CreateStudentProfilePayload } from './types';
 
 // * Authentication Actions
 export async function signInAction(formData: FormData) {
@@ -211,8 +211,6 @@ export async function createSkillAction(formData: FormData) {
     max_groups: parseInt(formData.get('maxGroups') as string),
     min_students_per_group: parseInt(formData.get('minStudentsPerGroup') as string),
     max_students_per_group: formData.get('maxStudentsPerGroup') ? parseInt(formData.get('maxStudentsPerGroup') as string) : null,
-    date_range_start: formData.get('dateRangeStart') as string,
-    date_range_end: formData.get('dateRangeEnd') as string,
     meta: formData.get('meta') ? [formData.get('meta') as string] : null,
     allowed_levels: (formData.get('allowedLevels') as string).split(',').filter(Boolean),
   };
@@ -266,13 +264,14 @@ export async function deleteSkillAction(id: string) {
 
 // * Group Management Actions
 export async function createGroupAction(formData: FormData) {
-  const groupData: CreateGroupPayload = {
-    skill_id: formData.get('skillId') as string,
-    force: formData.get('force') === 'true',
+  const groupData: CreateSkillGroupPayload = {
+    skill_id: Number(formData.get('skillId')),
+    academic_session_id: Number(formData.get('academicSessionId')),
+    group_number: formData.get('groupNumber') ? Number(formData.get('groupNumber')) : undefined,
   };
   
   try {
-    const response = await api.createGroup(groupData);
+    const response = await api.createSkillGroup(groupData);
     
     if (response.success) {
       return { success: true, data: response.data };
@@ -286,24 +285,13 @@ export async function createGroupAction(formData: FormData) {
 
 // * User Management Actions
 export async function updateUserAction(id: string, formData: FormData) {
+  // * Not implemented in current API; keep placeholder for future extension
   const userData: Partial<CreateUserPayload> = {
     first_name: formData.get('firstName') as string,
     last_name: formData.get('lastName') as string,
     email: formData.get('email') as string,
-    // Note: matricNumber, level, role are not part of CreateUserPayload in OpenAPI spec
   };
-  
-  try {
-    const response = await api.updateUser(id, userData);
-    
-    if (response.success) {
-      return { success: true, data: response.data };
-    } else {
-      throw new Error(response.message || 'Failed to update user');
-    }
-  } catch (error) {
-    throw new Error(error instanceof Error ? error.message : 'Failed to update user');
-  }
+  throw new Error('updateUserAction is not supported by the current API');
 }
 
 // * Academic Sessions Actions
@@ -401,10 +389,6 @@ export async function createStudentProfileAction(userId: string, formData: FormD
 }
 
 export async function deleteUserAction(id: string) {
-  try {
-    await api.deleteUser(id);
-    return { success: true };
-  } catch (error) {
-    throw new Error(error instanceof Error ? error.message : 'Failed to delete user');
-  }
+  // * Not implemented in current API; placeholder for future extension
+  throw new Error('deleteUserAction is not supported by the current API');
 }

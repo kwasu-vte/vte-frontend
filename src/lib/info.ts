@@ -4,7 +4,8 @@
 
 import { api } from './api';
 
-export async function makePayment({course, specialization}: {course: string, specialization: string | null}) {
+export async function makePayment(params: { course: string; specialization: string | null }) {
+    const { course, specialization: rawSpecialization } = params
     /** This function is used to make payment 
      * 
      *  Argument: 
@@ -12,15 +13,11 @@ export async function makePayment({course, specialization}: {course: string, spe
      *     specialization: This represents the specialization of the class
      *  Return: This returns the activation_url to be redirected to.
     **/
-   specialization = specialization === "" ? null : specialization;
+   const specialization = rawSpecialization === "" ? null : rawSpecialization;
    
    try {
-        // * Use centralized API service - no client-side token handling
-        const response = await api.makePayment({ course, specialization });
-        
-        if (response.success) {
-            return response.data.authorization_url;
-        }
+        // * Not implemented in current API surface. Use enrollment payment flows instead.
+        console.warn('makePayment is not supported by current API. Use payForEnrollment instead.');
         return false;
    } catch(err) {
         console.error('Payment error:', err);
@@ -36,12 +33,8 @@ export async function paystackRedirect({reference}: {reference: string}) {
      *  return: It returns a msg to represent success.  
      */
     try {
-        // * Use centralized API service - no client-side token handling
-        const response = await api.activateCourse({ reference });
-        
-        if (response.success) {
-            return response.data.msg;
-        }
+        // * Not implemented in current API surface.
+        console.warn('paystackRedirect is not supported by current API.');
         return false;
     } catch (err) {
         console.error('Course activation error:', err);

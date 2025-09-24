@@ -24,12 +24,14 @@ export async function apiRequest<T>(endpoint: string, options: RequestInit = {})
     : '';
   const url = isServer ? `${origin}${proxyUrl}` : proxyUrl;
 
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+    ...(options.headers as Record<string, string> | undefined),
+  };
+
   const config: RequestInit = {
-    headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      ...options.headers,
-    },
+    headers,
     ...options,
   };
 
@@ -38,11 +40,9 @@ export async function apiRequest<T>(endpoint: string, options: RequestInit = {})
       const { cookies } = await import('next/headers');
       const cookieStore = await cookies();
       const sessionToken = cookieStore.get('session_token');
-      if (sessionToken && !config.headers?.['Authorization']) {
-        config.headers = {
-          ...config.headers,
-          'Cookie': `session_token=${sessionToken.value}`,
-        } as HeadersInit;
+      if (sessionToken && !('Authorization' in headers)) {
+        headers['Cookie'] = `session_token=${sessionToken.value}`;
+        config.headers = headers;
       }
     } catch (error) {
       // * Continue without cookies when unavailable in context
