@@ -83,7 +83,7 @@ export default function SessionsTable({ onEdit }: SessionsTableProps) {
         )}
       </div>
     ) },
-  ], [endMutation.isPending, onEdit, startMutation.isPending])
+  ], [endMutation, onEdit, startMutation])
 
   return (
     <div className="space-y-3">
