@@ -400,3 +400,14 @@
 
 ## [Unreleased] - 2025-09-24
 - Implement Phase 3 admin components per DESIGN_GUIDE: GroupCapacityIndicator, GroupStudentsList, QRGenerationForm, QRDistributionTracker, MentorQRAssignment
+
+## [Phase 4] Mentor components populated (YYYY-MM-DD)
+- Implemented MentorGroupsList with API data, loading/error/empty states.
+- Added GroupStudentsRoster searchable table.
+- Added GroupScheduleCard with derived upcoming sessions from skill date range.
+- Implemented MentorSkillAssignment for add/remove skills with feedback.
+- Added MentorWorkloadView KPIs from group statistics.
+- Implemented MyQRCodesDisplay with copy/print actions.
+- Finalized PracticalQRCard for token display/print.
+- Implemented QRScanReport with history/report tabs and refresh.
+
