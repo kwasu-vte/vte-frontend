@@ -1,14 +1,24 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { api } from '@/lib/api';
-import { useMutation } from '@tanstack/react-query';
-import { Button, Input, Select, SelectItem } from '@nextui-org/react';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { Button, Select, SelectItem } from '@nextui-org/react';
 import { DefaultErrorComponent, DefaultLoadingComponent } from '@/components/shared/StateRenderer';
 
 export default function AdminReportsPage() {
   const [groupId, setGroupId] = useState<string>('');
   const [type, setType] = useState<'attendance' | 'capacity'>('attendance');
+
+  const { data: groupsData } = useQuery({
+    queryKey: ['skill-groups', { per_page: 100 }],
+    queryFn: async () => {
+      const res = await api.getSkillGroups({ per_page: 100 })
+      return res.data?.results ?? []
+    },
+  })
+
+  const groups = useMemo(() => (groupsData || []).map((g: any) => ({ id: g.id, name: g.group_display_name || `Group ${g.group_number}` })), [groupsData])
 
   const reportMutation = useMutation({
     mutationFn: async () => {
@@ -39,13 +49,17 @@ export default function AdminReportsPage() {
             <SelectItem key="attendance" value="attendance">Attendance</SelectItem>
             <SelectItem key="capacity" value="capacity">Capacity Overview</SelectItem>
           </Select>
-          <Input
-            label="Group ID (for attendance)"
-            placeholder="e.g. 12"
-            value={groupId}
-            onValueChange={setGroupId}
+          <Select
+            label="Group (for attendance)"
+            placeholder="Select group"
+            selectedKeys={groupId ? [groupId] : []}
+            onChange={(e) => setGroupId(e.target.value)}
             isDisabled={type !== 'attendance'}
-          />
+          >
+            {groups.map((g) => (
+              <SelectItem key={String(g.id)}>{g.name}</SelectItem>
+            ))}
+          </Select>
           <div className="flex items-end">
             <Button color="primary" isDisabled={type === 'attendance' && !groupId} onClick={() => reportMutation.mutate()}>
               Generate
@@ -60,6 +74,7 @@ export default function AdminReportsPage() {
           <div className="p-4"><DefaultErrorComponent error={reportMutation.error as Error} /></div>
         )}
         {reportMutation.isSuccess && (
+          // TODO: Replace JSON dump with visual report viewer and export options (CSV/PDF).
           <pre className="bg-neutral-50 border border-neutral-200 rounded p-4 overflow-auto text-xs">
 {JSON.stringify(reportMutation.data, null, 2)}
           </pre>

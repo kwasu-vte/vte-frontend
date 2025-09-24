@@ -1,9 +1,11 @@
 "use client"
 import React from "react"
-import { useState } from "react"
+import { useEffect, useMemo, useState } from "react"
+import { useQuery } from "@tanstack/react-query"
 import { Button, Card, CardBody, CardHeader, Input, Select, SelectItem, Spinner } from "@nextui-org/react"
 import { z } from "zod"
-import { qrCodesApi } from "@/src/lib/api"
+import { api } from "@/lib/api"
+import { qrCodesApi } from "@/lib/api"
 
 /**
  * * QRGenerationForm
@@ -16,9 +18,8 @@ import { qrCodesApi } from "@/src/lib/api"
  * - onGenerate: (payload: any) => void // TODO: Replace any with concrete type when backend contracts are finalized
  */
 export type QRGenerationFormProps = {
-  groups: Array<{ id: string; name: string }>
-  mentors: Array<{ id: string; name: string }>
-  onGenerate: (payload: unknown) => void
+  onGenerate?: (payload: unknown) => void
+  onGroupSelected?: (groupId: number) => void
 }
 
 const PayloadSchema = z.object({
@@ -30,8 +31,8 @@ const PayloadSchema = z.object({
   pointsPerScan: z.coerce.number().int().min(1).max(100).default(1),
 })
 
-export default function QRGenerationForm(props: QRGenerationFormProps) {
-  const { groups, mentors, onGenerate } = props
+export function QRGenerationForm(props: QRGenerationFormProps) {
+  const { onGenerate, onGroupSelected } = props
   const [mode, setMode] = useState<"single" | "bulk">("single")
   const [groupId, setGroupId] = useState<string>("")
   const [mentorId, setMentorId] = useState<string>("")
@@ -40,6 +41,29 @@ export default function QRGenerationForm(props: QRGenerationFormProps) {
   const [pointsPerScan, setPointsPerScan] = useState<string>("1")
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  const { data: groupsData } = useQuery({
+    queryKey: ["skill-groups", { per_page: 100 }],
+    queryFn: async () => {
+      const res = await api.getSkillGroups({ per_page: 100 })
+      return res.data?.results ?? []
+    },
+  })
+
+  const { data: mentorsData } = useQuery({
+    queryKey: ["mentors", { per_page: "100" }],
+    queryFn: async () => {
+      const res = await api.getMentors({ per_page: "100" })
+      return res.data ?? []
+    },
+  })
+
+  const groups = useMemo(() => (groupsData || []).map((g: any) => ({ id: g.id, name: g.group_display_name || `Group ${g.group_number}` })), [groupsData])
+  const mentors = useMemo(() => (mentorsData || []).map((m: any) => ({ id: m.user_id || m.id, name: m.full_name || m.user?.first_name + ' ' + m.user?.last_name })), [mentorsData])
+
+  // TODO: Allow selecting academic session to scope groups.
+  // TODO: Show generation result summary with quick link to print page.
+  // TODO: Validate mentor belongs to group/skill context when backend supports it.
 
   async function handleSubmit() {
     setError(null)
@@ -61,7 +85,8 @@ export default function QRGenerationForm(props: QRGenerationFormProps) {
           expires_in_days: parsed.expiresInDays,
           points_per_scan: parsed.pointsPerScan,
         } as any)
-        onGenerate(res)
+        onGenerate && onGenerate(res)
+        onGroupSelected && onGroupSelected(parsed.groupId)
       } else {
         const res = await qrCodesApi.bulkGenerate({
           group_ids: groups.map((g) => Number(g.id)),
@@ -69,7 +94,7 @@ export default function QRGenerationForm(props: QRGenerationFormProps) {
           expires_in_days: parsed.expiresInDays,
           points_per_scan: parsed.pointsPerScan,
         } as any)
-        onGenerate(res)
+        onGenerate && onGenerate(res)
       }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to generate QR codes")

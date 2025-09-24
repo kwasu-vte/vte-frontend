@@ -2,8 +2,8 @@
 import React from "react"
 import { useMemo, useState } from "react"
 import { Button, Card, CardBody, CardHeader, Chip, Pagination, Select, SelectItem, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tooltip } from "@nextui-org/react"
-import { useClientQuery } from "@/src/lib/hooks/useClientQuery"
-import { qrCodesApi } from "@/src/lib/api"
+import { useQuery } from "@tanstack/react-query"
+import { qrCodesApi } from "@/lib/api"
 
 /**
  * * QRDistributionTracker
@@ -15,32 +15,35 @@ import { qrCodesApi } from "@/src/lib/api"
  * - onMarkDistributed: (batchId: string) => void
  */
 export type QRDistributionTrackerProps = {
-  qrBatches: Array<{ id: string; mentor: string; group: string; date: string; status: "distributed" | "pending" }>
-  onMarkDistributed: (batchId: string) => void
+  selectedGroupId?: number | null
+  qrBatches?: Array<{ id: string; mentor: string; group: string; date: string; status: "distributed" | "pending" }>
+  onMarkDistributed?: (batchId: string) => void
 }
 
-export default function QRDistributionTracker(props: QRDistributionTrackerProps) {
-  const { qrBatches, onMarkDistributed } = props
+export function QRDistributionTracker(props: QRDistributionTrackerProps) {
+  const { selectedGroupId, qrBatches, onMarkDistributed } = props
   const [status, setStatus] = useState<"all" | "active" | "expired">("all")
   const [page, setPage] = useState(1)
+  // TODO: Persist distribution status via API when backend endpoint is available.
+  // TODO: Support global (multi-group) distribution view when a list-all endpoint exists.
 
   // * If parent did not provide batches, fetch codes and aggregate
-  const shouldFetch = !qrBatches || qrBatches.length === 0
-  const { data, isLoading, isError } = useClientQuery({
-    queryKey: ["qr-codes", status, page],
+  const shouldFetch = (!!selectedGroupId) && (!qrBatches || qrBatches.length === 0)
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["qr-codes", selectedGroupId, status, page],
     queryFn: async () => {
-      // NOTE: API is per-group; since we lack group here, this acts as a placeholder fetch path
-      // In real usage, parent should provide batches; we keep this resilient
-      return { data: { data: [] } } as any
+      if (!selectedGroupId) return { results: [] } as any
+      const res = await qrCodesApi.listGroupCodes(selectedGroupId, { per_page: 100, status: status === 'all' ? 'all' : status === 'active' ? 'active' : 'expired' })
+      return res.data
     },
     enabled: shouldFetch,
   })
 
   const rows = useMemo(() => {
-    const base = shouldFetch ? (data?.data?.data || []) : qrBatches
+    const base = shouldFetch ? (data?.results || []) : (qrBatches || [])
     if (status === "all") return base
     // Map our status to API status names when applicable
-    return base.filter((b: any) => (status === "active" ? b.status === "pending" : b.status === "expired" || b.status === "distributed"))
+    return base.filter((b: any) => (status === "active" ? b.status === "active" : b.status !== "active"))
   }, [shouldFetch, data, qrBatches, status])
 
   const totalPages = Math.max(1, Math.ceil(rows.length / 10))
@@ -59,6 +62,7 @@ export default function QRDistributionTracker(props: QRDistributionTrackerProps)
         </div>
       </CardHeader>
       <CardBody>
+        {/* TODO: Add a print labels dialog with preview and printer tips. */}
         {isLoading ? (
           <div className="flex items-center justify-center py-8"><Spinner label="Loading..." /></div>
         ) : isError ? (
@@ -86,11 +90,13 @@ export default function QRDistributionTracker(props: QRDistributionTrackerProps)
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-2">
-                        <Tooltip content="Mark as distributed">
-                          <Button size="sm" color="primary" variant="bordered" onPress={() => onMarkDistributed(String(b.id))} isDisabled={b.status === "distributed"}>
+                        {onMarkDistributed && (
+                          <Tooltip content="Mark as distributed">
+                            <Button size="sm" color="primary" variant="bordered" onPress={() => onMarkDistributed(String(b.id))} isDisabled={b.status === "distributed"}>
                             Mark Distributed
-                          </Button>
-                        </Tooltip>
+                            </Button>
+                          </Tooltip>
+                        )}
                         <Tooltip content="Print labels">
                           <Button size="sm" variant="ghost">Print</Button>
                         </Tooltip>

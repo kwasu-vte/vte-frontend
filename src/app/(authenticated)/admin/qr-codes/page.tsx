@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useState } from 'react';
 import { QRGenerationForm } from '@/components/features/admin/QRGenerationForm';
