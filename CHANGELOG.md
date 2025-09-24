@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+- Admin Dashboard: Implemented server-side data fetch for sessions, group statistics, and enrollments; added StatCard grid, Recent Activity list, and Quick Actions panel with resilient fallbacks per docs/ROUTE_SPECS.md and docs/DESIGN_GUIDE.md.
+- Admin: Added Enrollments page with filters/table; added nested Skills → Groups page; added QR Codes (main/print/distribution) pages; added Reports page; updated Sidebar with Enrollments, QR Codes, Reports links.
+
+## [Unreleased]
+
 ### Added
 - Split monolithic `src/lib/api.ts` into domain-specific services under `src/lib/api/`
   - Added: `academic-sessions.ts`, `enrollments.ts`, `qr-codes.ts`, `skill-groups.ts`, `mentors.ts`, `students.ts`

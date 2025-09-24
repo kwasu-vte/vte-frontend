@@ -3,95 +3,137 @@
 // * Demonstrates the new architecture in action
 
 import PWATestPanel from '@/components/shared/PWATestPanel';
+import { StatCard, StatCardGrid } from '@/components/shared/StatCard';
+import { api } from '@/lib/api';
+import type { AcademicSession, GroupStatistics, PaginatedResponse, Enrollment } from '@/lib/types';
+import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
 
-export default function AdminDashboard() {
+async function getDashboardData() {
+  // * Fetch in parallel with fail-safe handling
+  const [sessionsRes, statsRes, enrollmentsRes] = await Promise.allSettled([
+    api.getAcademicSessions(),
+    api.getGroupStatistics(),
+    api.getAllEnrollments({ per_page: 25 }),
+  ]);
+
+  const sessions: AcademicSession[] = sessionsRes.status === 'fulfilled' && sessionsRes.value?.data ? sessionsRes.value.data : [];
+  const stats: GroupStatistics | null = statsRes.status === 'fulfilled' && statsRes.value?.data ? statsRes.value.data : null;
+  const enrollments: PaginatedResponse<Enrollment> | null = enrollmentsRes.status === 'fulfilled' && enrollmentsRes.value?.data ? enrollmentsRes.value.data : null;
+
+  // * Determine active session (explicit flag first, else by date)
+  const now = new Date();
+  const activeSession =
+    sessions.find((s) => s.active) ||
+    sessions.find((s) => {
+      if (!s.starts_at || !s.ends_at) return false;
+      const start = new Date(s.starts_at);
+      const end = new Date(s.ends_at);
+      return start <= now && now <= end;
+    }) ||
+    null;
+
+  return { sessions, activeSession, stats, enrollments };
+}
+
+export default async function AdminDashboard() {
+  const { sessions, activeSession, stats, enrollments } = await getDashboardData();
+
+  const totalGroups = stats?.total_groups ?? '0';
+  const totalStudents = stats?.total_students ?? '0';
+  const fullGroups = stats?.full_groups ?? '0';
+  const groupsWithCapacity = stats?.groups_with_capacity ?? '0';
+
   return (
     <div className="space-y-6">
+      {/* * Header */}
       <div className="bg-white p-6 rounded-lg shadow-sm border border-neutral-200">
         <div className="flex justify-between items-start">
           <div>
-            <h1 className="text-3xl font-bold text-neutral-900 mb-2">
-              Admin Dashboard
-            </h1>
-            <p className="text-neutral-600">
-              Welcome to the new VTE Frontend architecture. This page demonstrates the AppShell integration.
-            </p>
+            <h1 className="text-3xl font-bold text-neutral-900 mb-2">Admin Dashboard</h1>
+            <p className="text-neutral-600">Overview of sessions, capacity, and recent activity.</p>
+            <div className="mt-3 inline-flex items-center gap-2 text-sm">
+              <span className="px-2 py-1 rounded-md bg-neutral-100 text-neutral-700">Session:</span>
+              <span className="font-medium text-neutral-900">
+                {activeSession ? `${activeSession.name}${activeSession.active ? ' (Active)' : ''}` : 'No active session'}
+              </span>
+            </div>
           </div>
           <PWATestPanel />
         </div>
       </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-neutral-200">
-          <h3 className="text-lg font-semibold text-neutral-900 mb-2">Skills Management</h3>
-          <p className="text-neutral-600 text-sm mb-4">Manage vocational skills and courses</p>
-          <div className="text-2xl font-bold text-green-600">0</div>
-        </div>
-        
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-neutral-200">
-          <h3 className="text-lg font-semibold text-neutral-900 mb-2">Groups</h3>
-          <p className="text-neutral-600 text-sm mb-4">Manage student groups</p>
-          <div className="text-2xl font-bold text-blue-600">0</div>
-        </div>
-        
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-neutral-200">
-          <h3 className="text-lg font-semibold text-neutral-900 mb-2">Students</h3>
-          <p className="text-neutral-600 text-sm mb-4">Manage student accounts</p>
-          <div className="text-2xl font-bold text-purple-600">0</div>
-        </div>
-        
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-neutral-200">
-          <h3 className="text-lg font-semibold text-neutral-900 mb-2">Mentors</h3>
-          <p className="text-neutral-600 text-sm mb-4">Manage mentor accounts</p>
-          <div className="text-2xl font-bold text-orange-600">0</div>
-        </div>
-      </div>
-      
-      <div className="bg-white p-6 rounded-lg shadow-sm border border-neutral-200">
-        <h2 className="text-xl font-semibold text-neutral-900 mb-4">
-          Architecture Status
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-              <span className="text-sm text-neutral-700">AppShell Layout</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-              <span className="text-sm text-neutral-700">Server-Side Authentication</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-              <span className="text-sm text-neutral-700">Role-Based Navigation</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-              <span className="text-sm text-neutral-700">httpOnly Cookie Security</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-              <span className="text-sm text-neutral-700">Progressive Web App (PWA)</span>
-            </div>
+
+      {/* * Stats */}
+      <StatCardGrid>
+        <StatCard title="Total Groups" value={totalGroups} color="primary" />
+        <StatCard title="Total Students" value={totalStudents} color="success" />
+        <StatCard title="Full Groups" value={fullGroups} color="warning" />
+        <StatCard title="With Capacity" value={groupsWithCapacity} color="neutral" />
+      </StatCardGrid>
+
+      {/* * Content: Activity | Quick Actions */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* * Activity Feed */}
+        <div className="lg:col-span-2 bg-white p-6 rounded-lg shadow-sm border border-neutral-200">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold text-neutral-900">Recent Activity</h2>
+            <Link href="/admin/enrollments" className="text-sm text-primary hover:underline">View all</Link>
           </div>
-          <div className="space-y-2">
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-              <span className="text-sm text-neutral-700">API Integration Testing</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-              <span className="text-sm text-neutral-700">Real Data Loading</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-              <span className="text-sm text-neutral-700">State Management</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-              <span className="text-sm text-neutral-700">Error Handling</span>
+          <div className="divide-y divide-neutral-200">
+            {enrollments && enrollments.results.length > 0 ? (
+              enrollments.results.slice(0, 10).map((enr) => (
+                <div key={enr.id} className="py-3 flex items-center justify-between">
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-neutral-900 truncate">
+                      {enr.user?.first_name} {enr.user?.last_name}
+                    </p>
+                    <p className="text-xs text-neutral-600 truncate">
+                      Enrolled in {enr.skill?.title} • {new Date(enr.created_at).toLocaleString()}
+                    </p>
+                  </div>
+                  <span className="ml-4 inline-flex items-center px-2 py-1 rounded-md text-xs bg-neutral-100 text-neutral-700 capitalize">
+                    {enr.status}
+                  </span>
+                </div>
+              ))
+            ) : (
+              <div className="py-8 text-center text-neutral-600">No recent activity</div>
+            )}
+          </div>
+        </div>
+
+        {/* * Quick Actions */}
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-neutral-200">
+          <h2 className="text-xl font-semibold text-neutral-900 mb-4">Quick Actions</h2>
+          <div className="space-y-3">
+            <Link href="/admin/qr-codes" className="block w-full text-left px-4 py-3 rounded-lg bg-primary text-primary-foreground hover:bg-primary-600 transition-colors">
+              Generate QR Codes
+            </Link>
+            <Link href="/admin/sessions" className="block w-full text-left px-4 py-3 rounded-lg bg-neutral-100 text-neutral-900 hover:bg-neutral-200 transition-colors">
+              Manage Sessions
+            </Link>
+            <Link href="/admin/reports" className="block w-full text-left px-4 py-3 rounded-lg bg-neutral-100 text-neutral-900 hover:bg-neutral-200 transition-colors">
+              View Reports
+            </Link>
+          </div>
+          <div className="mt-6">
+            <h3 className="text-sm font-medium text-neutral-900 mb-2">Sessions</h3>
+            <div className="max-h-48 overflow-y-auto divide-y divide-neutral-200">
+              {(sessions || []).slice(0, 6).map((s) => (
+                <div key={s.id} className="py-2 flex items-center justify-between">
+                  <div className="min-w-0">
+                    <p className="text-sm text-neutral-900 truncate">{s.name}</p>
+                    <p className="text-xs text-neutral-600 truncate">
+                      {s.starts_at ? new Date(s.starts_at).toLocaleDateString() : 'TBD'} - {s.ends_at ? new Date(s.ends_at).toLocaleDateString() : 'TBD'}
+                    </p>
+                  </div>
+                  {s.active && <span className="ml-2 px-2 py-0.5 rounded-md text-xs bg-green-100 text-green-700">Active</span>}
+                </div>
+              ))}
+              {(!sessions || sessions.length === 0) && (
+                <div className="py-6 text-center text-neutral-600">No sessions found</div>
+              )}
             </div>
           </div>
         </div>

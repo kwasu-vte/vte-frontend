@@ -22,7 +22,9 @@ import {
   LogOut,
   School,
   UserPlus,
-  Megaphone
+  Megaphone,
+  QrCode,
+  ClipboardList
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -52,6 +54,12 @@ const navigationItems: NavigationItem[] = [
     role: ['Admin'],
   },
   {
+    href: '/admin/enrollments',
+    label: 'Enrollments',
+    icon: ClipboardList,
+    role: ['Admin'],
+  },
+  {
     href: '/admin/students',
     label: 'Students',
     icon: GraduationCap,
@@ -61,6 +69,18 @@ const navigationItems: NavigationItem[] = [
     href: '/admin/mentors',
     label: 'Mentors',
     icon: UserCheck,
+    role: ['Admin'],
+  },
+  {
+    href: '/admin/qr-codes',
+    label: 'QR Codes',
+    icon: QrCode,
+    role: ['Admin'],
+  },
+  {
+    href: '/admin/reports',
+    label: 'Reports',
+    icon: BarChart3,
     role: ['Admin'],
   },
   {
