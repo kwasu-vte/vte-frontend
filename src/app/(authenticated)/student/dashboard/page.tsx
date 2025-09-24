@@ -1,72 +1,185 @@
 // * Student Dashboard Page
-// * Tests AppShell integration for student role
-// * Demonstrates student-specific navigation and permissions
+// * Student hub with profile completion alert, enrollment status, and quick actions
+// * Follows design guide principles with NextUI components
+
+import React from 'react';
+import { getCurrentUser } from '@/lib/auth';
+import { studentsApi, enrollmentsApi } from '@/lib/api';
+import { ProfileCompletionAlert } from '@/components/features/student/ProfileCompletionAlert';
+import { EnrollmentStatus } from '@/components/features/student/EnrollmentStatus';
+import { GroupAssignmentCard } from '@/components/features/student/GroupAssignmentCard';
+import { UpcomingPracticals } from '@/components/features/student/UpcomingPracticals';
+import { QuickActions } from '@/components/features/student/QuickActions';
+import { NotificationContainer } from '@/components/shared/NotificationContainer';
+import { StateRenderer } from '@/components/shared/StateRenderer';
+import { Card, CardBody, CardHeader, Skeleton } from '@nextui-org/react';
 
 export const dynamic = 'force-dynamic';
 
-export default function StudentDashboard() {
+interface DashboardData {
+  profile: any;
+  enrollment: any;
+  upcomingPracticals: any[];
+}
+
+async function getDashboardData(userId: string): Promise<DashboardData> {
+  try {
+    // Fetch profile and enrollment data in parallel
+    const [profileResponse, enrollmentResponse] = await Promise.allSettled([
+      studentsApi.getProfile(userId),
+      enrollmentsApi.getUserEnrollment(userId)
+    ]);
+
+    const profile = profileResponse.status === 'fulfilled' ? profileResponse.value.data : null;
+    const enrollment = enrollmentResponse.status === 'fulfilled' ? enrollmentResponse.value.data : null;
+
+    // Mock upcoming practicals for now - this would come from a schedule API
+    const upcomingPracticals = [
+      {
+        id: '1',
+        date: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(), // 2 days from now
+        venue: 'Lab A',
+        mentor: 'Dr. Smith'
+      },
+      {
+        id: '2', 
+        date: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(), // 5 days from now
+        venue: 'Lab B',
+        mentor: 'Dr. Johnson'
+      }
+    ];
+
+    return {
+      profile,
+      enrollment,
+      upcomingPracticals
+    };
+  } catch (error) {
+    console.error('Error fetching dashboard data:', error);
+    return {
+      profile: null,
+      enrollment: null,
+      upcomingPracticals: []
+    };
+  }
+}
+
+export default async function StudentDashboard() {
+  const user = await getCurrentUser();
+  if (!user) {
+    return <div>Error: User not found</div>;
+  }
+
+  const data = await getDashboardData(user.id);
+
   return (
     <div className="space-y-6">
-      <div className="bg-white p-6 rounded-lg shadow-sm border border-neutral-200">
+      {/* Page Header */}
+      <div>
         <h1 className="text-3xl font-bold text-neutral-900 mb-2">
-          Student Dashboard
+          Welcome back, {user.first_name}!
         </h1>
         <p className="text-neutral-600">
-          Welcome to your student portal. This page demonstrates student-specific access.
+          Here's what's happening with your practical training.
         </p>
       </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-neutral-200">
-          <h3 className="text-lg font-semibold text-neutral-900 mb-2">My Skills</h3>
-          <p className="text-neutral-600 text-sm mb-4">View enrolled skills</p>
-          <div className="text-2xl font-bold text-blue-600">0</div>
+
+      {/* Profile Completion Alert */}
+      {data.profile && (
+        <ProfileCompletionAlert 
+          profile={data.profile}
+          dismissible={true}
+        />
+      )}
+
+      {/* Main Dashboard Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left Column - Status Cards */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Enrollment Status */}
+          <StateRenderer
+            data={data.enrollment}
+            loadingComponent={
+              <Card shadow="sm" className="w-full">
+                <CardBody className="p-6">
+                  <Skeleton className="h-20 w-full" />
+                </CardBody>
+              </Card>
+            }
+            emptyComponent={
+              <Card shadow="sm" className="w-full">
+                <CardHeader>
+                  <p className="text-xl font-medium leading-normal">No Active Enrollment</p>
+                </CardHeader>
+                <CardBody>
+                  <p className="text-sm text-neutral-600">
+                    You haven't enrolled in any skills yet. Browse available skills to get started.
+                  </p>
+                </CardBody>
+              </Card>
+            }
+          >
+            {(enrollment) => (
+              <EnrollmentStatus 
+                enrollment={{
+                  id: enrollment.id.toString(),
+                  skillName: enrollment.skill?.title || 'Unknown Skill',
+                  status: enrollment.status.toUpperCase() as any,
+                  paymentStatus: enrollment.payment_status,
+                  group: enrollment.group_id?.toString()
+                }}
+                showTimeline={true}
+              />
+            )}
+          </StateRenderer>
+
+          {/* Group Assignment */}
+          {data.enrollment && (
+            <StateRenderer
+              data={data.enrollment.group_id}
+              loadingComponent={
+                <Card shadow="sm" className="w-full">
+                  <CardBody className="p-6">
+                    <Skeleton className="h-20 w-full" />
+                  </CardBody>
+                </Card>
+              }
+              emptyComponent={null}
+            >
+              {(groupId) => (
+                <GroupAssignmentCard
+                  enrollment={{
+                    id: data.enrollment.id.toString(),
+                    status: data.enrollment.status
+                  }}
+                  group={{
+                    number: parseInt(groupId),
+                    mentorName: 'TBD', // This would come from group details API
+                    schedule: 'TBD'
+                  }}
+                />
+              )}
+            </StateRenderer>
+          )}
+
+          {/* Upcoming Practicals */}
+          <UpcomingPracticals 
+            practicals={data.upcomingPracticals}
+            limit={3}
+          />
         </div>
-        
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-neutral-200">
-          <h3 className="text-lg font-semibold text-neutral-900 mb-2">My Group</h3>
-          <p className="text-neutral-600 text-sm mb-4">View your assigned group</p>
-          <div className="text-2xl font-bold text-green-600">0</div>
-        </div>
-        
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-neutral-200">
-          <h3 className="text-lg font-semibold text-neutral-900 mb-2">Payment</h3>
-          <p className="text-neutral-600 text-sm mb-4">Manage payments</p>
-          <div className="text-2xl font-bold text-purple-600">0</div>
+
+        {/* Right Column - Quick Actions */}
+        <div>
+          <QuickActions 
+            enrollment={data.enrollment}
+            hasProfile={!!data.profile}
+          />
         </div>
       </div>
-      
-      <div className="bg-white p-6 rounded-lg shadow-sm border border-neutral-200">
-        <h2 className="text-xl font-semibold text-neutral-900 mb-4">
-          Student Permissions
-        </h2>
-        <div className="space-y-2">
-          <div className="flex items-center space-x-2">
-            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-            <span className="text-sm text-neutral-700">Enroll in skills</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-            <span className="text-sm text-neutral-700">View my group</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-            <span className="text-sm text-neutral-700">View payments</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-            <span className="text-sm text-neutral-700">View attendance</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-            <span className="text-sm text-neutral-700">Manage skills (restricted)</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-            <span className="text-sm text-neutral-700">Take attendance (restricted)</span>
-          </div>
-        </div>
-      </div>
+
+      {/* Notifications */}
+      <NotificationContainer />
     </div>
   );
 }
