@@ -1,9 +1,9 @@
 "use client"
 import React from "react"
 import { Select, SelectItem, Button } from "@nextui-org/react"
-import { academicSessionsApi, skillsApi } from "@/src/lib/api"
+import { api } from "@/lib/api"
 import { useQuery } from "@tanstack/react-query"
-import type { AcademicSession, Skill } from "@/src/lib/types"
+import type { AcademicSession, Skill } from "@/lib/types"
 
 /**
  * * EnrollmentFilters
@@ -16,39 +16,37 @@ import type { AcademicSession, Skill } from "@/src/lib/types"
  * - onFilterChange: (filters: Record<string, any>) => void
  */
 export type EnrollmentFiltersProps = {
-  currentFilters: Record<string, unknown>
-  availableSkills: Array<{ id: string; name: string }>
-  onFilterChange: (filters: Record<string, unknown>) => void
+  value: { academic_session_id?: number; skill_id?: string; per_page?: number }
+  onChange: (filters: { academic_session_id?: number; skill_id?: string; per_page?: number }) => void
+  defaultPerPage?: number
 }
 
-export default function EnrollmentFilters({ currentFilters, availableSkills, onFilterChange }: EnrollmentFiltersProps) {
+export function EnrollmentFilters({ value, onChange, defaultPerPage = 25 }: EnrollmentFiltersProps) {
   const { data: sessionsResp } = useQuery({
     queryKey: ["academic-sessions"],
-    queryFn: () => academicSessionsApi.getAll(),
+    queryFn: () => api.getAcademicSessions(),
   })
 
   const { data: skillsResp, isLoading: skillsLoading } = useQuery({
     queryKey: ["skills"],
-    queryFn: () => skillsApi.getAll(),
-    initialData: availableSkills?.length
-      ? { success: true, message: "", data: availableSkills as unknown as Skill[] }
-      : undefined,
+    queryFn: () => api.getSkills(),
   })
 
-  const [filters, setFilters] = React.useState<Record<string, unknown>>(currentFilters || {})
+  const [filters, setFilters] = React.useState<{ academic_session_id?: number; skill_id?: string; per_page?: number }>(value || { per_page: defaultPerPage })
 
   const sessions = (sessionsResp?.data as AcademicSession[]) || []
   const skills = (skillsResp?.data as Skill[]) || []
 
-  const handleChange = (key: string, value: unknown) => {
-    const next = { ...filters, [key]: value }
+  const handleChange = (key: keyof EnrollmentFiltersProps["value"], nextValue: number | string | undefined) => {
+    const next = { ...filters, [key]: nextValue }
     setFilters(next)
-    onFilterChange(next)
+    onChange(next)
   }
 
   const reset = () => {
-    setFilters({})
-    onFilterChange({})
+    const resetValue = { per_page: defaultPerPage }
+    setFilters(resetValue)
+    onChange(resetValue)
   }
 
   return (
@@ -92,5 +90,7 @@ export default function EnrollmentFilters({ currentFilters, availableSkills, onF
     </div>
   )
 }
+
+export default EnrollmentFilters
 
 

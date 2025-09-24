@@ -3,8 +3,8 @@ import { notFound } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 
-export default async function AdminSkillGroupsPage({ params }: { params: { skillId: string } }) {
-	const skillId = params.skillId;
+export default async function AdminSkillGroupsPage({ params }: { params: Promise<{ skillId: string }> }) {
+	const { skillId } = await params;
 	const skillRes = await api.getSkill(skillId).catch(() => null);
 	if (!skillRes?.data) return notFound();
 

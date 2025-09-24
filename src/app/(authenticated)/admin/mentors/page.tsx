@@ -129,7 +129,7 @@ export default function AdminMentorsPage() {
           <p><strong>Loading:</strong> {isLoading ? 'Yes' : 'No'}</p>
           <p><strong>Error:</strong> {error ? error.message : 'None'}</p>
           <p><strong>Data Count:</strong> {mentors?.length || 0}</p>
-          <p><strong>Query Key:</strong> ['mentors']</p>
+          <p><strong>Query Key:</strong> [&#39;mentors&#39;]</p>
           <p><strong>Mutations:</strong> Create: {createMentorMutation.isPending ? 'Pending' : 'Idle'}</p>
         </div>
       </div>

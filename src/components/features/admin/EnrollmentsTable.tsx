@@ -35,6 +35,14 @@ export default function EnrollmentsTable({ enrollments, perPage = 25, onAssignGr
     { key: "status", label: "Status", render: (e: Enrollment) => <EnrollmentStatusBadge status={e.status.toUpperCase() as any} /> },
     { key: "payment_status", label: "Payment", render: (e: Enrollment) => e.payment_status === 'paid' ? 'Paid' : e.payment_status === 'failed' ? 'Failed' : 'Pending' },
     { key: "created_at", label: "Enrolled On", render: (e: Enrollment) => new Date(e.created_at).toLocaleString() },
+    ...(onAssignGroup ? [{ key: "actions", label: "Actions", render: (e: Enrollment) => (
+      <button
+        className="text-primary hover:underline text-sm"
+        onClick={() => onAssignGroup?.(Number(e.id))}
+      >
+        Assign to Group
+      </button>
+    ) }] : [] as any),
   ]
 
   return (

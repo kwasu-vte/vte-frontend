@@ -2,9 +2,9 @@
 import React from "react"
 import { Card, CardBody, CardHeader, Chip, Button, Skeleton } from "@nextui-org/react"
 import { useQuery } from "@tanstack/react-query"
-import { api } from "@/src/lib/api"
-import type { SkillGroup } from "@/src/lib/types"
-import GroupCapacityIndicator from "@/src/components/features/admin/GroupCapacityIndicator"
+import { api } from "@/lib/api"
+import type { SkillGroup } from "@/lib/types"
+import GroupCapacityIndicator from "@/components/features/admin/GroupCapacityIndicator"
 
 /**
  * * MentorGroupsList

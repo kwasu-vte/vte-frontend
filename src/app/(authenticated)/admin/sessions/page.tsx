@@ -79,8 +79,15 @@ export default function AdminSessionsPage() {
     await upsertMutation.mutateAsync();
   };
 
+  const hasActive = (sessions || []).some((s) => s.active)
+
   return (
     <div className="space-y-6">
+      {!isLoading && !error && !hasActive && (
+        <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-md p-4">
+          No active academic session. Start a session to enable assignments and attendance.
+        </div>
+      )}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-neutral-900">Academic Sessions</h1>

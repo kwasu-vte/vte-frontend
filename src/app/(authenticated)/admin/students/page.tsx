@@ -195,7 +195,7 @@ export default function AdminStudentsPage() {
           <p><strong>Loading:</strong> {isLoading ? 'Yes' : 'No'}</p>
           <p><strong>Error:</strong> {error ? (error as Error).message : 'None'}</p>
           <p><strong>Data Count:</strong> {students?.length || 0}</p>
-          <p><strong>Query Key:</strong> ['students', {{}}]</p>
+          <p><strong>Query Key:</strong> [&#39;students&#39;, {}]</p>
         </div>
       </div>
     </div>

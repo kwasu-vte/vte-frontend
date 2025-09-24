@@ -2,8 +2,8 @@
 import React from "react"
 import { Card, CardHeader, CardBody, Button, Chip, Select, SelectItem, Skeleton } from "@nextui-org/react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { api } from "@/src/lib/api"
-import type { Skill } from "@/src/lib/types"
+import { api } from "@/lib/api"
+import type { Skill } from "@/lib/types"
 
 /**
  * * MentorSkillAssignment

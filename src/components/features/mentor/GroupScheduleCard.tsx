@@ -2,7 +2,7 @@
 import React from "react"
 import { Card, CardHeader, CardBody, Chip, Skeleton } from "@nextui-org/react"
 import { useQuery } from "@tanstack/react-query"
-import { api } from "@/src/lib/api"
+import { api } from "@/lib/api"
 
 /**
  * * GroupScheduleCard

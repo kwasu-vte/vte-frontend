@@ -40,8 +40,8 @@ export default function AdminSkillsPage() {
     queryKey: ['skills'],
     queryFn: async () => {
       const response = await api.getSkills();
-      // * Extract items from paginated response
-      return response.data?.items || [];
+      // * api.getSkills returns Skill[] directly
+      return response.data ?? [];
     },
   });
 
@@ -230,7 +230,7 @@ export default function AdminSkillsPage() {
       {/* * Skills Table */}
       <div className="bg-white rounded-lg shadow-sm border border-neutral-200">
         <SkillsTable
-          skills={skills}
+          skills={skills ?? []}
           isLoading={isLoading}
           error={error}
           onEdit={openEditModal}

@@ -26,9 +26,20 @@ export default function AdminGroupsPage() {
   } = useQuery({
     queryKey: ['groups'],
     queryFn: async () => {
-      const response = await api.getGroups();
-      // * Extract items from paginated response
-      return response.data?.items || [];
+      // * No direct groups list API; derive from skill groups
+      const res = await api.getSkillGroups({ per_page: 100 });
+      const results = res.data?.results ?? [];
+      // * Map to Group[] shape for this table (best-effort)
+      const mapped = results.map((g: any) => ({
+        id: String(g.id),
+        name: g.group_display_name || `Group ${g.group_number}`,
+        skill: { id: String(g.skill?.id ?? ''), title: g.skill?.title ?? 'Unknown' },
+        mentor: null,
+        members: [],
+        creation_date: g.created_at ?? '',
+        end_date: g.updated_at ?? ''
+      })) as unknown as Group[];
+      return mapped;
     },
     enabled: typeof window !== 'undefined', // * Only enable on client side
   });

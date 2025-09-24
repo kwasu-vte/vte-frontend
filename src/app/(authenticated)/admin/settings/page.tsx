@@ -306,7 +306,7 @@ export default function AdminSettingsPage() {
                   </div>
                   <div>
                     <h4 className="font-semibold text-neutral-900">
-                      {currentUser.full_name || `${currentUser.first_name} ${currentUser.last_name}`}
+                      {`${currentUser.first_name} ${currentUser.last_name}`}
                     </h4>
                     <p className="text-sm text-neutral-600">{currentUser.email}</p>
                   </div>
@@ -319,9 +319,9 @@ export default function AdminSettingsPage() {
                   <div className="flex justify-between">
                     <span className="text-neutral-600">Role:</span>
                     <Chip color="primary" size="sm" variant="flat">
-                      {currentUser.role === 'superadmin' ? 'Super Admin' : 
-                       currentUser.role === 'Admin' ? 'Administrator' :
-                       currentUser.role?.charAt(0).toUpperCase() + currentUser.role?.slice(1) || 'User'}
+                      {currentUser.role === 'Admin' ? 'Administrator' :
+                       currentUser.role === 'Mentor' ? 'Mentor' :
+                       currentUser.role === 'Student' ? 'Student' : 'User'}
                     </Chip>
                   </div>
                   
@@ -346,14 +346,7 @@ export default function AdminSettingsPage() {
                     </div>
                   )}
 
-                  {currentUser.created_at && (
-                    <div className="flex justify-between">
-                      <span className="text-neutral-600">Member Since:</span>
-                      <span className="font-medium">
-                        {new Date(currentUser.created_at).toLocaleDateString()}
-                      </span>
-                    </div>
-                  )}
+                  {/* * No created_at on User type */}
                 </div>
               </div>
             ) : (
@@ -750,13 +743,13 @@ export default function AdminSettingsPage() {
                   <div>
                     <span className="font-medium text-neutral-700">Created:</span>
                     <p className="text-neutral-600">
-                      {new Date(selectedSession.created_at).toLocaleDateString()}
+                      {selectedSession.created_at ? new Date(selectedSession.created_at).toLocaleDateString() : '—'}
                     </p>
                   </div>
                   <div>
                     <span className="font-medium text-neutral-700">Updated:</span>
                     <p className="text-neutral-600">
-                      {new Date(selectedSession.updated_at).toLocaleDateString()}
+                      {selectedSession.updated_at ? new Date(selectedSession.updated_at).toLocaleDateString() : '—'}
                     </p>
                   </div>
                 </div>
