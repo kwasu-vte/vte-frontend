@@ -48,39 +48,12 @@ export default function AdminMentorsPage() {
       queryClient.invalidateQueries({ queryKey: ['mentors'] })
       setIsCreateModalOpen(false)
     },
+    onError: (error) => {
+      console.error('Error creating mentor:', error)
+    }
   })
 
-  // * Update mentor mutation
-  const updateMentorMutation = useMutation({
-    mutationFn: async (data: UpdateUserPayload) => {
-      if (!selectedMentor) throw new Error('No mentor selected');
-      const response = await api.updateUser(selectedMentor.id, data);
-      return response.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['mentors'] });
-      setIsEditModalOpen(false);
-      setSelectedMentor(null);
-    },
-    onError: (error) => {
-      console.error('Error updating mentor:', error);
-    },
-  });
-
-  // * Delete mentor mutation
-  const deleteMentorMutation = useMutation({
-    mutationFn: async (mentorId: string) => {
-      await api.deleteUser(mentorId);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['mentors'] });
-      setIsDeleteModalOpen(false);
-      setSelectedMentor(null);
-    },
-    onError: (error) => {
-      console.error('Error deleting mentor:', error);
-    },
-  });
+  // Note: update/delete user APIs are not present in api.ts; leaving edit/delete as no-op for now
 
   const handleCreateMentor = async (data: CreateMentorProfilePayload) => {
     setIsSubmitting(true);
@@ -92,24 +65,13 @@ export default function AdminMentorsPage() {
   };
 
   // * Handle edit mentor
-  const handleEditMentor = async (data: CreateUserPayload | UpdateUserPayload) => {
-    setIsSubmitting(true);
-    try {
-      await updateMentorMutation.mutateAsync(data as UpdateUserPayload);
-    } finally {
-      setIsSubmitting(false);
-    }
+  const handleEditMentor = async () => {
+    // no-op until update API exists
   };
 
   // * Handle delete mentor
   const handleDeleteMentor = async () => {
-    if (!selectedMentor) return;
-    setIsSubmitting(true);
-    try {
-      await deleteMentorMutation.mutateAsync(selectedMentor.id);
-    } finally {
-      setIsSubmitting(false);
-    }
+    // no-op until delete API exists
   };
 
   const openCreateModal = () => {

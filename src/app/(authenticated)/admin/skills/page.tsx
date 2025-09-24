@@ -11,7 +11,7 @@ import { StateRenderer, DefaultLoadingComponent, DefaultErrorComponent, DefaultE
 import { SkillsTable } from '@/components/features/admin/SkillsTable';
 import { SkillModal } from '@/components/features/admin/SkillModal';
 import { api } from '@/lib/api';
-import { Skill, CreateSkillPayload, UpdateSkillPayload } from '@/lib/types';
+import { Skill, CreateSkillPayload, UpdateSkillPayload, SkillDateRangePayload } from '@/lib/types';
 import { Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@nextui-org/react';
 import { Plus, AlertTriangle, Eye } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
@@ -146,6 +146,20 @@ export default function AdminSkillsPage() {
       setIsSubmitting(false);
     }
   };
+
+  // Basic date range update action (trigger example)
+  async function handleUpdateDateRange(skill: Skill, payload: SkillDateRangePayload) {
+    setIsSubmitting(true)
+    try {
+      await api.updateSkillDateRange(String(skill.id), payload)
+      queryClient.invalidateQueries({ queryKey: ['skills'] })
+      addNotification({ type: 'success', title: 'Date Range Updated', message: 'Skill date range saved.' })
+    } catch (error) {
+      addNotification({ type: 'error', title: 'Update Failed', message: getErrorMessage(error, 'Could not update date range.') })
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
 
   // * Handle delete skill
   const handleDeleteSkill = async () => {

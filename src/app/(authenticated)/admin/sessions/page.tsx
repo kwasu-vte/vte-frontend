@@ -49,6 +49,20 @@ export default function AdminSessionsPage() {
     },
   });
 
+  const startMutation = useMutation({
+    mutationFn: async (id: number) => (await api.startAcademicSession(id)).data,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-sessions'] });
+    },
+  });
+
+  const endMutation = useMutation({
+    mutationFn: async (id: number) => (await api.endAcademicSession(id)).data,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-sessions'] });
+    },
+  });
+
   const openCreate = () => {
     setEditing(null);
     setForm({ name: '', starts_at: '', ends_at: '' });
@@ -96,9 +110,21 @@ export default function AdminSessionsPage() {
                         <CalendarDays className="w-5 h-5 text-blue-600" />
                         <h3 className="text-lg font-semibold text-neutral-900">{item.name}</h3>
                       </div>
-                      <Button size="sm" variant="light" startContent={<Edit2 className="w-4 h-4" />} onClick={() => openEdit(item)}>
-                        Edit
-                      </Button>
+                      <div className="flex items-center gap-2">
+                        <Button size="sm" variant="light" startContent={<Edit2 className="w-4 h-4" />} onClick={() => openEdit(item)}>
+                          Edit
+                        </Button>
+                        {!item.active && (
+                          <Button size="sm" color="primary" isDisabled={startMutation.isPending} onClick={() => startMutation.mutate(item.id)}>
+                            Start
+                          </Button>
+                        )}
+                        {item.active && (
+                          <Button size="sm" color="warning" variant="bordered" isDisabled={endMutation.isPending} onClick={() => endMutation.mutate(item.id)}>
+                            End
+                          </Button>
+                        )}
+                      </div>
                     </div>
                     <div className="text-sm text-neutral-600">
                       <p><strong>Start:</strong> {item.starts_at || '—'}</p>

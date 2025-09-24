@@ -1,11 +1,9 @@
 "use client"
 import React from "react"
 import { Pagination } from "@nextui-org/react"
-import { useQuery } from "@tanstack/react-query"
-import { enrollmentsApi } from "@/src/lib/api"
-import type { Enrollment, PaginatedResponse, ApiResponse } from "@/src/lib/types"
+import type { Enrollment } from "@/lib/types"
 import EnrollmentStatusBadge from "./EnrollmentStatusBadge"
-import { DataTable } from "@/src/components/shared/DataTable"
+import { DataTable } from "@/components/shared/DataTable"
 
 /**
  * * EnrollmentsTable
@@ -20,26 +18,16 @@ import { DataTable } from "@/src/components/shared/DataTable"
  * - onAssignGroup: (enrollmentId: string) => void
  */
 export type EnrollmentsTableProps = {
-  filters: Record<string, unknown>
+  enrollments: Enrollment[]
   perPage?: number
   onAssignGroup?: (enrollmentId: number) => void
 }
 
-export default function EnrollmentsTable({ filters, perPage = 25, onAssignGroup }: EnrollmentsTableProps) {
+export default function EnrollmentsTable({ enrollments, perPage = 25, onAssignGroup }: EnrollmentsTableProps) {
   const [page, setPage] = React.useState(1)
-
-  const { data, isLoading, error, refetch } = useQuery<ApiResponse<PaginatedResponse<Enrollment>>>({
-    queryKey: ["enrollments", filters, perPage, page],
-    queryFn: () => enrollmentsApi.getAll({
-      academic_session_id: filters.academic_session_id as number | undefined,
-      skill_id: filters.skill_id as string | undefined,
-      per_page: perPage,
-    }),
-  })
-
-  const rows = data?.data.results || []
-  const total = data?.data.count || 0
+  const total = enrollments.length
   const totalPages = Math.max(1, Math.ceil(total / perPage))
+  const rows = React.useMemo(() => enrollments.slice((page - 1) * perPage, page * perPage), [enrollments, page, perPage])
 
   const columns = [
     { key: "student", label: "Student", render: (e: Enrollment) => `${e.user?.last_name ?? ''} ${e.user?.first_name ?? ''}`.trim() || e.user_id },
@@ -53,8 +41,8 @@ export default function EnrollmentsTable({ filters, perPage = 25, onAssignGroup 
     <div className="space-y-4">
       <DataTable<Enrollment>
         data={rows}
-        isLoading={isLoading}
-        error={error as any}
+        isLoading={false}
+        error={null as any}
         columns={columns}
         emptyMessage="No enrollments found"
       />
