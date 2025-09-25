@@ -241,6 +241,12 @@ export interface EnrollmentPaymentResponse {
   gateway: string;
 }
 
+// * Payment Records (UI-only; no CRUD in API)
+// (Payment record type intentionally omitted; use Enrollment payment_status)
+
+// * System Configuration
+// (System configuration types intentionally omitted per plan)
+
 // * QR Code Management
 export interface GroupQrCode {
   id: string;
@@ -271,6 +277,13 @@ export interface BulkGenerateQrCodePayload {
   expires_at?: string;
 }
 
+export interface QrScanEntry {
+  id: string;
+  student: Pick<User, 'id' | 'first_name' | 'last_name' | 'email'>;
+  created_at: string;
+  points_awarded?: string;
+}
+
 export interface QrScanHistory {
   qr_info: {
     token: string;
@@ -279,7 +292,7 @@ export interface QrScanHistory {
     mark_value: string;
     expires_at: string;
   };
-  scans: AttendanceRecord[];
+  scans: QrScanEntry[];
 }
 
 export interface AttendanceReport {
@@ -439,6 +452,9 @@ export interface QrScanResponse {
     };
   };
 }
+
+// * Attendance domain
+// (Attendance CRUD record type intentionally omitted; use QrScanHistory/AttendanceReport)
 
 // --- NAVIGATION ---
 export interface NavigationItem {
