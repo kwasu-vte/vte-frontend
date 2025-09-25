@@ -20,7 +20,7 @@ interface ScanQRPageData {
 
 async function getScanQRPageData(userId: string): Promise<ScanQRPageData> {
   try {
-    const enrollmentResponse = await enrollmentsApi.getEnrollment(userId);
+    const enrollmentResponse = await enrollmentsApi.getUserEnrollment(userId);
     const enrollment = enrollmentResponse.success ? enrollmentResponse.data : null;
 
     return {

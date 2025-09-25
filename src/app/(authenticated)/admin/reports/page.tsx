@@ -13,7 +13,7 @@ export default function AdminReportsPage() {
   const { data: groupsData } = useQuery({
     queryKey: ['skill-groups', { per_page: 100 }],
     queryFn: async () => {
-      const res = await skillGroupsApi.getAll({ per_page: 100 })
+      const res = await skillGroupsApi.list({ per_page: 100 })
       return res.data?.items ?? []
     },
   })
@@ -23,7 +23,7 @@ export default function AdminReportsPage() {
   const reportMutation = useMutation({
     mutationFn: async () => {
       if (type === 'attendance' && groupId) {
-        return (await qrCodesApi.getAttendanceReport(Number(groupId))).data;
+        return (await qrCodesApi.getGroupAttendanceReport(Number(groupId))).data;
       }
       if (type === 'capacity') {
         return (await skillGroupsApi.getStatistics()).data;

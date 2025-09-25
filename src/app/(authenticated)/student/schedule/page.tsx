@@ -22,42 +22,29 @@ interface SchedulePageData {
 
 async function getSchedulePageData(userId: string): Promise<SchedulePageData> {
   try {
-    const enrollmentResponse = await enrollmentsApi.getEnrollment(userId);
+    const enrollmentResponse = await enrollmentsApi.getUserEnrollment(userId);
     const enrollment = enrollmentResponse.success ? enrollmentResponse.data : null;
 
-    // Mock upcoming practicals data - this would come from schedule APIs
-    const upcomingPracticals = enrollment ? [
-      {
-        id: '1',
-        date: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toISOString(), // 1 day from now
-        venue: 'Lab A',
-        mentor: 'Dr. Smith'
-      },
-      {
-        id: '2',
-        date: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(), // 3 days from now
-        venue: 'Lab B',
-        mentor: 'Dr. Johnson'
-      },
-      {
-        id: '3',
-        date: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(), // 5 days from now
-        venue: 'Lab C',
-        mentor: 'Dr. Williams'
-      },
-      {
-        id: '4',
-        date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days from now
-        venue: 'Lab A',
-        mentor: 'Dr. Smith'
-      },
-      {
-        id: '5',
-        date: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString(), // 10 days from now
-        venue: 'Lab B',
-        mentor: 'Dr. Johnson'
+    // Derive upcoming practicals from enrolled skill date range
+    const upcomingPracticals = (() => {
+      const skill = enrollment?.skill;
+      if (!skill?.date_range_start || !skill?.date_range_end) return [] as { id: string; date: string }[];
+      const start = new Date(skill.date_range_start);
+      const end = new Date(skill.date_range_end);
+      const now = new Date();
+      const items: { id: string; date: string }[] = [];
+      const stepDays = 7;
+      for (let d = new Date(start); d <= end; d.setDate(d.getDate() + stepDays)) {
+        const candidate = new Date(d);
+        if (candidate >= now) {
+          const isWeekend = candidate.getDay() === 0 || candidate.getDay() === 6;
+          if (skill.exclude_weekends && isWeekend) continue;
+          items.push({ id: `${candidate.getTime()}`, date: candidate.toISOString() });
+          if (items.length >= 12) break;
+        }
       }
-    ] : [];
+      return items;
+    })();
 
     return {
       enrollment,

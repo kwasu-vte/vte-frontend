@@ -22,7 +22,7 @@ interface MyGroupPageData {
 
 async function getMyGroupPageData(userId: string): Promise<MyGroupPageData> {
   try {
-    const enrollmentResponse = await enrollmentsApi.getEnrollment(userId);
+    const enrollmentResponse = await enrollmentsApi.getUserEnrollment(userId);
     const enrollment = enrollmentResponse.success ? enrollmentResponse.data : null;
 
     // Mock group details - this would come from a group details API

@@ -20,7 +20,7 @@ interface PaymentPageData {
 
 async function getPaymentPageData(userId: string): Promise<PaymentPageData> {
   try {
-    const enrollmentResponse = await enrollmentsApi.getEnrollment(userId);
+    const enrollmentResponse = await enrollmentsApi.getUserEnrollment(userId);
     const enrollment = enrollmentResponse.success ? enrollmentResponse.data : null;
 
     return {

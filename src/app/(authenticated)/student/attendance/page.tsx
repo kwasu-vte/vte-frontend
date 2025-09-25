@@ -24,7 +24,7 @@ interface AttendancePageData {
 
 async function getAttendancePageData(userId: string): Promise<AttendancePageData> {
   try {
-    const enrollmentResponse = await enrollmentsApi.getEnrollment(userId);
+    const enrollmentResponse = await enrollmentsApi.getUserEnrollment(userId);
     const enrollment = enrollmentResponse.success ? enrollmentResponse.data : null;
 
     // Mock attendance data - this would come from attendance APIs

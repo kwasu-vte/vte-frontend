@@ -24,12 +24,12 @@ export default function AdminEnrollmentsPage() {
   const { data: groupsData } = useQuery({
     queryKey: ['skill-groups', { skill_id: filters.skill_id }],
     queryFn: async () => {
-      const res = await skillGroupsApi.getAll({ per_page: 100, ...(filters.skill_id ? { skill_id: Number(filters.skill_id) } : {}) })
+      const res = await skillGroupsApi.list({ per_page: 100, ...(filters.skill_id ? { skill_id: Number(filters.skill_id) } : {}) })
       return res.data?.items ?? []
     },
     enabled: typeof window !== 'undefined',
   })
-  const groupOptions = (groupsData || []).map((g: any) => ({ id: String(g.id), name: g.group_display_name || `Group ${g.group_number}` }))
+  const groupOptions = (groupsData || []).map((g) => ({ id: String(g.id), name: g.group_display_name || `Group ${g.group_number}` }))
 
   async function openAssign(enrollmentId: number) {
     setAssignEnrollmentId(enrollmentId)

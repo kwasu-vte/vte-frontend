@@ -26,28 +26,40 @@ async function getDashboardData(userId: string): Promise<DashboardData> {
   try {
     // Fetch profile and enrollment data in parallel
     const [profileResponse, enrollmentResponse] = await Promise.allSettled([
-      studentsApi.getStudentProfile(userId),
-      enrollmentsApi.getEnrollment(userId)
+      studentsApi.getProfile(userId),
+      enrollmentsApi.getUserEnrollment(userId)
     ]);
 
     const profile = profileResponse.status === 'fulfilled' ? profileResponse.value.data : null;
     const enrollment = enrollmentResponse.status === 'fulfilled' ? enrollmentResponse.value.data : null;
 
-    // Mock upcoming practicals for now - this would come from a schedule API
-    const upcomingPracticals = [
-      {
-        id: '1',
-        date: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(), // 2 days from now
-        venue: 'Lab A',
-        mentor: 'Dr. Smith'
-      },
-      {
-        id: '2', 
-        date: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(), // 5 days from now
-        venue: 'Lab B',
-        mentor: 'Dr. Johnson'
+    // Derive upcoming practicals from enrolled skill date range
+    const deriveUpcomingPracticals = () => {
+      const skill = enrollment?.skill;
+      if (!skill?.date_range_start || !skill?.date_range_end) return [] as { id: string; date: string }[];
+
+      const start = new Date(skill.date_range_start);
+      const end = new Date(skill.date_range_end);
+      const now = new Date();
+      const items: { id: string; date: string }[] = [];
+
+      // Generate up to 10 dates between start and end (every 7 days), future-only
+      const stepDays = 7;
+      for (let d = new Date(start); d <= end; d.setDate(d.getDate() + stepDays)) {
+        const candidate = new Date(d);
+        if (candidate >= now) {
+          // Optionally skip weekends if exclude_weekends
+          const isWeekend = candidate.getDay() === 0 || candidate.getDay() === 6;
+          if (skill.exclude_weekends && isWeekend) continue;
+          items.push({ id: `${candidate.getTime()}`, date: candidate.toISOString() });
+          if (items.length >= 10) break;
+        }
       }
-    ];
+
+      return items;
+    };
+
+    const upcomingPracticals = deriveUpcomingPracticals();
 
     return {
       profile,

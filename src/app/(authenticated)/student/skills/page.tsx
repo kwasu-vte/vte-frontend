@@ -23,7 +23,7 @@ async function getSkillsPageData(userId: string): Promise<SkillsPageData> {
   try {
     // Fetch profile and available skills in parallel
     const [profileResponse, skillsResponse] = await Promise.allSettled([
-      studentsApi.getStudentProfile(userId),
+      studentsApi.getProfile(userId),
       studentsApi.getAvailableSkills(userId)
     ]);
 

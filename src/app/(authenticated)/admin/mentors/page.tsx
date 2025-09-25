@@ -31,7 +31,7 @@ export default function AdminMentorsPage() {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['mentors', { search: debouncedSearch }],
     queryFn: async () => {
-      const res = await mentorsApi.getAll({ search: debouncedSearch || undefined, per_page: '25' })
+      const res = await mentorsApi.list({ search: debouncedSearch || undefined, per_page: '25' })
       return res.data
     },
     enabled: typeof window !== 'undefined',

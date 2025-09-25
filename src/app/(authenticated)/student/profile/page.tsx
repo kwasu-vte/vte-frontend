@@ -25,8 +25,8 @@ async function getProfilePageData(userId: string): Promise<ProfilePageData> {
   try {
     // Fetch profile and enrollment data in parallel
     const [profileResponse, enrollmentsResponse] = await Promise.allSettled([
-      studentsApi.getStudentProfile(userId),
-      enrollmentsApi.getAllEnrollments({ per_page: 50 }) // Get recent enrollments
+      studentsApi.getProfile(userId),
+      enrollmentsApi.getAll({ per_page: 50 }) // Get recent enrollments
     ]);
 
     const profile = profileResponse.status === 'fulfilled' ? profileResponse.value.data : null;
