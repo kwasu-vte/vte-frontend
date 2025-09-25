@@ -28,7 +28,7 @@ export default function AdminGroupsPage() {
     queryFn: async () => {
       // * No direct groups list API; derive from skill groups
       const res = await api.getSkillGroups({ per_page: 100 });
-      const results = res.data?.results ?? [];
+      const results = res.data?.items ?? [];
       // * Map to Group[] shape for this table (best-effort)
       const mapped = results.map((g: any) => ({
         id: String(g.id),

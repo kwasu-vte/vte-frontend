@@ -49,7 +49,7 @@ export default function AdminStudentsPage() {
     enabled: typeof window !== 'undefined',
   });
 
-  const students = useMemo(() => studentsResponse?.results ?? [], [studentsResponse]);
+  const students = useMemo(() => studentsResponse?.items ?? [], [studentsResponse]);
 
   // * Update student mutation
   const updateStudentMutation = useMutation({

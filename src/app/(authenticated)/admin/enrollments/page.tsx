@@ -25,7 +25,7 @@ export default function AdminEnrollmentsPage() {
     queryKey: ['skill-groups', { skill_id: filters.skill_id }],
     queryFn: async () => {
       const res = await api.getSkillGroups({ per_page: 100, ...(filters.skill_id ? { skill_id: Number(filters.skill_id) } : {}) })
-      return res.data?.results ?? []
+      return res.data?.items ?? []
     },
     enabled: typeof window !== 'undefined',
   })
@@ -51,7 +51,7 @@ export default function AdminEnrollmentsPage() {
     refetch()
   }
 
-  const rows = useMemo(() => data?.results ?? [], [data]);
+  const rows = useMemo(() => data?.items ?? [], [data]);
 
   return (
     <div className="space-y-6">
@@ -105,7 +105,7 @@ export default function AdminEnrollmentsPage() {
               selectedKeys={selectedGroupId ? [selectedGroupId] : []}
               onChange={(e) => setSelectedGroupId(e.target.value)}
             >
-              {groupOptions.map((g) => (
+              {groupOptions.map((g: any) => (
                 <SelectItem key={g.id}>{g.name}</SelectItem>
               ))}
             </Select>

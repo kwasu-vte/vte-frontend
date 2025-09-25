@@ -14,7 +14,7 @@ export default function AdminReportsPage() {
     queryKey: ['skill-groups', { per_page: 100 }],
     queryFn: async () => {
       const res = await api.getSkillGroups({ per_page: 100 })
-      return res.data?.results ?? []
+      return res.data?.items ?? []
     },
   })
 
@@ -56,7 +56,7 @@ export default function AdminReportsPage() {
             onChange={(e) => setGroupId(e.target.value)}
             isDisabled={type !== 'attendance'}
           >
-            {groups.map((g) => (
+            {groups.map((g: any) => (
               <SelectItem key={String(g.id)}>{g.name}</SelectItem>
             ))}
           </Select>

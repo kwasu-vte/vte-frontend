@@ -81,8 +81,8 @@ export default async function AdminDashboard() {
             <Link href="/admin/enrollments" className="text-sm text-primary hover:underline">View all</Link>
           </div>
           <div className="divide-y divide-neutral-200">
-            {enrollments && enrollments.results.length > 0 ? (
-              enrollments.results.slice(0, 10).map((enr) => (
+            {enrollments && enrollments.items.length > 0 ? (
+              enrollments.items.slice(0, 10).map((enr: any) => (
                 <div key={enr.id} className="py-3 flex items-center justify-between">
                   <div className="min-w-0">
                     <p className="text-sm font-medium text-neutral-900 truncate">
