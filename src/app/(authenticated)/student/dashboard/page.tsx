@@ -26,8 +26,8 @@ async function getDashboardData(userId: string): Promise<DashboardData> {
   try {
     // Fetch profile and enrollment data in parallel
     const [profileResponse, enrollmentResponse] = await Promise.allSettled([
-      studentsApi.getProfile(userId),
-      enrollmentsApi.getUserEnrollment(userId)
+      studentsApi.getStudentProfile(userId),
+      enrollmentsApi.getEnrollment(userId)
     ]);
 
     const profile = profileResponse.status === 'fulfilled' ? profileResponse.value.data : null;
@@ -80,7 +80,7 @@ export default async function StudentDashboard() {
           Welcome back, {user.first_name}!
         </h1>
         <p className="text-neutral-600">
-          Here's what's happening with your practical training.
+          Here&apos;s what&apos;s happening with your practical training.
         </p>
       </div>
 
@@ -99,6 +99,8 @@ export default async function StudentDashboard() {
           {/* Enrollment Status */}
           <StateRenderer
             data={data.enrollment}
+            isLoading={false}
+            error={null}
             loadingComponent={
               <Card shadow="sm" className="w-full">
                 <CardBody className="p-6">
@@ -113,7 +115,7 @@ export default async function StudentDashboard() {
                 </CardHeader>
                 <CardBody>
                   <p className="text-sm text-neutral-600">
-                    You haven't enrolled in any skills yet. Browse available skills to get started.
+                    You haven&apos;t enrolled in any skills yet. Browse available skills to get started.
                   </p>
                 </CardBody>
               </Card>
@@ -137,6 +139,8 @@ export default async function StudentDashboard() {
           {data.enrollment && (
             <StateRenderer
               data={data.enrollment.group_id}
+              isLoading={false}
+              error={null}
               loadingComponent={
                 <Card shadow="sm" className="w-full">
                   <CardBody className="p-6">

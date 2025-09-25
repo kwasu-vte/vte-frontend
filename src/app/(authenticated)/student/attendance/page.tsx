@@ -11,7 +11,7 @@ import { PracticalCalendar } from '@/components/features/student/PracticalCalend
 import { NotificationContainer } from '@/components/shared/NotificationContainer';
 import { StateRenderer } from '@/components/shared/StateRenderer';
 import { Card, CardBody, CardHeader, Skeleton, Button, Progress, Chip, Divider } from '@nextui-org/react';
-import { ArrowLeft, BarChart3, Calendar, CheckCircle, Clock, AlertCircle } from 'lucide-react';
+import { ArrowLeft, BarChart3, Calendar, CheckCircle, Clock, AlertCircle, Users } from 'lucide-react';
 import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
@@ -24,7 +24,7 @@ interface AttendancePageData {
 
 async function getAttendancePageData(userId: string): Promise<AttendancePageData> {
   try {
-    const enrollmentResponse = await enrollmentsApi.getUserEnrollment(userId);
+    const enrollmentResponse = await enrollmentsApi.getEnrollment(userId);
     const enrollment = enrollmentResponse.success ? enrollmentResponse.data : null;
 
     // Mock attendance data - this would come from attendance APIs
@@ -99,6 +99,8 @@ export default async function StudentAttendance() {
       {/* Main Content */}
       <StateRenderer
         data={data.enrollment}
+        isLoading={false}
+        error={null}
         loadingComponent={
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -259,10 +261,12 @@ export default async function StudentAttendance() {
                 <Divider />
                 <CardBody className="p-6">
                   <PracticalCalendar
-                    groupId={enrollment.group_id?.toString() || ''}
-                    skillId={enrollment.skill?.id || ''}
-                    startDate={enrollment.created_at}
-                    endDate={new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()}
+                    practicalDates={data.attendanceHistory.map((item: any) => ({
+                      date: item.date,
+                      venue: item.venue,
+                      time: item.time
+                    }))}
+                    viewMode="month"
                   />
                 </CardBody>
               </Card>
@@ -281,7 +285,7 @@ export default async function StudentAttendance() {
               <Card shadow="sm" className="w-full">
                 <CardHeader className="flex items-center gap-2">
                   <CheckCircle className="h-5 w-5 text-primary" />
-                  <p className="text-xl font-medium leading-normal">Today's Progress</p>
+                  <p className="text-xl font-medium leading-normal">Today&apos;s Progress</p>
                 </CardHeader>
                 <Divider />
                 <CardBody className="p-6">

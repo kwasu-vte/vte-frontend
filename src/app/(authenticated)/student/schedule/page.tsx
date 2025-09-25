@@ -22,7 +22,7 @@ interface SchedulePageData {
 
 async function getSchedulePageData(userId: string): Promise<SchedulePageData> {
   try {
-    const enrollmentResponse = await enrollmentsApi.getUserEnrollment(userId);
+    const enrollmentResponse = await enrollmentsApi.getEnrollment(userId);
     const enrollment = enrollmentResponse.success ? enrollmentResponse.data : null;
 
     // Mock upcoming practicals data - this would come from schedule APIs
@@ -105,6 +105,8 @@ export default async function StudentSchedule() {
 
       {/* Main Content */}
       <StateRenderer
+        isLoading={false}
+        error={null}
         data={data.enrollment}
         loadingComponent={
           <div className="space-y-6">
@@ -223,10 +225,12 @@ export default async function StudentSchedule() {
                 <Divider />
                 <CardBody className="p-6">
                   <PracticalCalendar
-                    groupId={enrollment.group_id?.toString() || ''}
-                    skillId={enrollment.skill?.id || ''}
-                    startDate={enrollment.created_at}
-                    endDate={new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString()}
+                    practicalDates={data.upcomingPracticals.map((practical: any) => ({
+                      date: practical.date,
+                      venue: practical.venue,
+                      time: practical.time
+                    }))}
+                    viewMode="month"
                   />
                 </CardBody>
               </Card>
@@ -266,7 +270,7 @@ export default async function StudentSchedule() {
                         <div className="space-y-2 text-sm text-neutral-600">
                           <p>• Arrive 10 minutes before scheduled time</p>
                           <p>• Bring your student ID and QR code scanner</p>
-                          <p>• Notify your mentor if you'll be late or absent</p>
+                          <p>• Notify your mentor if you&apos;ll be late or absent</p>
                           <p>• Check for schedule changes before each session</p>
                         </div>
                       </div>

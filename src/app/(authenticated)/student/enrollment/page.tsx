@@ -23,7 +23,7 @@ interface EnrollmentPageData {
 
 async function getEnrollmentPageData(userId: string): Promise<EnrollmentPageData> {
   try {
-    const enrollmentResponse = await enrollmentsApi.getUserEnrollment(userId);
+    const enrollmentResponse = await enrollmentsApi.getEnrollment(userId);
     const enrollment = enrollmentResponse.success ? enrollmentResponse.data : null;
 
     return {
@@ -70,6 +70,8 @@ export default async function StudentEnrollment() {
 
       {/* Main Content */}
       <StateRenderer
+        isLoading={false}
+        error={null}
         data={data.enrollment}
         loadingComponent={
           <div className="space-y-6">
@@ -91,7 +93,7 @@ export default async function StudentEnrollment() {
               <BookOpen className="h-12 w-12 text-neutral-400 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-neutral-900 mb-2">No Active Enrollment</h3>
               <p className="text-neutral-600 mb-6">
-                You haven't enrolled in any skills yet. Browse available skills to get started.
+                You haven&apos;t enrolled in any skills yet. Browse available skills to get started.
               </p>
               <Button
                 as={Link}

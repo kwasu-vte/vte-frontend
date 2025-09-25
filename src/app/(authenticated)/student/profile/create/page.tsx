@@ -47,7 +47,7 @@ export default function StudentProfileCreate() {
 
     setIsLoading(true);
     try {
-      const response = await studentsApi.createProfile(user.id, data);
+      const response = await studentsApi.createStudentProfile(user.id, data);
       
       if (response.success) {
         addNotification({

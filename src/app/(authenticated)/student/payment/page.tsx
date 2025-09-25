@@ -20,7 +20,7 @@ interface PaymentPageData {
 
 async function getPaymentPageData(userId: string): Promise<PaymentPageData> {
   try {
-    const enrollmentResponse = await enrollmentsApi.getUserEnrollment(userId);
+    const enrollmentResponse = await enrollmentsApi.getEnrollment(userId);
     const enrollment = enrollmentResponse.success ? enrollmentResponse.data : null;
 
     return {
@@ -67,6 +67,8 @@ export default async function StudentPayment() {
 
       {/* Main Content */}
       <StateRenderer
+        isLoading={false}
+        error={null}
         data={data.enrollment}
         loadingComponent={
           <div className="space-y-6">
@@ -88,7 +90,7 @@ export default async function StudentPayment() {
               <CreditCard className="h-12 w-12 text-neutral-400 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-neutral-900 mb-2">No Payment Required</h3>
               <p className="text-neutral-600 mb-6">
-                You don't have any pending payments at this time.
+                You don&apos;t have any pending payments at this time.
               </p>
               <Button
                 as={Link}

@@ -25,12 +25,12 @@ async function getProfilePageData(userId: string): Promise<ProfilePageData> {
   try {
     // Fetch profile and enrollment data in parallel
     const [profileResponse, enrollmentsResponse] = await Promise.allSettled([
-      studentsApi.getProfile(userId),
-      enrollmentsApi.getAll({ per_page: 50 }) // Get recent enrollments
+      studentsApi.getStudentProfile(userId),
+      enrollmentsApi.getAllEnrollments({ per_page: 50 }) // Get recent enrollments
     ]);
 
     const profile = profileResponse.status === 'fulfilled' ? profileResponse.value.data : null;
-    const allEnrollments = enrollmentsResponse.status === 'fulfilled' ? enrollmentsResponse.value.data.results : [];
+    const allEnrollments = enrollmentsResponse.status === 'fulfilled' ? enrollmentsResponse.value.data.items : [];
     
     // Filter enrollments for this user
     const userEnrollments = allEnrollments.filter((enrollment: any) => enrollment.user_id === userId);
@@ -91,6 +91,8 @@ export default async function StudentProfile() {
 
       {/* Profile View */}
       <StateRenderer
+        isLoading={false}
+        error={null}
         data={data.profile}
         loadingComponent={
           <Card shadow="sm" className="w-full">
@@ -106,7 +108,7 @@ export default async function StudentProfile() {
             </CardHeader>
             <CardBody>
               <p className="text-sm text-neutral-600 mb-4">
-                You haven't created your profile yet.
+                You haven&apos;t created your profile yet.
               </p>
               <Button
                 as={Link}
@@ -135,6 +137,8 @@ export default async function StudentProfile() {
         </CardHeader>
         <CardBody className="p-6">
           <StateRenderer
+        isLoading={false}
+        error={null}
             data={data.enrollments}
             loadingComponent={<Skeleton className="h-20 w-full" />}
             emptyComponent={
@@ -167,6 +171,8 @@ export default async function StudentProfile() {
 
       {/* Attendance Summary */}
       <StateRenderer
+        isLoading={false}
+        error={null}
         data={data.attendanceSummary}
         loadingComponent={
           <Card shadow="sm" className="w-full">

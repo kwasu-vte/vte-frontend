@@ -22,7 +22,7 @@ interface MyGroupPageData {
 
 async function getMyGroupPageData(userId: string): Promise<MyGroupPageData> {
   try {
-    const enrollmentResponse = await enrollmentsApi.getUserEnrollment(userId);
+    const enrollmentResponse = await enrollmentsApi.getEnrollment(userId);
     const enrollment = enrollmentResponse.success ? enrollmentResponse.data : null;
 
     // Mock group details - this would come from a group details API
@@ -97,6 +97,8 @@ export default async function StudentMyGroup() {
 
       {/* Main Content */}
       <StateRenderer
+        isLoading={false}
+        error={null}
         data={data.enrollment}
         loadingComponent={
           <div className="space-y-6">
@@ -118,7 +120,7 @@ export default async function StudentMyGroup() {
               <Users className="h-12 w-12 text-neutral-400 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-neutral-900 mb-2">No Group Assignment</h3>
               <p className="text-neutral-600 mb-6">
-                You haven't been assigned to a group yet. Complete your enrollment and payment to get assigned.
+                You haven&apos;t been assigned to a group yet. Complete your enrollment and payment to get assigned.
               </p>
               <Button
                 as={Link}
@@ -143,7 +145,7 @@ export default async function StudentMyGroup() {
                   <Users className="h-12 w-12 text-warning-400 mx-auto mb-4" />
                   <h3 className="text-lg font-medium text-neutral-900 mb-2">Awaiting Group Assignment</h3>
                   <p className="text-neutral-600 mb-6">
-                    Your enrollment is confirmed but you haven't been assigned to a group yet. This usually happens within 24-48 hours after payment confirmation.
+                    Your enrollment is confirmed but you haven&apos;t been assigned to a group yet. This usually happens within 24-48 hours after payment confirmation.
                   </p>
                   <div className="space-y-2">
                     <p className="text-sm text-neutral-500">
@@ -285,10 +287,12 @@ export default async function StudentMyGroup() {
                 <Divider />
                 <CardBody className="p-6">
                   <PracticalCalendar
-                    groupId={data.groupDetails.id}
-                    skillId={data.groupDetails.skill?.id}
-                    startDate={data.groupDetails.schedule.start}
-                    endDate={data.groupDetails.schedule.end}
+                    practicalDates={data.groupDetails.schedule.days.map((day: string) => ({
+                      date: `${data.groupDetails.schedule.start}T09:00:00Z`, // Mock time
+                      venue: data.groupDetails.schedule.location,
+                      time: '09:00 AM'
+                    }))}
+                    viewMode="month"
                   />
                 </CardBody>
               </Card>

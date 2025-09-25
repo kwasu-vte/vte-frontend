@@ -23,7 +23,7 @@ async function getSkillsPageData(userId: string): Promise<SkillsPageData> {
   try {
     // Fetch profile and available skills in parallel
     const [profileResponse, skillsResponse] = await Promise.allSettled([
-      studentsApi.getProfile(userId),
+      studentsApi.getStudentProfile(userId),
       studentsApi.getAvailableSkills(userId)
     ]);
 
@@ -140,6 +140,8 @@ export default async function StudentSkills() {
 
       {/* Skills Grid */}
       <StateRenderer
+        isLoading={false}
+        error={null}
         data={data.availableSkills}
         loadingComponent={
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

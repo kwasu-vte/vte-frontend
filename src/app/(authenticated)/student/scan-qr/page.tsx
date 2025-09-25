@@ -20,7 +20,7 @@ interface ScanQRPageData {
 
 async function getScanQRPageData(userId: string): Promise<ScanQRPageData> {
   try {
-    const enrollmentResponse = await enrollmentsApi.getUserEnrollment(userId);
+    const enrollmentResponse = await enrollmentsApi.getEnrollment(userId);
     const enrollment = enrollmentResponse.success ? enrollmentResponse.data : null;
 
     return {
@@ -60,13 +60,15 @@ export default async function StudentScanQR() {
             Scan QR Code
           </h1>
           <p className="text-neutral-600">
-            Scan your mentor's QR code to mark attendance.
+            Scan your mentor&apos;s QR code to mark attendance.
           </p>
         </div>
       </div>
 
       {/* Main Content */}
       <StateRenderer
+        isLoading={false}
+        error={null}
         data={data.enrollment}
         loadingComponent={
           <div className="space-y-6">
@@ -201,7 +203,7 @@ export default async function StudentScanQR() {
                           <ul className="mt-1 space-y-1">
                             <li>• Each QR code can only be scanned once per student</li>
                             <li>• QR codes expire after a certain time period</li>
-                            <li>• Make sure you're scanning the correct QR code for your group</li>
+                            <li>• Make sure you&apos;re scanning the correct QR code for your group</li>
                             <li>• Contact your mentor if you encounter any issues</li>
                           </ul>
                         </div>
