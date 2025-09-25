@@ -2,7 +2,7 @@
 import React from "react"
 import { Card, CardBody, CardHeader, Chip, Button, Skeleton, Tabs, Tab } from "@nextui-org/react"
 import { useQuery, useQueries } from "@tanstack/react-query"
-import { api } from "@/lib/api"
+import { mentorsApi, qrCodesApi } from "@/lib/api"
 import type { SkillGroup, PaginatedResponse, GroupQrCode, AttendanceReport } from "@/lib/types"
 import MentorGroupsList from "@/components/features/mentor/MentorGroupsList"
 import MyQRCodesDisplay from "@/components/features/mentor/MyQRCodesDisplay"
@@ -25,7 +25,7 @@ export default function MentorDashboard(props: MentorDashboardProps) {
   const { data: groups, isLoading: loadingGroups, isError: groupsError, refetch: refetchGroups } = useQuery({
     queryKey: ["mentor-skill-groups", userId],
     queryFn: async () => {
-      const res = await api.getMentorSkillGroups(userId)
+      const res = await mentorsApi.getSkillGroups(userId)
       return (res?.data ?? []) as SkillGroup[]
     },
     enabled: !!userId,
@@ -48,7 +48,7 @@ export default function MentorDashboard(props: MentorDashboardProps) {
     queries: qrGroups.map((g) => ({
       queryKey: ["group-qr-codes", g.id, "active"],
       queryFn: async () => {
-        const res = await api.listGroupQrCodes(Number(g.id), { status: "active", per_page: 20 })
+        const res = await qrCodesApi.listByGroup(Number(g.id), { status: "active", per_page: 20 })
         return { groupId: g.id, data: (res?.data as PaginatedResponse<GroupQrCode>) ?? null }
       },
       enabled: !!g?.id,
@@ -73,7 +73,7 @@ export default function MentorDashboard(props: MentorDashboardProps) {
     queryKey: ["group-attendance-report", primaryGroup?.id],
     queryFn: async () => {
       if (!primaryGroup?.id) return null as AttendanceReport | null
-      const res = await api.getGroupAttendanceReport(Number(primaryGroup.id))
+      const res = await qrCodesApi.getAttendanceReport(Number(primaryGroup.id))
       return (res?.data ?? null) as AttendanceReport | null
     },
     enabled: !!primaryGroup?.id && !selectedActiveToken,

@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { api } from '@/lib/api';
+import { enrollmentsApi, skillGroupsApi, skillsApi } from '@/lib/api';
 import type { Enrollment, PaginatedResponse } from '@/lib/types';
 import { StateRenderer, DefaultLoadingComponent, DefaultErrorComponent } from '@/components/shared/StateRenderer';
 import EnrollmentFilters from '@/components/features/admin/EnrollmentFilters';
@@ -18,13 +18,13 @@ export default function AdminEnrollmentsPage() {
 
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['admin-enrollments', filters],
-    queryFn: async () => (await api.getAllEnrollments(filters)).data as PaginatedResponse<Enrollment>,
+    queryFn: async () => (await enrollmentsApi.getAll(filters)).data as PaginatedResponse<Enrollment>,
     enabled: typeof window !== 'undefined',
   });
   const { data: groupsData } = useQuery({
     queryKey: ['skill-groups', { skill_id: filters.skill_id }],
     queryFn: async () => {
-      const res = await api.getSkillGroups({ per_page: 100, ...(filters.skill_id ? { skill_id: Number(filters.skill_id) } : {}) })
+      const res = await skillGroupsApi.getAll({ per_page: 100, ...(filters.skill_id ? { skill_id: Number(filters.skill_id) } : {}) })
       return res.data?.items ?? []
     },
     enabled: typeof window !== 'undefined',
@@ -38,7 +38,7 @@ export default function AdminEnrollmentsPage() {
 
   async function handleAssignConfirm() {
     if (!assignEnrollmentId || !selectedGroupId) return
-    await api.assignStudentToGroup(Number(selectedGroupId), { enrollment_id: assignEnrollmentId })
+    await skillGroupsApi.assignStudent(Number(selectedGroupId), { enrollment_id: assignEnrollmentId })
     setAssignOpen(false)
     setAssignEnrollmentId(null)
     setSelectedGroupId("")
@@ -47,7 +47,7 @@ export default function AdminEnrollmentsPage() {
 
   async function handleAutoAssign() {
     if (!filters.skill_id || !filters.academic_session_id) return
-    await api.autoAssignStudentsToGroups(filters.skill_id, { academic_session_id: filters.academic_session_id })
+    await skillsApi.autoAssignStudentsToGroups(filters.skill_id, { academic_session_id: filters.academic_session_id })
     refetch()
   }
 

@@ -3,7 +3,7 @@ import React from "react"
 import { useMemo, useState } from "react"
 import { Button, Card, CardBody, CardHeader, Chip, Pagination, Select, SelectItem, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tooltip } from "@nextui-org/react"
 import { useQuery } from "@tanstack/react-query"
-import { api } from "@/lib/api"
+import { qrCodesApi } from "@/lib/api"
 
 /**
  * * QRDistributionTracker
@@ -33,7 +33,7 @@ export function QRDistributionTracker(props: QRDistributionTrackerProps) {
     queryKey: ["qr-codes", selectedGroupId, status, page],
     queryFn: async () => {
       if (!selectedGroupId) return { results: [] } as any
-      const res = await api.listGroupQrCodes(selectedGroupId, { per_page: 100, status: status === 'all' ? 'all' : status === 'active' ? 'active' : 'expired' })
+      const res = await qrCodesApi.listByGroup(selectedGroupId, { per_page: 100, status: status === 'all' ? 'all' : status === 'active' ? 'active' : 'expired' })
       return res.data
     },
     enabled: shouldFetch,

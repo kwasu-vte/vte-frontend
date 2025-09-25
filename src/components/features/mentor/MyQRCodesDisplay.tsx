@@ -2,7 +2,7 @@
 import React from "react"
 import { Card, CardBody, CardHeader, Button, Chip, Skeleton } from "@nextui-org/react"
 import { useQuery } from "@tanstack/react-query"
-import { api } from "@/lib/api"
+import { qrCodesApi } from "@/lib/api"
 import type { PaginatedResponse, GroupQrCode } from "@/lib/types"
 
 /**
@@ -18,7 +18,7 @@ export default function MyQRCodesDisplay(props: MyQRCodesDisplayProps) {
   const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ["group-qr-codes", groupId],
     queryFn: async () => {
-      const res = await api.listGroupQrCodes(groupId, { status: "active", per_page: 50 })
+      const res = await qrCodesApi.listByGroup(groupId, { status: "active", per_page: 50 })
       return res?.data as PaginatedResponse<GroupQrCode>
     },
   })

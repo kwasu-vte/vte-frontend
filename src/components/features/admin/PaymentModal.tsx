@@ -6,15 +6,16 @@
 
 import { useState, useEffect } from 'react';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, Select, SelectItem, Textarea } from '@nextui-org/react';
-import { Payment, CreatePaymentPayload, UpdatePaymentPayload } from '@/lib/types';
+// Note: Payment types removed as no payment CRUD APIs exist
+// import { Payment, CreatePaymentPayload, UpdatePaymentPayload } from '@/lib/types';
 import { useQuery } from '@tanstack/react-query';
-import { api } from '@/lib/api';
+import { studentsApi } from '@/lib/api';
 
 interface PaymentModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: CreatePaymentPayload | UpdatePaymentPayload) => void;
-  payment?: Payment | null;
+  onSubmit: (data: any) => void; // Note: Payment types removed
+  payment?: any | null; // Note: Payment types removed
   isLoading?: boolean;
 }
 
@@ -38,7 +39,7 @@ export function PaymentModal({
   const { data: students } = useQuery({
     queryKey: ['students'],
     queryFn: async () => {
-      const response = await api.getStudents({ per_page: 100 });
+      const response = await studentsApi.searchStudents({ per_page: 100 });
       return response.data?.items ?? [];
     },
   });
@@ -75,7 +76,7 @@ export function PaymentModal({
       return;
     }
 
-    const submitData: CreatePaymentPayload | UpdatePaymentPayload = {
+    const submitData: any = { // Note: Payment types removed
       student_id: formData.student_id,
       amount: parseFloat(formData.amount),
       payment_method: formData.payment_method || null,

@@ -2,7 +2,7 @@
 import React from "react"
 import { Tabs, Tab, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Button, Skeleton } from "@nextui-org/react"
 import { useQuery } from "@tanstack/react-query"
-import { api } from "@/lib/api"
+import { qrCodesApi } from "@/lib/api"
 import type { AttendanceReport, QrScanHistory } from "@/lib/types"
 
 export type QRScanReportProps = {
@@ -17,7 +17,7 @@ export default function QRScanReport(props: QRScanReportProps) {
   const { data: history, isLoading: loadingHistory, refetch: refetchHistory } = useQuery({
     queryKey: ["qr-scan-history", qrToken, perPage],
     queryFn: async () => {
-      const res = await api.getQrScanHistory(qrToken, perPage)
+      const res = await qrCodesApi.getScanHistory(qrToken, perPage)
       return res?.data as QrScanHistory
     },
     refetchInterval: 5000,
@@ -26,7 +26,7 @@ export default function QRScanReport(props: QRScanReportProps) {
   const { data: report, isLoading: loadingReport, refetch: refetchReport } = useQuery({
     queryKey: ["group-attendance-report", groupId],
     queryFn: async () => {
-      const res = await api.getGroupAttendanceReport(groupId)
+      const res = await qrCodesApi.getAttendanceReport(groupId)
       return res?.data as AttendanceReport
     },
     refetchInterval: 10000,

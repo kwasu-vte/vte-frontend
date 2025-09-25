@@ -9,7 +9,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { StudentsTable } from '@/components/features/admin/StudentsTable';
 // import { StudentModal } from '@/components/features/admin/StudentModal';
 import { StudentProfileModal } from '@/components/features/admin/StudentProfileModal';
-import { api } from '@/lib/api';
+import { studentsApi } from '@/lib/api';
 import { StudentProfile } from '@/lib/types';
 import type { CreateUserPayload, UpdateUserPayload } from '@/lib/types'
 import { Button, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@nextui-org/react';
@@ -43,7 +43,7 @@ export default function AdminStudentsPage() {
   } = useQuery({
     queryKey: ['students', { search: debouncedSearch }],
     queryFn: async () => {
-      const response = await api.getStudents({ search: debouncedSearch || undefined, per_page: 25 });
+      const response = await studentsApi.searchStudents({ search: debouncedSearch || undefined, per_page: 25 });
       return response.data;
     },
     enabled: typeof window !== 'undefined',

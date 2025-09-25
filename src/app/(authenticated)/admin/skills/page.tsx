@@ -10,7 +10,7 @@ import { useClientQuery } from '@/lib/hooks/useClientQuery';
 import { StateRenderer, DefaultLoadingComponent, DefaultErrorComponent, DefaultEmptyComponent } from '@/components/shared/StateRenderer';
 import { SkillsTable } from '@/components/features/admin/SkillsTable';
 import { SkillModal } from '@/components/features/admin/SkillModal';
-import { api } from '@/lib/api';
+import { skillsApi } from '@/lib/api';
 import { Skill, CreateSkillPayload, UpdateSkillPayload, SkillDateRangePayload } from '@/lib/types';
 import { Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@nextui-org/react';
 import { Plus, AlertTriangle, Eye } from 'lucide-react';
@@ -39,8 +39,8 @@ export default function AdminSkillsPage() {
   } = useClientQuery({
     queryKey: ['skills'],
     queryFn: async () => {
-      const response = await api.getSkills();
-      // * api.getSkills returns Skill[] directly
+      const response = await skillsApi.getAll();
+      // * skillsApi.getAll returns Skill[] directly
       return response.data ?? [];
     },
   });
@@ -48,7 +48,7 @@ export default function AdminSkillsPage() {
   // * Create skill mutation
   const createSkillMutation = useMutation({
     mutationFn: async (data: CreateSkillPayload) => {
-      const response = await api.createSkill(data);
+      const response = await skillsApi.create(data);
       return response;
     },
     onSuccess: (response) => {
@@ -74,7 +74,7 @@ export default function AdminSkillsPage() {
   const updateSkillMutation = useMutation({
     mutationFn: async (data: UpdateSkillPayload) => {
       if (!selectedSkill) throw new Error('No skill selected');
-      const response = await api.updateSkill(selectedSkill.id, data);
+      const response = await skillsApi.update(selectedSkill.id, data);
       return response;
     },
     onSuccess: (response) => {
@@ -100,7 +100,7 @@ export default function AdminSkillsPage() {
   // * Delete skill mutation
   const deleteSkillMutation = useMutation({
     mutationFn: async (skillId: string) => {
-      const response = await api.deleteSkill(skillId);
+      const response = await skillsApi.delete(skillId);
       return response;
     },
     onSuccess: (response) => {
@@ -151,7 +151,7 @@ export default function AdminSkillsPage() {
   async function handleUpdateDateRange(skill: Skill, payload: SkillDateRangePayload) {
     setIsSubmitting(true)
     try {
-      await api.updateSkillDateRange(String(skill.id), payload)
+      await skillsApi.updateDateRange(String(skill.id), payload)
       queryClient.invalidateQueries({ queryKey: ['skills'] })
       addNotification({ type: 'success', title: 'Date Range Updated', message: 'Skill date range saved.' })
     } catch (error) {

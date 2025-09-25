@@ -8,7 +8,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { MentorsTable } from '@/components/features/admin/MentorsTable';
 import { MentorModal } from '@/components/features/admin/MentorModal';
-import { api } from '@/lib/api';
+import { mentorsApi } from '@/lib/api';
 import { MentorProfile, CreateMentorProfilePayload } from '@/lib/types';
 import { Button, Input } from '@nextui-org/react';
 import { Plus, Search } from 'lucide-react';
@@ -31,7 +31,7 @@ export default function AdminMentorsPage() {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['mentors', { search: debouncedSearch }],
     queryFn: async () => {
-      const res = await api.getMentors({ search: debouncedSearch || undefined, per_page: '25' })
+      const res = await mentorsApi.getAll({ search: debouncedSearch || undefined, per_page: '25' })
       return res.data
     },
     enabled: typeof window !== 'undefined',
@@ -41,7 +41,7 @@ export default function AdminMentorsPage() {
 
   const createMentorMutation = useMutation({
     mutationFn: async (payload: CreateMentorProfilePayload) => {
-      const response = await api.createMentor(payload)
+      const response = await mentorsApi.create(payload)
       return response.data
     },
     onSuccess: () => {

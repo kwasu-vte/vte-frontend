@@ -1,14 +1,14 @@
-import { api } from '@/lib/api';
+import { skillsApi } from '@/lib/api';
 import { notFound } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 
 export default async function AdminSkillGroupsPage({ params }: { params: Promise<{ skillId: string }> }) {
 	const { skillId } = await params;
-	const skillRes = await api.getSkill(skillId).catch(() => null);
+	const skillRes = await skillsApi.getById(skillId).catch(() => null);
 	if (!skillRes?.data) return notFound();
 
-	const groupsRes = await api.getGroupsBySkill(skillId, { include_full: true }).catch(() => null);
+	const groupsRes = await skillsApi.getGroupsBySkill(skillId, { include_full: true }).catch(() => null);
 	const groups = groupsRes?.data ?? [];
 
 	return (

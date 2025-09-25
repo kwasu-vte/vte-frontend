@@ -2,7 +2,7 @@
 import React from "react"
 import { Card, CardBody, CardHeader, Chip, Button, Skeleton } from "@nextui-org/react"
 import { useQuery } from "@tanstack/react-query"
-import { api } from "@/lib/api"
+import { mentorsApi } from "@/lib/api"
 import type { SkillGroup } from "@/lib/types"
 import GroupCapacityIndicator from "@/components/features/admin/GroupCapacityIndicator"
 
@@ -37,7 +37,7 @@ export default function MentorGroupsList(props: MentorGroupsListProps) {
     queryKey: ["mentor-skill-groups", userId],
     queryFn: async () => {
       if (!userId) return [] as SkillGroup[]
-      const res = await api.getMentorSkillGroups(userId)
+      const res = await mentorsApi.getSkillGroups(userId)
       return res?.data ?? []
     },
     enabled: !!userId && !providedGroups,

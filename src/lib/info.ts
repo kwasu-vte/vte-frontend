@@ -1,8 +1,8 @@
 // * Payment Utilities
-// * SECURITY: All API calls now go through centralized api.ts service
+// * SECURITY: All API calls now go through domain-specific API clients
 // * No client-side token storage - uses httpOnly cookies via proxy
 
-import { api } from './api';
+// Note: Legacy payment functions not implemented in current API
 
 export async function makePayment(params: { course: string; specialization: string | null }) {
     const { course, specialization: rawSpecialization } = params

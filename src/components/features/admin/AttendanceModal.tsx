@@ -6,15 +6,16 @@
 
 import { useState, useEffect } from 'react';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, Select, SelectItem, Textarea } from '@nextui-org/react';
-import { AttendanceRecord, CreateAttendanceRecordPayload, UpdateAttendanceRecordPayload } from '@/lib/types';
+// Note: AttendanceRecord types removed as only reports exist
+// import { AttendanceRecord, CreateAttendanceRecordPayload, UpdateAttendanceRecordPayload } from '@/lib/types';
 import { useQuery } from '@tanstack/react-query';
-import { api } from '@/lib/api';
+import { studentsApi, skillGroupsApi } from '@/lib/api';
 
 interface AttendanceModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: CreateAttendanceRecordPayload | UpdateAttendanceRecordPayload) => void;
-  record?: AttendanceRecord | null;
+  onSubmit: (data: any) => void; // Note: AttendanceRecord types removed
+  record?: any | null; // Note: AttendanceRecord types removed
   isLoading?: boolean;
 }
 
@@ -37,7 +38,7 @@ export function AttendanceModal({
   const { data: students } = useQuery({
     queryKey: ['students'],
     queryFn: async () => {
-      const response = await api.getStudents({ per_page: 100 });
+      const response = await studentsApi.searchStudents({ per_page: 100 });
       return response.data?.items ?? [];
     },
   });
@@ -46,7 +47,7 @@ export function AttendanceModal({
   const { data: groups } = useQuery({
     queryKey: ['groups'],
     queryFn: async () => {
-      const response = await api.getSkillGroups({ per_page: 100 });
+      const response = await skillGroupsApi.getAll({ per_page: 100 });
       // Map to minimal shape for the Select usage below
       return (response.data?.items ?? []).map((g: any) => ({
         id: String(g.id),
@@ -87,7 +88,7 @@ export function AttendanceModal({
       return;
     }
 
-    const submitData: CreateAttendanceRecordPayload | UpdateAttendanceRecordPayload = {
+    const submitData: any = { // Note: AttendanceRecord types removed
       student_id: formData.student_id,
       group_id: formData.group_id,
       date: formData.date,

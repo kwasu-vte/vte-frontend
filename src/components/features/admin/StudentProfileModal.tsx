@@ -2,7 +2,7 @@
 
 import { Modal, ModalContent, ModalHeader, ModalBody } from "@nextui-org/react";
 import { useQuery } from "@tanstack/react-query";
-import { api } from "@/lib/api";
+import { studentsApi } from "@/lib/api";
 import type { StudentProfile } from "@/lib/types";
 import ProfileView from "@/components/features/student/ProfileView";
 
@@ -17,7 +17,7 @@ export function StudentProfileModal({ isOpen, onClose, userId }: StudentProfileM
     queryKey: ["student-profile", userId],
     queryFn: async () => {
       if (!userId) return null as unknown as StudentProfile;
-      const res = await api.getStudentProfile(userId);
+      const res = await studentsApi.getProfile(userId);
       return res.data;
     },
     enabled: isOpen && !!userId,

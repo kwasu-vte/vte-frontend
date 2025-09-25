@@ -1,7 +1,7 @@
 "use client"
 import React from "react"
 import { Select, SelectItem, Button } from "@nextui-org/react"
-import { api } from "@/lib/api"
+import { academicSessionsApi, skillsApi } from "@/lib/api"
 import { useQuery } from "@tanstack/react-query"
 import type { AcademicSession, Skill } from "@/lib/types"
 
@@ -24,12 +24,12 @@ export type EnrollmentFiltersProps = {
 export function EnrollmentFilters({ value, onChange, defaultPerPage = 25 }: EnrollmentFiltersProps) {
   const { data: sessionsResp } = useQuery({
     queryKey: ["academic-sessions"],
-    queryFn: () => api.getAcademicSessions(),
+    queryFn: () => academicSessionsApi.getAll(),
   })
 
   const { data: skillsResp, isLoading: skillsLoading } = useQuery({
     queryKey: ["skills"],
-    queryFn: () => api.getSkills(),
+    queryFn: () => skillsApi.getAll(),
   })
 
   const [filters, setFilters] = React.useState<{ academic_session_id?: number; skill_id?: string; per_page?: number }>(value || { per_page: defaultPerPage })

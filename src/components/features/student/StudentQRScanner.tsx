@@ -1,7 +1,7 @@
 "use client"
 import React from "react"
 import { Card, CardBody, CardHeader, Button, Input, Spinner } from "@nextui-org/react"
-import { api } from "@/lib/api"
+import { qrCodesApi } from "@/lib/api"
 import ScanResultModal from "./ScanResultModal"
 import ScanConfirmationModal from "./ScanConfirmationModal"
 import ScanProgressIndicator from "./ScanProgressIndicator"
@@ -39,7 +39,7 @@ function StudentQRScanner({ studentId, onScanSuccess, onScanError, requiredScans
     }
     setIsSubmitting(true)
     try {
-      const { data } = await api.processQrScan({ token: token.trim(), student_id: studentId })
+      const { data } = await qrCodesApi.processScan({ token: token.trim(), student_id: studentId })
       // data: QrScanResponse { success, message, points, timestamp, student_name }
       const success = Boolean((data as any)?.success)
       const points = (data as any)?.points as number | undefined

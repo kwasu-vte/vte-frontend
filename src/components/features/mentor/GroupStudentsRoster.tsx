@@ -2,7 +2,7 @@
 import React from "react"
 import { Input, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Skeleton, Chip, Avatar, Button } from "@nextui-org/react"
 import { useQuery } from "@tanstack/react-query"
-import { api } from "@/lib/api"
+import { skillGroupsApi } from "@/lib/api"
 import type { SkillGroup, User } from "@/lib/types"
 
 /**
@@ -24,7 +24,7 @@ export default function GroupStudentsRoster(props: GroupStudentsRosterProps) {
   const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ["group-details", groupId],
     queryFn: async () => {
-      const res = await api.getSkillGroup(groupId)
+      const res = await skillGroupsApi.getById(groupId)
       return res?.data as SkillGroup
     },
   })

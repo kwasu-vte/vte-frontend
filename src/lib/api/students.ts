@@ -6,6 +6,15 @@ export const studentsApi = {
     return apiRequest('v1/users/students');
   },
 
+  searchStudents(params: { search?: string; per_page?: number; page?: number }): Promise<ApiResponse<PaginatedResponse<StudentProfile>>> {
+    const query = new URLSearchParams();
+    if (params?.search) query.append('search', params.search);
+    if (params?.per_page) query.append('per_page', params.per_page.toString());
+    if (params?.page) query.append('page', params.page.toString());
+    const queryString = query.toString();
+    return apiRequest(`v1/users/students${queryString ? `?${queryString}` : ''}`);
+  },
+
   getProfile(userId: string): Promise<ApiResponse<StudentProfile>> {
     return apiRequest(`v1/users/${userId}/student`);
   },

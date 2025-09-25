@@ -4,7 +4,7 @@
 
 import PWATestPanel from '@/components/shared/PWATestPanel';
 import { StatCard, StatCardGrid } from '@/components/shared/StatCard';
-import { api } from '@/lib/api';
+import { academicSessionsApi, skillGroupsApi, enrollmentsApi } from '@/lib/api';
 import type { AcademicSession, GroupStatistics, PaginatedResponse, Enrollment } from '@/lib/types';
 import Link from 'next/link';
 
@@ -13,9 +13,9 @@ export const dynamic = 'force-dynamic';
 async function getDashboardData() {
   // * Fetch in parallel with fail-safe handling
   const [sessionsRes, statsRes, enrollmentsRes] = await Promise.allSettled([
-    api.getAcademicSessions(),
-    api.getGroupStatistics(),
-    api.getAllEnrollments({ per_page: 25 }),
+    academicSessionsApi.getAll(),
+    skillGroupsApi.getStatistics(),
+    enrollmentsApi.getAll({ per_page: 25 }),
   ]);
 
   const sessions: AcademicSession[] = sessionsRes.status === 'fulfilled' && sessionsRes.value?.data ? sessionsRes.value.data : [];

@@ -2,7 +2,7 @@
 import React from "react"
 import { Card, CardHeader, CardBody, Tabs, Tab, Select, SelectItem, Skeleton } from "@nextui-org/react"
 import { useQuery } from "@tanstack/react-query"
-import { api } from "@/lib/api"
+import { mentorsApi, qrCodesApi } from "@/lib/api"
 import type { SkillGroup, PaginatedResponse, GroupQrCode } from "@/lib/types"
 import PracticalQRCard from "@/components/features/mentor/PracticalQRCard"
 import QRScanReport from "@/components/features/mentor/QRScanReport"
@@ -14,7 +14,7 @@ export default function MentorMyQRCodesView(props: { userId: string }) {
   const { data: groups, isLoading: loadingGroups } = useQuery({
     queryKey: ["mentor-skill-groups", userId],
     queryFn: async () => {
-      const res = await api.getMentorSkillGroups(userId)
+      const res = await mentorsApi.getSkillGroups(userId)
       return (res?.data ?? []) as SkillGroup[]
     },
     enabled: !!userId,
@@ -32,7 +32,7 @@ export default function MentorMyQRCodesView(props: { userId: string }) {
     queryKey: ["group-qr-codes", selectedGroupId, "all"],
     queryFn: async () => {
       if (!selectedGroupId) return null as PaginatedResponse<GroupQrCode> | null
-      const res = await api.listGroupQrCodes(selectedGroupId, { status: "all", per_page: 100 })
+      const res = await qrCodesApi.listByGroup(selectedGroupId, { status: "all", per_page: 100 })
       return (res?.data ?? null) as PaginatedResponse<GroupQrCode> | null
     },
     enabled: !!selectedGroupId,

@@ -8,7 +8,7 @@ import { useState, useEffect } from 'react';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, Select, SelectItem } from '@nextui-org/react';
 import { Group, CreateGroupPayload } from '@/lib/types';
 import { useQuery } from '@tanstack/react-query';
-import { api } from '@/lib/api';
+import { skillsApi, mentorsApi } from '@/lib/api';
 
 interface GroupModalProps {
   isOpen: boolean;
@@ -36,7 +36,7 @@ export function GroupModal({
   const { data: skills } = useQuery({
     queryKey: ['skills'],
     queryFn: async () => {
-      const response = await api.getSkills();
+      const response = await skillsApi.getAll();
       return response.data;
     },
   });
@@ -45,7 +45,7 @@ export function GroupModal({
   const { data: mentors } = useQuery({
     queryKey: ['mentors'],
     queryFn: async () => {
-      const response = await api.getMentors();
+      const response = await mentorsApi.getAll();
       return response.data;
     },
   });

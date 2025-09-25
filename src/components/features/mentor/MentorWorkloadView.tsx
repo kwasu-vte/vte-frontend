@@ -2,7 +2,7 @@
 import React from "react"
 import { Card, CardBody } from "@nextui-org/react"
 import { useQuery } from "@tanstack/react-query"
-import { api } from "@/lib/api"
+import { skillGroupsApi } from "@/lib/api"
 import type { GroupStatistics } from "@/lib/types"
 import { StatCard, StatCardGrid } from "@/components/shared/StatCard"
 
@@ -21,7 +21,7 @@ export default function MentorWorkloadView(props: MentorWorkloadViewProps) {
   const { data, isLoading } = useQuery({
     queryKey: ["group-statistics", skillId, academicSessionId],
     queryFn: async () => {
-      const res = await api.getGroupStatistics({
+      const res = await skillGroupsApi.getStatistics({
         skill_id: skillId,
         academic_session_id: academicSessionId,
       })

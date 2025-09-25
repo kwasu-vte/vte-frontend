@@ -2,7 +2,7 @@
 import React from "react"
 import { Card, CardHeader, CardBody, Button, Chip, Select, SelectItem, Skeleton } from "@nextui-org/react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { api } from "@/lib/api"
+import { mentorsApi, skillsApi } from "@/lib/api"
 import type { Skill } from "@/lib/types"
 
 /**
@@ -21,7 +21,7 @@ export default function MentorSkillAssignment(props: MentorSkillAssignmentProps)
   const { data: assigned, isLoading: loadingAssigned } = useQuery({
     queryKey: ["mentor-assigned-skills", userId],
     queryFn: async () => {
-      const res = await api.getMentorAssignedSkills(userId)
+      const res = await mentorsApi.getAssignedSkills(userId)
       return res?.data ?? []
     },
   })
@@ -29,14 +29,14 @@ export default function MentorSkillAssignment(props: MentorSkillAssignmentProps)
   const { data: allSkills, isLoading: loadingSkills } = useQuery({
     queryKey: ["skills"],
     queryFn: async () => {
-      const res = await api.getSkills()
+      const res = await skillsApi.getAll()
       return res?.data ?? []
     },
   })
 
   const assignMutation = useMutation({
     mutationFn: async (skillId: string) => {
-      return api.assignSkillToMentor(mentorProfileId, { skill_id: skillId, is_primary: false })
+      return mentorsApi.assignSkill(mentorProfileId, { skill_id: skillId, is_primary: false })
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["mentor-assigned-skills", userId] })
@@ -45,7 +45,7 @@ export default function MentorSkillAssignment(props: MentorSkillAssignmentProps)
 
   const removeMutation = useMutation({
     mutationFn: async (skillId: string) => {
-      return api.removeSkillFromMentor(mentorProfileId, { skill_id: skillId })
+      return mentorsApi.removeSkill(mentorProfileId, { skill_id: skillId })
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["mentor-assigned-skills", userId] })

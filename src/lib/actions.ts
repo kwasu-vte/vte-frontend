@@ -7,7 +7,7 @@
 
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { api } from './api';
+import { authApi, skillsApi, skillGroupsApi, academicSessionsApi, studentsApi } from './api';
 import { CreateSkillPayload, UpdateSkillPayload, CreateSkillGroupPayload, CreateUserPayload, CreateStudentProfilePayload } from './types';
 
 // * Authentication Actions
@@ -26,7 +26,7 @@ export async function signInAction(formData: FormData) {
   let token: string | null = null;
   try {
     console.log('[SignIn Action] Calling API signIn...');
-    const response = await api.signIn({ email: username, password });
+    const response = await authApi.login({ email: username, password });
     
     if (!response.success) {
       console.error(`[SignIn Action] API signIn failed: ${response.message}`);
@@ -36,7 +36,7 @@ export async function signInAction(formData: FormData) {
     console.log('[SignIn Action] API signIn successful, getting user data...');
     // * Get token from response; cookie will be set via /auth/callback (browser route)
     token = (response as any)?.data?.access_token || null;
-    const me = token ? await api.getCurrentUserWithToken(token) : await api.getCurrentUser();
+    const me = token ? await authApi.getCurrentUser() : await authApi.getCurrentUser();
     if (!me.success || !me.data) {
       console.error(`[SignIn Action] Failed to get user data: ${me.message}`);
       throw new Error(me.message || 'Failed to fetch user after login');
@@ -80,13 +80,13 @@ export async function signInActionSafe(_prevState: { error?: string | null } | u
   let target: string | null = null;
   let token: string | null = null;
   try {
-    const response = await api.signIn({ email: username, password });
+    const response = await authApi.login({ email: username, password });
     if (!response.success) {
       return { error: response.message || 'Authentication failed' };
     }
 
     token = (response as any)?.data?.access_token || null;
-    const me = token ? await api.getCurrentUserWithToken(token) : await api.getCurrentUser();
+    const me = token ? await authApi.getCurrentUser() : await authApi.getCurrentUser();
     if (!me.success || !me.data) {
       return { error: me.message || 'Failed to fetch user after login' };
     }
@@ -111,7 +111,7 @@ export async function signInActionSafe(_prevState: { error?: string | null } | u
 
 export async function signOutAction() {
   try {
-    await api.signOut();
+    await authApi.logout();
   } catch (_) {
     // * Ignore API errors - proceed to redirect
   }
@@ -155,7 +155,7 @@ export async function signUpAction(formData: FormData) {
   
   let shouldRedirect = false;
   try {
-    const response = await api.signUp(userData);
+    const response = await authApi.register(userData);
     
     if (response.success) {
       // * Mark for redirect to sign in after successful registration
@@ -192,7 +192,7 @@ export async function signUpActionSafe(_prevState: { error?: string | null } | u
   }
 
   try {
-    const response = await api.signUp(userData);
+    const response = await authApi.register(userData);
     if (!response.success) {
       return { error: response.message || 'Registration failed' };
     }
@@ -216,7 +216,7 @@ export async function createSkillAction(formData: FormData) {
   };
   
   try {
-    const response = await api.createSkill(skillData);
+    const response = await skillsApi.create(skillData);
     
     if (response.success) {
       // * Return success - the page will handle the redirect/refresh
@@ -241,7 +241,7 @@ export async function updateSkillAction(id: string, formData: FormData) {
   };
   
   try {
-    const response = await api.updateSkill(id, skillData);
+    const response = await skillsApi.update(id, skillData);
     
     if (response.success) {
       return { success: true, data: response.data };
@@ -255,7 +255,7 @@ export async function updateSkillAction(id: string, formData: FormData) {
 
 export async function deleteSkillAction(id: string) {
   try {
-    await api.deleteSkill(id);
+    await skillsApi.delete(id);
     return { success: true };
   } catch (error) {
     throw new Error(error instanceof Error ? error.message : 'Failed to delete skill');
@@ -271,7 +271,7 @@ export async function createGroupAction(formData: FormData) {
   };
   
   try {
-    const response = await api.createSkillGroup(groupData);
+    const response = await skillGroupsApi.create(groupData);
     
     if (response.success) {
       return { success: true, data: response.data };
@@ -303,7 +303,7 @@ export async function createAcademicSessionAction(formData: FormData) {
   };
 
   try {
-    const response = await api.createAcademicSession(sessionData);
+    const response = await academicSessionsApi.create(sessionData);
     
     if (response.success) {
       return { success: true, data: response.data };
@@ -323,7 +323,7 @@ export async function updateAcademicSessionAction(id: number, formData: FormData
   };
 
   try {
-    const response = await api.updateAcademicSession(id, sessionData);
+    const response = await academicSessionsApi.update(id, sessionData);
     
     if (response.success) {
       return { success: true, data: response.data };
@@ -337,7 +337,7 @@ export async function updateAcademicSessionAction(id: number, formData: FormData
 
 export async function startAcademicSessionAction(id: number) {
   try {
-    const response = await api.startAcademicSession(id);
+    const response = await academicSessionsApi.start(id);
     
     if (response.success) {
       return { success: true, data: response.data };
@@ -351,7 +351,7 @@ export async function startAcademicSessionAction(id: number) {
 
 export async function endAcademicSessionAction(id: number) {
   try {
-    const response = await api.endAcademicSession(id);
+    const response = await academicSessionsApi.end(id);
     
     if (response.success) {
       return { success: true, data: response.data };
@@ -376,7 +376,7 @@ export async function createStudentProfileAction(userId: string, formData: FormD
   };
 
   try {
-    const response = await api.createStudentProfile(userId, profileData);
+    const response = await studentsApi.createProfile(userId, profileData);
     
     if (response.success) {
       return { success: true, data: response.data };

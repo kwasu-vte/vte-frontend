@@ -8,7 +8,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { StateRenderer, DefaultLoadingComponent, DefaultErrorComponent, DefaultEmptyComponent } from '@/components/shared/StateRenderer';
 import { GroupsTable } from '@/components/features/admin/GroupsTable';
-import { api } from '@/lib/api';
+import { skillGroupsApi } from '@/lib/api';
 import { Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@nextui-org/react';
 import { Eye } from 'lucide-react';
 import type { Group } from '@/lib/types';
@@ -27,7 +27,7 @@ export default function AdminGroupsPage() {
     queryKey: ['groups'],
     queryFn: async () => {
       // * No direct groups list API; derive from skill groups
-      const res = await api.getSkillGroups({ per_page: 100 });
+      const res = await skillGroupsApi.getAll({ per_page: 100 });
       const results = res.data?.items ?? [];
       // * Map to Group[] shape for this table (best-effort)
       const mapped = results.map((g: any) => ({

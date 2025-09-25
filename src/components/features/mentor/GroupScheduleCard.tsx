@@ -2,7 +2,7 @@
 import React from "react"
 import { Card, CardHeader, CardBody, Chip, Skeleton } from "@nextui-org/react"
 import { useQuery } from "@tanstack/react-query"
-import { api } from "@/lib/api"
+import { skillsApi } from "@/lib/api"
 
 /**
  * * GroupScheduleCard
@@ -25,7 +25,7 @@ export default function GroupScheduleCard(props: GroupScheduleCardProps) {
   const { data, isLoading } = useQuery({
     queryKey: ["skill-date-range", skillId, academicSessionId],
     queryFn: async () => {
-      const res = await api.getSkillDateRange(skillId, academicSessionId ? String(academicSessionId) : undefined)
+      const res = await skillsApi.getDateRange(skillId, academicSessionId ? String(academicSessionId) : undefined)
       return res?.data ?? null
     },
   })

@@ -2,7 +2,7 @@
 import React from "react"
 import { Tabs, Tab, Card, CardHeader, CardBody, Chip, Skeleton } from "@nextui-org/react"
 import { useQuery } from "@tanstack/react-query"
-import { api } from "@/lib/api"
+import { mentorsApi } from "@/lib/api"
 import type { SkillGroup } from "@/lib/types"
 import PracticalCalendar from "@/components/features/student/PracticalCalendar"
 import GroupScheduleCard from "@/components/features/mentor/GroupScheduleCard"
@@ -14,7 +14,7 @@ export default function MentorScheduleView(props: { userId: string }) {
   const { data: groups, isLoading: loadingGroups } = useQuery({
     queryKey: ["mentor-skill-groups", userId],
     queryFn: async () => {
-      const res = await api.getMentorSkillGroups(userId)
+      const res = await mentorsApi.getSkillGroups(userId)
       return (res?.data ?? []) as SkillGroup[]
     },
     enabled: !!userId,

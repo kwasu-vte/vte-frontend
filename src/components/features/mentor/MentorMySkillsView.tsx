@@ -2,7 +2,7 @@
 import React from "react"
 import { Card, CardBody, CardHeader, Skeleton } from "@nextui-org/react"
 import { useQuery } from "@tanstack/react-query"
-import { api } from "@/lib/api"
+import { mentorsApi } from "@/lib/api"
 import type { MentorProfile, SkillGroup } from "@/lib/types"
 import MentorSkillAssignment from "@/components/features/mentor/MentorSkillAssignment"
 import MentorGroupsList from "@/components/features/mentor/MentorGroupsList"
@@ -18,7 +18,7 @@ export default function MentorMySkillsView(props: MentorMySkillsViewProps) {
   const { data: profile, isLoading: loadingProfile, isError: errorProfile } = useQuery({
     queryKey: ["mentor-profile", userId],
     queryFn: async () => {
-      const res = await api.getMentorProfile(userId)
+      const res = await mentorsApi.getProfile(userId)
       return (res?.data ?? null) as MentorProfile | null
     },
     enabled: !!userId,
@@ -27,7 +27,7 @@ export default function MentorMySkillsView(props: MentorMySkillsViewProps) {
   const { data: groups, isLoading: loadingGroups, isError: errorGroups } = useQuery({
     queryKey: ["mentor-skill-groups", userId],
     queryFn: async () => {
-      const res = await api.getMentorSkillGroups(userId)
+      const res = await mentorsApi.getSkillGroups(userId)
       return (res?.data ?? []) as SkillGroup[]
     },
     enabled: !!userId,

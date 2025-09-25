@@ -2,7 +2,7 @@
 import React from "react"
 import { Card, CardHeader, CardBody, Input, Select, SelectItem, Button, Tabs, Tab, Chip, Skeleton } from "@nextui-org/react"
 import { useQuery } from "@tanstack/react-query"
-import { api } from "@/lib/api"
+import { mentorsApi, qrCodesApi } from "@/lib/api"
 import type { Skill, SkillGroup, AttendanceReport } from "@/lib/types"
 import MentorGroupsList from "@/components/features/mentor/MentorGroupsList"
 import GroupStudentsRoster from "@/components/features/mentor/GroupStudentsRoster"
@@ -18,7 +18,7 @@ export default function MentorGroupsPageView(props: { userId: string }) {
   const { data: skills, isLoading: loadingSkills } = useQuery({
     queryKey: ["mentor-assigned-skills", userId],
     queryFn: async () => {
-      const res = await api.getMentorAssignedSkills(userId)
+      const res = await mentorsApi.getAssignedSkills(userId)
       return (res?.data ?? []) as Skill[]
     },
     enabled: !!userId,
@@ -27,7 +27,7 @@ export default function MentorGroupsPageView(props: { userId: string }) {
   const { data: groups, isLoading: loadingGroups, isError: groupsError } = useQuery({
     queryKey: ["mentor-skill-groups", userId],
     queryFn: async () => {
-      const res = await api.getMentorSkillGroups(userId)
+      const res = await mentorsApi.getSkillGroups(userId)
       return (res?.data ?? []) as SkillGroup[]
     },
     enabled: !!userId,
@@ -50,7 +50,7 @@ export default function MentorGroupsPageView(props: { userId: string }) {
     queryKey: ["group-attendance-report", selectedGroupId],
     queryFn: async () => {
       if (!selectedGroupId) return null as AttendanceReport | null
-      const res = await api.getGroupAttendanceReport(Number(selectedGroupId))
+      const res = await qrCodesApi.getAttendanceReport(Number(selectedGroupId))
       return (res?.data ?? null) as AttendanceReport | null
     },
     enabled: !!selectedGroupId,

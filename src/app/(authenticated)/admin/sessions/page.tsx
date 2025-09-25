@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { StateRenderer, DefaultLoadingComponent, DefaultErrorComponent, DefaultEmptyComponent } from '@/components/shared/StateRenderer';
-import { api } from '@/lib/api';
+import { academicSessionsApi } from '@/lib/api';
 import type { AcademicSession } from '@/lib/types';
 import { Button, Card, CardBody, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input } from '@nextui-org/react';
 import { CalendarDays, Plus, Edit2 } from 'lucide-react';
@@ -20,7 +20,7 @@ export default function AdminSessionsPage() {
   const { data: sessions, isLoading, error, refetch } = useQuery({
     queryKey: ['admin-sessions'],
     queryFn: async () => {
-      const res = await api.getAcademicSessions();
+      const res = await academicSessionsApi.getAll();
       return res.data as AcademicSession[];
     },
     enabled: typeof window !== 'undefined',
@@ -29,13 +29,13 @@ export default function AdminSessionsPage() {
   const upsertMutation = useMutation({
     mutationFn: async () => {
       if (editing) {
-        return (await api.updateAcademicSession(editing.id, {
+        return (await academicSessionsApi.update(editing.id, {
           name: form.name || undefined,
           starts_at: form.starts_at || undefined,
           ends_at: form.ends_at || undefined,
         })).data;
       }
-      return (await api.createAcademicSession({
+      return (await academicSessionsApi.create({
         name: form.name,
         starts_at: form.starts_at || null,
         ends_at: form.ends_at || null,
@@ -50,14 +50,14 @@ export default function AdminSessionsPage() {
   });
 
   const startMutation = useMutation({
-    mutationFn: async (id: number) => (await api.startAcademicSession(id)).data,
+    mutationFn: async (id: number) => (await academicSessionsApi.start(id)).data,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-sessions'] });
     },
   });
 
   const endMutation = useMutation({
-    mutationFn: async (id: number) => (await api.endAcademicSession(id)).data,
+    mutationFn: async (id: number) => (await academicSessionsApi.end(id)).data,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-sessions'] });
     },

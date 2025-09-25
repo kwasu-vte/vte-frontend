@@ -3,7 +3,7 @@ import React from "react"
 import { useMemo, useState } from "react"
 import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tooltip } from "@nextui-org/react"
 import { useClientQuery } from "@/lib/hooks/useClientQuery"
-import { api } from "@/lib/api"
+import { enrollmentsApi } from "@/lib/api"
 
 /**
  * * GroupStudentsList
@@ -32,7 +32,7 @@ export default function GroupStudentsList(props: GroupStudentsListProps) {
   const { data, isLoading, isError } = useClientQuery({
     queryKey: ["group-students", groupId],
     queryFn: async () => {
-      const res = await api.getAllEnrollments({ per_page: 1000 })
+      const res = await enrollmentsApi.getAll({ per_page: 1000 })
       return res.data
     },
     enabled: shouldFetch,

@@ -2,7 +2,7 @@
 import React from "react"
 import { Card, CardHeader, CardBody, Select, SelectItem, Input, Button, Chip, Skeleton } from "@nextui-org/react"
 import { useQuery } from "@tanstack/react-query"
-import { api } from "@/lib/api"
+import { mentorsApi, qrCodesApi } from "@/lib/api"
 import type { SkillGroup, AttendanceReport } from "@/lib/types"
 import AttendanceReportComp from "@/components/features/student/AttendanceReport"
 import { DefaultEmptyComponent, DefaultLoadingComponent } from "@/components/shared/StateRenderer"
@@ -13,7 +13,7 @@ export default function MentorAttendanceReportsView(props: { userId: string }) {
   const { data: groups, isLoading: loadingGroups } = useQuery({
     queryKey: ["mentor-skill-groups", userId],
     queryFn: async () => {
-      const res = await api.getMentorSkillGroups(userId)
+      const res = await mentorsApi.getSkillGroups(userId)
       return (res?.data ?? []) as SkillGroup[]
     },
     enabled: !!userId,
@@ -33,7 +33,7 @@ export default function MentorAttendanceReportsView(props: { userId: string }) {
     queryKey: ["group-attendance-report", groupId],
     queryFn: async () => {
       if (!groupId) return null as AttendanceReport | null
-      const res = await api.getGroupAttendanceReport(groupId)
+      const res = await qrCodesApi.getAttendanceReport(groupId)
       return (res?.data ?? null) as AttendanceReport | null
     },
     enabled: !!groupId && submitted,

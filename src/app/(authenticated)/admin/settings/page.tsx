@@ -5,7 +5,7 @@
 
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { api } from '@/lib/api';
+import { authApi, academicSessionsApi } from '@/lib/api';
 import { User, AcademicSession } from '@/lib/types';
 import { 
   Button, 
@@ -65,7 +65,7 @@ export default function AdminSettingsPage() {
   } = useQuery({
     queryKey: ['currentUser'],
     queryFn: async () => {
-      const response = await api.getCurrentUser();
+      const response = await authApi.getCurrentUser();
       return response.data;
     },
     enabled: typeof window !== 'undefined',
@@ -80,7 +80,7 @@ export default function AdminSettingsPage() {
   } = useQuery({
     queryKey: ['academicSessions'],
     queryFn: async () => {
-      const response = await api.getAcademicSessions();
+      const response = await academicSessionsApi.getAll();
       return response.data;
     },
     enabled: typeof window !== 'undefined',
@@ -89,7 +89,7 @@ export default function AdminSettingsPage() {
   // * Create academic session mutation
   const createSessionMutation = useMutation({
     mutationFn: async (data: { name: string; starts_at?: string; ends_at?: string }) => {
-      const response = await api.createAcademicSession(data);
+      const response = await academicSessionsApi.create(data);
       return response;
     },
     onSuccess: (response) => {
@@ -116,7 +116,7 @@ export default function AdminSettingsPage() {
   const updateSessionMutation = useMutation({
     mutationFn: async (data: { name?: string; starts_at?: string; ends_at?: string }) => {
       if (!selectedSession) throw new Error('No session selected');
-      const response = await api.updateAcademicSession(selectedSession.id, data);
+      const response = await academicSessionsApi.update(selectedSession.id, data);
       return response;
     },
     onSuccess: (response) => {
@@ -142,7 +142,7 @@ export default function AdminSettingsPage() {
   // * Start academic session mutation
   const startSessionMutation = useMutation({
     mutationFn: async (sessionId: number) => {
-      const response = await api.startAcademicSession(sessionId);
+      const response = await academicSessionsApi.start(sessionId);
       return response;
     },
     onSuccess: (response) => {
@@ -166,7 +166,7 @@ export default function AdminSettingsPage() {
   // * End academic session mutation
   const endSessionMutation = useMutation({
     mutationFn: async (sessionId: number) => {
-      const response = await api.endAcademicSession(sessionId);
+      const response = await academicSessionsApi.end(sessionId);
       return response;
     },
     onSuccess: (response) => {

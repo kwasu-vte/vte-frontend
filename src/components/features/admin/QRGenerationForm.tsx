@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { Button, Card, CardBody, CardHeader, Input, Select, SelectItem, Spinner } from "@nextui-org/react"
 import { z } from "zod"
-import { api } from "@/lib/api"
+import { skillGroupsApi, mentorsApi, qrCodesApi } from "@/lib/api"
 
 /**
  * * QRGenerationForm
@@ -44,7 +44,7 @@ export function QRGenerationForm(props: QRGenerationFormProps) {
   const { data: groupsData } = useQuery({
     queryKey: ["skill-groups", { per_page: 100 }],
     queryFn: async () => {
-      const res = await api.getSkillGroups({ per_page: 100 })
+      const res = await skillGroupsApi.getAll({ per_page: 100 })
       return res.data?.items ?? []
     },
   })
@@ -52,7 +52,7 @@ export function QRGenerationForm(props: QRGenerationFormProps) {
   const { data: mentorsData } = useQuery({
     queryKey: ["mentors", { per_page: "100" }],
     queryFn: async () => {
-      const res = await api.getMentors({ per_page: "100" })
+      const res = await mentorsApi.getAll({ per_page: "100" })
       return res.data ?? []
     },
   })
@@ -79,7 +79,7 @@ export function QRGenerationForm(props: QRGenerationFormProps) {
 
       if (parsed.mode === "single") {
         if (!parsed.groupId) throw new Error("Group is required for single mode")
-        const res = await api.generateGroupQrCodes(parsed.groupId, {
+        const res = await qrCodesApi.generateForGroup(parsed.groupId, {
           count: parsed.count,
           expires_in_days: parsed.expiresInDays,
           points_per_scan: parsed.pointsPerScan,
@@ -87,7 +87,7 @@ export function QRGenerationForm(props: QRGenerationFormProps) {
         onGenerate && onGenerate(res)
         onGroupSelected && onGroupSelected(parsed.groupId)
       } else {
-        const res = await api.bulkGenerateQrCodes({
+        const res = await qrCodesApi.bulkGenerate({
           group_ids: groups.map((g: any) => Number(g.id)),
           count: parsed.count,
           expires_in_days: parsed.expiresInDays,
