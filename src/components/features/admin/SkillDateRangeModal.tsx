@@ -52,7 +52,7 @@ export default function SkillDateRangeModal({ isOpen, skillId, academicSessionId
 
   const queryClient = useQueryClient()
 
-  // * For now, emit values outward (API integration for skill range update lives in parent via docs plan)
+  // * For now, emit values outward (parent should call skillsApi.updateDateRange)
   const onSubmit = (values: FormValues) => {
     // * Validate within session bounds if available
     if (currentSession?.starts_at && currentSession?.ends_at) {
@@ -65,7 +65,7 @@ export default function SkillDateRangeModal({ isOpen, skillId, academicSessionId
         return
       }
     }
-    // * Emit; parent can call api.updateSkillDateRange per plan
+    // * Emit; parent can call skillsApi.updateDateRange
     onSuccess?.({
       id: 0,
       skill_id: skillId,

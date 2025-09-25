@@ -18,7 +18,7 @@ export default function MyQRCodesDisplay(props: MyQRCodesDisplayProps) {
   const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ["group-qr-codes", groupId],
     queryFn: async () => {
-      const res = await qrCodesApi.listByGroup(groupId, { status: "active", per_page: 50 })
+      const res = await qrCodesApi.listGroupCodes(groupId, { status: "active", per_page: 50 })
       return res?.data as PaginatedResponse<GroupQrCode>
     },
   })

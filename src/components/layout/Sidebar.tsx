@@ -20,9 +20,6 @@ import {
   GraduationCap,
   Home,
   LogOut,
-  School,
-  UserPlus,
-  Megaphone,
   QrCode,
   ClipboardList
 } from 'lucide-react';
@@ -84,25 +81,7 @@ const navigationItems: NavigationItem[] = [
     role: ['Admin'],
   },
   {
-    href: '/admin/attendance',
-    label: 'Attendance',
-    icon: Calendar,
-    role: ['Admin'],
-  },
-  {
-    href: '/admin/payments',
-    label: 'Payments',
-    icon: CreditCard,
-    role: ['Admin'],
-  },
-  {
-    href: '/admin/announcements',
-    label: 'Announcements',
-    icon: Megaphone,
-    role: ['Admin'],
-  },
-  {
-    href: '/admin/settings',
+    href: '/admin/sessions',
     label: 'System Settings',
     icon: Settings,
     role: ['Admin'],
@@ -127,18 +106,6 @@ const navigationItems: NavigationItem[] = [
     icon: Calendar,
     role: ['Mentor'],
   },
-  {
-    href: '/mentor/attendance',
-    label: 'Take Attendance',
-    icon: UserCheck,
-    role: ['Mentor'],
-  },
-  {
-    href: '/mentor/announcements',
-    label: 'Announcements',
-    icon: Megaphone,
-    role: ['Mentor'],
-  },
 
   // * Student Navigation
   {
@@ -154,12 +121,6 @@ const navigationItems: NavigationItem[] = [
     role: ['Student'],
   },
   {
-    href: '/student/courses',
-    label: 'My Courses',
-    icon: School,
-    role: ['Student'],
-  },
-  {
     href: '/student/my-group',
     label: 'My Group',
     icon: Users,
@@ -169,12 +130,6 @@ const navigationItems: NavigationItem[] = [
     href: '/student/payment',
     label: 'Payment',
     icon: CreditCard,
-    role: ['Student'],
-  },
-  {
-    href: '/student/announcements',
-    label: 'Announcements',
-    icon: Megaphone,
     role: ['Student'],
   },
 ];

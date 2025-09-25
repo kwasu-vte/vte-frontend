@@ -44,7 +44,7 @@ export function QRGenerationForm(props: QRGenerationFormProps) {
   const { data: groupsData } = useQuery({
     queryKey: ["skill-groups", { per_page: 100 }],
     queryFn: async () => {
-      const res = await skillGroupsApi.getAll({ per_page: 100 })
+      const res = await skillGroupsApi.list({ per_page: 100 })
       return res.data?.items ?? []
     },
   })
@@ -52,7 +52,7 @@ export function QRGenerationForm(props: QRGenerationFormProps) {
   const { data: mentorsData } = useQuery({
     queryKey: ["mentors", { per_page: "100" }],
     queryFn: async () => {
-      const res = await mentorsApi.getAll({ per_page: "100" })
+      const res = await mentorsApi.list({ per_page: "100" })
       return res.data ?? []
     },
   })

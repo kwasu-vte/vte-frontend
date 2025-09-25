@@ -32,7 +32,7 @@ export default function MentorMyQRCodesView(props: { userId: string }) {
     queryKey: ["group-qr-codes", selectedGroupId, "all"],
     queryFn: async () => {
       if (!selectedGroupId) return null as PaginatedResponse<GroupQrCode> | null
-      const res = await qrCodesApi.listByGroup(selectedGroupId, { status: "all", per_page: 100 })
+      const res = await qrCodesApi.listGroupCodes(selectedGroupId, { status: "all", per_page: 100 })
       return (res?.data ?? null) as PaginatedResponse<GroupQrCode> | null
     },
     enabled: !!selectedGroupId,

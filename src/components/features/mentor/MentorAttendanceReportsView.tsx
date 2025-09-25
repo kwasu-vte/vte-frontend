@@ -33,7 +33,7 @@ export default function MentorAttendanceReportsView(props: { userId: string }) {
     queryKey: ["group-attendance-report", groupId],
     queryFn: async () => {
       if (!groupId) return null as AttendanceReport | null
-      const res = await qrCodesApi.getAttendanceReport(groupId)
+      const res = await qrCodesApi.getGroupAttendanceReport(groupId)
       return (res?.data ?? null) as AttendanceReport | null
     },
     enabled: !!groupId && submitted,

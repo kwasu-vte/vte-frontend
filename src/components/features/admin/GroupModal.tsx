@@ -45,7 +45,7 @@ export function GroupModal({
   const { data: mentors } = useQuery({
     queryKey: ['mentors'],
     queryFn: async () => {
-      const response = await mentorsApi.getAll();
+      const response = await mentorsApi.list();
       return response.data;
     },
   });

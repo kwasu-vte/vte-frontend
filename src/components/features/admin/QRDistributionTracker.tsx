@@ -33,7 +33,7 @@ export function QRDistributionTracker(props: QRDistributionTrackerProps) {
     queryKey: ["qr-codes", selectedGroupId, status, page],
     queryFn: async () => {
       if (!selectedGroupId) return { results: [] } as any
-      const res = await qrCodesApi.listByGroup(selectedGroupId, { per_page: 100, status: status === 'all' ? 'all' : status === 'active' ? 'active' : 'expired' })
+      const res = await qrCodesApi.listGroupCodes(selectedGroupId, { per_page: 100, status: status === 'all' ? 'all' : status === 'active' ? 'active' : 'expired' })
       return res.data
     },
     enabled: shouldFetch,

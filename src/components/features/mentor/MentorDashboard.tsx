@@ -48,7 +48,7 @@ export default function MentorDashboard(props: MentorDashboardProps) {
     queries: qrGroups.map((g) => ({
       queryKey: ["group-qr-codes", g.id, "active"],
       queryFn: async () => {
-        const res = await qrCodesApi.listByGroup(Number(g.id), { status: "active", per_page: 20 })
+        const res = await qrCodesApi.listGroupCodes(Number(g.id), { status: "active", per_page: 20 })
         return { groupId: g.id, data: (res?.data as PaginatedResponse<GroupQrCode>) ?? null }
       },
       enabled: !!g?.id,
@@ -73,7 +73,7 @@ export default function MentorDashboard(props: MentorDashboardProps) {
     queryKey: ["group-attendance-report", primaryGroup?.id],
     queryFn: async () => {
       if (!primaryGroup?.id) return null as AttendanceReport | null
-      const res = await qrCodesApi.getAttendanceReport(Number(primaryGroup.id))
+      const res = await qrCodesApi.getGroupAttendanceReport(Number(primaryGroup.id))
       return (res?.data ?? null) as AttendanceReport | null
     },
     enabled: !!primaryGroup?.id && !selectedActiveToken,

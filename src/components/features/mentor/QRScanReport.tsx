@@ -26,7 +26,7 @@ export default function QRScanReport(props: QRScanReportProps) {
   const { data: report, isLoading: loadingReport, refetch: refetchReport } = useQuery({
     queryKey: ["group-attendance-report", groupId],
     queryFn: async () => {
-      const res = await qrCodesApi.getAttendanceReport(groupId)
+      const res = await qrCodesApi.getGroupAttendanceReport(groupId)
       return res?.data as AttendanceReport
     },
     refetchInterval: 10000,
