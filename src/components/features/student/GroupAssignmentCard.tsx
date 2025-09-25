@@ -17,7 +17,7 @@ export type GroupAssignmentCardProps = {
   mentor?: { name: string }
 }
 
-export default function GroupAssignmentCard({ enrollment, group, mentor }: GroupAssignmentCardProps) {
+function GroupAssignmentCard({ enrollment, group, mentor }: GroupAssignmentCardProps) {
   const isAssigned = Boolean(group)
 
   return (
@@ -50,4 +50,5 @@ export default function GroupAssignmentCard({ enrollment, group, mentor }: Group
   )
 }
 
-
+export { GroupAssignmentCard }
+export default GroupAssignmentCard

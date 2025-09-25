@@ -23,7 +23,7 @@ export type StudentQRScannerProps = {
   completedScansToday?: number
 }
 
-export default function StudentQRScanner({ studentId, onScanSuccess, onScanError, requiredScansToday = 3, completedScansToday = 0 }: StudentQRScannerProps) {
+function StudentQRScanner({ studentId, onScanSuccess, onScanError, requiredScansToday = 3, completedScansToday = 0 }: StudentQRScannerProps) {
   const [token, setToken] = React.useState("")
   const [isSubmitting, setIsSubmitting] = React.useState(false)
   const [resultOpen, setResultOpen] = React.useState(false)
@@ -110,4 +110,5 @@ export default function StudentQRScanner({ studentId, onScanSuccess, onScanError
   )
 }
 
-
+export { StudentQRScanner }
+export default StudentQRScanner

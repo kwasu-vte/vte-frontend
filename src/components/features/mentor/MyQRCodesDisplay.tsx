@@ -72,7 +72,7 @@ export default function MyQRCodesDisplay(props: MyQRCodesDisplayProps) {
     )
   }
 
-  const items = data?.results ?? []
+  const items = data?.items ?? []
 
   if (items.length === 0) {
     return (
@@ -85,7 +85,7 @@ export default function MyQRCodesDisplay(props: MyQRCodesDisplayProps) {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {items.map((code) => (
+      {items.map((code: any) => (
         <Card key={code.id} shadow="sm" className="p-4">
           <CardHeader className="flex items-center justify-between">
             <p className="text-base font-medium text-neutral-900">Token</p>

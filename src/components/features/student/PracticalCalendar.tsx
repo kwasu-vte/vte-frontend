@@ -15,7 +15,7 @@ export type PracticalCalendarProps = {
   viewMode?: 'month' | 'week'
 }
 
-export default function PracticalCalendar({ practicalDates, viewMode = 'month' }: PracticalCalendarProps) {
+function PracticalCalendar({ practicalDates, viewMode = 'month' }: PracticalCalendarProps) {
   const [mode, setMode] = React.useState<'month' | 'week'>(viewMode)
 
   const sorted = React.useMemo(() => (
@@ -89,4 +89,5 @@ export default function PracticalCalendar({ practicalDates, viewMode = 'month' }
   )
 }
 
-
+export { PracticalCalendar }
+export default PracticalCalendar

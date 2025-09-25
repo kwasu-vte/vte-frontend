@@ -40,7 +40,7 @@ export function QRDistributionTracker(props: QRDistributionTrackerProps) {
   })
 
   const rows = useMemo(() => {
-    const base = shouldFetch ? (data?.results || []) : (qrBatches || [])
+    const base = shouldFetch ? (data?.items || []) : (qrBatches || [])
     if (status === "all") return base
     // Map our status to API status names when applicable
     return base.filter((b: any) => (status === "active" ? b.status === "active" : b.status !== "active"))

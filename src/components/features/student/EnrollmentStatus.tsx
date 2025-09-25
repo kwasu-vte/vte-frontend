@@ -22,7 +22,7 @@ const statusColor: Record<EnrollmentStatusProps["enrollment"]["status"], "defaul
   ACTIVE: "success",
 }
 
-export default function EnrollmentStatus({ enrollment, showTimeline = true }: EnrollmentStatusProps) {
+function EnrollmentStatus({ enrollment, showTimeline = true }: EnrollmentStatusProps) {
   const currentIndex = ["SELECTED", "PAID", "ASSIGNED", "ACTIVE"].indexOf(enrollment.status)
 
   return (
@@ -62,4 +62,5 @@ export default function EnrollmentStatus({ enrollment, showTimeline = true }: En
   )
 }
 
-
+export { EnrollmentStatus }
+export default EnrollmentStatus

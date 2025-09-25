@@ -33,7 +33,7 @@ export type SkillSelectionGridProps = {
   isLoading?: boolean
 }
 
-export default function SkillSelectionGrid({ 
+function SkillSelectionGrid({ 
   availableSkills, 
   studentLevel, 
   onSelectSkill, 
@@ -205,4 +205,5 @@ export default function SkillSelectionGrid({
   )
 }
 
-
+export { SkillSelectionGrid }
+export default SkillSelectionGrid

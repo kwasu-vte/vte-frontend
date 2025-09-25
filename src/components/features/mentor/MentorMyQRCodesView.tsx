@@ -42,7 +42,7 @@ export default function MentorMyQRCodesView(props: { userId: string }) {
   // Group by date (day) for display
   const groupedByDate = React.useMemo(() => {
     const map = new Map<string, GroupQrCode[]>()
-    const items = codes?.results ?? []
+    const items = codes?.items ?? []
     for (const c of items) {
       const d = c.expires_at ? new Date(c.expires_at) : new Date()
       const key = new Date(d.getFullYear(), d.getMonth(), d.getDate()).toISOString()
@@ -55,7 +55,7 @@ export default function MentorMyQRCodesView(props: { userId: string }) {
 
   // Select a token for side report
   const selectedToken = React.useMemo(() => {
-    const items = codes?.results ?? []
+    const items = codes?.items ?? []
     return items.length > 0 ? items[0].token : null
   }, [codes])
 
@@ -91,7 +91,7 @@ export default function MentorMyQRCodesView(props: { userId: string }) {
           <CardBody className="space-y-4">
             {loadingCodes ? (
               <DefaultLoadingComponent />
-            ) : !codes || (codes.results ?? []).length === 0 ? (
+            ) : !codes || (codes.items ?? []).length === 0 ? (
               <DefaultEmptyComponent message="No QR codes for this group." />
             ) : (
               groupedByDate.map(([iso, items]) => (

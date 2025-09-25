@@ -20,7 +20,7 @@ export type ProfileCompletionAlertProps = {
   onDismiss?: () => void
 }
 
-export default function ProfileCompletionAlert({ profile, dismissible = true, onDismiss }: ProfileCompletionAlertProps) {
+function ProfileCompletionAlert({ profile, dismissible = true, onDismiss }: ProfileCompletionAlertProps) {
   const [isDismissed, setIsDismissed] = React.useState(false)
 
   // Determine missing fields
@@ -87,4 +87,5 @@ export default function ProfileCompletionAlert({ profile, dismissible = true, on
   )
 }
 
-
+export { ProfileCompletionAlert }
+export default ProfileCompletionAlert

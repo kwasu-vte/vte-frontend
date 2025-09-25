@@ -17,7 +17,7 @@ export type AttendanceCompletionBadgeProps = {
   scanProgress: { required: number; completed: number }
 }
 
-export default function AttendanceCompletionBadge({ date, scanProgress }: AttendanceCompletionBadgeProps) {
+function AttendanceCompletionBadge({ date, scanProgress }: AttendanceCompletionBadgeProps) {
   const { required, completed } = scanProgress
   const percentage = required > 0 ? Math.round((completed / required) * 100) : 0
   
@@ -69,4 +69,5 @@ export default function AttendanceCompletionBadge({ date, scanProgress }: Attend
   )
 }
 
-
+export { AttendanceCompletionBadge }
+export default AttendanceCompletionBadge

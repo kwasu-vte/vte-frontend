@@ -19,7 +19,7 @@ export type AttendanceReportProps = {
   attendanceData: Array<{ student: string; scans: number; points: number; percentage: number }>
 }
 
-export default function AttendanceReport({ groupId, dateRange, attendanceData }: AttendanceReportProps) {
+function AttendanceReport({ groupId, dateRange, attendanceData }: AttendanceReportProps) {
   const start = new Date(dateRange.start).toLocaleDateString()
   const end = new Date(dateRange.end).toLocaleDateString()
 
@@ -91,4 +91,5 @@ export default function AttendanceReport({ groupId, dateRange, attendanceData }:
   )
 }
 
-
+export { AttendanceReport }
+export default AttendanceReport

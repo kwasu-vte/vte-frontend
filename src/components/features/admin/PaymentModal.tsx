@@ -39,7 +39,7 @@ export function PaymentModal({
     queryKey: ['students'],
     queryFn: async () => {
       const response = await api.getStudents({ per_page: 100 });
-      return response.data?.results ?? [];
+      return response.data?.items ?? [];
     },
   });
 

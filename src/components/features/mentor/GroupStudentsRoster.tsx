@@ -59,7 +59,7 @@ export default function GroupStudentsRoster(props: GroupStudentsRosterProps) {
     )
   }
 
-  const students: User[] = (data?.students as any) ?? []
+  const students: User[] = (data?.enrollments as any)?.map((e: any) => e.user) ?? []
 
   const filtered = students.filter((s) => {
     const full = `${s.first_name ?? ""} ${s.last_name ?? ""}`.trim().toLowerCase()

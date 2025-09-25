@@ -45,7 +45,7 @@ export function QRGenerationForm(props: QRGenerationFormProps) {
     queryKey: ["skill-groups", { per_page: 100 }],
     queryFn: async () => {
       const res = await api.getSkillGroups({ per_page: 100 })
-      return res.data?.results ?? []
+      return res.data?.items ?? []
     },
   })
 
@@ -88,7 +88,7 @@ export function QRGenerationForm(props: QRGenerationFormProps) {
         onGroupSelected && onGroupSelected(parsed.groupId)
       } else {
         const res = await api.bulkGenerateQrCodes({
-          group_ids: groups.map((g) => Number(g.id)),
+          group_ids: groups.map((g: any) => Number(g.id)),
           count: parsed.count,
           expires_in_days: parsed.expiresInDays,
           points_per_scan: parsed.pointsPerScan,
@@ -126,7 +126,7 @@ export function QRGenerationForm(props: QRGenerationFormProps) {
             onChange={(e) => setGroupId(e.target.value)}
             isRequired
           >
-            {groups.map((g) => (
+            {groups.map((g: any) => (
               <SelectItem key={String(g.id)}>{g.name}</SelectItem>
             ))}
           </Select>

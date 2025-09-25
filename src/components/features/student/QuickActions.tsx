@@ -18,7 +18,7 @@ export type QuickActionsProps = {
   hasProfile?: boolean
 }
 
-export default function QuickActions({ enrollment, hasProfile = false }: QuickActionsProps) {
+function QuickActions({ enrollment, hasProfile = false }: QuickActionsProps) {
   const actions = React.useMemo(() => {
     const baseActions = [
       {
@@ -44,7 +44,7 @@ export default function QuickActions({ enrollment, hasProfile = false }: QuickAc
           label: "Complete Payment",
           href: "/student/payment",
           icon: CreditCard,
-          color: "warning" as const,
+          color: "primary" as const,
           description: "Pay for enrollment"
         })
       }
@@ -55,7 +55,7 @@ export default function QuickActions({ enrollment, hasProfile = false }: QuickAc
             label: "My Group",
             href: "/student/my-group",
             icon: Users,
-            color: "success" as const,
+            color: "primary" as const,
             description: "View group details"
           },
           {
@@ -107,3 +107,6 @@ export default function QuickActions({ enrollment, hasProfile = false }: QuickAc
     </Card>
   )
 }
+
+export { QuickActions }
+export default QuickActions

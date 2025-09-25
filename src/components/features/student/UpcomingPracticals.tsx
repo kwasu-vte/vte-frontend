@@ -41,7 +41,7 @@ function getCountdownColor(date: string) {
   return "primary"
 }
 
-export default function UpcomingPracticals({ practicals, limit = 5 }: UpcomingPracticalsProps) {
+function UpcomingPracticals({ practicals, limit = 5 }: UpcomingPracticalsProps) {
   const items = React.useMemo(() => (
     [...practicals]
       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
@@ -116,4 +116,5 @@ export default function UpcomingPracticals({ practicals, limit = 5 }: UpcomingPr
   )
 }
 
-
+export { UpcomingPracticals }
+export default UpcomingPracticals

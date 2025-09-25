@@ -17,7 +17,7 @@ export type PaymentRedirectProps = {
   onProceed: () => void
 }
 
-export default function PaymentRedirect({ enrollment, amount, onProceed }: PaymentRedirectProps) {
+function PaymentRedirect({ enrollment, amount, onProceed }: PaymentRedirectProps) {
   return (
     <Card shadow="sm" className="w-full max-w-lg">
       <CardHeader className="flex items-center justify-between">
@@ -40,4 +40,5 @@ export default function PaymentRedirect({ enrollment, amount, onProceed }: Payme
   )
 }
 
-
+export { PaymentRedirect }
+export default PaymentRedirect

@@ -38,7 +38,7 @@ export function AttendanceModal({
     queryKey: ['students'],
     queryFn: async () => {
       const response = await api.getStudents({ per_page: 100 });
-      return response.data?.results ?? [];
+      return response.data?.items ?? [];
     },
   });
 
@@ -48,7 +48,7 @@ export function AttendanceModal({
     queryFn: async () => {
       const response = await api.getSkillGroups({ per_page: 100 });
       // Map to minimal shape for the Select usage below
-      return (response.data?.results ?? []).map((g: any) => ({
+      return (response.data?.items ?? []).map((g: any) => ({
         id: String(g.id),
         name: g.group_display_name || `Group ${g.group_number}`,
         skill: { title: g.skill?.title ?? 'Unknown' },

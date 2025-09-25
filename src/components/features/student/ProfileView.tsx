@@ -27,7 +27,7 @@ export type ProfileViewProps = {
   showCompletionBadge?: boolean
 }
 
-export default function ProfileView({ profile, showCompletionBadge = true }: ProfileViewProps) {
+function ProfileView({ profile, showCompletionBadge = true }: ProfileViewProps) {
   const fields = [
     { 
       label: 'Matric Number', 
@@ -125,4 +125,5 @@ export default function ProfileView({ profile, showCompletionBadge = true }: Pro
   )
 }
 
-
+export { ProfileView }
+export default ProfileView

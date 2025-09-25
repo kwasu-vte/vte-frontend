@@ -58,10 +58,10 @@ export default function MentorDashboard(props: MentorDashboardProps) {
   // * Select a recent active token (first available) for QR scan history; else fallback to group report
   const selectedActiveToken = React.useMemo(() => {
     for (const q of qrQueries) {
-      const items = (q.data?.data as PaginatedResponse<GroupQrCode> | undefined)?.results ?? []
+      const items = (q.data?.data as PaginatedResponse<GroupQrCode> | undefined)?.items ?? []
       if (items.length > 0) {
         // prefer token expiring today
-        const todayToken = items.find((c) => c.expires_at && isSameDay(new Date(c.expires_at), today))
+        const todayToken = items.find((c: any) => c.expires_at && isSameDay(new Date(c.expires_at), today))
         return (todayToken ?? items[0])?.token
       }
     }

@@ -40,12 +40,12 @@ export default function GroupStudentsList(props: GroupStudentsListProps) {
 
   const list = useMemo(() => {
     const base = shouldFetch
-      ? (data?.results || [])
+      ? (data?.items || [])
           .filter((e: any) => String(e.group?.id ?? e.skill_group_id) === String(groupId))
           .map((e: any) => ({
-            id: String(e.student?.id || e.student_id),
-            matric: e.student?.matric_number || e.student?.matric || e.student?.matric_no || "",
-            name: e.student?.full_name || `${e.student?.last_name ?? ''} ${e.student?.first_name ?? ''}`.trim(),
+            id: String(e.user?.id || e.user_id),
+            matric: e.user?.matric_number || e.user?.matric || e.user?.matric_no || "",
+            name: e.user?.full_name || `${e.user?.last_name ?? ''} ${e.user?.first_name ?? ''}`.trim(),
             status: e.status || "unknown",
           }))
       : students

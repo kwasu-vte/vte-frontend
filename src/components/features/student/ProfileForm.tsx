@@ -20,7 +20,7 @@ export type ProfileFormProps = {
   isLoading?: boolean
 }
 
-export default function ProfileForm({ onSubmit, initialData, isLoading = false }: ProfileFormProps) {
+function ProfileForm({ onSubmit, initialData, isLoading = false }: ProfileFormProps) {
   const [formData, setFormData] = React.useState<CreateStudentProfilePayload>({
     matric_number: initialData?.matric_number || '',
     student_level: initialData?.student_level || '',
@@ -239,4 +239,5 @@ export default function ProfileForm({ onSubmit, initialData, isLoading = false }
   )
 }
 
-
+export { ProfileForm }
+export default ProfileForm

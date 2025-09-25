@@ -45,7 +45,7 @@ export function StudentProfileModal({ isOpen, onClose, userId }: StudentProfileM
           )}
           {!isLoading && !error && data && <ProfileView profile={{
             matric_number: data.matric_number,
-            level: Number(data.student_level || 0),
+            student_level: data.student_level || "",
             department: data.department,
             faculty: data.faculty || "",
             phone: data.phone || "",

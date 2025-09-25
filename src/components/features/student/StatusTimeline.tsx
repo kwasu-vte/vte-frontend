@@ -24,7 +24,7 @@ export type StatusTimelineProps = {
   }
 }
 
-export default function StatusTimeline({ enrollment, skill }: StatusTimelineProps) {
+function StatusTimeline({ enrollment, skill }: StatusTimelineProps) {
   const steps = [
     {
       id: 'selected',
@@ -169,3 +169,6 @@ export default function StatusTimeline({ enrollment, skill }: StatusTimelineProp
     </Card>
   )
 }
+
+export { StatusTimeline }
+export default StatusTimeline
