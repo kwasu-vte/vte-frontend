@@ -216,10 +216,22 @@ export interface ApiResponse<T> {
 }
 
 export interface PaginatedResponse<T> {
-  count: number;
-  next: string | null;
-  previous: string | null;
-  results: T[];
+  items: T[];
+  meta: {
+    current_page: number;
+    from: number | null;
+    last_page: number;
+    path: string;
+    per_page: number;
+    to: number | null;
+    total: number;
+  };
+  links: {
+    first: string | null;
+    last: string | null;
+    prev: string | null;
+    next: string | null;
+  };
 }
 
 // --- FORM PAYLOADS ---
@@ -305,10 +317,11 @@ export interface Enrollment {
   user_id: string;
   skill_id: string;
   academic_session_id: number;
-  status: 'pending' | 'paid' | 'assigned' | 'completed';
+  status: 'pending_payment' | 'paid' | 'assigned' | 'cancelled';
   payment_status: 'pending' | 'paid' | 'failed';
   created_at: string;
   updated_at: string;
+  group_id?: number; // Reference to assigned skill group
   user?: User;
   skill?: Skill;
   academic_session?: AcademicSession;
@@ -394,7 +407,7 @@ export interface SkillGroup {
   updated_at: string;
   skill?: Skill;
   academic_session?: AcademicSession;
-  students?: User[];
+  enrollments?: Enrollment[]; // Students accessed via enrollments relationship
   practical_dates?: string[];
   is_full: boolean;
   has_capacity: boolean;

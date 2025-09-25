@@ -516,3 +516,19 @@ class ApiClient {
 
 // * Export singleton instance
 export const api = new ApiClient();
+
+// * Convenience exports for specific API groups
+export const studentsApi = {
+  getStudents: (params?: { search?: string; per_page?: number; page?: number }) => api.getStudents(params),
+  getStudentProfile: (userId: string) => api.getStudentProfile(userId),
+  getAvailableSkills: (userId: string) => api.getAvailableSkills(userId),
+  createStudentProfile: (userId: string, profileData: CreateStudentProfilePayload) => api.createStudentProfile(userId, profileData),
+};
+
+export const enrollmentsApi = {
+  getEnrollment: (userId: string) => api.getEnrollment(userId),
+  createEnrollment: (userId: string, data: CreateEnrollmentPayload) => api.createEnrollment(userId, data),
+  payForEnrollment: (userId: string, data?: EnrollmentPaymentPayload) => api.payForEnrollment(userId, data),
+  getAllEnrollments: (params?: { academic_session_id?: number; skill_id?: string; per_page?: number }) => api.getAllEnrollments(params),
+  getEnrollmentById: (enrollmentId: number) => api.getEnrollmentById(enrollmentId),
+};
