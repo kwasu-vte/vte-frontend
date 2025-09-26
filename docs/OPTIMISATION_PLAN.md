@@ -1,3 +1,88 @@
+Here are your three detailed implementation plans:
+
+## **PLAN 1: TypeScript Files** (8 days)
+
+**Phase 1 (Days 1-3): Complete Domain API Clients**
+- **File**: `lib/api/skills.ts` - Add 8 missing methods: `create()`, `update()`, `delete()`, `getById()`, `getDateRange()`, `updateDateRange()`, `getGroupsBySkill()`, `autoAssignStudentsToGroups()`
+- **File**: `lib/api/students.ts` - Add `searchStudents()` method
+- **File**: `lib/api/auth.ts` - CREATE new file with `login()`, `logout()`, `refresh()`, `getCurrentUser()`, `register()`
+
+**Phase 2 (Days 4-5): Delete Legacy API Client**
+- **DELETE**: `lib/api.ts` (entire 800+ line file)
+- **UPDATE**: 25+ page files to replace `api.*` calls with domain client calls
+- **Pattern**: `api.getSkills()` → `skillsApi.getAll()`
+
+**Phase 3 (Days 6-7): Type System Cleanup**
+- **File**: `lib/types.ts` - Remove `Payment`, `AttendanceRecord`, `SystemConfig`, announcement types
+- **DELETE**: `lib/api/types/` directory (all files)
+- **DELETE**: `lib/api/types/index.ts`
+
+**Phase 4 (Day 8): API Index Reorganization**
+- **File**: `lib/api/index.ts` - Remove exports for deleted payment/attendance/announcement APIs
+
+## **PLAN 2: Pages Restructure** (10 days)
+
+**Phase 1 (Days 9-10): Delete Unsupported Pages**
+- **DELETE**: `/app/admin/payments/page.tsx`
+- **DELETE**: `/app/admin/attendance/page.tsx`
+- **DELETE**: `/app/admin/announcements/page.tsx`
+- **DELETE**: `/app/mentor/announcements/page.tsx`
+- **DELETE**: `/app/mentor/attendance/page.tsx`
+- **DELETE**: `/app/student/courses/page.tsx`
+- **DELETE**: `/app/student/announcements/page.tsx`
+
+**Phase 2 (Days 11-12): Merge Redundant Pages**
+- **KEEP**: `/app/admin/sessions/page.tsx`
+- **DELETE**: `/app/admin/settings/page.tsx`
+- **ACTION**: Move user profile display to sessions page
+
+**Phase 3 (Day 13): Update Navigation**
+- **File**: `components/navigation/admin-nav.tsx` - Remove 4 links
+- **File**: `components/navigation/mentor-nav.tsx` - Remove 2 links  
+- **File**: `components/navigation/student-nav.tsx` - Remove 2 links
+
+**Phase 4 (Days 14-16): Replace Mock Data**
+- **Admin Dashboard**: Replace `mockRecentActivity` with `enrollmentsApi.getAll()`
+- **Student Dashboard**: Replace `mockUpcomingPracticals` with skill date derivation
+- **Mentor Dashboard**: Replace `mockTodaysSchedule` with `mentorsApi.getSkillGroups()`
+
+**Phase 5 (Days 17-18): Component Updates**
+- **DELETE**: `/components/mock-data/` directory (all files)
+- **UPDATE**: `/components/data/` components to use real APIs
+
+## **PLAN 3: Implementation & Integration** (28 days)
+
+### **Week 1: Foundation (Days 1-7)**
+- **Days 1-2**: Complete API clients in priority order: `skillsApi`, `enrollmentsApi`, `authApi`
+- **Days 3-4**: Migrate admin pages from legacy API to domain clients
+- **Days 5-6**: Migrate mentor/student pages from legacy API to domain clients  
+- **Day 7**: Delete `lib/api.ts` and verify no import errors
+
+### **Week 2: Page Cleanup (Days 8-14)**
+- **Days 8-9**: Delete all unsupported pages and update navigation
+- **Days 10-11**: Replace mock data in admin pages
+- **Days 12-13**: Replace mock data in mentor/student pages
+- **Day 14**: Navigation and component cleanup
+
+### **Week 3: Data Flow Optimization (Days 15-21)**
+- **Days 15-16**: Create composite data hooks (`useStudentDashboardData`, etc.)
+- **Days 17-18**: Implement parallel data loading in admin dashboard
+- **Days 19-20**: Add error handling and loading states across all pages
+- **Day 21**: Performance testing (sub-2-second page loads)
+
+### **Week 4: Integration & Polish (Days 22-28)**
+- **Days 22-23**: End-to-end user flow testing for all three dashboards
+- **Days 24-25**: Edge case testing (empty states, network failures, expired sessions)
+- **Days 26-27**: Documentation and code review
+- **Day 28**: Final validation and deployment
+
+**Success Metrics:**
+- **Technical**: Zero legacy API references, zero mock data, 100% functional coverage
+- **User Experience**: 25 fully functional pages (down from 33), consistent error handling
+- **Performance**: Sub-2-second page loads, sub-500ms API responses
+
+**Final Result**: Admin (10 pages), Mentor (6 pages), Student (9 pages) - all fully functional with real API integration.
+
 # VTE Implementation Plans
 
 ## PLAN 1: TypeScript Files Restructure

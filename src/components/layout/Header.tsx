@@ -37,11 +37,8 @@ function generateBreadcrumbs(pathname: string) {
     else if (segment === 'groups') label = 'Groups';
     else if (segment === 'students') label = 'Students';
     else if (segment === 'mentors') label = 'Mentors';
-    else if (segment === 'attendance') label = 'Attendance';
-    else if (segment === 'payments') label = 'Payments';
     else if (segment === 'settings') label = 'Settings';
     else if (segment === 'profile') label = 'Profile';
-    else if (segment === 'payment') label = 'Payment';
     else if (segment === 'my-group') label = 'My Group';
     else if (segment === 'my-groups') label = 'My Groups';
     else if (segment === 'calendar') label = 'Calendar';

@@ -15,7 +15,6 @@ import {
   Calendar, 
   Settings, 
   BarChart3, 
-  CreditCard,
   UserCheck,
   GraduationCap,
   Home,
@@ -124,12 +123,6 @@ const navigationItems: NavigationItem[] = [
     href: '/student/my-group',
     label: 'My Group',
     icon: Users,
-    role: ['Student'],
-  },
-  {
-    href: '/student/payment',
-    label: 'Payment',
-    icon: CreditCard,
     role: ['Student'],
   },
 ];

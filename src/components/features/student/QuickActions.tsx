@@ -1,7 +1,7 @@
 "use client"
 import React from "react"
 import { Card, CardBody, CardHeader, Button } from "@nextui-org/react"
-import { BookOpen, Users, CreditCard, QrCode, Calendar, User } from "lucide-react"
+import { BookOpen, Users, QrCode, Calendar, User } from "lucide-react"
 import Link from "next/link"
 
 /**
@@ -39,16 +39,6 @@ function QuickActions({ enrollment, hasProfile = false }: QuickActionsProps) {
 
     // Add enrollment-specific actions
     if (enrollment) {
-      if (enrollment.status === "pending" || enrollment.status === "paid") {
-        baseActions.push({
-          label: "Complete Payment",
-          href: "/student/payment",
-          icon: CreditCard,
-          color: "primary" as const,
-          description: "Pay for enrollment"
-        })
-      }
-
       if (enrollment.group) {
         baseActions.push(
           {
