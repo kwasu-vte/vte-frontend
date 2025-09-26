@@ -4,7 +4,7 @@
 
 import React from 'react';
 import { getCurrentUser } from '@/lib/auth';
-import { enrollmentsApi } from '@/lib/api';
+import { enrollmentsApi, skillGroupsApi } from '@/lib/api';
 import { GroupAssignmentCard } from '@/components/features/student/GroupAssignmentCard';
 import { PracticalCalendar } from '@/components/features/student/PracticalCalendar';
 import { NotificationContainer } from '@/components/shared/NotificationContainer';
@@ -25,31 +25,55 @@ async function getMyGroupPageData(userId: string): Promise<MyGroupPageData> {
     const enrollmentResponse = await enrollmentsApi.getUserEnrollment(userId);
     const enrollment = enrollmentResponse.success ? enrollmentResponse.data : null;
 
-    // Mock group details - this would come from a group details API
-    const groupDetails = enrollment?.group_id ? {
-      id: enrollment.group_id,
-      name: `Group ${enrollment.group_id}`,
-      skill: enrollment.skill,
-      mentor: {
-        id: 'mentor-1',
-        name: 'Dr. John Smith',
-        email: 'john.smith@university.edu',
-        phone: '+234 801 234 5678',
-        specialization: 'Full-Stack Development'
-      },
-      members: [
-        { id: 'student-1', name: 'You', email: 'you@student.edu', level: '300' },
-        { id: 'student-2', name: 'Jane Doe', email: 'jane@student.edu', level: '300' },
-        { id: 'student-3', name: 'Bob Johnson', email: 'bob@student.edu', level: '400' },
-        { id: 'student-4', name: 'Alice Brown', email: 'alice@student.edu', level: '300' }
-      ],
-      schedule: {
-        start: '2024-01-15',
-        end: '2024-06-15',
-        days: ['Monday', 'Wednesday', 'Friday'],
-        location: 'Lab 1, Computer Science Building'
+    // Fetch real group details if user has a group assignment
+    let groupDetails = null;
+    if (enrollment?.group_id) {
+      try {
+        const groupResponse = await skillGroupsApi.getById(Number(enrollment.group_id));
+        const group = groupResponse.data;
+        
+        if (group) {
+          groupDetails = {
+            id: group.id,
+            name: group.group_display_name || `Group ${group.group_number}`,
+            skill: group.skill,
+            mentor: null, // Mentor info would need to be fetched separately
+            members: group.enrollments?.map((enrollment: any) => ({
+              id: enrollment.user_id,
+              name: `${enrollment.user?.first_name || ''} ${enrollment.user?.last_name || ''}`.trim() || 'Unknown',
+              email: enrollment.user?.email || 'Not provided',
+              level: enrollment.user?.student_level || 'Unknown'
+            })) || [],
+            schedule: {
+              start: group.created_at,
+              end: group.updated_at,
+              days: ['Monday', 'Wednesday', 'Friday'], // This would come from skill date range
+              location: 'Lab 1, Computer Science Building' // This would come from skill details
+            },
+            capacity: parseInt(group.max_student_capacity) || 0,
+            currentSize: group.enrollments?.length || 0
+          };
+        }
+      } catch (error) {
+        console.warn('Could not fetch group details:', error);
+        // Fallback to basic group info from enrollment
+        groupDetails = {
+          id: enrollment.group_id,
+          name: `Group ${enrollment.group_id}`,
+          skill: enrollment.skill,
+          mentor: null,
+          members: [],
+          schedule: {
+            start: enrollment.created_at,
+            end: enrollment.updated_at,
+            days: ['Monday', 'Wednesday', 'Friday'],
+            location: 'Lab 1, Computer Science Building'
+          },
+          capacity: 0,
+          currentSize: 0
+        };
       }
-    } : null;
+    }
 
     return {
       enrollment,

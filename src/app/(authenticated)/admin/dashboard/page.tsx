@@ -1,49 +1,22 @@
 // * Admin Dashboard Page
 // * Tests full AppShell integration with real admin functionality
-// * Demonstrates the new architecture in action
+// * Uses composite data hook for optimized data fetching
 
+'use client';
+
+import React from 'react';
 import PWATestPanel from '@/components/shared/PWATestPanel';
 import { StatCard, StatCardGrid } from '@/components/shared/StatCard';
-import { academicSessionsApi, skillGroupsApi, enrollmentsApi } from '@/lib/api';
-import type { AcademicSession, GroupStatistics, PaginatedResponse, Enrollment } from '@/lib/types';
+import { useAdminDashboardData } from '@/lib/hooks/use-admin-dashboard-data';
 import Link from 'next/link';
 
-export const dynamic = 'force-dynamic';
+export default function AdminDashboard() {
+  const { sessions, activeSession, statistics, recentEnrollments, isLoading, error } = useAdminDashboardData();
 
-async function getDashboardData() {
-  // * Fetch in parallel with fail-safe handling
-  const [sessionsRes, statsRes, enrollmentsRes] = await Promise.allSettled([
-    academicSessionsApi.getAll(),
-    skillGroupsApi.getStatistics(),
-    enrollmentsApi.getAll({ per_page: 25 }),
-  ]);
-
-  const sessions: AcademicSession[] = sessionsRes.status === 'fulfilled' && sessionsRes.value?.data ? sessionsRes.value.data : [];
-  const stats: GroupStatistics | null = statsRes.status === 'fulfilled' && statsRes.value?.data ? statsRes.value.data : null;
-  const enrollments: PaginatedResponse<Enrollment> | null = enrollmentsRes.status === 'fulfilled' && enrollmentsRes.value?.data ? enrollmentsRes.value.data : null;
-
-  // * Determine active session (explicit flag first, else by date)
-  const now = new Date();
-  const activeSession =
-    sessions.find((s) => s.active) ||
-    sessions.find((s) => {
-      if (!s.starts_at || !s.ends_at) return false;
-      const start = new Date(s.starts_at);
-      const end = new Date(s.ends_at);
-      return start <= now && now <= end;
-    }) ||
-    null;
-
-  return { sessions, activeSession, stats, enrollments };
-}
-
-export default async function AdminDashboard() {
-  const { sessions, activeSession, stats, enrollments } = await getDashboardData();
-
-  const totalGroups = stats?.total_groups ?? '0';
-  const totalStudents = stats?.total_students ?? '0';
-  const fullGroups = stats?.full_groups ?? '0';
-  const groupsWithCapacity = stats?.groups_with_capacity ?? '0';
+  const totalGroups = statistics?.total_groups ?? '0';
+  const totalStudents = statistics?.total_students ?? '0';
+  const fullGroups = statistics?.full_groups ?? '0';
+  const groupsWithCapacity = statistics?.groups_with_capacity ?? '0';
 
   return (
     <div className="space-y-6">
@@ -81,8 +54,8 @@ export default async function AdminDashboard() {
             <Link href="/admin/enrollments" className="text-sm text-primary hover:underline">View all</Link>
           </div>
           <div className="divide-y divide-neutral-200">
-            {enrollments && enrollments.items.length > 0 ? (
-              enrollments.items.slice(0, 10).map((enr: any) => (
+            {recentEnrollments && recentEnrollments.items.length > 0 ? (
+              recentEnrollments.items.slice(0, 10).map((enr: any) => (
                 <div key={enr.id} className="py-3 flex items-center justify-between">
                   <div className="min-w-0">
                     <p className="text-sm font-medium text-neutral-900 truncate">

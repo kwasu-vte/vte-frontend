@@ -161,8 +161,8 @@ export default async function StudentEnrollment() {
                 }}
                 group={{
                   number: parseInt(enrollment.group_id),
-                  mentorName: 'TBD', // This would come from group details API
-                  schedule: 'TBD'
+                  mentorName: 'Loading...', // This would come from group details API
+                  schedule: 'Loading...'
                 }}
               />
             )}

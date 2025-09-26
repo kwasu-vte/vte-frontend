@@ -4,7 +4,7 @@
 
 import React from 'react';
 import { getCurrentUser } from '@/lib/auth';
-import { studentsApi, enrollmentsApi } from '@/lib/api';
+import { studentsApi, enrollmentsApi, qrCodesApi } from '@/lib/api';
 import { ProfileView } from '@/components/features/student/ProfileView';
 import { AttendanceReport } from '@/components/features/student/AttendanceReport';
 import { NotificationContainer } from '@/components/shared/NotificationContainer';
@@ -35,13 +35,37 @@ async function getProfilePageData(userId: string): Promise<ProfilePageData> {
     // Filter enrollments for this user
     const userEnrollments = allEnrollments.filter((enrollment: any) => enrollment.user_id === userId);
 
-    // Mock attendance summary for now - this would come from attendance API
-    const attendanceSummary = {
-      totalSessions: 12,
-      attendedSessions: 10,
-      attendanceRate: 83.3,
-      lastAttendance: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString()
-    };
+    // Derive attendance summary from QR scan data if user has an active enrollment
+    let attendanceSummary = null;
+    if (profile && userEnrollments.length > 0) {
+      const activeEnrollment = userEnrollments.find((enrollment: any) => 
+        enrollment.status === 'assigned' || enrollment.status === 'active'
+      );
+      
+      if (activeEnrollment && activeEnrollment.group_id) {
+        try {
+          // Get attendance report for the group
+          const attendanceResponse = await qrCodesApi.getGroupAttendanceReport(Number(activeEnrollment.group_id));
+          const attendanceData = attendanceResponse.data;
+          
+          if (attendanceData) {
+            // Calculate attendance stats from the report
+            const totalEnrolled = parseInt(attendanceData.group_info?.total_enrolled || '0');
+            const attendedStudents = attendanceData.students?.length || 0;
+            
+            attendanceSummary = {
+              totalSessions: totalEnrolled,
+              attendedSessions: attendedStudents,
+              attendanceRate: totalEnrolled > 0 ? Math.round((attendedStudents / totalEnrolled) * 100) : 0,
+              lastAttendance: attendanceData.group_info?.practical_date || new Date().toISOString()
+            };
+          }
+        } catch (error) {
+          console.warn('Could not fetch attendance data:', error);
+          // Fallback to null - will show empty state
+        }
+      }
+    }
 
     return {
       profile,

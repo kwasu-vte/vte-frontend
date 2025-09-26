@@ -1,9 +1,7 @@
 "use client"
 import React from "react"
 import { Card, CardBody, CardHeader, Chip, Button, Skeleton, Tabs, Tab } from "@nextui-org/react"
-import { useQuery, useQueries } from "@tanstack/react-query"
-import { mentorsApi, qrCodesApi } from "@/lib/api"
-import type { SkillGroup, PaginatedResponse, GroupQrCode, AttendanceReport } from "@/lib/types"
+import { useMentorDashboardData } from "@/lib/hooks/use-mentor-dashboard-data"
 import MentorGroupsList from "@/components/features/mentor/MentorGroupsList"
 import MyQRCodesDisplay from "@/components/features/mentor/MyQRCodesDisplay"
 import QRScanReport from "@/components/features/mentor/QRScanReport"
@@ -14,51 +12,20 @@ export type MentorDashboardProps = {
   userId: string
 }
 
-function isSameDay(a: Date, b: Date) {
-  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate()
-}
-
 export default function MentorDashboard(props: MentorDashboardProps) {
   const { userId } = props
+  const { profile, skills, groups, todaysGroups, qrCodes, attendanceReport, isLoading, error } = useMentorDashboardData(userId)
 
-  // * Fetch mentor groups
-  const { data: groups, isLoading: loadingGroups, isError: groupsError, refetch: refetchGroups } = useQuery({
-    queryKey: ["mentor-skill-groups", userId],
-    queryFn: async () => {
-      const res = await mentorsApi.getSkillGroups(userId)
-      return (res?.data ?? []) as SkillGroup[]
-    },
-    enabled: !!userId,
-  })
-
-  // * Pick a primary group for right-panel reports (fallback logic)
+  // Pick a primary group for right-panel reports (fallback logic)
   const primaryGroup = React.useMemo(() => (groups && groups.length > 0 ? groups[0] : null), [groups])
 
-  // * Today schedule: derive by group.next_practical_at (if present) or within skill date range (basic heuristic)
+  // Today schedule: derive by group.next_practical_at (if present) or within skill date range (basic heuristic)
   const today = React.useMemo(() => new Date(), [])
-  const todaysGroups = React.useMemo(() => {
-    if (!groups || groups.length === 0) return [] as SkillGroup[]
-    const withNextToday = groups.filter((g) => (g as any)?.next_practical_at && isSameDay(new Date((g as any).next_practical_at), today))
-    return withNextToday
-  }, [groups, today])
 
-  // * Fetch active QR codes per group (limit to first 3 groups to avoid overfetching)
-  const qrGroups = React.useMemo(() => (groups ?? []).slice(0, 3), [groups])
-  const qrQueries = useQueries({
-    queries: qrGroups.map((g) => ({
-      queryKey: ["group-qr-codes", g.id, "active"],
-      queryFn: async () => {
-        const res = await qrCodesApi.listGroupCodes(Number(g.id), { status: "active", per_page: 20 })
-        return { groupId: g.id, data: (res?.data as PaginatedResponse<GroupQrCode>) ?? null }
-      },
-      enabled: !!g?.id,
-    })),
-  })
-
-  // * Select a recent active token (first available) for QR scan history; else fallback to group report
+  // Select a recent active token (first available) for QR scan history; else fallback to group report
   const selectedActiveToken = React.useMemo(() => {
-    for (const q of qrQueries) {
-      const items = (q.data?.data as PaginatedResponse<GroupQrCode> | undefined)?.items ?? []
+    for (const q of qrCodes) {
+      const items = q.data?.items ?? []
       if (items.length > 0) {
         // prefer token expiring today
         const todayToken = items.find((c: any) => c.expires_at && isSameDay(new Date(c.expires_at), today))
@@ -66,19 +33,11 @@ export default function MentorDashboard(props: MentorDashboardProps) {
       }
     }
     return null
-  }, [qrQueries, today])
+  }, [qrCodes, today])
 
-  // * Fallback group attendance report if no token
-  const { data: fallbackReport, isLoading: loadingReport } = useQuery({
-    queryKey: ["group-attendance-report", primaryGroup?.id],
-    queryFn: async () => {
-      if (!primaryGroup?.id) return null as AttendanceReport | null
-      const res = await qrCodesApi.getGroupAttendanceReport(Number(primaryGroup.id))
-      return (res?.data ?? null) as AttendanceReport | null
-    },
-    enabled: !!primaryGroup?.id && !selectedActiveToken,
-    refetchInterval: 10000,
-  })
+  function isSameDay(a: Date, b: Date) {
+    return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate()
+  }
 
   return (
     <div className="space-y-6">
@@ -88,7 +47,7 @@ export default function MentorDashboard(props: MentorDashboardProps) {
           <h1 className="text-3xl font-bold text-neutral-900">Mentor Dashboard</h1>
           <p className="text-neutral-600">Daily overview of your groups, QR codes, and recent scans.</p>
         </div>
-        <Button color="primary" variant="bordered" onPress={() => refetchGroups()}>Refresh</Button>
+        <Button color="primary" variant="bordered" onPress={() => window.location.reload()}>Refresh</Button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -105,9 +64,9 @@ export default function MentorDashboard(props: MentorDashboardProps) {
             </CardHeader>
             <CardBody>
               <StateRenderer
-                data={todaysGroups as SkillGroup[]}
-                isLoading={loadingGroups}
-                error={groupsError ? new Error("Failed to load groups") : null}
+                data={todaysGroups}
+                isLoading={isLoading}
+                error={error}
                 loadingComponent={<DefaultLoadingComponent />}
                 emptyComponent={<DefaultEmptyComponent message="No practicals scheduled for today." />}
               >
@@ -143,27 +102,27 @@ export default function MentorDashboard(props: MentorDashboardProps) {
             <CardBody>
               {selectedActiveToken && primaryGroup ? (
                 <QRScanReport qrToken={selectedActiveToken} groupId={Number(primaryGroup.id)} perPage={10} />
-              ) : loadingReport ? (
+              ) : isLoading ? (
                 <div className="space-y-4">
                   <Skeleton className="h-8 w-48 rounded-md" />
                   <Skeleton className="h-64 w-full rounded-md" />
                 </div>
-              ) : fallbackReport ? (
+              ) : attendanceReport ? (
                 <Tabs aria-label="Attendance Summary" variant="underlined">
                   <Tab key="report" title="Report">
                     <div className="text-sm text-neutral-600 mb-3">Attendance summary for your primary group.</div>
                     <div className="grid grid-cols-2 gap-4">
                       <Card shadow="sm" className="p-4">
                         <CardHeader className="text-sm text-neutral-600">Skill</CardHeader>
-                        <CardBody className="text-base font-medium text-neutral-900">{fallbackReport.group_info.skill_title}</CardBody>
+                        <CardBody className="text-base font-medium text-neutral-900">{attendanceReport.group_info.skill_title}</CardBody>
                       </Card>
                       <Card shadow="sm" className="p-4">
                         <CardHeader className="text-sm text-neutral-600">Total Enrolled</CardHeader>
-                        <CardBody className="text-base font-medium text-neutral-900">{fallbackReport.group_info.total_enrolled}</CardBody>
+                        <CardBody className="text-base font-medium text-neutral-900">{attendanceReport.group_info.total_enrolled}</CardBody>
                       </Card>
                       <Card shadow="sm" className="p-4">
                         <CardHeader className="text-sm text-neutral-600">Practical Date</CardHeader>
-                        <CardBody className="text-base font-medium text-neutral-900">{fallbackReport.group_info.practical_date ? new Date(fallbackReport.group_info.practical_date).toLocaleDateString() : "—"}</CardBody>
+                        <CardBody className="text-base font-medium text-neutral-900">{attendanceReport.group_info.practical_date ? new Date(attendanceReport.group_info.practical_date).toLocaleDateString() : "—"}</CardBody>
                       </Card>
                     </div>
                   </Tab>
@@ -184,17 +143,17 @@ export default function MentorDashboard(props: MentorDashboardProps) {
               <Chip variant="flat">Active</Chip>
             </CardHeader>
             <CardBody>
-              {loadingGroups ? (
+              {isLoading ? (
                 <div className="space-y-3">
                   {Array.from({ length: 3 }).map((_, i) => (
                     <Skeleton key={i} className="h-24 w-full rounded-md" />
                   ))}
                 </div>
-              ) : qrGroups.length === 0 ? (
+              ) : groups.length === 0 ? (
                 <DefaultEmptyComponent message="No groups available for QR codes." />
               ) : (
                 <div className="space-y-4">
-                  {qrGroups.map((g) => (
+                  {groups.slice(0, 3).map((g) => (
                     <div key={g.id} className="border rounded-md p-3 bg-neutral-50">
                       <div className="flex items-center justify-between mb-2">
                         <p className="text-sm font-medium text-neutral-900">Group #{g.group_number ?? g.id}</p>
@@ -232,9 +191,9 @@ export default function MentorDashboard(props: MentorDashboardProps) {
         </CardHeader>
         <CardBody>
           <StateRenderer
-            data={groups as SkillGroup[]}
-            isLoading={loadingGroups}
-            error={groupsError ? new Error("Failed to load groups") : null}
+            data={groups}
+            isLoading={isLoading}
+            error={error}
             loadingComponent={<DefaultLoadingComponent />}
             emptyComponent={<DefaultEmptyComponent message="No groups assigned yet." />}
           >
