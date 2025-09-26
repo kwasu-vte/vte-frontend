@@ -5,21 +5,70 @@
 
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
-import { Card, CardHeader, CardBody, Input, Button, Link } from '@nextui-org/react';
+import { Card, CardHeader, CardBody, Input, Button, Link, Spinner, Checkbox } from '@nextui-org/react';
 import { Eye, EyeOff } from 'lucide-react';
-import { signInAction } from '@/lib/actions';
+import { signInActionSafe } from '@/lib/actions';
 import logo from '@/assets/kwasulogo.png';
+import { NotificationContainer } from '@/components/shared/NotificationContainer';
+import { useFormState, useFormStatus } from 'react-dom';
+import { useRouter, useSearchParams } from 'next/navigation';
+
+function SubmitButton() {
+  const { pending } = useFormStatus();
+  return (
+    <Button
+      type="submit"
+      color="primary"
+      size="lg"
+      className="w-full font-semibold"
+      isDisabled={pending}
+      startContent={pending ? <Spinner size="sm" color="white" /> : null}
+    >
+      {pending ? 'Signing In…' : 'Sign In'}
+    </Button>
+  );
+}
 
 export default function SignInPage() {
   const [isVisible, setIsVisible] = useState(false);
+  const [formState, formAction] = useFormState(signInActionSafe as any, { error: null });
+  const [clientError, setClientError] = useState<string | null>(null);
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
   const toggleVisibility = () => setIsVisible(!isVisible);
 
+  const usernameLabel = useMemo(() => 'Matric Number or Email', []);
+  const passwordLabel = useMemo(() => 'Password', []);
+
+  // * If already authenticated, redirect by role (public page guard)
+  useEffect(() => {
+    let isMounted = true;
+    const checkAuth = async () => {
+      try {
+        const res = await fetch('/api/v1/users/auth/me', { headers: { Accept: 'application/json' } });
+        if (!res.ok) return;
+        const json = await res.json();
+        const role = String(json?.data?.role || '').toLowerCase();
+        const target = role === 'admin' || role === 'mentor' || role === 'student' ? `/${role}/dashboard` : '/';
+        if (isMounted) {
+          const redirectParam = searchParams.get('redirect');
+          router.replace(redirectParam || target);
+        }
+      } catch (_) {
+        // * Silent: user likely unauthenticated
+      }
+    };
+    checkAuth();
+    return () => { isMounted = false; };
+  }, [router, searchParams]);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-neutral-50 flex items-center justify-center p-6">
       <div className="w-full max-w-md">
+        <NotificationContainer />
         {/* * Logo and Brand */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center mb-4">
@@ -44,21 +93,38 @@ export default function SignInPage() {
         </div>
 
         {/* * Sign-In Form */}
-        <Card className="shadow-xl">
+        <Card shadow="sm">
           <CardHeader className="pb-0">
             <h4 className="text-xl font-semibold text-foreground">
               Sign In
             </h4>
           </CardHeader>
           <CardBody className="space-y-6">
-            <form action={signInAction} className="space-y-4">
+            <form
+              action={formAction}
+              className="space-y-4"
+              onSubmit={(e) => {
+                setClientError(null);
+                const form = e.currentTarget as HTMLFormElement;
+                const data = new FormData(form);
+                const username = String(data.get('username') || '').trim();
+                const password = String(data.get('password') || '').trim();
+                if (!username || !password) {
+                  e.preventDefault();
+                  setClientError('Username and password are required');
+                }
+              }}
+            >
               {/* * Username/Matric Number Field */}
               <Input
                 name="username"
-                label="Matric Number or Email"
+                label={usernameLabel}
                 placeholder="Enter your matric number or email"
                 variant="bordered"
                 isRequired
+                isInvalid={!!clientError && !String((document.activeElement as HTMLElement)?.getAttribute?.('name'))}
+                errorMessage={clientError || undefined}
+                autoComplete="username email"
                 classNames={{
                   input: "text-base",
                   label: "font-medium",
@@ -68,11 +134,12 @@ export default function SignInPage() {
               {/* * Password Field */}
               <Input
                 name="password"
-                label="Password"
+                label={passwordLabel}
                 placeholder="Enter your password"
                 variant="bordered"
                 type={isVisible ? "text" : "password"}
                 isRequired
+                autoComplete="current-password"
                 endContent={
                   <button
                     type="button"
@@ -92,15 +159,30 @@ export default function SignInPage() {
                 }}
               />
 
+              {/* * Remember Me */}
+              <div className="flex items-center justify-between">
+                <Checkbox name="remember" size="sm">
+                  Remember me
+                </Checkbox>
+                <div className="text-xs text-neutral-600" aria-live="polite">
+                  {/* Placeholder for future forgot password link */}
+                </div>
+              </div>
+
+              {/* * Inline error */}
+              {clientError ? (
+                <div className="text-sm text-danger-600" role="alert" aria-live="assertive">
+                  {clientError}
+                </div>
+              ) : null}
+              {formState?.error ? (
+                <div className="text-sm text-danger-600" role="alert" aria-live="assertive">
+                  {formState.error}
+                </div>
+              ) : null}
+
               {/* * Submit Button */}
-              <Button
-                type="submit"
-                color="primary"
-                size="lg"
-                className="w-full font-semibold"
-              >
-                Sign In
-              </Button>
+              <SubmitButton />
             </form>
 
             {/* * Sign Up Link */}

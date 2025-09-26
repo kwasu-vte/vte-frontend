@@ -4,51 +4,69 @@
 
 'use client';
 
-import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useState, useEffect } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useClientQuery } from '@/lib/hooks/useClientQuery';
 import { StateRenderer, DefaultLoadingComponent, DefaultErrorComponent, DefaultEmptyComponent } from '@/components/shared/StateRenderer';
 import { SkillsTable } from '@/components/features/admin/SkillsTable';
 import { SkillModal } from '@/components/features/admin/SkillModal';
-import { api } from '@/lib/api';
-import { Skill, CreateSkillPayload, UpdateSkillPayload } from '@/lib/types';
+import { skillsApi } from '@/lib/api';
+import { Skill, CreateSkillPayload, UpdateSkillPayload, SkillDateRangePayload } from '@/lib/types';
 import { Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@nextui-org/react';
-import { Plus, AlertTriangle } from 'lucide-react';
+import { Plus, AlertTriangle, Eye } from 'lucide-react';
+import { useApp } from '@/context/AppContext';
+import { getErrorMessage, getErrorTitle, getSuccessTitle, getSuccessMessage } from '@/lib/error-handling';
 
 export default function AdminSkillsPage() {
+  console.log('🎯 AdminSkillsPage component mounted');
+  
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const queryClient = useQueryClient();
+  const { addNotification } = useApp();
 
-  // * React Query for data fetching
+  // * React Query for data fetching - only run on client
   const {
     data: skills,
     isLoading,
     error,
     refetch
-  } = useQuery({
+  } = useClientQuery({
     queryKey: ['skills'],
     queryFn: async () => {
-      const response = await api.getSkills();
-      return response.data;
+      const response = await skillsApi.getAll();
+      // * skillsApi.getAll returns Skill[] directly
+      return response.data ?? [];
     },
   });
 
   // * Create skill mutation
   const createSkillMutation = useMutation({
     mutationFn: async (data: CreateSkillPayload) => {
-      const response = await api.createSkill(data);
-      return response.data;
+      const response = await skillsApi.create(data);
+      return response;
     },
-    onSuccess: () => {
+    onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ['skills'] });
       setIsCreateModalOpen(false);
+      addNotification({
+        type: 'success',
+        title: getSuccessTitle('create', 'skill'),
+        message: getSuccessMessage(response, 'The skill has been created successfully.'),
+      });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error('Error creating skill:', error);
+      addNotification({
+        type: 'error',
+        title: getErrorTitle('create', 'skill'),
+        message: getErrorMessage(error, 'An unexpected error occurred while creating the skill.'),
+      });
     },
   });
 
@@ -56,39 +74,64 @@ export default function AdminSkillsPage() {
   const updateSkillMutation = useMutation({
     mutationFn: async (data: UpdateSkillPayload) => {
       if (!selectedSkill) throw new Error('No skill selected');
-      const response = await api.updateSkill(selectedSkill.id, data);
-      return response.data;
+      const response = await skillsApi.update(selectedSkill.id, data);
+      return response;
     },
-    onSuccess: () => {
+    onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ['skills'] });
       setIsEditModalOpen(false);
       setSelectedSkill(null);
+      addNotification({
+        type: 'success',
+        title: getSuccessTitle('update', 'skill'),
+        message: getSuccessMessage(response, 'The skill has been updated successfully.'),
+      });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error('Error updating skill:', error);
+      addNotification({
+        type: 'error',
+        title: getErrorTitle('update', 'skill'),
+        message: getErrorMessage(error, 'An unexpected error occurred while updating the skill.'),
+      });
     },
   });
 
   // * Delete skill mutation
   const deleteSkillMutation = useMutation({
     mutationFn: async (skillId: string) => {
-      await api.deleteSkill(skillId);
+      const response = await skillsApi.delete(skillId);
+      return response;
     },
-    onSuccess: () => {
+    onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ['skills'] });
       setIsDeleteModalOpen(false);
       setSelectedSkill(null);
+      addNotification({
+        type: 'success',
+        title: getSuccessTitle('delete', 'skill'),
+        message: getSuccessMessage(response, 'The skill has been deleted successfully.'),
+      });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error('Error deleting skill:', error);
+      addNotification({
+        type: 'error',
+        title: getErrorTitle('delete', 'skill'),
+        message: getErrorMessage(error, 'An unexpected error occurred while deleting the skill.'),
+      });
     },
   });
 
   // * Handle create skill
   const handleCreateSkill = async (data: CreateSkillPayload | UpdateSkillPayload) => {
+    console.log('🎯 Creating skill with data:', data);
     setIsSubmitting(true);
     try {
       await createSkillMutation.mutateAsync(data as CreateSkillPayload);
+      console.log('🎯 Skill created successfully');
+    } catch (error) {
+      console.error('🎯 Error creating skill:', error);
     } finally {
       setIsSubmitting(false);
     }
@@ -104,6 +147,20 @@ export default function AdminSkillsPage() {
     }
   };
 
+  // Basic date range update action (trigger example)
+  async function handleUpdateDateRange(skill: Skill, payload: SkillDateRangePayload) {
+    setIsSubmitting(true)
+    try {
+      await skillsApi.updateDateRange(String(skill.id), payload)
+      queryClient.invalidateQueries({ queryKey: ['skills'] })
+      addNotification({ type: 'success', title: 'Date Range Updated', message: 'Skill date range saved.' })
+    } catch (error) {
+      addNotification({ type: 'error', title: 'Update Failed', message: getErrorMessage(error, 'Could not update date range.') })
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
   // * Handle delete skill
   const handleDeleteSkill = async () => {
     if (!selectedSkill) return;
@@ -117,8 +174,17 @@ export default function AdminSkillsPage() {
 
   // * Open create modal
   const openCreateModal = () => {
+    console.log('🎯 Opening create modal...');
+    alert('Button clicked! Modal should open now.');
     setSelectedSkill(null);
     setIsCreateModalOpen(true);
+    console.log('🎯 Modal state set to true');
+  };
+
+  // * Open view modal
+  const openViewModal = (skill: Skill) => {
+    setSelectedSkill(skill);
+    setIsViewModalOpen(true);
   };
 
   // * Open edit modal
@@ -137,6 +203,7 @@ export default function AdminSkillsPage() {
   const closeModals = () => {
     setIsCreateModalOpen(false);
     setIsEditModalOpen(false);
+    setIsViewModalOpen(false);
     setIsDeleteModalOpen(false);
     setSelectedSkill(null);
   };
@@ -154,68 +221,31 @@ export default function AdminSkillsPage() {
         <Button
           color="primary"
           startContent={<Plus className="w-4 h-4" />}
-          onPress={openCreateModal}
+          onClick={openCreateModal}
         >
           Create Skill
         </Button>
       </div>
 
-      {/* * Skills Table with StateRenderer */}
+      {/* * Skills Table */}
       <div className="bg-white rounded-lg shadow-sm border border-neutral-200">
-        <StateRenderer
-          data={skills}
+        <SkillsTable
+          skills={skills ?? []}
           isLoading={isLoading}
           error={error}
-          loadingComponent={
-            <div className="p-6">
-              <DefaultLoadingComponent />
-            </div>
-          }
-          errorComponent={
-            <div className="p-6">
-              <DefaultErrorComponent 
-                error={error!} 
-                onRetry={() => refetch()} 
-              />
-            </div>
-          }
-          emptyComponent={
-            <div className="p-6">
-              <DefaultEmptyComponent 
-                message="No skills found. Create your first skill to get started."
-                actionButton={
-                  <Button
-                    color="primary"
-                    startContent={<Plus className="w-4 h-4" />}
-                    onPress={openCreateModal}
-                  >
-                    Create Skill
-                  </Button>
-                }
-              />
-            </div>
-          }
-        >
-          {(data) => (
-            <SkillsTable
-              skills={data}
-              onEdit={openEditModal}
-              onDelete={openDeleteModal}
-              onView={(skill) => {
-                // TODO: Navigate to skill details page
-                console.log('View skill:', skill);
-              }}
-              onManageGroups={(skill) => {
-                // TODO: Navigate to groups management for this skill
-                console.log('Manage groups for skill:', skill);
-              }}
-              onManageSchedule={(skill) => {
-                // TODO: Navigate to schedule management for this skill
-                console.log('Manage schedule for skill:', skill);
-              }}
-            />
-          )}
-        </StateRenderer>
+          onEdit={openEditModal}
+          onDelete={openDeleteModal}
+          onCreate={openCreateModal}
+          onView={openViewModal}
+          onManageGroups={(skill) => {
+            // TODO: Navigate to groups management for this skill
+            console.log('Manage groups for skill:', skill);
+          }}
+          onManageSchedule={(skill) => {
+            // TODO: Navigate to schedule management for this skill
+            console.log('Manage schedule for skill:', skill);
+          }}
+        />
       </div>
 
       {/* * Create Skill Modal */}
@@ -234,6 +264,92 @@ export default function AdminSkillsPage() {
         skill={selectedSkill}
         isLoading={isSubmitting}
       />
+
+      {/* * View Skill Modal */}
+      <Modal
+        isOpen={isViewModalOpen}
+        onClose={closeModals}
+        size="lg"
+      >
+        <ModalContent>
+          <ModalHeader className="flex flex-col gap-1">
+            <div className="flex items-center gap-2">
+              <Eye className="w-5 h-5 text-blue-500" />
+              <h2 className="text-lg font-semibold">Skill Details</h2>
+            </div>
+          </ModalHeader>
+          <ModalBody>
+            {selectedSkill && (
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-lg font-semibold text-neutral-900 mb-2">
+                    {selectedSkill.title}
+                  </h3>
+                  {selectedSkill.description && (
+                    <p className="text-neutral-600 mb-4">
+                      {selectedSkill.description}
+                    </p>
+                  )}
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <span className="font-medium text-neutral-700">Max Students per Group:</span>
+                    <p className="text-neutral-600">{selectedSkill.max_students_per_group}</p>
+                  </div>
+                  <div>
+                    <span className="font-medium text-neutral-700">Created:</span>
+                    <p className="text-neutral-600">
+                      {selectedSkill.created_at ? new Date(selectedSkill.created_at).toLocaleDateString() : '—'}
+                    </p>
+                  </div>
+                </div>
+
+                {selectedSkill.meta && selectedSkill.meta.length > 0 && (
+                  <div>
+                    <span className="font-medium text-neutral-700 mb-2 block">Tags:</span>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedSkill.meta.map((tag, index) => (
+                        <span
+                          key={index}
+                          className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </ModalBody>
+          <ModalFooter>
+            <Button color="default" variant="light" onClick={closeModals}>
+              Close
+            </Button>
+            <Button 
+              color="primary" 
+              variant="light"
+              onClick={() => {
+                closeModals();
+                openEditModal(selectedSkill!);
+              }}
+            >
+              Edit
+            </Button>
+            <Button 
+              color="danger" 
+              variant="light"
+              onClick={() => {
+                closeModals();
+                openDeleteModal(selectedSkill!);
+              }}
+            >
+              Delete
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
 
       {/* * Delete Confirmation Modal */}
       <Modal
@@ -257,14 +373,14 @@ export default function AdminSkillsPage() {
           <ModalFooter>
             <Button
               variant="light"
-              onPress={closeModals}
+              onClick={closeModals}
               isDisabled={isSubmitting}
             >
               Cancel
             </Button>
             <Button
               color="danger"
-              onPress={handleDeleteSkill}
+              onClick={handleDeleteSkill}
               isLoading={isSubmitting}
               isDisabled={isSubmitting}
             >

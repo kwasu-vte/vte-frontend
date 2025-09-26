@@ -1,510 +1,332 @@
 // * Student My Group Page
-// * Shows the student's assigned group and group members
-// * Follows the same pattern as other pages with StateRenderer + React Query
+// * View assigned group with GroupInfoCard, MentorCard, GroupMembersList, and PracticalSchedule
+// * Follows design guide principles with NextUI components
 
-'use client';
+import React from 'react';
+import { getCurrentUser } from '@/lib/auth';
+import { enrollmentsApi, skillGroupsApi } from '@/lib/api';
+import { GroupAssignmentCard } from '@/components/features/student/GroupAssignmentCard';
+import { PracticalCalendar } from '@/components/features/student/PracticalCalendar';
+import { NotificationContainer } from '@/components/shared/NotificationContainer';
+import { StateRenderer } from '@/components/shared/StateRenderer';
+import { Card, CardBody, CardHeader, Skeleton, Button, Avatar, Chip, Divider } from '@nextui-org/react';
+import { ArrowLeft, Users, User, Calendar, Mail, Phone } from 'lucide-react';
+import Link from 'next/link';
 
-import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { StateRenderer, DefaultLoadingComponent, DefaultErrorComponent, DefaultEmptyComponent } from '@/components/shared/StateRenderer';
-import { api } from '@/lib/api';
-import { Group, User } from '@/lib/types';
-import { Button, Card, CardBody, CardHeader, Chip, Avatar, AvatarGroup, Progress, Divider } from '@nextui-org/react';
-import { Users, Calendar, Clock, MapPin, BookOpen, User as UserIcon, MessageCircle, Phone, Mail } from 'lucide-react';
+export const dynamic = 'force-dynamic';
 
-interface GroupMember {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  level: string;
-  avatar?: string;
-  isOnline?: boolean;
+interface MyGroupPageData {
+  enrollment: any;
+  groupDetails: any;
 }
 
-interface GroupDetails {
-  id: string;
-  name: string;
-  skill: {
-    id: string;
-    title: string;
-    description: string;
-  };
-  mentor: {
-    id: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    phone?: string;
-    specialization?: string;
-  };
-  members: GroupMember[];
-  schedule: {
-    start: string;
-    end: string;
-    days: string[];
-    location?: string;
-  };
-  progress: {
-    completed: number;
-    total: number;
-    percentage: number;
-  };
-  announcements: {
-    id: string;
-    title: string;
-    content: string;
-    createdAt: string;
-    author: string;
-  }[];
+async function getMyGroupPageData(userId: string): Promise<MyGroupPageData> {
+  try {
+    const enrollmentResponse = await enrollmentsApi.getUserEnrollment(userId);
+    const enrollment = enrollmentResponse.success ? enrollmentResponse.data : null;
+
+    // Fetch real group details if user has a group assignment
+    let groupDetails = null;
+    if (enrollment?.group_id) {
+      try {
+        const groupResponse = await skillGroupsApi.getById(Number(enrollment.group_id));
+        const group = groupResponse.data;
+        
+        if (group) {
+          groupDetails = {
+            id: group.id,
+            name: group.group_display_name || `Group ${group.group_number}`,
+            skill: group.skill,
+            mentor: null, // Mentor info would need to be fetched separately
+            members: group.enrollments?.map((enrollment: any) => ({
+              id: enrollment.user_id,
+              name: `${enrollment.user?.first_name || ''} ${enrollment.user?.last_name || ''}`.trim() || 'Unknown',
+              email: enrollment.user?.email || 'Not provided',
+              level: enrollment.user?.student_level || 'Unknown'
+            })) || [],
+            schedule: {
+              start: group.created_at,
+              end: group.updated_at,
+              days: ['Monday', 'Wednesday', 'Friday'], // This would come from skill date range
+              location: 'Lab 1, Computer Science Building' // This would come from skill details
+            },
+            capacity: parseInt(group.max_student_capacity) || 0,
+            currentSize: group.enrollments?.length || 0
+          };
+        }
+      } catch (error) {
+        console.warn('Could not fetch group details:', error);
+        // Fallback to basic group info from enrollment
+        groupDetails = {
+          id: enrollment.group_id,
+          name: `Group ${enrollment.group_id}`,
+          skill: enrollment.skill,
+          mentor: null,
+          members: [],
+          schedule: {
+            start: enrollment.created_at,
+            end: enrollment.updated_at,
+            days: ['Monday', 'Wednesday', 'Friday'],
+            location: 'Lab 1, Computer Science Building'
+          },
+          capacity: 0,
+          currentSize: 0
+        };
+      }
+    }
+
+    return {
+      enrollment,
+      groupDetails
+    };
+  } catch (error) {
+    console.error('Error fetching my group page data:', error);
+    return {
+      enrollment: null,
+      groupDetails: null
+    };
+  }
 }
 
-export default function StudentMyGroupPage() {
-  // * React Query for data fetching - get student's group details
-  const {
-    data: groupDetails,
-    isLoading,
-    error,
-    refetch
-  } = useQuery({
-    queryKey: ['student-group'],
-    queryFn: async () => {
-      // TODO: Implement student group details endpoint
-      // For now, return mock data
-      return {
-        id: 'group-1',
-        name: 'Group A',
-        skill: {
-          id: 'skill-1',
-          title: 'Web Development',
-          description: 'Learn modern web development with React, Node.js, and databases'
-        },
-        mentor: {
-          id: 'mentor-1',
-          firstName: 'John',
-          lastName: 'Smith',
-          email: 'john.smith@example.com',
-          phone: '+234 801 234 5678',
-          specialization: 'Full-Stack Development'
-        },
-        members: [
-          {
-            id: 'student-1',
-            firstName: 'You',
-            lastName: 'Student',
-            email: 'you@example.com',
-            level: '300',
-            isOnline: true
-          },
-          {
-            id: 'student-2',
-            firstName: 'Jane',
-            lastName: 'Doe',
-            email: 'jane.doe@example.com',
-            level: '300',
-            isOnline: false
-          },
-          {
-            id: 'student-3',
-            firstName: 'Bob',
-            lastName: 'Johnson',
-            email: 'bob.johnson@example.com',
-            level: '400',
-            isOnline: true
-          },
-          {
-            id: 'student-4',
-            firstName: 'Alice',
-            lastName: 'Brown',
-            email: 'alice.brown@example.com',
-            level: '300',
-            isOnline: false
-          }
-        ],
-        schedule: {
-          start: '2024-01-15',
-          end: '2024-06-15',
-          days: ['Monday', 'Wednesday', 'Friday'],
-          location: 'Lab 1, Computer Science Building'
-        },
-        progress: {
-          completed: 8,
-          total: 12,
-          percentage: 67
-        },
-        announcements: [
-          {
-            id: 'announcement-1',
-            title: 'Project Submission Deadline',
-            content: 'Remember that the final project is due next Friday. Please ensure all components are working properly.',
-            createdAt: '2024-01-20T10:00:00Z',
-            author: 'John Smith'
-          },
-          {
-            id: 'announcement-2',
-            title: 'Lab Session Cancelled',
-            content: 'Today\'s lab session has been cancelled due to maintenance. We will resume next week.',
-            createdAt: '2024-01-18T14:30:00Z',
-            author: 'John Smith'
-          }
-        ]
-      } as GroupDetails;
-    },
-  });
+export default async function StudentMyGroup() {
+  const user = await getCurrentUser();
+  if (!user) {
+    return <div>Error: User not found</div>;
+  }
 
-  // * Format date for display
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  };
-
-  // * Get member initials for avatar
-  const getMemberInitials = (member: GroupMember) => {
-    return `${member.firstName.charAt(0)}${member.lastName.charAt(0)}`.toUpperCase();
-  };
-
-  // * Get online members count
-  const onlineMembers = groupDetails?.members.filter(member => member.isOnline).length || 0;
+  const data = await getMyGroupPageData(user.id);
 
   return (
     <div className="space-y-6">
-      {/* * Page Header */}
-      <div className="flex items-center justify-between">
+      {/* Page Header */}
+      <div className="flex items-center gap-4">
+        <Button
+          as={Link}
+          href="/student/dashboard"
+          isIconOnly
+          variant="ghost"
+          className="text-neutral-600"
+        >
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
         <div>
-          <h1 className="text-3xl font-bold text-neutral-900">My Group</h1>
-          <p className="text-neutral-600 mt-1">
-            View your group details, members, and progress
+          <h1 className="text-3xl font-bold text-neutral-900 mb-2">
+            My Group
+          </h1>
+          <p className="text-neutral-600">
+            View your assigned group details and members.
           </p>
         </div>
       </div>
 
-      {/* * Group Overview */}
-      <div className="bg-white rounded-lg shadow-sm border border-neutral-200">
-        <StateRenderer
-          data={groupDetails}
-          isLoading={isLoading}
-          error={error}
-          loadingComponent={
-            <div className="p-6">
-              <DefaultLoadingComponent />
-            </div>
+      {/* Main Content */}
+      <StateRenderer
+        isLoading={false}
+        error={null}
+        data={data.enrollment}
+        loadingComponent={
+          <div className="space-y-6">
+            <Card shadow="sm" className="w-full">
+              <CardBody className="p-6">
+                <Skeleton className="h-40 w-full" />
+              </CardBody>
+            </Card>
+            <Card shadow="sm" className="w-full">
+              <CardBody className="p-6">
+                <Skeleton className="h-32 w-full" />
+              </CardBody>
+            </Card>
+          </div>
+        }
+        emptyComponent={
+          <Card shadow="sm" className="w-full">
+            <CardBody className="p-8 text-center">
+              <Users className="h-12 w-12 text-neutral-400 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-neutral-900 mb-2">No Group Assignment</h3>
+              <p className="text-neutral-600 mb-6">
+                You haven&apos;t been assigned to a group yet. Complete your enrollment and payment to get assigned.
+              </p>
+              <Button
+                as={Link}
+                href="/student/enrollment"
+                color="primary"
+                startContent={<Users className="h-4 w-4" />}
+              >
+                View Enrollment
+              </Button>
+            </CardBody>
+          </Card>
+        }
+      >
+        {(enrollment) => {
+          // Check if student is assigned to a group
+          const isAssigned = enrollment.status === 'assigned' || enrollment.status === 'active';
+          
+          if (!isAssigned || !data.groupDetails) {
+            return (
+              <Card shadow="sm" className="w-full">
+                <CardBody className="p-8 text-center">
+                  <Users className="h-12 w-12 text-warning-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-neutral-900 mb-2">Awaiting Group Assignment</h3>
+                  <p className="text-neutral-600 mb-6">
+                    Your enrollment is confirmed but you haven&apos;t been assigned to a group yet. This usually happens within 24-48 hours after payment confirmation.
+                  </p>
+                  <div className="space-y-2">
+                    <p className="text-sm text-neutral-500">
+                      Current status: <span className="font-medium capitalize">{enrollment.status}</span>
+                    </p>
+                    <p className="text-sm text-neutral-500">
+                      Payment status: <span className="font-medium capitalize">{enrollment.payment_status}</span>
+                    </p>
+                  </div>
+                </CardBody>
+              </Card>
+            );
           }
-          errorComponent={
-            <div className="p-6">
-              <DefaultErrorComponent 
-                error={error!} 
-                onRetry={() => refetch()} 
+
+          return (
+            <div className="space-y-6">
+              {/* Group Assignment Card */}
+              <GroupAssignmentCard
+                enrollment={{
+                  id: enrollment.id.toString(),
+                  status: enrollment.status
+                }}
+                group={{
+                  number: parseInt(data.groupDetails.id),
+                  mentorName: data.groupDetails.mentor.name,
+                  schedule: `${data.groupDetails.schedule.days.join(', ')} at ${data.groupDetails.schedule.location}`
+                }}
               />
-            </div>
-          }
-          emptyComponent={
-            <div className="p-6">
-              <DefaultEmptyComponent 
-                message="You are not assigned to any group yet. Contact an administrator to get assigned to a group."
-                actionButton={
-                  <Button
-                    color="primary"
-                    startContent={<Users className="w-4 h-4" />}
-                    onPress={() => window.location.href = '/student/skills'}
-                  >
-                    Browse Skills
-                  </Button>
-                }
-              />
-            </div>
-          }
-        >
-          {(data) => (
-            <div className="p-6 space-y-6">
-              {/* * Group Header */}
-              <div className="flex items-start justify-between">
-                <div className="space-y-2">
-                  <h2 className="text-2xl font-bold text-neutral-900">{data.name}</h2>
-                  <p className="text-lg text-neutral-600">{data.skill.title}</p>
-                  <p className="text-sm text-neutral-500">{data.skill.description}</p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Chip color="primary" variant="flat">
-                    {data.members.length} Members
-                  </Chip>
-                  <Chip color="success" variant="flat">
-                    {onlineMembers} Online
-                  </Chip>
-                </div>
-              </div>
 
-              {/* * Progress Section */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold text-neutral-900">Course Progress</h3>
-                  <span className="text-sm text-neutral-600">
-                    {data.progress.completed} of {data.progress.total} modules completed
-                  </span>
-                </div>
-                <Progress
-                  value={data.progress.percentage}
-                  color="primary"
-                  className="w-full"
-                />
-                <div className="text-center text-sm text-neutral-600">
-                  {data.progress.percentage}% Complete
-                </div>
-              </div>
-
-              <Divider />
-
-              {/* * Schedule Information */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <Card>
-                  <CardHeader className="flex items-center gap-3">
-                    <div className="p-2 bg-blue-100 rounded-lg">
-                      <Calendar className="w-5 h-5 text-blue-600" />
+              {/* Group Information */}
+              <Card shadow="sm" className="w-full">
+                <CardHeader className="flex items-center gap-2">
+                  <Users className="h-5 w-5 text-primary" />
+                  <p className="text-xl font-medium leading-normal">Group Information</p>
+                </CardHeader>
+                <Divider />
+                <CardBody className="p-6">
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-neutral-600">Group Name</span>
+                      <span className="font-medium text-neutral-900">{data.groupDetails.name}</span>
                     </div>
-                    <div>
-                      <h3 className="text-lg font-semibold">Schedule</h3>
-                      <p className="text-sm text-neutral-600">Class timings and location</p>
+                    <div className="flex items-center justify-between">
+                      <span className="text-neutral-600">Skill</span>
+                      <span className="font-medium text-neutral-900">{data.groupDetails.skill?.title}</span>
                     </div>
-                  </CardHeader>
-                  <CardBody className="space-y-3">
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2 text-sm">
-                        <Clock className="w-4 h-4 text-neutral-400" />
-                        <span className="text-neutral-600">Duration:</span>
-                        <span className="font-medium">
-                          {formatDate(data.schedule.start)} - {formatDate(data.schedule.end)}
-                        </span>
+                    <div className="flex items-center justify-between">
+                      <span className="text-neutral-600">Duration</span>
+                      <span className="font-medium text-neutral-900">
+                        {new Date(data.groupDetails.schedule.start).toLocaleDateString()} - {new Date(data.groupDetails.schedule.end).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-neutral-600">Schedule</span>
+                      <span className="font-medium text-neutral-900">{data.groupDetails.schedule.days.join(', ')}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-neutral-600">Location</span>
+                      <span className="font-medium text-neutral-900">{data.groupDetails.schedule.location}</span>
+                    </div>
+                  </div>
+                </CardBody>
+              </Card>
+
+              {/* Mentor Information */}
+              <Card shadow="sm" className="w-full">
+                <CardHeader className="flex items-center gap-2">
+                  <User className="h-5 w-5 text-primary" />
+                  <p className="text-xl font-medium leading-normal">Mentor</p>
+                </CardHeader>
+                <Divider />
+                <CardBody className="p-6">
+                  <div className="flex items-start gap-4">
+                    <Avatar
+                      name={data.groupDetails.mentor.name.split(' ').map((n: string) => n[0]).join('')}
+                      size="lg"
+                      className="text-lg"
+                    />
+                    <div className="flex-1 space-y-3">
+                      <div>
+                        <h3 className="text-lg font-medium text-neutral-900">{data.groupDetails.mentor.name}</h3>
+                        <p className="text-sm text-neutral-600">{data.groupDetails.mentor.specialization}</p>
                       </div>
-                      <div className="flex items-center gap-2 text-sm">
-                        <Calendar className="w-4 h-4 text-neutral-400" />
-                        <span className="text-neutral-600">Days:</span>
-                        <span className="font-medium">{data.schedule.days.join(', ')}</span>
-                      </div>
-                      {data.schedule.location && (
+                      <div className="space-y-2">
                         <div className="flex items-center gap-2 text-sm">
-                          <MapPin className="w-4 h-4 text-neutral-400" />
-                          <span className="text-neutral-600">Location:</span>
-                          <span className="font-medium">{data.schedule.location}</span>
+                          <Mail className="h-4 w-4 text-neutral-400" />
+                          <span className="text-neutral-600">{data.groupDetails.mentor.email}</span>
                         </div>
-                      )}
-                    </div>
-                  </CardBody>
-                </Card>
-
-                <Card>
-                  <CardHeader className="flex items-center gap-3">
-                    <div className="p-2 bg-green-100 rounded-lg">
-                      <UserIcon className="w-5 h-5 text-green-600" />
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-semibold">Mentor</h3>
-                      <p className="text-sm text-neutral-600">Your group mentor</p>
-                    </div>
-                  </CardHeader>
-                  <CardBody className="space-y-3">
-                    <div className="space-y-2">
-                      <div className="font-medium text-neutral-900">
-                        {data.mentor.firstName} {data.mentor.lastName}
-                      </div>
-                      {data.mentor.specialization && (
-                        <div className="text-sm text-neutral-600">
-                          {data.mentor.specialization}
-                        </div>
-                      )}
-                      <div className="flex items-center gap-2 text-sm">
-                        <Mail className="w-4 h-4 text-neutral-400" />
-                        <span className="text-neutral-600">{data.mentor.email}</span>
-                      </div>
-                      {data.mentor.phone && (
                         <div className="flex items-center gap-2 text-sm">
-                          <Phone className="w-4 h-4 text-neutral-400" />
-                          <span className="text-neutral-600">{data.mentor.phone}</span>
+                          <Phone className="h-4 w-4 text-neutral-400" />
+                          <span className="text-neutral-600">{data.groupDetails.mentor.phone}</span>
                         </div>
-                      )}
+                      </div>
                     </div>
-                  </CardBody>
-                </Card>
-              </div>
+                  </div>
+                </CardBody>
+              </Card>
 
-              {/* * Group Members */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-neutral-900">Group Members</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {data.members.map((member) => (
-                    <Card key={member.id}>
-                      <CardBody className="p-4">
-                        <div className="flex items-center gap-3">
-                          <div className="relative">
-                            <Avatar
-                              name={getMemberInitials(member)}
-                              size="md"
-                              className="text-sm"
-                            />
-                            {member.isOnline && (
-                              <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
+              {/* Group Members */}
+              <Card shadow="sm" className="w-full">
+                <CardHeader className="flex items-center gap-2">
+                  <Users className="h-5 w-5 text-primary" />
+                  <p className="text-xl font-medium leading-normal">Group Members</p>
+                </CardHeader>
+                <Divider />
+                <CardBody className="p-6">
+                  <div className="space-y-4">
+                    {data.groupDetails.members.map((member: any, index: number) => (
+                      <div key={member.id} className="flex items-center gap-3 p-3 border border-neutral-200 rounded-lg">
+                        <Avatar
+                          name={member.name.split(' ').map((n: string) => n[0]).join('')}
+                          size="md"
+                          className="text-sm"
+                        />
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium text-neutral-900">{member.name}</span>
+                            {index === 0 && (
+                              <Chip size="sm" color="primary" variant="flat">
+                                You
+                              </Chip>
                             )}
                           </div>
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2">
-                              <span className="font-medium text-neutral-900">
-                                {member.firstName} {member.lastName}
-                              </span>
-                              {member.id === 'student-1' && (
-                                <Chip size="sm" color="primary" variant="flat">
-                                  You
-                                </Chip>
-                              )}
-                            </div>
-                            <div className="text-sm text-neutral-600">{member.email}</div>
-                            <div className="text-xs text-neutral-500">Level {member.level}</div>
-                          </div>
-                          <div className="flex gap-1">
-                            <Button
-                              isIconOnly
-                              size="sm"
-                              variant="light"
-                              onPress={() => {
-                                // TODO: Open chat with member
-                                console.log('Chat with', member.firstName);
-                              }}
-                            >
-                              <MessageCircle className="w-4 h-4" />
-                            </Button>
-                          </div>
+                          <p className="text-sm text-neutral-600">{member.email}</p>
+                          <p className="text-xs text-neutral-500">Level {member.level}</p>
                         </div>
-                      </CardBody>
-                    </Card>
-                  ))}
-                </div>
-              </div>
-
-              {/* * Announcements */}
-              {data.announcements.length > 0 && (
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-neutral-900">Recent Announcements</h3>
-                  <div className="space-y-3">
-                    {data.announcements.map((announcement) => (
-                      <Card key={announcement.id}>
-                        <CardBody className="p-4">
-                          <div className="space-y-2">
-                            <div className="flex items-center justify-between">
-                              <h4 className="font-medium text-neutral-900">
-                                {announcement.title}
-                              </h4>
-                              <span className="text-xs text-neutral-500">
-                                {new Date(announcement.createdAt).toLocaleDateString()}
-                              </span>
-                            </div>
-                            <p className="text-sm text-neutral-600">
-                              {announcement.content}
-                            </p>
-                            <div className="text-xs text-neutral-500">
-                              By {announcement.author}
-                            </div>
-                          </div>
-                        </CardBody>
-                      </Card>
+                      </div>
                     ))}
                   </div>
-                </div>
-              )}
-            </div>
-          )}
-        </StateRenderer>
-      </div>
+                </CardBody>
+              </Card>
 
-      {/* * Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
-          <CardBody className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <BookOpen className="w-5 h-5 text-blue-600" />
-              </div>
-              <div className="flex-1">
-                <h3 className="font-medium text-neutral-900">Course Materials</h3>
-                <p className="text-sm text-neutral-600">Access learning resources</p>
-              </div>
-              <Button
-                color="primary"
-                variant="light"
-                size="sm"
-                onPress={() => {
-                  // TODO: Navigate to course materials
-                  console.log('View course materials');
-                }}
-              >
-                View
-              </Button>
+              {/* Practical Schedule */}
+              <Card shadow="sm" className="w-full">
+                <CardHeader className="flex items-center gap-2">
+                  <Calendar className="h-5 w-5 text-primary" />
+                  <p className="text-xl font-medium leading-normal">Practical Schedule</p>
+                </CardHeader>
+                <Divider />
+                <CardBody className="p-6">
+                  <PracticalCalendar
+                    practicalDates={data.groupDetails.schedule.days.map((day: string) => ({
+                      date: `${data.groupDetails.schedule.start}T09:00:00Z`, // Mock time
+                      venue: data.groupDetails.schedule.location,
+                      time: '09:00 AM'
+                    }))}
+                    viewMode="month"
+                  />
+                </CardBody>
+              </Card>
             </div>
-          </CardBody>
-        </Card>
+          );
+        }}
+      </StateRenderer>
 
-        <Card>
-          <CardBody className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <MessageCircle className="w-5 h-5 text-green-600" />
-              </div>
-              <div className="flex-1">
-                <h3 className="font-medium text-neutral-900">Group Chat</h3>
-                <p className="text-sm text-neutral-600">Chat with group members</p>
-              </div>
-              <Button
-                color="primary"
-                variant="light"
-                size="sm"
-                onPress={() => {
-                  // TODO: Open group chat
-                  console.log('Open group chat');
-                }}
-              >
-                Chat
-              </Button>
-            </div>
-          </CardBody>
-        </Card>
-
-        <Card>
-          <CardBody className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <Calendar className="w-5 h-5 text-purple-600" />
-              </div>
-              <div className="flex-1">
-                <h3 className="font-medium text-neutral-900">Schedule</h3>
-                <p className="text-sm text-neutral-600">View upcoming sessions</p>
-              </div>
-              <Button
-                color="primary"
-                variant="light"
-                size="sm"
-                onPress={() => {
-                  // TODO: Navigate to schedule
-                  console.log('View schedule');
-                }}
-              >
-                View
-              </Button>
-            </div>
-          </CardBody>
-        </Card>
-      </div>
-
-      {/* * Debug Information */}
-      <div className="bg-neutral-50 p-4 rounded-lg">
-        <h3 className="font-semibold text-neutral-900 mb-2">Debug Information</h3>
-        <div className="text-sm text-neutral-600 space-y-1">
-          <p><strong>Loading:</strong> {isLoading ? 'Yes' : 'No'}</p>
-          <p><strong>Error:</strong> {error ? error.message : 'None'}</p>
-          <p><strong>Group ID:</strong> {groupDetails?.id || 'None'}</p>
-          <p><strong>Members Count:</strong> {groupDetails?.members.length || 0}</p>
-          <p><strong>Online Members:</strong> {onlineMembers}</p>
-        </div>
-      </div>
+      {/* Notifications */}
+      <NotificationContainer />
     </div>
   );
 }

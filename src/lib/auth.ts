@@ -5,50 +5,76 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { User, AuthSession } from './types';
-import { api } from './api';
+import { authApi } from './api';
+
+// * Normalize backend role casing to frontend canonical type
+function normalizeUserRole(role: any): 'Admin' | 'Mentor' | 'Student' {
+  const r = String(role || '').toLowerCase();
+  if (r === 'admin' || r === 'superadmin') return 'Admin';
+  if (r === 'mentor') return 'Mentor';
+  return 'Student';
+}
 
 // * Get the current user session from cookies
 export async function getSession(): Promise<AuthSession | null> {
   try {
     const cookieStore = await cookies();
     const sessionToken = cookieStore.get('session_token');
-    const refreshToken = cookieStore.get('refresh_token');
 
-    if (!sessionToken || !refreshToken) {
+    if (!sessionToken) {
       return null;
     }
 
-    // * Validate session token with backend by calling getCurrentUser
+    // * Validate session token with backend
     try {
-      const response = await api.getCurrentUser();
+      // * Use the regular getCurrentUser API call which properly handles cookies
+      const response = await authApi.getCurrentUser();
       
       if (response.success && response.data) {
+        const normalizedUser = { ...response.data, role: normalizeUserRole((response as any)?.data?.role) } as User;
         return {
-          user: response.data,
+          user: normalizedUser,
           access_token: sessionToken.value,
-          refresh_token: refreshToken.value,
         };
       } else {
-        // * Token is invalid, try to refresh if refresh token exists
-        if (refreshToken) {
-          const newToken = await refreshAccessToken();
-          if (newToken) {
-            // * Retry getCurrentUser with new token
-            const retryResponse = await api.getCurrentUser();
-            if (retryResponse.success && retryResponse.data) {
-              return {
-                user: retryResponse.data,
-                access_token: newToken,
-                refresh_token: refreshToken.value,
-              };
-            }
+        // * Session invalid, try refresh
+        console.log('Session validation failed, attempting refresh...');
+        const newToken = await refreshAccessToken();
+        if (newToken) {
+          // * Retry getCurrentUser after refresh
+          const retryResponse = await authApi.getCurrentUser();
+          if (retryResponse.success && retryResponse.data) {
+            const normalizedUser = { ...retryResponse.data, role: normalizeUserRole((retryResponse as any)?.data?.role) } as User;
+            return {
+              user: normalizedUser,
+              access_token: newToken,
+            };
           }
         }
+        console.log('Session refresh failed, session is invalid');
         return null;
       }
     } catch (error) {
-      // * API call failed, token might be invalid
-      console.error('Failed to validate session token:', error);
+      // * API call failed, session might be invalid
+      console.error('Failed to validate session:', error);
+      
+      // * Try refresh as last resort
+      try {
+        const newToken = await refreshAccessToken();
+        if (newToken) {
+          const retryResponse = await authApi.getCurrentUser();
+          if (retryResponse.success && retryResponse.data) {
+            const normalizedUser = { ...retryResponse.data, role: normalizeUserRole((retryResponse as any)?.data?.role) } as User;
+            return {
+              user: normalizedUser,
+              access_token: newToken,
+            };
+          }
+        }
+      } catch (refreshError) {
+        console.error('Failed to refresh session:', refreshError);
+      }
+      
       return null;
     }
   } catch (error) {
@@ -85,7 +111,7 @@ export async function hasAnyRole(requiredRoles: User['role'][]): Promise<boolean
 export async function requireAuth(): Promise<User> {
   const user = await getCurrentUser();
   if (!user) {
-    redirect('/auth/sign-in');
+    redirect('/auth/sign_in');
   }
   return user;
 }
@@ -102,25 +128,12 @@ export async function requireRole(requiredRole: User['role']): Promise<User> {
 // * Refresh the access token using refresh token
 export async function refreshAccessToken(): Promise<string | null> {
   try {
-    const cookieStore = await cookies();
-    const refreshToken = cookieStore.get('refresh_token');
-
-    if (!refreshToken) {
-      return null;
-    }
-
-    const response = await api.refreshToken();
+    const response = await authApi.refresh();
     
     if (response.success) {
-      // * Update the session token cookie
-      cookieStore.set('session_token', response.data.access_token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        maxAge: 60 * 60 * 24 * 7, // 7 days
-      });
-      
-      return response.data.access_token;
+      // * Proxy updates cookie; return token for immediate use if needed
+      const token = (response as any)?.data?.access_token ?? (response as any)?.access_token;
+      return token || null;
     }
     
     return null;
@@ -134,7 +147,6 @@ export async function refreshAccessToken(): Promise<string | null> {
 export async function clearAuthCookies(): Promise<void> {
   const cookieStore = await cookies();
   cookieStore.delete('session_token');
-  cookieStore.delete('refresh_token');
 }
 
 // * Validate and decode JWT token (placeholder for production)

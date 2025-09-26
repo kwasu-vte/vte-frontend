@@ -8,7 +8,7 @@ import { useState, useEffect } from 'react';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, Select, SelectItem } from '@nextui-org/react';
 import { Group, CreateGroupPayload } from '@/lib/types';
 import { useQuery } from '@tanstack/react-query';
-import { api } from '@/lib/api';
+import { skillsApi, mentorsApi } from '@/lib/api';
 
 interface GroupModalProps {
   isOpen: boolean;
@@ -36,7 +36,7 @@ export function GroupModal({
   const { data: skills } = useQuery({
     queryKey: ['skills'],
     queryFn: async () => {
-      const response = await api.getSkills();
+      const response = await skillsApi.getAll();
       return response.data;
     },
   });
@@ -45,7 +45,7 @@ export function GroupModal({
   const { data: mentors } = useQuery({
     queryKey: ['mentors'],
     queryFn: async () => {
-      const response = await api.getMentors();
+      const response = await mentorsApi.list();
       return response.data;
     },
   });
@@ -154,7 +154,7 @@ export function GroupModal({
             >
               {mentors?.map((mentor) => (
                 <SelectItem key={mentor.id} value={mentor.id}>
-                  {mentor.first_name} {mentor.last_name}
+                  {mentor.full_name || mentor.user?.first_name + ' ' + mentor.user?.last_name || String(mentor.id)}
                 </SelectItem>
               )) || []}
             </Select>
@@ -170,7 +170,7 @@ export function GroupModal({
           <ModalFooter>
             <Button
               variant="light"
-              onPress={onClose}
+              onClick={onClose}
               isDisabled={isLoading}
             >
               Cancel

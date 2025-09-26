@@ -21,36 +21,19 @@ import {
   SelectItem,
   Chip,
   Divider,
+  Accordion,
+  AccordionItem,
 } from '@nextui-org/react';
 import { X, Plus, Trash2 } from 'lucide-react';
 import { Skill, CreateSkillPayload, UpdateSkillPayload } from '@/lib/types';
 
-// * Validation schema
+// * Validation schema - simplified for max students per group only
 const skillSchema = z.object({
-  title: z.string().min(1, 'Title is required').max(100, 'Title must be less than 100 characters'),
-  description: z.string().optional(),
-  max_groups: z.number().min(1, 'Must have at least 1 group').max(100, 'Maximum 100 groups allowed'),
-  min_students_per_group: z.number().min(1, 'Minimum 1 student per group').max(50, 'Maximum 50 students per group'),
-  max_students_per_group: z.number().min(1, 'Maximum students must be at least 1').max(50, 'Maximum 50 students per group').optional(),
-  date_range_start: z.string().min(1, 'Start date is required'),
-  date_range_end: z.string().min(1, 'End date is required'),
+  title: z.string().min(5, 'Title must be at least 5 characters').max(255, 'Title must be less than 255 characters'),
+  description: z.string().max(255, 'Description must be less than 255 characters').optional(),
+  max_students_per_group: z.number().min(1, 'Maximum students must be at least 1'),
   allowed_levels: z.array(z.string()).min(1, 'At least one level must be selected'),
   meta: z.array(z.string()).optional(),
-}).refine((data) => {
-  if (data.max_students_per_group && data.min_students_per_group > data.max_students_per_group) {
-    return false;
-  }
-  return true;
-}, {
-  message: 'Minimum students per group cannot be greater than maximum students per group',
-  path: ['max_students_per_group'],
-}).refine((data) => {
-  const startDate = new Date(data.date_range_start);
-  const endDate = new Date(data.date_range_end);
-  return endDate > startDate;
-}, {
-  message: 'End date must be after start date',
-  path: ['date_range_end'],
 });
 
 type SkillFormData = z.infer<typeof skillSchema>;
@@ -72,6 +55,9 @@ export function SkillModal({
 }: SkillModalProps) {
   const isEdit = !!skill;
   
+  // * Debug logging
+  console.log('🎯 SkillModal rendered:', { isOpen, isEdit, isLoading });
+  
   const {
     register,
     handleSubmit,
@@ -85,11 +71,7 @@ export function SkillModal({
     defaultValues: {
       title: '',
       description: '',
-      max_groups: 1,
-      min_students_per_group: 1,
       max_students_per_group: 10,
-      date_range_start: '',
-      date_range_end: '',
       allowed_levels: [],
       meta: [],
     },
@@ -103,11 +85,7 @@ export function SkillModal({
         reset({
           title: skill.title,
           description: skill.description || '',
-          max_groups: skill.max_groups,
-          min_students_per_group: skill.min_students_per_group,
           max_students_per_group: skill.max_students_per_group || 10,
-          date_range_start: skill.date_range_start || '',
-          date_range_end: skill.date_range_end || '',
           allowed_levels: skill.allowed_levels || [],
           meta: skill.meta || [],
         });
@@ -116,11 +94,7 @@ export function SkillModal({
         reset({
           title: '',
           description: '',
-          max_groups: 1,
-          min_students_per_group: 1,
           max_students_per_group: 10,
-          date_range_start: '',
-          date_range_end: '',
           allowed_levels: [],
           meta: [],
         });
@@ -130,11 +104,23 @@ export function SkillModal({
 
   // * Handle form submission
   const onFormSubmit = async (data: SkillFormData) => {
+    console.log('🎯 Form submitted with data:', data);
+    
+    // * Add min_students_per_group: 1 and max_groups: 100 silently to the request
+    const requestData = {
+      ...data,
+      min_students_per_group: 1,
+      max_groups: 100,
+    };
+    
+    console.log('🎯 Request data with silent fields:', requestData);
+    
     try {
-      await onSubmit(data);
+      await onSubmit(requestData);
+      console.log('🎯 Form submission successful, closing modal');
       onClose();
     } catch (error) {
-      console.error('Error submitting skill:', error);
+      console.error('🎯 Error submitting skill:', error);
     }
   };
 
@@ -173,8 +159,9 @@ export function SkillModal({
       size="2xl"
       scrollBehavior="inside"
       classNames={{
-        base: 'max-h-[90vh]',
-        body: 'py-6',
+        base: 'max-h-[95vh]',
+        body: 'py-6 max-h-[70vh] overflow-y-auto',
+        footer: 'mt-4',
       }}
     >
       <ModalContent>
@@ -213,6 +200,9 @@ export function SkillModal({
                 errorMessage={errors.description?.message}
                 minRows={3}
               />
+              <p className="text-xs text-neutral-500">
+                Optional: Provide a detailed description of this skill (max 255 characters)
+              </p>
             </div>
 
             <Divider />
@@ -221,69 +211,38 @@ export function SkillModal({
             <div className="space-y-4">
               <h3 className="text-lg font-medium text-neutral-900">Group Configuration</h3>
               
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Input
-                  {...register('max_groups', { valueAsNumber: true })}
-                  label="Max Groups"
-                  type="number"
-                  min="1"
-                  max="100"
-                  isInvalid={!!errors.max_groups}
-                  errorMessage={errors.max_groups?.message}
-                  isRequired
-                />
-
-                <Input
-                  {...register('min_students_per_group', { valueAsNumber: true })}
-                  label="Min Students per Group"
-                  type="number"
-                  min="1"
-                  max="50"
-                  isInvalid={!!errors.min_students_per_group}
-                  errorMessage={errors.min_students_per_group?.message}
-                  isRequired
-                />
-
-                <Input
-                  {...register('max_students_per_group', { valueAsNumber: true })}
-                  label="Max Students per Group"
-                  type="number"
-                  min="1"
-                  max="50"
-                  isInvalid={!!errors.max_students_per_group}
-                  errorMessage={errors.max_students_per_group?.message}
-                />
+              {/* * Alert explaining max students per group */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <div className="text-blue-500 mt-0.5">
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-medium text-blue-900 mb-1">How Group Sizing Works</h4>
+                    <p className="text-sm text-blue-800">
+                      The maximum students per group determines how many students can be in any single group for this skill. 
+                      For example, if you set this to 70 and have 100 students enrolled, the system will automatically create 
+                      two groups: one with 70 students and another with 30 students.
+                    </p>
+                  </div>
+                </div>
               </div>
-            </div>
-
-            <Divider />
-
-            {/* * Date Range */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-medium text-neutral-900">Date Range</h3>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Input
-                  {...register('date_range_start')}
-                  label="Start Date"
-                  type="date"
-                  isInvalid={!!errors.date_range_start}
-                  errorMessage={errors.date_range_start?.message}
-                  isRequired
-                />
-
-                <Input
-                  {...register('date_range_end')}
-                  label="End Date"
-                  type="date"
-                  isInvalid={!!errors.date_range_end}
-                  errorMessage={errors.date_range_end?.message}
-                  isRequired
-                />
-              </div>
+              <Input
+                {...register('max_students_per_group', { valueAsNumber: true })}
+                label="Maximum Students per Group"
+                type="number"
+                min="1"
+                max="100"
+                isInvalid={!!errors.max_students_per_group}
+                errorMessage={errors.max_students_per_group?.message}
+                isRequired
+                placeholder="e.g., 70"
+              />
             </div>
 
-            <Divider />
 
             {/* * Allowed Levels */}
             <div className="space-y-4">
@@ -312,51 +271,62 @@ export function SkillModal({
 
             <Divider />
 
-            {/* * Meta Tags */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-medium text-neutral-900">Meta Tags</h3>
-              <p className="text-sm text-neutral-600">
-                Add optional tags to categorize this skill.
-              </p>
-              
-              <div className="space-y-2">
-                <Button
-                  type="button"
-                  variant="light"
-                  size="sm"
-                  startContent={<Plus className="w-4 h-4" />}
-                  onPress={handleAddMetaTag}
-                >
-                  Add Tag
-                </Button>
-                
-                {currentMeta.length > 0 && (
-                  <div className="flex flex-wrap gap-2">
-                    {currentMeta.map(tag => (
-                      <Chip
-                        key={tag}
-                        color="secondary"
-                        variant="solid"
-                        endContent={
-                          <X 
-                            className="w-3 h-3 cursor-pointer" 
-                            onClick={() => handleRemoveMetaTag(tag)}
-                          />
-                        }
+            {/* * Additional Settings */}
+            <Accordion>
+              <AccordionItem 
+                key="meta-tags" 
+                aria-label="Meta Tags" 
+                title="Additional Settings"
+                subtitle="Optional tags and advanced configuration"
+              >
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="text-md font-medium text-neutral-900 mb-2">Meta Tags</h4>
+                    <p className="text-sm text-neutral-600 mb-4">
+                      Add optional tags to categorize this skill.
+                    </p>
+                    
+                    <div className="space-y-2">
+                      <Button
+                        type="button"
+                        variant="light"
+                        size="sm"
+                        startContent={<Plus className="w-4 h-4" />}
+                        onClick={handleAddMetaTag}
                       >
-                        {tag}
-                      </Chip>
-                    ))}
+                        Add Tag
+                      </Button>
+                      
+                      {currentMeta.length > 0 && (
+                        <div className="flex flex-wrap gap-2">
+                          {currentMeta.map(tag => (
+                            <Chip
+                              key={tag}
+                              color="secondary"
+                              variant="solid"
+                              endContent={
+                                <X 
+                                  className="w-3 h-3 cursor-pointer" 
+                                  onClick={() => handleRemoveMetaTag(tag)}
+                                />
+                              }
+                            >
+                              {tag}
+                            </Chip>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
-                )}
-              </div>
-            </div>
+                </div>
+              </AccordionItem>
+            </Accordion>
           </ModalBody>
 
           <ModalFooter>
             <Button
               variant="light"
-              onPress={onClose}
+              onClick={onClose}
               isDisabled={isSubmitting || isLoading}
             >
               Cancel

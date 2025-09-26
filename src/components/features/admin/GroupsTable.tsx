@@ -10,11 +10,11 @@ import { MoreVertical, Edit, Trash2, Eye, Users, Calendar } from 'lucide-react';
 
 interface GroupsTableProps {
   groups: Group[];
-  onEdit: (group: Group) => void;
-  onDelete: (group: Group) => void;
-  onView: (group: Group) => void;
-  onManageMembers: (group: Group) => void;
-  onManageAttendance: (group: Group) => void;
+  onView?: (group: Group) => void;
+  onEdit?: (group: Group) => void;
+  onDelete?: (group: Group) => void;
+  onManageMembers?: (group: Group) => void;
+  onManageAttendance?: (group: Group) => void;
 }
 
 export function GroupsTable({
@@ -113,28 +113,32 @@ export function GroupsTable({
                   <DropdownItem
                     key="view"
                     startContent={<Eye className="w-4 h-4" />}
-                    onPress={() => onView(group)}
+                    onClick={() => onView?.(group)}
+                    isDisabled={!onView}
                   >
                     View Details
                   </DropdownItem>
                   <DropdownItem
                     key="edit"
                     startContent={<Edit className="w-4 h-4" />}
-                    onPress={() => onEdit(group)}
+                    onClick={() => onEdit?.(group)}
+                    isDisabled={!onEdit}
                   >
                     Edit Group
                   </DropdownItem>
                   <DropdownItem
                     key="members"
                     startContent={<Users className="w-4 h-4" />}
-                    onPress={() => onManageMembers(group)}
+                    onClick={() => onManageMembers?.(group)}
+                    isDisabled={!onManageMembers}
                   >
                     Manage Members
                   </DropdownItem>
                   <DropdownItem
                     key="attendance"
                     startContent={<Calendar className="w-4 h-4" />}
-                    onPress={() => onManageAttendance(group)}
+                    onClick={() => onManageAttendance?.(group)}
+                    isDisabled={!onManageAttendance}
                   >
                     Manage Attendance
                   </DropdownItem>
@@ -143,7 +147,8 @@ export function GroupsTable({
                     className="text-danger"
                     color="danger"
                     startContent={<Trash2 className="w-4 h-4" />}
-                    onPress={() => onDelete(group)}
+                    onClick={() => onDelete?.(group)}
+                    isDisabled={!onDelete}
                   >
                     Delete Group
                   </DropdownItem>

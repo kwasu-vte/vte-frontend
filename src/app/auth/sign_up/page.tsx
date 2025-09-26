@@ -4,21 +4,72 @@
 
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
-import { Card, CardHeader, CardBody, Input, Button, Link, Select, SelectItem } from '@nextui-org/react';
+import { Card, CardHeader, CardBody, Input, Button, Link, Spinner } from '@nextui-org/react';
 import { Eye, EyeOff } from 'lucide-react';
-import { signUpAction } from '@/lib/actions';
+import { signUpActionSafe } from '@/lib/actions';
 import logo from '@/assets/kwasulogo.png';
+import { NotificationContainer } from '@/components/shared/NotificationContainer';
+import { useFormState, useFormStatus } from 'react-dom';
+import { useRouter, useSearchParams } from 'next/navigation';
+
+function SubmitButton() {
+  const { pending } = useFormStatus();
+  return (
+    <Button
+      type="submit"
+      color="primary"
+      size="lg"
+      className="w-full font-semibold"
+      isDisabled={pending}
+      startContent={pending ? <Spinner size="sm" color="white" /> : null}
+    >
+      {pending ? 'Creating Account…' : 'Create Account'}
+    </Button>
+  );
+}
 
 export default function SignUpPage() {
   const [isVisible, setIsVisible] = useState(false);
+  const [formState, formAction] = useFormState(signUpActionSafe as any, { error: null });
+  const [clientError, setClientError] = useState<string | null>(null);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const firstNameLabel = useMemo(() => 'First Name', []);
+  const lastNameLabel = useMemo(() => 'Last Name', []);
+  const emailLabel = useMemo(() => 'Email', []);
+  const passwordLabel = useMemo(() => 'Password', []);
+  const confirmPasswordLabel = useMemo(() => 'Confirm Password', []);
 
   const toggleVisibility = () => setIsVisible(!isVisible);
 
+  // * If already authenticated, redirect by role (public page guard)
+  useEffect(() => {
+    let isMounted = true;
+    const checkAuth = async () => {
+      try {
+        const res = await fetch('/api/v1/users/auth/me', { headers: { Accept: 'application/json' } });
+        if (!res.ok) return;
+        const json = await res.json();
+        const role = String(json?.data?.role || '').toLowerCase();
+        const target = role === 'admin' || role === 'mentor' || role === 'student' ? `/${role}/dashboard` : '/';
+        if (isMounted) {
+          const redirectParam = searchParams.get('redirect');
+          router.replace(redirectParam || target);
+        }
+      } catch (_) {
+        // * Silent: user likely unauthenticated
+      }
+    };
+    checkAuth();
+    return () => { isMounted = false; };
+  }, [router, searchParams]);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex items-center justify-center p-4">
-      <div className="w-full max-w-2xl">
+    <div className="min-h-screen bg-neutral-50 flex items-center justify-center p-6">
+      <div className="w-full max-w-xl">
+        <NotificationContainer />
         {/* * Logo and Brand */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center mb-4">
@@ -43,22 +94,46 @@ export default function SignUpPage() {
         </div>
 
         {/* * Sign-Up Form */}
-        <Card className="shadow-xl">
+        <Card shadow="sm">
           <CardHeader className="pb-0">
             <h4 className="text-xl font-semibold text-foreground">
               Sign Up
             </h4>
           </CardHeader>
           <CardBody className="space-y-6">
-            <form action={signUpAction} className="space-y-4">
+            <form
+              action={formAction}
+              className="space-y-4"
+              noValidate
+              onSubmit={(e) => {
+                setClientError(null);
+                const form = e.currentTarget as HTMLFormElement;
+                const data = new FormData(form);
+                const firstName = String(data.get('firstName') || '').trim();
+                const lastName = String(data.get('lastName') || '').trim();
+                const email = String(data.get('email') || '').trim();
+                const password = String(data.get('password') || '');
+                const password2 = String(data.get('password2') || '');
+                if (!firstName || !lastName || !email || !password || !password2) {
+                  e.preventDefault();
+                  setClientError('All fields are required');
+                  return;
+                }
+                if (password !== password2) {
+                  e.preventDefault();
+                  setClientError('Passwords do not match');
+                }
+              }}
+            >
               {/* * Name Fields */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Input
                   name="firstName"
-                  label="First Name"
+                  label={firstNameLabel}
                   placeholder="Enter your first name"
                   variant="bordered"
                   isRequired
+                  autoComplete="given-name"
                   classNames={{
                     input: "text-base",
                     label: "font-medium",
@@ -66,10 +141,11 @@ export default function SignUpPage() {
                 />
                 <Input
                   name="lastName"
-                  label="Last Name"
+                  label={lastNameLabel}
                   placeholder="Enter your last name"
                   variant="bordered"
                   isRequired
+                  autoComplete="family-name"
                   classNames={{
                     input: "text-base",
                     label: "font-medium",
@@ -77,96 +153,35 @@ export default function SignUpPage() {
                 />
               </div>
 
-              {/* * Username and Email */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Input
-                  name="username"
-                  label="Username"
-                  placeholder="Choose a username"
-                  variant="bordered"
-                  isRequired
-                  classNames={{
-                    input: "text-base",
-                    label: "font-medium",
-                  }}
-                />
-                <Input
-                  name="email"
-                  label="Email"
-                  placeholder="Enter your email"
-                  type="email"
-                  variant="bordered"
-                  isRequired
-                  classNames={{
-                    input: "text-base",
-                    label: "font-medium",
-                  }}
-                />
-              </div>
-
-              {/* * Matric Number and Level */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Input
-                  name="matricNumber"
-                  label="Matric Number"
-                  placeholder="Enter your matric number"
-                  variant="bordered"
-                  isRequired
-                  classNames={{
-                    input: "text-base",
-                    label: "font-medium",
-                  }}
-                />
-                <Select
-                  name="level"
-                  label="Level"
-                  placeholder="Select your level"
-                  variant="bordered"
-                  isRequired
-                  classNames={{
-                    trigger: "",
-                    label: "font-medium",
-                    value: "",
-                    popoverContent: "",
-                  }}
-                >
-                  <SelectItem key="100" value="100">100 Level</SelectItem>
-                  <SelectItem key="200" value="200">200 Level</SelectItem>
-                  <SelectItem key="300" value="300">300 Level</SelectItem>
-                  <SelectItem key="400" value="400">400 Level</SelectItem>
-                  <SelectItem key="500" value="500">500 Level</SelectItem>
-                  <SelectItem key="600" value="600">600 Level</SelectItem>
-                </Select>
-              </div>
-
-              {/* * Role Selection */}
-              <Select
-                name="role"
-                label="Role"
-                placeholder="Select your role"
+              {/* * Email */}
+              <Input
+                name="email"
+                label={emailLabel}
+                placeholder="Enter your email"
+                type="email"
                 variant="bordered"
                 isRequired
+                autoComplete="email"
                 classNames={{
-                  trigger: "",
+                  input: "text-base",
                   label: "font-medium",
-                  value: "",
-                  popoverContent: "",
                 }}
-              >
-                <SelectItem key="Student" value="Student">Student</SelectItem>
-                <SelectItem key="Mentor" value="Mentor">Mentor</SelectItem>
-                <SelectItem key="Admin" value="Admin">Admin</SelectItem>
-              </Select>
+              />
+
+              {/* * Note: Matric/Level captured later in profile creation per spec */}
+
+              {/* * Role is fixed to Student for public sign-up per spec */}
 
               {/* * Password Fields */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Input
                   name="password"
-                  label="Password"
+                  label={passwordLabel}
                   placeholder="Enter your password"
                   variant="bordered"
                   type={isVisible ? "text" : "password"}
                   isRequired
+                  autoComplete="new-password"
                   endContent={
                     <button
                       type="button"
@@ -187,11 +202,12 @@ export default function SignUpPage() {
                 />
                 <Input
                   name="password2"
-                  label="Confirm Password"
+                  label={confirmPasswordLabel}
                   placeholder="Confirm your password"
                   variant="bordered"
                   type="password"
                   isRequired
+                  autoComplete="new-password"
                   classNames={{
                     input: "text-base",
                     label: "font-medium",
@@ -199,15 +215,20 @@ export default function SignUpPage() {
                 />
               </div>
 
+              {/* * Inline error */}
+              {clientError ? (
+                <div className="text-sm text-danger-600" role="alert" aria-live="assertive">
+                  {clientError}
+                </div>
+              ) : null}
+              {formState?.error ? (
+                <div className="text-sm text-danger-600" role="alert" aria-live="assertive">
+                  {formState.error}
+                </div>
+              ) : null}
+
               {/* * Submit Button */}
-              <Button
-                type="submit"
-                color="primary"
-                size="lg"
-                className="w-full font-semibold"
-              >
-                Create Account
-              </Button>
+              <SubmitButton />
             </form>
 
             {/* * Sign In Link */}

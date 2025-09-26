@@ -22,6 +22,7 @@ interface DataTableProps<T> {
   loadingComponent?: React.ReactNode;
   errorComponent?: React.ReactNode;
   emptyComponent?: React.ReactNode;
+  emptyActionButton?: React.ReactNode;
 }
 
 export function DataTable<T>({
@@ -34,6 +35,7 @@ export function DataTable<T>({
   loadingComponent,
   errorComponent,
   emptyComponent,
+  emptyActionButton,
 }: DataTableProps<T>) {
   return (
     <StateRenderer
@@ -42,42 +44,71 @@ export function DataTable<T>({
       error={error}
       loadingComponent={loadingComponent || <DefaultLoadingComponent />}
       errorComponent={errorComponent || <DefaultErrorComponent error={error!} />}
-      emptyComponent={emptyComponent || <DefaultEmptyComponent message={emptyMessage} />}
+      emptyComponent={emptyComponent || <DefaultEmptyComponent message={emptyMessage} actionButton={emptyActionButton} />}
     >
-      {(items) => (
-        <Table
-          aria-label="Data table"
-          selectionMode="single"
-          onRowAction={(key) => {
-            if (onRowClick) {
-              const item = items.find((_, index) => index.toString() === key);
-              if (item) onRowClick(item);
-            }
-          }}
-          classNames={{
-            wrapper: "shadow-sm",
-          }}
-        >
-          <TableHeader columns={columns}>
-            {(column) => (
-              <TableColumn key={column.key}>
-                {column.label}
-              </TableColumn>
-            )}
-          </TableHeader>
-          <TableBody items={items}>
-            {(item) => (
-              <TableRow key={(item as any).id || Math.random()}>
-                {columns.map((column) => (
-                  <TableCell key={column.key}>
-                    {column.render ? column.render(item) : (item as any)[column.key]}
-                  </TableCell>
-                ))}
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      )}
+      {(items) => {
+        // * Handle undefined/null data gracefully
+        if (!items) {
+          return (
+            <div className="p-6 text-center">
+              <div className="text-neutral-400 text-6xl mb-4">📭</div>
+              <h3 className="text-xl font-semibold text-neutral-900 mb-2">No data found</h3>
+              <p className="text-neutral-600 mb-4">{emptyMessage}</p>
+              {emptyActionButton}
+            </div>
+          );
+        }
+
+        // * Ensure items is an array to prevent "items is not iterable" error
+        const safeItems = Array.isArray(items) ? items : [];
+        
+        // * If it's an empty array, show empty state
+        if (safeItems.length === 0) {
+          return (
+            <div className="p-6 text-center">
+              <div className="text-neutral-400 text-6xl mb-4">📭</div>
+              <h3 className="text-xl font-semibold text-neutral-900 mb-2">No data found</h3>
+              <p className="text-neutral-600 mb-4">{emptyMessage}</p>
+              {emptyActionButton}
+            </div>
+          );
+        }
+        
+        return (
+          <Table
+            aria-label="Data table"
+            selectionMode="single"
+            onRowAction={(key) => {
+              if (onRowClick) {
+                const item = safeItems.find((_, index) => index.toString() === key);
+                if (item) onRowClick(item);
+              }
+            }}
+            classNames={{
+              wrapper: "shadow-sm",
+            }}
+          >
+            <TableHeader columns={columns}>
+              {(column) => (
+                <TableColumn key={column.key}>
+                  {column.label}
+                </TableColumn>
+              )}
+            </TableHeader>
+            <TableBody items={safeItems}>
+              {(item) => (
+                <TableRow key={(item as any).id || Math.random()}>
+                  {columns.map((column) => (
+                    <TableCell key={column.key}>
+                      {column.render ? column.render(item) : (item as any)[column.key]}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        );
+      }}
     </StateRenderer>
   );
 }

@@ -105,7 +105,7 @@ export function CalendarView({
                 isIconOnly
                 variant="light"
                 size="sm"
-                onPress={goToPreviousMonth}
+                onClick={goToPreviousMonth}
                 className="text-neutral-500 hover:text-neutral-700"
               >
                 <ChevronLeft className="w-4 h-4" />
@@ -113,7 +113,7 @@ export function CalendarView({
               <Button
                 variant="light"
                 size="sm"
-                onPress={goToToday}
+                onClick={goToToday}
                 className="text-neutral-500 hover:text-neutral-700"
               >
                 Today
@@ -122,7 +122,7 @@ export function CalendarView({
                 isIconOnly
                 variant="light"
                 size="sm"
-                onPress={goToNextMonth}
+                onClick={goToNextMonth}
                 className="text-neutral-500 hover:text-neutral-700"
               >
                 <ChevronRight className="w-4 h-4" />
@@ -272,7 +272,7 @@ export function EventList({
                 key={event.id}
                 className="hover:shadow-md transition-shadow cursor-pointer"
                 isPressable
-                onPress={() => onEventClick?.(event)}
+                onClick={() => onEventClick?.(event)}
               >
                 <CardBody className="p-4">
                   <div className="flex items-start justify-between">

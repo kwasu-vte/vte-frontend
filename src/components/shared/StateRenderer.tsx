@@ -8,6 +8,7 @@ interface StateRendererProps<T> {
   data: T | undefined;
   isLoading: boolean;
   error: Error | null;
+  onRetry?: () => void;
   // Slots (as render props/children)
   loadingComponent?: React.ReactNode;
   errorComponent?: React.ReactNode;
@@ -19,6 +20,7 @@ export function StateRenderer<T>({
   data,
   isLoading,
   error,
+  onRetry,
   loadingComponent,
   errorComponent,
   emptyComponent,
@@ -26,21 +28,23 @@ export function StateRenderer<T>({
 }: StateRendererProps<T>) {
   // * State 1: Loading
   if (isLoading) {
-    return <>{loadingComponent}</>;
+    return <>{loadingComponent ?? <DefaultLoadingComponent />}</>;
   }
 
   // * State 2: Error
   if (error) {
-    return <>{errorComponent}</>;
+    return <>{errorComponent ?? <DefaultErrorComponent error={error} onRetry={onRetry} />}</>;
   }
 
-  // * State 3: Empty
-  if (!data || (Array.isArray(data) && data.length === 0)) {
-    return <>{emptyComponent}</>;
+  // * State 3: Empty - Only show empty state for explicitly empty arrays
+  // * Don't show empty state for undefined data (which happens during initial load)
+  if (Array.isArray(data) && data.length === 0) {
+    return <>{emptyComponent ?? <DefaultEmptyComponent message="No items to display." />}</>;
   }
 
-  // * State 4: Success - Render the data
-  return <>{children(data as NonNullable<T>)}</>;
+  // * State 4: Success - Render the data (including undefined/null data)
+  // * Let the child component handle undefined/null data gracefully
+  return children(data as NonNullable<T>);
 }
 
 // * Default Components for Common States

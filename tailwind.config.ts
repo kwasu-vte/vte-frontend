@@ -80,7 +80,41 @@ const config: Config = {
   },
   plugins: [
     require("tailwindcss-animate"), 
-    nextui()
+    nextui({
+      prefix: "nextui",
+      addCommonColors: true,
+      themes: {
+        light: {
+          colors: {
+            // Map to our globals.css tokens (light theme)
+            background: "#f8fafc", // neutral-50
+            foreground: "#475569", // neutral-600 per DESIGN_GUIDE
+
+            primary: {
+              DEFAULT: "#3b82f6", // primary-500
+              foreground: "#ffffff",
+            },
+            secondary: {
+              DEFAULT: "#f1f5f9", // neutral-100
+              foreground: "#0f172a",
+            },
+            success: {
+              DEFAULT: "#10b981",
+              foreground: "#ffffff",
+            },
+            warning: {
+              DEFAULT: "#f59e0b",
+              foreground: "#0b0f19",
+            },
+            danger: {
+              DEFAULT: "#ef4444",
+              foreground: "#ffffff",
+            },
+            focus: "#2563eb", // primary-600 for focus ring
+          },
+        },
+      },
+    })
   ],
 };
 

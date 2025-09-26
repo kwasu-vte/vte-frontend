@@ -15,13 +15,12 @@ import {
   Calendar, 
   Settings, 
   BarChart3, 
-  CreditCard,
   UserCheck,
   GraduationCap,
   Home,
   LogOut,
-  School,
-  UserPlus
+  QrCode,
+  ClipboardList
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -40,54 +39,48 @@ const navigationItems: NavigationItem[] = [
   },
   {
     href: '/admin/skills',
-    label: 'Skills Management',
+    label: 'Skills',
     icon: BookOpen,
     role: ['Admin'],
   },
   {
     href: '/admin/groups',
-    label: 'Groups Management',
+    label: 'Groups',
     icon: Users,
     role: ['Admin'],
   },
   {
+    href: '/admin/enrollments',
+    label: 'Enrollments',
+    icon: ClipboardList,
+    role: ['Admin'],
+  },
+  {
     href: '/admin/students',
-    label: 'Student Management',
+    label: 'Students',
     icon: GraduationCap,
     role: ['Admin'],
   },
   {
     href: '/admin/mentors',
-    label: 'Mentor Management',
+    label: 'Mentors',
     icon: UserCheck,
     role: ['Admin'],
   },
   {
-    href: '/admin/attendance',
-    label: 'Attendance Records',
-    icon: Calendar,
+    href: '/admin/qr-codes',
+    label: 'QR Codes',
+    icon: QrCode,
     role: ['Admin'],
   },
   {
-    href: '/admin/payments',
-    label: 'Payment Records',
-    icon: CreditCard,
+    href: '/admin/reports',
+    label: 'Reports',
+    icon: BarChart3,
     role: ['Admin'],
   },
   {
-    href: '/academicSessions',
-    label: 'Academic Sessions',
-    icon: School,
-    role: ['Admin'],
-  },
-  {
-    href: '/studentProfiles',
-    label: 'Student Profiles',
-    icon: UserPlus,
-    role: ['Admin'],
-  },
-  {
-    href: '/admin/settings',
+    href: '/admin/sessions',
     label: 'System Settings',
     icon: Settings,
     role: ['Admin'],
@@ -112,12 +105,6 @@ const navigationItems: NavigationItem[] = [
     icon: Calendar,
     role: ['Mentor'],
   },
-  {
-    href: '/mentor/attendance',
-    label: 'Take Attendance',
-    icon: UserCheck,
-    role: ['Mentor'],
-  },
 
   // * Student Navigation
   {
@@ -133,27 +120,9 @@ const navigationItems: NavigationItem[] = [
     role: ['Student'],
   },
   {
-    href: '/student/payment',
-    label: 'Payment',
-    icon: CreditCard,
-    role: ['Student'],
-  },
-  {
     href: '/student/my-group',
     label: 'My Group',
     icon: Users,
-    role: ['Student'],
-  },
-  {
-    href: '/student/attendance',
-    label: 'Attendance',
-    icon: UserCheck,
-    role: ['Student'],
-  },
-  {
-    href: '/student/profile',
-    label: 'Profile',
-    icon: GraduationCap,
     role: ['Student'],
   },
 ];

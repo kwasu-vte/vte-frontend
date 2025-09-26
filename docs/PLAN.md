@@ -195,7 +195,7 @@ To fulfill the urgent requirement for handling all UI states, we will implement 
 ```tsx
 'use client';
 import { useQuery } from '@tanstack/react-query';
-import { api } from '@/lib/api';
+import { skillsApi } from '@/lib/api';
 import { StateRenderer } from '@/components/shared/StateRenderer';
 import { SkillsTable } from '@/components/features/admin/SkillsTable';
 import { Skeleton } from '@nextui-org/react';
@@ -203,7 +203,7 @@ import { Skeleton } from '@nextui-org/react';
 export default function SkillsPage() {
   const { data, isLoading, error } = useQuery({
     queryKey: ['skills'],
-    queryFn: () => api.skills.getAll(),
+    queryFn: () => skillsApi.getAll(),
   });
 
   return (
@@ -212,12 +212,12 @@ export default function SkillsPage() {
       <StateRenderer
         data={data}
         isLoading={isLoading}
-        error={error}
+        error={error as Error | null}
         loadingComponent={<Skeleton className="h-64 w-full" />}
         emptyComponent={<EmptyState message="No skills created." />}
         errorComponent={<ErrorState />}
       >
-        {(skills) => <SkillsTable skills={skills} />}
+        {(res) => <SkillsTable skills={res?.data ?? []} />}
       </StateRenderer>
     </div>
   );
@@ -241,7 +241,7 @@ This is the step-by-step guide for the refactoring.
     -   **Task:** Create `src/context/AuthContext.tsx` to hold the user profile state.
     -   **Task:** Create Server Actions in `src/lib/actions.ts` for `signIn` and `signOut`.
 3.  **Refactor Login/Signup Pages:**
-    -   **Task:** Rebuild the `/auth/sign-in` and `/auth/sign-up` pages using NextUI components that call the new Server Actions.
+    -   **Task:** Rebuild the `/auth/sign_in` and `/auth/sign-up` pages using NextUI components that call the new Server Actions.
 
 ### **Phase 2: Unify Layout & UI**
 1.  **Implement Design System:**

@@ -6,7 +6,23 @@
 
 import { useState, useEffect } from 'react';
 import { Card, CardBody, CardHeader, Input, Switch, Button, Divider } from '@nextui-org/react';
-import { SystemConfig, UpdateSystemConfigPayload } from '@/lib/types';
+// Deprecated per plan: no SystemConfig API; keep local prop types to avoid leaking types
+type SystemConfig = {
+  system_name?: string;
+  system_description?: string | null;
+  admin_email?: string;
+  support_email?: string;
+  max_file_size?: number | null;
+  session_timeout?: string;
+  email_daily_limit?: number | null;
+  enable_registration?: boolean;
+  enable_notifications?: boolean;
+  enable_analytics?: boolean;
+  enable_backups?: boolean;
+  maintenance_mode?: boolean;
+}
+
+type UpdateSystemConfigPayload = Partial<SystemConfig>
 import { Settings, Database, Mail, Shield, Users, Bell } from 'lucide-react';
 
 interface SettingsFormProps {

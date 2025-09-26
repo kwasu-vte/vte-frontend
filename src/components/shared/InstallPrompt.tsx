@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
@@ -132,9 +133,7 @@ export function InstallPrompt({ className }: InstallPromptProps) {
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold">
-              KW
-            </div>
+            <Image src="/kwasulogo.png" alt="KWASU VTE" width={32} height={32} />
             Install KWASU VTE
           </DialogTitle>
           <DialogDescription>
@@ -183,7 +182,7 @@ export function InstallPrompt({ className }: InstallPromptProps) {
               <Button 
                 variant="outline" 
                 onClick={handleDismiss}
-                className="w-full"
+                className="w-full text-blue-800"
               >
                 Maybe Later
               </Button>

@@ -7,7 +7,7 @@
 import React from 'react';
 import { DataTable } from '@/components/shared/DataTable';
 import { Button, Chip, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@nextui-org/react';
-import { MoreVertical, Edit, Trash2, Eye, Users, Calendar } from 'lucide-react';
+import { MoreVertical, Edit, Trash2, Eye, Users, Calendar, Plus } from 'lucide-react';
 import { Skill } from '@/lib/types';
 
 interface SkillsTableProps {
@@ -17,6 +17,7 @@ interface SkillsTableProps {
   onView?: (skill: Skill) => void;
   onManageGroups?: (skill: Skill) => void;
   onManageSchedule?: (skill: Skill) => void;
+  onCreate?: () => void;
   isLoading?: boolean;
   error?: Error | null;
 }
@@ -28,6 +29,7 @@ export function SkillsTable({
   onView,
   onManageGroups,
   onManageSchedule,
+  onCreate,
   isLoading = false,
   error = null,
 }: SkillsTableProps) {
@@ -76,7 +78,7 @@ export function SkillsTable({
     },
     {
       key: 'groups',
-      label: 'Groups',
+      label: 'Max Groups',
       render: (skill: Skill) => (
         <div className="text-center">
           <div className="font-medium text-neutral-900">
@@ -133,20 +135,6 @@ export function SkillsTable({
       ),
     },
     {
-      key: 'date_range',
-      label: 'Date Range',
-      render: (skill: Skill) => (
-        <div className="space-y-1">
-          <div className="text-sm text-neutral-900">
-            {formatDate(skill.date_range_start)}
-          </div>
-          <div className="text-xs text-neutral-500">
-            to {formatDate(skill.date_range_end)}
-          </div>
-        </div>
-      ),
-    },
-    {
       key: 'actions',
       label: 'Actions',
       render: (skill: Skill) => {
@@ -157,7 +145,7 @@ export function SkillsTable({
             <DropdownItem
               key="view"
               startContent={<Eye className="w-4 h-4" />}
-              onPress={() => onView(skill)}
+              onClick={() => onView(skill)}
             >
               View Details
             </DropdownItem>
@@ -169,7 +157,7 @@ export function SkillsTable({
             <DropdownItem
               key="edit"
               startContent={<Edit className="w-4 h-4" />}
-              onPress={() => onEdit(skill)}
+              onClick={() => onEdit(skill)}
             >
               Edit Skill
             </DropdownItem>
@@ -181,7 +169,7 @@ export function SkillsTable({
             <DropdownItem
               key="groups"
               startContent={<Users className="w-4 h-4" />}
-              onPress={() => onManageGroups(skill)}
+              onClick={() => onManageGroups(skill)}
             >
               Manage Groups
             </DropdownItem>
@@ -193,7 +181,7 @@ export function SkillsTable({
             <DropdownItem
               key="schedule"
               startContent={<Calendar className="w-4 h-4" />}
-              onPress={() => onManageSchedule(skill)}
+              onClick={() => onManageSchedule(skill)}
             >
               Manage Schedule
             </DropdownItem>
@@ -207,7 +195,7 @@ export function SkillsTable({
               className="text-danger"
               color="danger"
               startContent={<Trash2 className="w-4 h-4" />}
-              onPress={() => onDelete(skill)}
+              onClick={() => onDelete(skill)}
             >
               Delete Skill
             </DropdownItem>
@@ -243,6 +231,17 @@ export function SkillsTable({
       columns={columns}
       emptyMessage="No skills found. Create your first skill to get started."
       onRowClick={onView}
+      emptyActionButton={
+        onCreate ? (
+          <Button
+            color="primary"
+            startContent={<Plus className="w-4 h-4" />}
+            onClick={onCreate}
+          >
+            Create Skill
+          </Button>
+        ) : undefined
+      }
     />
   );
 }

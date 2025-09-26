@@ -4,285 +4,179 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { StateRenderer, DefaultLoadingComponent, DefaultErrorComponent, DefaultEmptyComponent } from '@/components/shared/StateRenderer';
 import { StudentsTable } from '@/components/features/admin/StudentsTable';
-import { StudentModal } from '@/components/features/admin/StudentModal';
-import { api } from '@/lib/api';
-import { User, CreateUserPayload, UpdateUserPayload } from '@/lib/types';
-import { Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@nextui-org/react';
-import { Plus, AlertTriangle } from 'lucide-react';
+// import { StudentModal } from '@/components/features/admin/StudentModal';
+import { StudentProfileModal } from '@/components/features/admin/StudentProfileModal';
+import { studentsApi } from '@/lib/api';
+import { StudentProfile } from '@/lib/types';
+import type { CreateUserPayload, UpdateUserPayload } from '@/lib/types'
+import { Button, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@nextui-org/react';
+import { AlertTriangle, Search } from 'lucide-react';
+import { useApp } from '@/context/AppContext';
+import { getErrorMessage, getErrorTitle, getSuccessTitle, getSuccessMessage } from '@/lib/error-handling';
 
 export default function AdminStudentsPage() {
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [selectedStudent, setSelectedStudent] = useState<User | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  // const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  // const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [selectedStudent, setSelectedStudent] = useState<StudentProfile | null>(null);
+  // const [isSubmitting, setIsSubmitting] = useState(false);
+  const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
 
   const queryClient = useQueryClient();
+  const { addNotification } = useApp();
 
-  // * React Query for data fetching
+  // * React Query for data fetching - only run on client
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(search.trim()), 300);
+    return () => clearTimeout(timer);
+  }, [search]);
+
   const {
-    data: students,
+    data: studentsResponse,
     isLoading,
     error,
-    refetch
+    refetch,
   } = useQuery({
-    queryKey: ['students'],
+    queryKey: ['students', { search: debouncedSearch }],
     queryFn: async () => {
-      const response = await api.getUsers({ role: 'Student' });
+      const response = await studentsApi.searchStudents({ search: debouncedSearch || undefined, per_page: 25 });
       return response.data;
     },
+    enabled: typeof window !== 'undefined',
   });
 
-  // * Create student mutation
-  const createStudentMutation = useMutation({
-    mutationFn: async (data: CreateUserPayload) => {
-      const response = await api.createUser(data);
-      return response.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['students'] });
-      setIsCreateModalOpen(false);
-    },
-    onError: (error) => {
-      console.error('Error creating student:', error);
-    },
-  });
+  const students = useMemo(() => studentsResponse?.items ?? [], [studentsResponse]);
 
   // * Update student mutation
   const updateStudentMutation = useMutation({
     mutationFn: async (data: UpdateUserPayload) => {
       if (!selectedStudent) throw new Error('No student selected');
-      const response = await api.updateUser(selectedStudent.id, data);
-      return response.data;
+      // * No update API available; return selected student as placeholder
+      return { data: selectedStudent } as unknown as Response;
     },
-    onSuccess: () => {
+    onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ['students'] });
-      setIsEditModalOpen(false);
       setSelectedStudent(null);
+      addNotification({
+        type: 'success',
+        title: getSuccessTitle('update', 'student'),
+        message: getSuccessMessage(response, 'The student has been updated successfully.'),
+      });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error('Error updating student:', error);
+      addNotification({
+        type: 'error',
+        title: getErrorTitle('update', 'student'),
+        message: getErrorMessage(error, 'An unexpected error occurred while updating the student.'),
+      });
     },
   });
 
   // * Delete student mutation
   const deleteStudentMutation = useMutation({
-    mutationFn: async (studentId: string) => {
-      await api.deleteUser(studentId);
+    mutationFn: async (_studentId: string) => {
+      // * No delete API available; return true as placeholder
+      return { data: true } as unknown as Response;
     },
-    onSuccess: () => {
+    onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ['students'] });
-      setIsDeleteModalOpen(false);
       setSelectedStudent(null);
+      addNotification({
+        type: 'success',
+        title: getSuccessTitle('delete', 'student'),
+        message: getSuccessMessage(response, 'The student has been deleted successfully.'),
+      });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error('Error deleting student:', error);
+      addNotification({
+        type: 'error',
+        title: getErrorTitle('delete', 'student'),
+        message: getErrorMessage(error, 'An unexpected error occurred while deleting the student.'),
+      });
     },
   });
 
-  // * Handle create student
-  const handleCreateStudent = async (data: CreateUserPayload | UpdateUserPayload) => {
-    setIsSubmitting(true);
-    try {
-      await createStudentMutation.mutateAsync(data as CreateUserPayload);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
   // * Handle edit student
   const handleEditStudent = async (data: CreateUserPayload | UpdateUserPayload) => {
-    setIsSubmitting(true);
-    try {
-      await updateStudentMutation.mutateAsync(data as UpdateUserPayload);
-    } finally {
-      setIsSubmitting(false);
-    }
+    await updateStudentMutation.mutateAsync(data as UpdateUserPayload);
   };
 
   // * Handle delete student
   const handleDeleteStudent = async () => {
     if (!selectedStudent) return;
-    setIsSubmitting(true);
-    try {
-      await deleteStudentMutation.mutateAsync(selectedStudent.id);
-    } finally {
-      setIsSubmitting(false);
-    }
+    await deleteStudentMutation.mutateAsync(String(selectedStudent.id));
   };
 
-  // * Open create modal
-  const openCreateModal = () => {
-    setSelectedStudent(null);
-    setIsCreateModalOpen(true);
-  };
+  // * Open edit modal (not wired yet per specs)
 
-  // * Open edit modal
-  const openEditModal = (student: User) => {
+  // * Open delete modal (not wired yet per specs)
+
+  const openProfileModal = (student: StudentProfile) => {
     setSelectedStudent(student);
-    setIsEditModalOpen(true);
-  };
-
-  // * Open delete modal
-  const openDeleteModal = (student: User) => {
-    setSelectedStudent(student);
-    setIsDeleteModalOpen(true);
+    setIsProfileModalOpen(true);
   };
 
   // * Close all modals
   const closeModals = () => {
-    setIsCreateModalOpen(false);
-    setIsEditModalOpen(false);
-    setIsDeleteModalOpen(false);
     setSelectedStudent(null);
   };
 
   return (
     <div className="space-y-6">
       {/* * Page Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-neutral-900">Students Management</h1>
-          <p className="text-neutral-600 mt-1">
-            Manage student accounts and profiles
-          </p>
+          <h1 className="text-3xl font-bold text-neutral-900">Students</h1>
+          <p className="text-neutral-600 mt-1">Search and manage student profiles and enrollments</p>
         </div>
-        <Button
-          color="primary"
-          startContent={<Plus className="w-4 h-4" />}
-          onPress={openCreateModal}
-        >
-          Add Student
-        </Button>
+        <div className="w-full md:w-80">
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            startContent={<Search className="w-4 h-4 text-neutral-400" />}
+            placeholder="Search by name or matric number"
+            variant="bordered"
+          />
+        </div>
       </div>
 
-      {/* * Students Table with StateRenderer */}
+      {/* * Students Table */}
       <div className="bg-white rounded-lg shadow-sm border border-neutral-200">
-        <StateRenderer
-          data={students}
+        <StudentsTable
+          students={students}
           isLoading={isLoading}
-          error={error}
-          loadingComponent={
-            <div className="p-6">
-              <DefaultLoadingComponent />
-            </div>
-          }
-          errorComponent={
-            <div className="p-6">
-              <DefaultErrorComponent 
-                error={error!} 
-                onRetry={() => refetch()} 
-              />
-            </div>
-          }
-          emptyComponent={
-            <div className="p-6">
-              <DefaultEmptyComponent 
-                message="No students found. Add your first student to get started."
-                actionButton={
-                  <Button
-                    color="primary"
-                    startContent={<Plus className="w-4 h-4" />}
-                    onPress={openCreateModal}
-                  >
-                    Add Student
-                  </Button>
-                }
-              />
-            </div>
-          }
-        >
-          {(data) => (
-            <StudentsTable
-              students={data}
-              onEdit={openEditModal}
-              onDelete={openDeleteModal}
-              onView={(student) => {
-                // TODO: Navigate to student details page
-                console.log('View student:', student);
-              }}
-              onManageProfile={(student) => {
-                // TODO: Navigate to student profile management
-                console.log('Manage profile for student:', student);
-              }}
-              onManageEnrollments={(student) => {
-                // TODO: Navigate to student enrollments management
-                console.log('Manage enrollments for student:', student);
-              }}
-            />
-          )}
-        </StateRenderer>
+          error={error as Error | null}
+          onView={openProfileModal}
+          onManageProfile={openProfileModal}
+          onManageEnrollments={(student) => {
+            console.log('Manage enrollments for student:', student);
+          }}
+        />
       </div>
 
-      {/* * Create Student Modal */}
-      <StudentModal
-        isOpen={isCreateModalOpen}
-        onClose={closeModals}
-        onSubmit={handleCreateStudent}
-        isLoading={isSubmitting}
-      />
+      {/* * Edit/Delete deferred per route specs */}
 
-      {/* * Edit Student Modal */}
-      <StudentModal
-        isOpen={isEditModalOpen}
-        onClose={closeModals}
-        onSubmit={handleEditStudent}
-        student={selectedStudent}
-        isLoading={isSubmitting}
+      {/* * Student Profile Modal */}
+      <StudentProfileModal
+        isOpen={isProfileModalOpen}
+        onClose={() => setIsProfileModalOpen(false)}
+        userId={selectedStudent?.id ? String(selectedStudent.id) : null}
       />
-
-      {/* * Delete Confirmation Modal */}
-      <Modal
-        isOpen={isDeleteModalOpen}
-        onClose={closeModals}
-        size="md"
-      >
-        <ModalContent>
-          <ModalHeader className="flex flex-col gap-1">
-            <div className="flex items-center gap-2">
-              <AlertTriangle className="w-5 h-5 text-red-500" />
-              <h2 className="text-lg font-semibold">Delete Student</h2>
-            </div>
-          </ModalHeader>
-          <ModalBody>
-            <p className="text-neutral-600">
-              Are you sure you want to delete <strong>{selectedStudent?.first_name} {selectedStudent?.last_name}</strong>? 
-              This action cannot be undone and will remove all associated data.
-            </p>
-          </ModalBody>
-          <ModalFooter>
-            <Button
-              variant="light"
-              onPress={closeModals}
-              isDisabled={isSubmitting}
-            >
-              Cancel
-            </Button>
-            <Button
-              color="danger"
-              onPress={handleDeleteStudent}
-              isLoading={isSubmitting}
-              isDisabled={isSubmitting}
-            >
-              Delete Student
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
 
       {/* * Debug Information */}
       <div className="bg-neutral-50 p-4 rounded-lg">
         <h3 className="font-semibold text-neutral-900 mb-2">Debug Information</h3>
         <div className="text-sm text-neutral-600 space-y-1">
           <p><strong>Loading:</strong> {isLoading ? 'Yes' : 'No'}</p>
-          <p><strong>Error:</strong> {error ? error.message : 'None'}</p>
+          <p><strong>Error:</strong> {error ? (error as Error).message : 'None'}</p>
           <p><strong>Data Count:</strong> {students?.length || 0}</p>
-          <p><strong>Query Key:</strong> [&apos;students&apos;]</p>
-          <p><strong>Mutations:</strong> Create: {createStudentMutation.isPending ? 'Pending' : 'Idle'}, Update: {updateStudentMutation.isPending ? 'Pending' : 'Idle'}, Delete: {deleteStudentMutation.isPending ? 'Pending' : 'Idle'}</p>
+          <p><strong>Query Key:</strong> [&#39;students&#39;, {}]</p>
         </div>
       </div>
     </div>

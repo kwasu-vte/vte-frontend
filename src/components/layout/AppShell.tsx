@@ -1,12 +1,16 @@
 // * AppShell Component
 // * Main layout wrapper for all authenticated views
 // * Receives user data as props from server-side
-// * Pure server-side authentication pattern
+// * Client component for interactivity
+
+'use client';
 
 import React from 'react';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
+import { NotificationContainer } from '@/components/shared/NotificationContainer';
 import { User } from '@/lib/types';
+import { useApp } from '@/context/AppContext';
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -14,11 +18,13 @@ interface AppShellProps {
 }
 
 export function AppShell({ children, user }: AppShellProps) {
+  const { isSidebarOpen, toggleSidebar } = useApp();
+
   return (
     <div className="flex h-screen bg-neutral-50">
       {/* * Sidebar */}
       <Sidebar 
-        isOpen={true} // * Default to open, can be controlled by AppContext
+        isOpen={isSidebarOpen}
         user={user}
       />
       
@@ -27,10 +33,7 @@ export function AppShell({ children, user }: AppShellProps) {
         {/* * Header */}
         <Header 
           user={user}
-          onMenuClick={() => {
-            // * TODO: Integrate with AppContext for sidebar toggle
-            console.log('Toggle sidebar');
-          }}
+          onMenuClick={toggleSidebar}
         />
         
         {/* * Page Content */}
@@ -38,6 +41,9 @@ export function AppShell({ children, user }: AppShellProps) {
           {children}
         </main>
       </div>
+      
+      {/* * Notifications */}
+      <NotificationContainer />
     </div>
   );
 }

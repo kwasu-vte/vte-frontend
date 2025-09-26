@@ -1,4 +1,68 @@
+## [Unreleased]
+
+### Changed
+- NextUI theme hardened in `tailwind.config.ts` per DESIGN_GUIDE: added `layout.borderRadius.medium=0.5rem`, `layout.boxShadow.small/medium`, and aligned `colors.foreground` to neutral-600.
+
+## [Unreleased] - 2025-09-24
+### Changed
+- Align `/auth/sign_in` page content & layout to ROUTE_SPECS and DESIGN_GUIDE (NextUI-themed, neutral bg, Card shadow=sm, inline errors, a11y).
+- Align `/auth/sign_up` page content & layout to ROUTE_SPECS and DESIGN_GUIDE (NextUI-themed, neutral bg, Card shadow=sm, inline errors, a11y, autocomplete).
+
+- Admin Dashboard: Implemented server-side data fetch for sessions, group statistics, and enrollments; added StatCard grid, Recent Activity list, and Quick Actions panel with resilient fallbacks per docs/ROUTE_SPECS.md and docs/DESIGN_GUIDE.md.
+- Admin: Added Enrollments page with filters/table; added nested Skills → Groups page; added QR Codes (main/print/distribution) pages; added Reports page; updated Sidebar with Enrollments, QR Codes, Reports links.
+
+## [Unreleased]
+
+### Added
+- Split monolithic `src/lib/api.ts` into domain-specific services under `src/lib/api/`
+  - Added: `academic-sessions.ts`, `enrollments.ts`, `qr-codes.ts`, `skill-groups.ts`, `mentors.ts`, `students.ts`
+  - Added: shared `base.ts` and `index.ts`
+- Introduced new types modules under `src/lib/types/`
+  - Added: `api-types.ts`, `enrollment-types.ts`, `qr-types.ts`, `group-types.ts`, `index.ts` (re-exports)
+- Scaffolded components with TODOs:
+  - Admin: `SessionsTable`, `SessionModal`, `SessionStatusBadge`, `SkillDateRangeModal`, `SkillLevelSelector`, `GroupCapacityIndicator`, `GroupStudentsList`, `EnrollmentsTable`, `EnrollmentStatusBadge`, `EnrollmentFilters`, `QRGenerationForm`, `QRDistributionTracker`, `MentorQRAssignment`
+  - Mentor: `MentorSkillAssignment`, `MentorWorkloadView`, `MyQRCodesDisplay`, `QRScanReport`, `PracticalQRCard`, `MentorGroupsList`, `GroupStudentsRoster`, `GroupScheduleCard`
+  - Student: `StudentQRScanner`, `ScanResultModal`, `ScanProgressIndicator`, `ScanConfirmationModal`, `AttendanceCompletionBadge`, `AttendanceReport`, `ManualAttendance`, `ProfileForm`, `ProfileView`, `ProfileCompletionAlert`, `SkillSelectionGrid`, `EnrollmentStatus`, `PaymentRedirect`, `GroupAssignmentCard`, `PracticalCalendar`, `UpcomingPracticals`
+- Added utility placeholders under `src/lib/utils/`: `print.ts`, `qr.ts`, `attendance.ts`, `enrollment.ts`, `groups.ts`, `dates.ts`
+- Added contexts: `src/context/SessionContext.tsx`, `src/context/EnrollmentContext.tsx`
+
+### Docs
+- Added `docs/COMPONENT_POPULATION_PLAN.md` detailing phased population plan and required NextUI components per feature.
+- Added `docs/ROUTE_SPECS.md` documenting complete route/page specifications mapped to `src/lib/api.ts` methods and realistic fallbacks.
+- Added Zustand stores: `src/lib/stores/sessionStore.ts`, `enrollmentStore.ts`, `groupStore.ts`, `qrStore.ts`
+
+### Changed
+### Authentication
+- Sign-in page: added client-side validation (required fields), NextUI `Checkbox` for "Remember me", and consolidated inline error display. Composition aligns with DESIGN_GUIDE (props for variants, Tailwind for layout).
+- Sign-up page: added client-side validation including password confirmation check and unified inline error display per DESIGN_GUIDE. Kept server actions and redirects per ROUTE_SPECS.
+
+- Admin Groups page is now read-only; removed create/edit/delete UI and mutations.
+- Added Admin Sessions page under `/admin/sessions` for session management.
+
+### Planned
+- Admin Sessions page for managing academic sessions.
+- Admin Skills: add date range management and nested routes (`[skillId]/page`, `groups/page`, `date-range/page`).
+- Mentor: rename `my-groups` to `my-skills`, add groups pages, rename `calendar` to `schedule`.
+  - Implemented: `mentor/calendar` → `mentor/schedule` route rename.
+  - Implemented: `mentor/my-groups` → `mentor/my-skills` route rename.
+- Mentor Attendance: restructure into QR scanner flow and group detail attendance.
+- Admin: add `enrollments` page; add `qr-codes` pages (list, print, history).
+- Student: add `profile` (view/create), restructure `skills` and add `skills/enroll`, add `enrollment` status page, simplify `my-group`, add `schedule`, make `payment` a redirect.
+- Remove deprecated pages later (but keep announcements pages for now).
 # Changelog
+
+## 2025-09-18
+- Auth: Standardized cookie-based auth to align with api.json
+  - Proxy sets/refreshes `session_token` on login/refresh and clears it on logout
+  - Removed `refresh_token` requirement in app; API only provides access token
+  - `signInAction` now fetches `/v1/users/auth/me` after login and redirects by role
+  - Middleware validates session via `/api/v1/users/auth/me` and enforces RBAC for `/admin`, `/mentor`, `/student`
+  - `auth.ts` simplified to rely on `session_token` and refresh endpoint
+
+- Fix: SSR auth cookie forwarding
+  - Use relative `/api/...` URLs on server to ensure Next forwards cookies
+  - Avoid building absolute origins in `ApiClient` to prevent missing `session_token`
+  - Result: `/api/v1/users/auth/me` now receives Authorization from cookie during SSR
 
 ## [Phase 7 Complete] - Progressive Web App (PWA) Implementation
 
@@ -66,7 +130,7 @@
   - Admin → `/admin/dashboard`
   - Mentor → `/mentor/dashboard`
   - Student → `/student/dashboard`
-  - Unauthenticated → `/auth/sign-in`
+  - Unauthenticated → `/auth/sign_in`
 - **Token Management:** Integrated automatic token refresh in authentication flow
 
 ### ✅ COMPLETED - Middleware Enhancement
@@ -277,14 +341,14 @@
 
 ### ✅ COMPLETED
 - **Created Missing Shared Components:**
-  -  - Displays key metrics and statistics with trend indicators
-  -  - Calendar component for events and activities with navigation
-  -  - Comprehensive empty state component with predefined variants
-  -  - Error handling component with retry functionality and variants
+  - `StatCard` - Displays key metrics and statistics with trend indicators
+  - `CalendarView` - Calendar component for events and activities with navigation
+  - `EmptyState` - Comprehensive empty state component with predefined variants
+  - `ErrorState` - Error handling component with retry functionality and variants
 
 - **Completed Skills Management Template:**
-  -  - Full-featured modal for creating/editing skills with form validation
-  -  - Specialized table component with actions dropdown
+  - `SkillModal` - Full-featured modal for creating/editing skills with form validation
+  - `SkillsTable` - Specialized table component with actions dropdown
   - Updated skills page with complete CRUD workflow using React Query mutations
   - Added delete confirmation modal with proper error handling
 
@@ -301,7 +365,7 @@
 - **Shared Components:** Complete set of reusable UI components
 - **Build System:** Stable and error-free
 
-### �� NEXT STEPS
+### 📋 NEXT STEPS
 - Begin Phase 4: Full-Scale Migration
 - Start migrating remaining admin pages using the established template pattern
 - Implement mentor and student page migrations
@@ -310,3 +374,79 @@
 ---
 
 ## [Phase 4 Testing Complete] - Backend Integration & API Testing
+
+- Fix: Authentication infinite redirect loop
+  - Resolved server-side cookie forwarding issue causing auth validation failures
+  - Updated middleware to exclude self-authenticating routes (root page) from middleware checks
+  - Enhanced BFF proxy to properly forward Cookie headers in server-to-server requests
+  - Added support for 'superadmin' role in role-based access control
+  - Optimized authentication flow to prevent redirect loops after successful login
+  - Result: Users can now successfully authenticate and be redirected to appropriate dashboards based on role
+
+
+- Fix: Client Component props error in AppShell
+  - Converted AppShell to client component to resolve event handler prop passing
+  - Integrated with AppContext for sidebar state management
+  - Fixed server-client component boundary violation
+  - Result: Admin dashboard now loads without errors and sidebar toggle works properly
+
+
+- Feature: Announcement Pages for All User Roles
+  - Created comprehensive announcement management system
+  - Admin announcements: Full CRUD operations with stats dashboard
+  - Mentor announcements: View announcements + create group announcements
+  - Student announcements: Read-only view with urgent alerts and filtering
+  - Added announcement navigation items to sidebar for all roles
+  - Implemented role-based announcement filtering and display
+  - Result: Complete announcement system with role-appropriate functionality
+
+
+## 2025-09-24 - Phase 1 Component Population (NextUI + React Query)
+- Implemented `SessionsTable` with start/end actions, status, and robust states.
+- Implemented `SessionModal` with Zod validation and create/update mutations.
+- Implemented `SessionStatusBadge` with semantic colors and derived labels.
+- Implemented `SkillDateRangeModal` with bounds validation and success callback.
+- Implemented `SkillLevelSelector` controlled multiselect with optional counts.
+
+## [0.2.1] - 2025-09-24
+### Added
+- skillsApi client (`src/lib/api/skills.ts`) and export wiring.
+- EnrollmentStatusBadge with NextUI Chip and optional tooltip.
+- EnrollmentFilters using NextUI Select and React Query for sessions/skills.
+- EnrollmentsTable with DataTable wrapper, server pagination, and loading/empty states.
+
+## [Unreleased] - 2025-09-24
+- Implement Phase 3 admin components per DESIGN_GUIDE: GroupCapacityIndicator, GroupStudentsList, QRGenerationForm, QRDistributionTracker, MentorQRAssignment
+
+## [Phase 4] Mentor components populated (YYYY-MM-DD)
+- Implemented MentorGroupsList with API data, loading/error/empty states.
+- Added GroupStudentsRoster searchable table.
+- Added GroupScheduleCard with derived upcoming sessions from skill date range.
+- Implemented MentorSkillAssignment for add/remove skills with feedback.
+- Added MentorWorkloadView KPIs from group statistics.
+- Implemented MyQRCodesDisplay with copy/print actions.
+- Finalized PracticalQRCard for token display/print.
+- Implemented QRScanReport with history/report tabs and refresh.
+
+
+## [Unreleased] - 2025-09-24
+### Changed
+- Align  page content & layout to ROUTE_SPECS and DESIGN_GUIDE (NextUI-themed, neutral bg,  shadow=sm, inline errors, a11y).
+- Align  page content & layout to ROUTE_SPECS and DESIGN_GUIDE (NextUI-themed, neutral bg,  shadow=sm, inline errors, a11y, autocomplete).
+
+
+## [Unreleased] - 2025-09-24
+### Changed
+- Align  page content & layout to ROUTE_SPECS and DESIGN_GUIDE (NextUI-themed, neutral bg, Card shadow=sm, inline errors, a11y).
+- Align  page content & layout to ROUTE_SPECS and DESIGN_GUIDE (NextUI-themed, neutral bg, Card shadow=sm, inline errors, a11y, autocomplete).
+
+## [Unreleased]
+### Added
+- Composite hooks: useStudentDashboardData, useMentorDashboardData, useAdminDashboardData
+- Integrated hooks into student, mentor, and admin dashboards
+
+### Changed
+- Refactored pages to client/server split where appropriate
+
+### Fixed
+- Type issues in dashboard pages and hooks

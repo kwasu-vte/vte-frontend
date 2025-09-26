@@ -160,7 +160,7 @@ export function ErrorState({
               <Button
                 color="primary"
                 startContent={<RefreshCw className="w-4 h-4" />}
-                onPress={onRetry}
+                onClick={onRetry}
               >
                 Try Again
               </Button>
@@ -168,7 +168,7 @@ export function ErrorState({
             {onReport && (
               <Button
                 variant="light"
-                onPress={onReport}
+                onClick={onReport}
               >
                 Report Issue
               </Button>

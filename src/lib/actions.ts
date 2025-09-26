@@ -5,44 +5,129 @@
 
 'use server';
 
+import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { api } from './api';
-import { CreateSkillPayload, UpdateSkillPayload, CreateGroupPayload, CreateUserPayload, CreateStudentProfilePayload } from './types';
+import { authApi, skillsApi, skillGroupsApi, academicSessionsApi, studentsApi } from './api';
+import { CreateSkillPayload, UpdateSkillPayload, CreateSkillGroupPayload, CreateUserPayload, CreateStudentProfilePayload } from './types';
 
 // * Authentication Actions
 export async function signInAction(formData: FormData) {
-  const username = formData.get('username') as string;
-  const password = formData.get('password') as string;
+  const username = String(formData.get('username') ?? '');
+  const password = String(formData.get('password') ?? '');
+  
+  console.log(`[SignIn Action] Attempting login for user: ${username}`);
   
   if (!username || !password) {
+    console.error('[SignIn Action] Missing username or password');
     throw new Error('Username and password are required');
   }
 
+  let target: string | null = null;
+  let token: string | null = null;
   try {
-    const response = await api.signIn({ email: username, password });
+    console.log('[SignIn Action] Calling API signIn...');
+    const response = await authApi.login({ email: username, password });
     
-    if (response.success) {
-      // * Proxy has already set httpOnly cookies
-      // * Redirect based on user role
-      const role = response.data.user.role.toLowerCase();
-      redirect(`/${role}/dashboard`);
-    } else {
+    if (!response.success) {
+      console.error(`[SignIn Action] API signIn failed: ${response.message}`);
       throw new Error(response.message || 'Authentication failed');
     }
+
+    console.log('[SignIn Action] API signIn successful, getting user data...');
+    // * Get token from response; cookie will be set via /auth/callback (browser route)
+    token = (response as any)?.data?.access_token || null;
+    const me = token ? await authApi.getCurrentUser() : await authApi.getCurrentUser();
+    if (!me.success || !me.data) {
+      console.error(`[SignIn Action] Failed to get user data: ${me.message}`);
+      throw new Error(me.message || 'Failed to fetch user after login');
+    }
+
+    const role = String(me.data.role || '').toLowerCase();
+    target = role === 'admin' || role === 'mentor' || role === 'student' ? `/${role}/dashboard` : '/';
+    console.log(`[SignIn Action] User role: ${role}, target: ${target}`);
   } catch (error) {
+    console.error('[SignIn Action] Error during authentication:', error);
+    // Fallback for legacy/edge cases of redirect signals
+    if ((error as any)?.digest === 'NEXT_REDIRECT' || String((error as any)?.message || '').includes('NEXT_REDIRECT')) {
+      throw error as Error;
+    }
     throw new Error(error instanceof Error ? error.message : 'Authentication failed');
   }
+
+  if (target && token) {
+    const params = new URLSearchParams();
+    params.set('token', token);
+    params.set('target', target);
+    const callbackUrl = `/auth/callback?${params.toString()}`;
+    console.log(`[SignIn Action] Redirecting to callback: ${callbackUrl}`);
+    redirect(callbackUrl);
+  } else {
+    console.error('[SignIn Action] Missing target or token, cannot redirect');
+    throw new Error('Authentication completed but redirect failed');
+  }
+}
+
+// * Authentication Action (Safe): returns inline error instead of throwing
+// * Intended for use with useFormState on the client to render errors inline
+export async function signInActionSafe(_prevState: { error?: string | null } | undefined, formData: FormData) {
+  const username = String(formData.get('username') ?? '');
+  const password = String(formData.get('password') ?? '');
+
+  if (!username || !password) {
+    return { error: 'Username and password are required' };
+  }
+
+  let target: string | null = null;
+  let token: string | null = null;
+  try {
+    const response = await authApi.login({ email: username, password });
+    if (!response.success) {
+      return { error: response.message || 'Authentication failed' };
+    }
+
+    token = (response as any)?.data?.access_token || null;
+    const me = token ? await authApi.getCurrentUser() : await authApi.getCurrentUser();
+    if (!me.success || !me.data) {
+      return { error: me.message || 'Failed to fetch user after login' };
+    }
+
+    const role = String(me.data.role || '').toLowerCase();
+    target = role === 'admin' || role === 'mentor' || role === 'student' ? `/${role}/dashboard` : '/';
+  } catch (error) {
+    // * Do not throw; return message so client can render inline
+    return { error: error instanceof Error ? error.message : 'Authentication failed' };
+  }
+
+  if (target && token) {
+    const params = new URLSearchParams();
+    params.set('token', token);
+    params.set('target', target);
+    const callbackUrl = `/auth/callback?${params.toString()}`;
+    redirect(callbackUrl);
+  }
+
+  return { error: 'Authentication completed but redirect failed' };
 }
 
 export async function signOutAction() {
   try {
-    await api.signOut();
-    // * Proxy has already cleared httpOnly cookies
-    redirect('/auth/sign-in');
-  } catch (error) {
-    // * Even if API call fails, redirect to sign-in
-    redirect('/auth/sign-in');
+    await authApi.logout();
+  } catch (_) {
+    // * Ignore API errors - proceed to redirect
   }
+  // * Ensure local cookie is cleared as well
+  try {
+    const cookieStore = await cookies();
+    cookieStore.set('session_token', '', {
+      path: '/',
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 0,
+    });
+  } catch (_) {}
+  // * Proxy has already cleared httpOnly cookies (if success); ensure navigation regardless
+  redirect('/auth/sign_in');
 }
 
 export async function signUpAction(formData: FormData) {
@@ -68,18 +153,54 @@ export async function signUpAction(formData: FormData) {
     throw new Error('Passwords do not match');
   }
   
+  let shouldRedirect = false;
   try {
-    const response = await api.signUp(userData);
+    const response = await authApi.register(userData);
     
     if (response.success) {
-      // * Redirect to sign in after successful registration
-      redirect('/auth/sign-in?message=Registration successful. Please sign in.');
+      // * Mark for redirect to sign in after successful registration
+      shouldRedirect = true;
     } else {
       throw new Error(response.message || 'Registration failed');
     }
   } catch (error) {
     throw new Error(error instanceof Error ? error.message : 'Registration failed');
   }
+
+  if (shouldRedirect) {
+    redirect('/student/profile/create');
+  }
+}
+
+// * Sign Up (Safe): returns error for inline display; success redirects
+export async function signUpActionSafe(_prevState: { error?: string | null } | undefined, formData: FormData) {
+  const userData: CreateUserPayload = {
+    first_name: String(formData.get('firstName') ?? ''),
+    last_name: String(formData.get('lastName') ?? ''),
+    email: String(formData.get('email') ?? ''),
+    password: String(formData.get('password') ?? ''),
+    password_confirmation: String(formData.get('password2') ?? ''),
+    role: 'Student',
+  };
+
+  // * Basic validation
+  if (!userData.first_name || !userData.last_name || !userData.email || !userData.password || !userData.password_confirmation) {
+    return { error: 'All fields are required' };
+  }
+  if (userData.password !== userData.password_confirmation) {
+    return { error: 'Passwords do not match' };
+  }
+
+  try {
+    const response = await authApi.register(userData);
+    if (!response.success) {
+      return { error: response.message || 'Registration failed' };
+    }
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : 'Registration failed' };
+  }
+
+  redirect('/student/profile/create');
 }
 
 // * Skill Management Actions
@@ -90,14 +211,12 @@ export async function createSkillAction(formData: FormData) {
     max_groups: parseInt(formData.get('maxGroups') as string),
     min_students_per_group: parseInt(formData.get('minStudentsPerGroup') as string),
     max_students_per_group: formData.get('maxStudentsPerGroup') ? parseInt(formData.get('maxStudentsPerGroup') as string) : null,
-    date_range_start: formData.get('dateRangeStart') as string,
-    date_range_end: formData.get('dateRangeEnd') as string,
     meta: formData.get('meta') ? [formData.get('meta') as string] : null,
     allowed_levels: (formData.get('allowedLevels') as string).split(',').filter(Boolean),
   };
   
   try {
-    const response = await api.createSkill(skillData);
+    const response = await skillsApi.create(skillData);
     
     if (response.success) {
       // * Return success - the page will handle the redirect/refresh
@@ -122,7 +241,7 @@ export async function updateSkillAction(id: string, formData: FormData) {
   };
   
   try {
-    const response = await api.updateSkill(id, skillData);
+    const response = await skillsApi.update(id, skillData);
     
     if (response.success) {
       return { success: true, data: response.data };
@@ -136,7 +255,7 @@ export async function updateSkillAction(id: string, formData: FormData) {
 
 export async function deleteSkillAction(id: string) {
   try {
-    await api.deleteSkill(id);
+    await skillsApi.delete(id);
     return { success: true };
   } catch (error) {
     throw new Error(error instanceof Error ? error.message : 'Failed to delete skill');
@@ -145,13 +264,14 @@ export async function deleteSkillAction(id: string) {
 
 // * Group Management Actions
 export async function createGroupAction(formData: FormData) {
-  const groupData: CreateGroupPayload = {
-    skill_id: formData.get('skillId') as string,
-    force: formData.get('force') === 'true',
+  const groupData: CreateSkillGroupPayload = {
+    skill_id: Number(formData.get('skillId')),
+    academic_session_id: Number(formData.get('academicSessionId')),
+    group_number: formData.get('groupNumber') ? Number(formData.get('groupNumber')) : undefined,
   };
   
   try {
-    const response = await api.createGroup(groupData);
+    const response = await skillGroupsApi.create(groupData);
     
     if (response.success) {
       return { success: true, data: response.data };
@@ -165,24 +285,13 @@ export async function createGroupAction(formData: FormData) {
 
 // * User Management Actions
 export async function updateUserAction(id: string, formData: FormData) {
+  // * Not implemented in current API; keep placeholder for future extension
   const userData: Partial<CreateUserPayload> = {
     first_name: formData.get('firstName') as string,
     last_name: formData.get('lastName') as string,
     email: formData.get('email') as string,
-    // Note: matricNumber, level, role are not part of CreateUserPayload in OpenAPI spec
   };
-  
-  try {
-    const response = await api.updateUser(id, userData);
-    
-    if (response.success) {
-      return { success: true, data: response.data };
-    } else {
-      throw new Error(response.message || 'Failed to update user');
-    }
-  } catch (error) {
-    throw new Error(error instanceof Error ? error.message : 'Failed to update user');
-  }
+  throw new Error('updateUserAction is not supported by the current API');
 }
 
 // * Academic Sessions Actions
@@ -194,7 +303,7 @@ export async function createAcademicSessionAction(formData: FormData) {
   };
 
   try {
-    const response = await api.createAcademicSession(sessionData);
+    const response = await academicSessionsApi.create(sessionData);
     
     if (response.success) {
       return { success: true, data: response.data };
@@ -214,7 +323,7 @@ export async function updateAcademicSessionAction(id: number, formData: FormData
   };
 
   try {
-    const response = await api.updateAcademicSession(id, sessionData);
+    const response = await academicSessionsApi.update(id, sessionData);
     
     if (response.success) {
       return { success: true, data: response.data };
@@ -228,7 +337,7 @@ export async function updateAcademicSessionAction(id: number, formData: FormData
 
 export async function startAcademicSessionAction(id: number) {
   try {
-    const response = await api.startAcademicSession(id);
+    const response = await academicSessionsApi.start(id);
     
     if (response.success) {
       return { success: true, data: response.data };
@@ -242,7 +351,7 @@ export async function startAcademicSessionAction(id: number) {
 
 export async function endAcademicSessionAction(id: number) {
   try {
-    const response = await api.endAcademicSession(id);
+    const response = await academicSessionsApi.end(id);
     
     if (response.success) {
       return { success: true, data: response.data };
@@ -267,7 +376,7 @@ export async function createStudentProfileAction(userId: string, formData: FormD
   };
 
   try {
-    const response = await api.createStudentProfile(userId, profileData);
+    const response = await studentsApi.createProfile(userId, profileData);
     
     if (response.success) {
       return { success: true, data: response.data };
@@ -280,10 +389,6 @@ export async function createStudentProfileAction(userId: string, formData: FormD
 }
 
 export async function deleteUserAction(id: string) {
-  try {
-    await api.deleteUser(id);
-    return { success: true };
-  } catch (error) {
-    throw new Error(error instanceof Error ? error.message : 'Failed to delete user');
-  }
+  // * Not implemented in current API; placeholder for future extension
+  throw new Error('deleteUserAction is not supported by the current API');
 }
