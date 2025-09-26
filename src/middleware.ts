@@ -68,12 +68,16 @@ export async function middleware(request: NextRequest) {
     // * Validate session and enforce RBAC via /api/v1/users/auth/me
     try {
       const bearer = `Bearer ${sessionToken.value}`;
-      const meRes = await fetch(`${request.nextUrl.origin}/api/v1/users/auth/me`, {
+      const meUrl = `${request.nextUrl.origin}/api/v1/users/auth/me`;
+      let meRes = await fetch(meUrl, {
         headers: {
           'Accept': 'application/json',
           'Authorization': bearer,
         },
       });
+
+      // * No POST fallback: endpoint is GET-only per API spec
+
       if (!meRes.ok) {
         const loginUrl = new URL('/auth/sign_in', request.url);
         loginUrl.searchParams.set('redirect', pathname);

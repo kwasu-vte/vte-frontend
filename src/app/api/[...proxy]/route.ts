@@ -9,29 +9,14 @@ import { cookies } from 'next/headers';
 // * Helper to generate unique trace ID
 const generateTraceId = () => Math.random().toString(36).substring(2, 10);
 
-// * Set secure session cookie
-const setSessionCookie = async (token: string, maxAgeSeconds: number) => {
-  const cookieStore = await cookies();
-  cookieStore.set('session_token', token, {
-    path: '/',
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    maxAge: maxAgeSeconds,
-  });
-};
-
-// * Delete session cookie
-const deleteSessionCookie = async () => {
-  const cookieStore = await cookies();
-  cookieStore.set('session_token', '', {
-    path: '/',
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    maxAge: 0,
-  });
-};
+// * Cookie options helper
+const cookieOptions = (maxAgeSeconds: number) => ({
+  path: '/',
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'lax' as const,
+  maxAge: maxAgeSeconds,
+});
 
 // * Universal request handler
 const handleRequest = async (request: NextRequest, { params }: { params: Promise<{ proxy: string[] }> }) => {
@@ -66,21 +51,11 @@ const handleRequest = async (request: NextRequest, { params }: { params: Promise
     }
   }
 
-  // * Get session token from secure cookie
+  // * Get session token from secure cookie (used only to create Authorization header)
   const cookieStore = await cookies();
   const sessionToken = cookieStore.get('session_token');
   console.debug(`[BFF Proxy ${traceId}] session_token cookie present: ${sessionToken ? 'yes' : 'no'}`);
-
-  // * Handle Cookie header forwarding for server-to-server requests
-  if (request.headers.has('Cookie')) {
-    // * Forward Cookie header from client request
-    requestHeaders.set('Cookie', request.headers.get('Cookie')!);
-    console.debug(`[BFF Proxy ${traceId}] Forwarding Cookie header from client.`);
-  } else if (sessionToken) {
-    // * Set session cookie if no Cookie header present
-    requestHeaders.set('Cookie', `session_token=${sessionToken.value}`);
-    console.debug(`[BFF Proxy ${traceId}] Setting session cookie from secure storage.`);
-  }
+  // * Intentionally do NOT forward any Cookie header upstream to backend to avoid auth confusion
 
   // * Add Authorization header from cookie only if not already provided
   if (!requestHeaders.has('Authorization') && sessionToken) {
@@ -101,9 +76,10 @@ const handleRequest = async (request: NextRequest, { params }: { params: Promise
     try {
       await fetch(targetUrl, { method: 'POST', headers: requestHeaders });
     } catch (_) {}
-    await deleteSessionCookie();
+    const resp = NextResponse.json({ success: true, message: 'Successfully logged out' });
+    resp.cookies.set('session_token', '', cookieOptions(0));
     console.info(`[BFF Proxy ${traceId}] User logged out. Session cookie deleted.`);
-    return NextResponse.json({ success: true, message: 'Successfully logged out' });
+    return resp;
   }
 
   // * Prepare fetch options
@@ -167,14 +143,15 @@ const handleRequest = async (request: NextRequest, { params }: { params: Promise
       const tokenPreview = typeof token === 'string' ? `${token.slice(0, 8)}...${token.slice(-4)}` : 'none';
       console.info(`[BFF Proxy ${traceId}] Login response keys: ${json ? Object.keys(json).join(',') : 'null'}`);
       console.info(`[BFF Proxy ${traceId}] Token detection → present: ${!!token}, preview: ${tokenPreview}`);
+      const resp = NextResponse.json({ success: apiResponse.ok, data: { access_token: token } }, { status: apiResponse.status, headers: responseHeaders });
       if (apiResponse.ok && token) {
-        await setSessionCookie(token, isNaN(expiresIn) ? 60 * 60 * 24 * 30 : expiresIn);
+        const maxAge = isNaN(expiresIn) ? 60 * 60 * 24 * 30 : expiresIn;
+        resp.cookies.set('session_token', token, cookieOptions(maxAge));
         console.info(`[BFF Proxy ${traceId}] Login successful. Session cookie set.`);
       } else {
         console.warn(`[BFF Proxy ${traceId}] Login success=${apiResponse.ok} but no token extracted; cannot set session cookie.`);
       }
-      // Echo back minimal safe data
-      return NextResponse.json({ success: apiResponse.ok, data: { access_token: token } }, { status: apiResponse.status, headers: responseHeaders });
+      return resp;
     }
 
     // * Special handling for refresh: extract token from spec shape and update cookie
@@ -182,11 +159,16 @@ const handleRequest = async (request: NextRequest, { params }: { params: Promise
       const json = await apiResponse.json().catch(() => null);
       const token = json?.data?.access_token ?? json?.access_token;
       const expiresIn = Number(json?.data?.expires_in ?? 60 * 60 * 24 * 7);
+      const resp = NextResponse.json(json ?? {}, { status: apiResponse.status, headers: responseHeaders });
       if (apiResponse.ok && token) {
-        await setSessionCookie(token, isNaN(expiresIn) ? 60 * 60 * 24 * 7 : expiresIn);
+        const maxAge = isNaN(expiresIn) ? 60 * 60 * 24 * 7 : expiresIn;
+        resp.cookies.set('session_token', token, cookieOptions(maxAge));
         console.info(`[BFF Proxy ${traceId}] Token refresh successful. Session cookie updated.`);
+      } else if (apiResponse.status === 401 || apiResponse.status === 403 || apiResponse.status === 500) {
+        resp.cookies.set('session_token', '', cookieOptions(0));
+        console.warn(`[BFF Proxy ${traceId}] Token refresh failed (${apiResponse.status}). Session cookie cleared.`);
       }
-      return NextResponse.json(json ?? {}, { status: apiResponse.status, headers: responseHeaders });
+      return resp;
     }
 
     // * For all other requests, return the API response
@@ -200,11 +182,18 @@ const handleRequest = async (request: NextRequest, { params }: { params: Promise
       });
     }
     
-    return new NextResponse(responseBody, {
+    const passthrough = new NextResponse(responseBody, {
       status: apiResponse.status,
       statusText: apiResponse.statusText,
       headers: responseHeaders,
     });
+
+    // * If session validation endpoint explicitly says unauthorized, clear session cookie
+    if (path === 'v1/users/auth/me' && apiResponse.status === 401) {
+      passthrough.cookies.set('session_token', '', cookieOptions(0));
+      console.info(`[BFF Proxy ${traceId}] /auth/me returned 401. Session cookie cleared.`);
+    }
+    return passthrough;
 
   } catch (err) {
     console.error(`[BFF Proxy ${traceId}] Fetch to real API failed:`, err);

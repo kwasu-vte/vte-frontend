@@ -40,6 +40,11 @@ export default async function AuthLayout({ children }: AuthLayoutProps) {
     return <>{children}</>;
   }
   
+  // * If no user (e.g., refresh failed), allow access without mutating cookies here
+  if (!user) {
+    return <>{children}</>;
+  }
+  
   // * If we have a valid user, redirect to appropriate dashboard
   if (user) {
     const role = String(user.role || '').toLowerCase();
