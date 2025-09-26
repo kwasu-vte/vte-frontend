@@ -439,3 +439,14 @@
 ### Changed
 - Align  page content & layout to ROUTE_SPECS and DESIGN_GUIDE (NextUI-themed, neutral bg, Card shadow=sm, inline errors, a11y).
 - Align  page content & layout to ROUTE_SPECS and DESIGN_GUIDE (NextUI-themed, neutral bg, Card shadow=sm, inline errors, a11y, autocomplete).
+
+## [Unreleased]
+### Added
+- Composite hooks: useStudentDashboardData, useMentorDashboardData, useAdminDashboardData
+- Integrated hooks into student, mentor, and admin dashboards
+
+### Changed
+- Refactored pages to client/server split where appropriate
+
+### Fixed
+- Type issues in dashboard pages and hooks
