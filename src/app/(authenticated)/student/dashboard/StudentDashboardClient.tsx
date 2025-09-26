@@ -13,6 +13,7 @@ import { QuickActions } from '@/components/features/student/QuickActions';
 import { NotificationContainer } from '@/components/shared/NotificationContainer';
 import { StateRenderer } from '@/components/shared/StateRenderer';
 import { Card, CardBody, CardHeader, Skeleton } from '@nextui-org/react';
+import { ListSkeleton, CardGridSkeleton } from '@/components/shared/Skeletons';
 
 interface StudentDashboardClientProps {
   userId: string;
@@ -50,10 +51,11 @@ export function StudentDashboardClient({ userId }: StudentDashboardClientProps) 
             data={enrollment}
             isLoading={isLoading}
             error={error}
+            onRetry={() => window.location.reload()}
             loadingComponent={
               <Card shadow="sm" className="w-full">
                 <CardBody className="p-6">
-                  <Skeleton className="h-20 w-full" />
+                  <ListSkeleton rows={2} />
                 </CardBody>
               </Card>
             }
@@ -90,10 +92,11 @@ export function StudentDashboardClient({ userId }: StudentDashboardClientProps) 
               data={enrollment.group_id}
               isLoading={isLoading}
               error={error}
+              onRetry={() => window.location.reload()}
               loadingComponent={
                 <Card shadow="sm" className="w-full">
                   <CardBody className="p-6">
-                    <Skeleton className="h-20 w-full" />
+                    <ListSkeleton rows={2} />
                   </CardBody>
                 </Card>
               }

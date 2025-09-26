@@ -9,6 +9,7 @@ import PWATestPanel from '@/components/shared/PWATestPanel';
 import { StatCard, StatCardGrid } from '@/components/shared/StatCard';
 import { useAdminDashboardData } from '@/lib/hooks/use-admin-dashboard-data';
 import Link from 'next/link';
+import { ListSkeleton } from '@/components/shared/Skeletons';
 
 export default function AdminDashboard() {
   const { sessions, activeSession, statistics, recentEnrollments, isLoading, error } = useAdminDashboardData();
@@ -54,7 +55,19 @@ export default function AdminDashboard() {
             <Link href="/admin/enrollments" className="text-sm text-primary hover:underline">View all</Link>
           </div>
           <div className="divide-y divide-neutral-200">
-            {recentEnrollments && recentEnrollments.items.length > 0 ? (
+            {isLoading ? (
+              <ListSkeleton rows={6} />
+            ) : error ? (
+              <div className="py-8 text-center">
+                <p className="text-neutral-700 mb-3">Failed to load recent activity.</p>
+                <button
+                  onClick={() => window.location.reload()}
+                  className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary-600 transition-colors"
+                >
+                  Try Again
+                </button>
+              </div>
+            ) : recentEnrollments && recentEnrollments.items.length > 0 ? (
               recentEnrollments.items.slice(0, 10).map((enr: any) => (
                 <div key={enr.id} className="py-3 flex items-center justify-between">
                   <div className="min-w-0">

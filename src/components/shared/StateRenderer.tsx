@@ -8,6 +8,7 @@ interface StateRendererProps<T> {
   data: T | undefined;
   isLoading: boolean;
   error: Error | null;
+  onRetry?: () => void;
   // Slots (as render props/children)
   loadingComponent?: React.ReactNode;
   errorComponent?: React.ReactNode;
@@ -19,6 +20,7 @@ export function StateRenderer<T>({
   data,
   isLoading,
   error,
+  onRetry,
   loadingComponent,
   errorComponent,
   emptyComponent,
@@ -26,18 +28,18 @@ export function StateRenderer<T>({
 }: StateRendererProps<T>) {
   // * State 1: Loading
   if (isLoading) {
-    return <>{loadingComponent}</>;
+    return <>{loadingComponent ?? <DefaultLoadingComponent />}</>;
   }
 
   // * State 2: Error
   if (error) {
-    return <>{errorComponent}</>;
+    return <>{errorComponent ?? <DefaultErrorComponent error={error} onRetry={onRetry} />}</>;
   }
 
   // * State 3: Empty - Only show empty state for explicitly empty arrays
   // * Don't show empty state for undefined data (which happens during initial load)
   if (Array.isArray(data) && data.length === 0) {
-    return <>{emptyComponent}</>;
+    return <>{emptyComponent ?? <DefaultEmptyComponent message="No items to display." />}</>;
   }
 
   // * State 4: Success - Render the data (including undefined/null data)

@@ -7,6 +7,7 @@ import MyQRCodesDisplay from "@/components/features/mentor/MyQRCodesDisplay"
 import QRScanReport from "@/components/features/mentor/QRScanReport"
 import PracticalCalendar from "@/components/features/student/PracticalCalendar"
 import { StateRenderer, DefaultLoadingComponent, DefaultEmptyComponent } from "@/components/shared/StateRenderer"
+import { ListSkeleton, CardGridSkeleton } from "@/components/shared/Skeletons"
 
 export type MentorDashboardProps = {
   userId: string
@@ -67,6 +68,7 @@ export default function MentorDashboard(props: MentorDashboardProps) {
                 data={todaysGroups}
                 isLoading={isLoading}
                 error={error}
+                onRetry={() => window.location.reload()}
                 loadingComponent={<DefaultLoadingComponent />}
                 emptyComponent={<DefaultEmptyComponent message="No practicals scheduled for today." />}
               >
@@ -145,9 +147,7 @@ export default function MentorDashboard(props: MentorDashboardProps) {
             <CardBody>
               {isLoading ? (
                 <div className="space-y-3">
-                  {Array.from({ length: 3 }).map((_, i) => (
-                    <Skeleton key={i} className="h-24 w-full rounded-md" />
-                  ))}
+                  <ListSkeleton rows={3} />
                 </div>
               ) : groups.length === 0 ? (
                 <DefaultEmptyComponent message="No groups available for QR codes." />
@@ -194,6 +194,7 @@ export default function MentorDashboard(props: MentorDashboardProps) {
             data={groups}
             isLoading={isLoading}
             error={error}
+            onRetry={() => window.location.reload()}
             loadingComponent={<DefaultLoadingComponent />}
             emptyComponent={<DefaultEmptyComponent message="No groups assigned yet." />}
           >
