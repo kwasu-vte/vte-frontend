@@ -1,28 +1,81 @@
 import { create } from "zustand"
+import { academicSessionsApi } from "@/lib/api/academic-sessions"
+import type { AcademicSession } from "@/lib/types"
 
 /**
  * * sessionStore (Zustand)
- * TODO: Load sessions from API, manage start/end actions, and active session state.
+ * * Manages academic sessions list and the currently active session.
  */
 
-type Session = { id: string; name: string; starts_at: string; ends_at: string; status: "active" | "inactive" | "expired" }
-
 type SessionStore = {
-  sessions: Session[]
-  activeSessionId: string | null
-  setSessions: (sessions: Session[]) => void
-  setActiveSession: (id: string | null) => void
-  refresh: () => Promise<void>
+  sessions: AcademicSession[];
+  activeSessionId: number | null;
+  setSessions: (sessions: AcademicSession[]) => void;
+  /**
+   * * Activates the session on the server and updates local state
+   */
+  activateSession: (id: number) => Promise<void>;
+  /**
+   * * Fetches sessions from backend and updates state
+   */
+  refresh: () => Promise<void>;
+  /**
+   * * Creates a new session and immediately activates it
+   */
+  createAndActivate: (params: { name: string; starts_at?: string | null; ends_at?: string | null; }) => Promise<AcademicSession | null>;
 }
 
-export const useSessionStore = create<SessionStore>((set) => ({
+export const useSessionStore = create<SessionStore>((set, get) => ({
   sessions: [],
   activeSessionId: null,
-  setSessions: (sessions) => set({ sessions }),
-  setActiveSession: (id) => set({ activeSessionId: id }),
+  setSessions: (sessions) => set({
+    sessions,
+    activeSessionId: sessions.find((s) => s.active)?.id ?? null,
+  }),
+  activateSession: async (id: number) => {
+    // * Activate on server; server should ensure single active session
+    await academicSessionsApi.start(id)
+    await get().refresh()
+  },
   refresh: async () => {
-    // TODO: Fetch sessions from backend and update state
-  }
+    try {
+      const res = await academicSessionsApi.getAll()
+      if (res?.success) {
+        const sessions = res.data || []
+        set({
+          sessions,
+          activeSessionId: sessions.find((s) => s.active)?.id ?? null,
+        })
+      }
+    } catch (error) {
+      // ! Swallow errors at store level; UI handles surfacing
+    }
+  },
+  createAndActivate: async ({ name, starts_at = null, ends_at = null }) => {
+    try {
+      // * Backend expects valid future dates; avoid nulls for immediate activation
+      const now = new Date()
+      const defaultStart = now.toISOString()
+      const oneYearLater = new Date(now.getTime())
+      oneYearLater.setFullYear(now.getFullYear() + 1)
+      const defaultEnd = oneYearLater.toISOString()
+
+      const payload = {
+        name,
+        starts_at: starts_at ?? defaultStart,
+        ends_at: ends_at ?? defaultEnd,
+      }
+
+      const created = await academicSessionsApi.create(payload)
+      if (!created?.success || !created.data) return null
+      const newSession = created.data
+      await academicSessionsApi.start(newSession.id)
+      await get().refresh()
+      return newSession
+    } catch (error) {
+      return null
+    }
+  },
 }))
 
 

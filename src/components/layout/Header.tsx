@@ -7,7 +7,18 @@
 import React from 'react';
 import { usePathname } from 'next/navigation';
 import { User } from '@/lib/types';
-import { Menu, Bell, ChevronDown } from 'lucide-react';
+import { Menu, Bell, ChevronDown, Plus } from 'lucide-react';
+import { useSessionStore } from '@/lib/stores/sessionStore';
+import { 
+  Select,
+  SelectTrigger,
+  SelectContent,
+  SelectItem,
+  SelectValue,
+} from '@/components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 interface HeaderProps {
   user: User;
@@ -59,6 +70,31 @@ function generateBreadcrumbs(pathname: string) {
 export function Header({ user, onMenuClick }: HeaderProps) {
   const pathname = usePathname();
   const breadcrumbs = generateBreadcrumbs(pathname);
+  const { sessions, activeSessionId, refresh, activateSession, createAndActivate } = useSessionStore();
+  const [isCreateOpen, setIsCreateOpen] = React.useState(false);
+  const [newName, setNewName] = React.useState('');
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [selectedValue, setSelectedValue] = React.useState<string | undefined>(undefined);
+
+  React.useEffect(() => {
+    // * Load sessions when header mounts
+    refresh();
+  }, [refresh]);
+
+  React.useEffect(() => {
+    setSelectedValue(activeSessionId ? String(activeSessionId) : undefined);
+  }, [activeSessionId]);
+
+  const handleCreate = async () => {
+    if (!newName.trim()) return;
+    setIsSubmitting(true);
+    const created = await createAndActivate({ name: newName.trim() });
+    setIsSubmitting(false);
+    if (created) {
+      setNewName('');
+      setIsCreateOpen(false);
+    }
+  };
 
   return (
     <header className="sticky top-0 z-40 bg-white border-b border-neutral-200 px-6 py-4">
@@ -98,8 +134,63 @@ export function Header({ user, onMenuClick }: HeaderProps) {
           </nav>
         </div>
 
-        {/* * Right Side - Notifications and User Profile */}
+        {/* * Right Side - Session selector (Admin) + Notifications and User Profile */}
         <div className="flex items-center space-x-4">
+          {user.role === 'Admin' && (
+            <div className="flex items-center gap-2">
+              <Select
+                value={selectedValue}
+                onValueChange={(val) => {
+                  if (val === '__create__') {
+                    // * Open modal and revert back to previous selection without triggering activation
+                    setIsCreateOpen(true);
+                    setSelectedValue(activeSessionId ? String(activeSessionId) : undefined);
+                    return;
+                  }
+                  setSelectedValue(val);
+                  activateSession(Number(val));
+                }}
+              >
+                <SelectTrigger className="w-[220px]">
+                  <SelectValue placeholder={sessions.length ? 'Select session' : 'No sessions'} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__create__">
+                    <span className="flex items-center">
+                      <Plus className="w-4 h-4 mr-2" /> Add new session…
+                    </span>
+                  </SelectItem>
+                  {sessions.map((s) => (
+                    <SelectItem key={s.id} value={String(s.id)}>
+                      {s.name}{s.active ? ' (current)' : ''}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Create academic session</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-3">
+                    <Input
+                      placeholder="e.g. 2024/2025"
+                      value={newName}
+                      onChange={(e) => setNewName(e.target.value)}
+                    />
+                    <div className="flex justify-end gap-2">
+                      <Button variant="ghost" onClick={() => setIsCreateOpen(false)}>
+                        Cancel
+                      </Button>
+                      <Button onClick={handleCreate} disabled={isSubmitting || !newName.trim()}>
+                        {isSubmitting ? 'Creating…' : 'Create & set current'}
+                      </Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
+          )}
           {/* * Notifications */}
           <button className="relative p-2 rounded-lg hover:bg-neutral-100 transition-colors">
             <Bell className="w-5 h-5 text-neutral-600" />
