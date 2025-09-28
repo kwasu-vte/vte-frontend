@@ -36,7 +36,7 @@ export function EnrollmentFilters({ value, onChange, defaultPerPage = 25 }: Enro
 
   const [filters, setFilters] = React.useState<{ academic_session_id?: number; skill_id?: string; per_page?: number }>(value || { per_page: defaultPerPage })
 
-  const sessions = (sessionsResp?.data as AcademicSession[]) || []
+  const sessions = React.useMemo(() => (sessionsResp?.data as AcademicSession[]) || [], [sessionsResp?.data])
   const skills = Array.isArray((skillsResp as any)?.data)
     ? ((skillsResp?.data as unknown) as Skill[])
     : ((((skillsResp as any)?.data?.items as unknown) as Skill[]) || [])
@@ -48,7 +48,7 @@ export function EnrollmentFilters({ value, onChange, defaultPerPage = 25 }: Enro
       setFilters(next)
       onChange(next)
     }
-  }, [activeSessionId])
+  }, [activeSessionId, filters, onChange])
 
   // * Fallback: if store is not yet populated, use the session marked active from API list
   React.useEffect(() => {
@@ -60,7 +60,7 @@ export function EnrollmentFilters({ value, onChange, defaultPerPage = 25 }: Enro
         onChange(next)
       }
     }
-  }, [sessions, activeSessionId])
+  }, [sessions, activeSessionId, filters, onChange])
 
   const handleChange = (key: keyof EnrollmentFiltersProps["value"], nextValue: number | string | undefined) => {
     const next = { ...filters, [key]: nextValue }

@@ -276,21 +276,38 @@ export default function AdminMentorsPage() {
                   </div>
                 </div>
 
-                {selectedMentor.assigned_skills && selectedMentor.assigned_skills.length > 0 && (
-                  <div>
-                    <span className="font-medium text-neutral-700 mb-2 block">Assigned Skills:</span>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedMentor.assigned_skills.map((skill, index) => (
-                        <span
-                          key={index}
-                          className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
-                        >
-                          {skill.title || skill.name || `Skill ${index + 1}`}
-                        </span>
-                      ))}
+                {(() => {
+                  // * Handle assigned_skills as either string (JSON) or array
+                  let skillsArray: any[] = [];
+                  if (selectedMentor.assigned_skills) {
+                    if (typeof selectedMentor.assigned_skills === 'string') {
+                      try {
+                        skillsArray = JSON.parse(selectedMentor.assigned_skills);
+                      } catch {
+                        // * If parsing fails, treat as empty array
+                        skillsArray = [];
+                      }
+                    } else if (Array.isArray(selectedMentor.assigned_skills)) {
+                      skillsArray = selectedMentor.assigned_skills;
+                    }
+                  }
+                  
+                  return skillsArray.length > 0 && (
+                    <div>
+                      <span className="font-medium text-neutral-700 mb-2 block">Assigned Skills:</span>
+                      <div className="flex flex-wrap gap-2">
+                        {skillsArray.map((skill, index) => (
+                          <span
+                            key={index}
+                            className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
+                          >
+                            {skill.title || skill.name || `Skill ${index + 1}`}
+                          </span>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  );
+                })()}
               </div>
             )}
           </ModalBody>

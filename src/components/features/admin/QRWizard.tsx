@@ -17,14 +17,25 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import { skillsApi, skillGroupsApi, mentorsApi, qrCodesApi } from '@/lib/api';
 import { z } from 'zod';
+import type { Skill, MentorProfile, SkillGroup, PaginatedResponse } from '@/lib/types';
 
 type WizardStep = 'purpose' | 'context' | 'configuration' | 'confirmation' | 'complete';
+
+interface WizardData {
+  purpose?: 'single' | 'bulk';
+  skillId?: string;
+  groupId?: number;
+  mentorId?: string;
+  count?: number;
+  expiresInDays?: number;
+  pointsPerScan?: number;
+}
 
 interface QRWizardProps {
   currentStep: WizardStep;
   onStepChange: (step: WizardStep) => void;
-  onComplete: (data: any) => void;
-  initialData?: any;
+  onComplete: (data: WizardData) => void;
+  initialData?: WizardData;
 }
 
 // * Validation schema for wizard data
@@ -39,7 +50,7 @@ const WizardDataSchema = z.object({
 });
 
 export function QRWizard({ currentStep, onStepChange, onComplete, initialData = {} }: QRWizardProps) {
-  const [data, setData] = useState(initialData);
+  const [data, setData] = useState<WizardData>(initialData);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -48,7 +59,7 @@ export function QRWizard({ currentStep, onStepChange, onComplete, initialData = 
     queryKey: ['qr-wizard-skills'],
     queryFn: async () => (await skillsApi.getAll()).data,
   });
-  const skills = (skillsResp as any)?.items ?? skillsResp ?? [];
+  const skills: Skill[] = (skillsResp as PaginatedResponse<Skill>)?.items ?? [];
 
   // * Load groups for selected skill
   const { data: groupsResp } = useQuery({
@@ -60,20 +71,20 @@ export function QRWizard({ currentStep, onStepChange, onComplete, initialData = 
     },
     enabled: !!data.skillId,
   });
-  const groups = groupsResp ?? [];
+  const groups: SkillGroup[] = groupsResp ?? [];
 
   // * Load mentors
   const { data: mentorsResp } = useQuery({
     queryKey: ['qr-wizard-mentors'],
     queryFn: async () => {
-      const res = await mentorsApi.list({ per_page: 100 });
+      const res = await mentorsApi.list({ per_page: '100' });
       return res.data ?? [];
     },
   });
-  const mentors = mentorsResp ?? [];
+  const mentors: MentorProfile[] = mentorsResp ?? [];
 
-  const updateData = (updates: any) => {
-    setData(prev => ({ ...prev, ...updates }));
+  const updateData = (updates: Partial<WizardData>) => {
+    setData((prev: WizardData) => ({ ...prev, ...updates }));
   };
 
   const canProceed = () => {
@@ -122,17 +133,17 @@ export function QRWizard({ currentStep, onStepChange, onComplete, initialData = 
       if (validatedData.purpose === 'single') {
         if (!validatedData.groupId) throw new Error('Group is required for single mode');
         await qrCodesApi.generateForGroup(validatedData.groupId, {
-          count: validatedData.count,
-          expires_in_days: validatedData.expiresInDays,
-          points_per_scan: validatedData.pointsPerScan,
-        } as any);
+          quantity: validatedData.count,
+          mark_value: validatedData.pointsPerScan,
+          expires_at: new Date(Date.now() + validatedData.expiresInDays * 24 * 60 * 60 * 1000).toISOString(),
+        });
       } else {
         await qrCodesApi.bulkGenerate({
-          group_ids: groups.map((g: any) => Number(g.id)),
-          count: validatedData.count,
-          expires_in_days: validatedData.expiresInDays,
-          points_per_scan: validatedData.pointsPerScan,
-        } as any);
+          skill_id: validatedData.skillId!,
+          mark_value: validatedData.pointsPerScan,
+          codes_per_group: validatedData.count,
+          expires_at: new Date(Date.now() + validatedData.expiresInDays * 24 * 60 * 60 * 1000).toISOString(),
+        });
       }
       
       onComplete(validatedData);
@@ -195,7 +206,7 @@ export function QRWizard({ currentStep, onStepChange, onComplete, initialData = 
     <Card>
       <CardHeader>
         <h2 className="text-xl font-semibold">Choose Your Training Program</h2>
-        <p className="text-neutral-600 mt-2">Select the vocational skill and specific training group you're managing.</p>
+        <p className="text-neutral-600 mt-2">Select the vocational skill and specific training group you&apos;re managing.</p>
       </CardHeader>
       <CardBody className="space-y-4">
         <Select
@@ -204,12 +215,12 @@ export function QRWizard({ currentStep, onStepChange, onComplete, initialData = 
           selectedKeys={data.skillId ? [data.skillId] : []}
           onChange={(e) => {
             const skillId = e.target.value || null;
-            updateData({ skillId, groupId: null }); // Reset group when skill changes
+            updateData({ skillId: skillId || undefined, groupId: undefined }); // Reset group when skill changes
           }}
           size="lg"
           isRequired
         >
-          {skills.map((skill: any) => (
+          {skills.map((skill: Skill) => (
             <SelectItem key={String(skill.id)}>
               {skill.title}
             </SelectItem>
@@ -221,12 +232,12 @@ export function QRWizard({ currentStep, onStepChange, onComplete, initialData = 
             label="Which training group?"
             placeholder="Select a group"
             selectedKeys={data.groupId ? [String(data.groupId)] : []}
-            onChange={(e) => updateData({ groupId: e.target.value ? Number(e.target.value) : null })}
+            onChange={(e) => updateData({ groupId: e.target.value ? Number(e.target.value) : undefined })}
             size="lg"
             isDisabled={!data.skillId}
             isRequired
           >
-            {groups.map((group: any) => (
+            {groups.map((group: SkillGroup) => (
               <SelectItem key={String(group.id)}>
                 {group.group_display_name || `Group ${group.group_number}`}
               </SelectItem>
@@ -238,7 +249,7 @@ export function QRWizard({ currentStep, onStepChange, onComplete, initialData = 
           <div className="bg-blue-50 p-4 rounded-lg">
             <h4 className="font-semibold text-blue-900 mb-2">Training groups that will get QR codes:</h4>
             <div className="flex flex-wrap gap-2">
-              {groups.map((group: any) => (
+              {groups.map((group: SkillGroup) => (
                 <Chip key={group.id} color="primary" variant="flat">
                   {group.group_display_name || `Group ${group.group_number}`}
                 </Chip>
@@ -299,10 +310,10 @@ export function QRWizard({ currentStep, onStepChange, onComplete, initialData = 
           label="Assign to instructor (optional)"
           placeholder="Select an instructor"
           selectedKeys={data.mentorId ? [data.mentorId] : []}
-          onChange={(e) => updateData({ mentorId: e.target.value || null })}
+          onChange={(e) => updateData({ mentorId: e.target.value || undefined })}
           size="lg"
         >
-          {mentors.map((mentor: any) => (
+          {mentors.map((mentor: MentorProfile) => (
             <SelectItem key={String(mentor.user_id || mentor.id)}>
               {mentor.full_name || `${mentor.user?.first_name} ${mentor.user?.last_name}`}
             </SelectItem>
@@ -313,9 +324,9 @@ export function QRWizard({ currentStep, onStepChange, onComplete, initialData = 
   );
 
   const renderConfirmationStep = () => {
-    const selectedSkill = skills.find((s: any) => String(s.id) === data.skillId);
-    const selectedGroup = groups.find((g: any) => g.id === data.groupId);
-    const selectedMentor = mentors.find((m: any) => String(m.user_id || m.id) === data.mentorId);
+    const selectedSkill = skills.find((s: Skill) => String(s.id) === data.skillId);
+    const selectedGroup = groups.find((g: SkillGroup) => String(g.id) === String(data.groupId));
+    const selectedMentor = mentors.find((m: MentorProfile) => String(m.user_id || m.id) === data.mentorId);
 
     return (
       <Card>
