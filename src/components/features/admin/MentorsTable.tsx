@@ -4,9 +4,11 @@
 
 "use client";
 
-import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Button, Chip, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@nextui-org/react';
+import React from 'react';
+import { DataTable } from '@/components/shared/DataTable';
+import { Button, Chip, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@nextui-org/react';
+import { MoreVertical, Eye, User as UserIcon, Users, Plus } from 'lucide-react';
 import { MentorProfile } from '@/lib/types';
-import { MoreVertical, Eye, User as UserIcon, Users } from 'lucide-react';
 import { getSpecializationLabel } from '@/lib/utils/specialization';
 
 interface MentorsTableProps {
@@ -15,6 +17,9 @@ interface MentorsTableProps {
   onManageProfile: (mentor: MentorProfile) => void;
   onManageGroups: (mentor: MentorProfile) => void;
   onAssignSkills?: (mentor: MentorProfile) => void;
+  onCreate?: () => void;
+  isLoading?: boolean;
+  error?: Error | null;
 }
 
 export function MentorsTable({
@@ -22,16 +27,19 @@ export function MentorsTable({
   onView,
   onManageProfile,
   onManageGroups,
-  onAssignSkills
+  onAssignSkills,
+  onCreate,
+  isLoading = false,
+  error = null,
 }: MentorsTableProps) {
-  const columns = [
-    { key: 'name', label: 'Mentor Name' },
-    { key: 'email', label: 'Email' },
-    { key: 'specialization', label: 'Specialization' },
-    { key: 'students', label: 'Current Students' },
-    { key: 'status', label: 'Status' },
-    { key: 'actions', label: 'Actions' }
-  ];
+  console.log('🔍 [MentorsTable] Received props:', {
+    mentors,
+    mentorsLength: mentors?.length,
+    isLoading,
+    error,
+    mentorsType: typeof mentors,
+    mentorsIsArray: Array.isArray(mentors)
+  });
 
   const getStatusColor = (mentor: MentorProfile) => {
     if (!mentor.is_active) return 'danger';
@@ -45,97 +53,154 @@ export function MentorsTable({
     return 'Active';
   };
 
-  return (
-    <Table aria-label="Mentors table">
-      <TableHeader columns={columns}>
-        {(column) => (
-          <TableColumn key={column.key}>
-            {column.label}
-          </TableColumn>
-        )}
-      </TableHeader>
-      <TableBody items={mentors}>
-        {(mentor: MentorProfile) => (
-          <TableRow key={mentor.id}>
-            <TableCell>
-              <div className="flex flex-col">
-                <span className="font-semibold text-neutral-900">{mentor.full_name || `${mentor.user.first_name} ${mentor.user.last_name}`}</span>
-                <span className="text-sm text-neutral-500">ID: {mentor.id}</span>
-              </div>
-            </TableCell>
-            <TableCell>
-              <div className="flex flex-col">
-                <span className="font-medium text-neutral-900">{mentor.user.email}</span>
-                <span className="text-sm text-neutral-500">Primary contact</span>
-              </div>
-            </TableCell>
-            <TableCell>
-              <div className="flex flex-col">
-                <span className="font-medium text-neutral-900">{getSpecializationLabel(mentor.specialization)}</span>
-              </div>
-            </TableCell>
-            <TableCell>
-              <div className="flex items-center gap-2">
-                <Users className="w-4 h-4 text-neutral-400" />
-                <span className="font-medium">{mentor.current_student_count ?? 0}</span>
-                <span className="text-sm text-neutral-500">students</span>
-              </div>
-            </TableCell>
-            <TableCell>
-              <Chip
-                color={getStatusColor(mentor)}
-                variant="flat"
+  // * Table columns configuration
+  const columns = [
+    {
+      key: 'name',
+      label: 'Mentor Name',
+      render: (mentor: MentorProfile) => (
+        <div className="flex flex-col">
+          <span className="font-semibold text-neutral-900">{mentor.full_name || `${mentor.user.first_name} ${mentor.user.last_name}`}</span>
+          <span className="text-sm text-neutral-500">ID: {mentor.id}</span>
+        </div>
+      ),
+    },
+    {
+      key: 'email',
+      label: 'Email',
+      render: (mentor: MentorProfile) => (
+        <div className="flex flex-col">
+          <span className="font-medium text-neutral-900">{mentor.user.email}</span>
+          <span className="text-sm text-neutral-500">Primary contact</span>
+        </div>
+      ),
+    },
+    {
+      key: 'specialization',
+      label: 'Specialization',
+      render: (mentor: MentorProfile) => (
+        <div className="flex flex-col">
+          <span className="font-medium text-neutral-900">{getSpecializationLabel(mentor.specialization)}</span>
+        </div>
+      ),
+    },
+    {
+      key: 'students',
+      label: 'Current Students',
+      render: (mentor: MentorProfile) => (
+        <div className="flex items-center gap-2">
+          <Users className="w-4 h-4 text-neutral-400" />
+          <span className="font-medium">{mentor.current_student_count ?? 0}</span>
+          <span className="text-sm text-neutral-500">students</span>
+        </div>
+      ),
+    },
+    {
+      key: 'status',
+      label: 'Status',
+      render: (mentor: MentorProfile) => (
+        <Chip
+          color={getStatusColor(mentor)}
+          variant="flat"
+          size="sm"
+        >
+          {getStatusText(mentor)}
+        </Chip>
+      ),
+    },
+    {
+      key: 'actions',
+      label: 'Actions',
+      render: (mentor: MentorProfile) => {
+        const menuItems = [];
+        
+        if (onView) {
+          menuItems.push(
+            <DropdownItem
+              key="view"
+              startContent={<Eye className="w-4 h-4" />}
+              onClick={() => onView(mentor)}
+            >
+              View Details
+            </DropdownItem>
+          );
+        }
+        
+        if (onManageProfile) {
+          menuItems.push(
+            <DropdownItem
+              key="profile"
+              startContent={<UserIcon className="w-4 h-4" />}
+              onClick={() => onManageProfile(mentor)}
+            >
+              Manage Profile
+            </DropdownItem>
+          );
+        }
+        
+        if (onManageGroups) {
+          menuItems.push(
+            <DropdownItem
+              key="groups"
+              startContent={<Users className="w-4 h-4" />}
+              onClick={() => onManageGroups(mentor)}
+            >
+              Manage Groups
+            </DropdownItem>
+          );
+        }
+        
+        if (onAssignSkills) {
+          menuItems.push(
+            <DropdownItem
+              key="assign"
+              onClick={() => onAssignSkills(mentor)}
+            >
+              Assign Skills
+            </DropdownItem>
+          );
+        }
+
+        return (
+          <Dropdown>
+            <DropdownTrigger>
+              <Button
+                isIconOnly
+                variant="light"
                 size="sm"
+                className="text-neutral-500 hover:text-neutral-700"
               >
-                {getStatusText(mentor)}
-              </Chip>
-            </TableCell>
-            <TableCell>
-              <Dropdown>
-                <DropdownTrigger>
-                  <Button
-                    isIconOnly
-                    size="sm"
-                    variant="light"
-                  >
-                    <MoreVertical className="w-4 h-4" />
-                  </Button>
-                </DropdownTrigger>
-                <DropdownMenu aria-label="Mentor actions">
-                  <DropdownItem
-                    key="view"
-                    startContent={<Eye className="w-4 h-4" />}
-                    onClick={() => onView(mentor)}
-                  >
-                    View Details
-                  </DropdownItem>
-                  <DropdownItem
-                    key="profile"
-                    startContent={<UserIcon className="w-4 h-4" />}
-                    onClick={() => onManageProfile(mentor)}
-                  >
-                    Manage Profile
-                  </DropdownItem>
-                  <DropdownItem
-                    key="groups"
-                    startContent={<Users className="w-4 h-4" />}
-                    onClick={() => onManageGroups(mentor)}
-                  >
-                    Manage Groups
-                  </DropdownItem>
-                  <DropdownItem
-                    key="assign"
-                    onClick={() => onAssignSkills?.(mentor)}
-                    isDisabled={!onAssignSkills}
-                  >
-                    Assign Skills
-                  </DropdownItem>
-                </DropdownMenu>
-              </Dropdown>
-            </TableCell>
-          </TableRow>
-        )}
-      </TableBody>
-    </Table>
+                <MoreVertical className="w-4 h-4" />
+              </Button>
+            </DropdownTrigger>
+            <DropdownMenu aria-label="Mentor actions">
+              {menuItems}
+            </DropdownMenu>
+          </Dropdown>
+        );
+      },
+    },
+  ];
+
+  return (
+    <DataTable
+      data={mentors}
+      isLoading={isLoading}
+      error={error}
+      columns={columns}
+      emptyMessage="No mentors found. Create your first mentor to get started."
+      onRowClick={onView}
+      emptyActionButton={
+        onCreate ? (
+          <Button
+            color="primary"
+            startContent={<Plus className="w-4 h-4" />}
+            onClick={onCreate}
+          >
+            Add Mentor
+          </Button>
+        ) : undefined
+      }
+    />
   );
 }
