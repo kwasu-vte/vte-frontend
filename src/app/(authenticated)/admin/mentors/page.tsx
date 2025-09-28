@@ -12,6 +12,7 @@ import { mentorsApi } from '@/lib/api';
 import { MentorProfile, CreateMentorProfilePayload } from '@/lib/types';
 import { Button, Input } from '@nextui-org/react';
 import { Plus, Search } from 'lucide-react';
+import { StateRenderer, DefaultLoadingComponent, DefaultErrorComponent, DefaultEmptyComponent } from '@/components/shared/StateRenderer';
 
 export default function AdminMentorsPage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -106,12 +107,23 @@ export default function AdminMentorsPage() {
       </div>
 
       <div className="bg-white rounded-lg shadow-sm border border-neutral-200">
-        <MentorsTable
-          mentors={mentors}
-          onView={(mentor) => console.log('View mentor', mentor)}
-          onManageProfile={(mentor) => console.log('Manage profile', mentor)}
-          onManageGroups={(mentor) => console.log('Manage groups', mentor)}
-        />
+        <StateRenderer
+          data={mentors}
+          isLoading={isLoading}
+          error={error as Error | null}
+          loadingComponent={<div className="p-6"><DefaultLoadingComponent /></div>}
+          errorComponent={<div className="p-6"><DefaultErrorComponent error={error as Error} onRetry={() => refetch()} /></div>}
+          emptyComponent={<div className="p-6"><DefaultEmptyComponent message="No mentors found. Create your first mentor to get started." /></div>}
+        >
+          {(items) => (
+            <MentorsTable
+              mentors={items}
+              onView={(mentor) => console.log('View mentor', mentor)}
+              onManageProfile={(mentor) => console.log('Manage profile', mentor)}
+              onManageGroups={(mentor) => console.log('Manage groups', mentor)}
+            />
+          )}
+        </StateRenderer>
       </div>
 
       {/* * Create Mentor Modal */}

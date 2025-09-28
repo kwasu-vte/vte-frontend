@@ -69,6 +69,8 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
       const created = await academicSessionsApi.create(payload)
       if (!created?.success || !created.data) return null
       const newSession = created.data
+      // * Immediately update with date fields to ensure backend reflects chosen schedule
+      await academicSessionsApi.update(newSession.id, { /* name: payload.name, */ starts_at: payload.starts_at || undefined, ends_at: payload.ends_at || undefined })
       await academicSessionsApi.start(newSession.id)
       await get().refresh()
       return newSession

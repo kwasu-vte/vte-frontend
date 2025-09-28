@@ -74,7 +74,10 @@ export function Header({ user, onMenuClick }: HeaderProps) {
   const [isCreateOpen, setIsCreateOpen] = React.useState(false);
   const [newName, setNewName] = React.useState('');
   const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [startsAt, setStartsAt] = React.useState<string>("");
+  const [endsAt, setEndsAt] = React.useState<string>("");
   const [selectedValue, setSelectedValue] = React.useState<string | undefined>(undefined);
+  const [showNoActiveModal, setShowNoActiveModal] = React.useState(false);
 
   React.useEffect(() => {
     // * Load sessions when header mounts
@@ -85,10 +88,49 @@ export function Header({ user, onMenuClick }: HeaderProps) {
     setSelectedValue(activeSessionId ? String(activeSessionId) : undefined);
   }, [activeSessionId]);
 
+  const computeDefaultDates = React.useCallback(() => {
+    const now = new Date();
+    const yyyy = now.getFullYear();
+    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    const dd = String(now.getDate()).padStart(2, '0');
+    const today = `${yyyy}-${mm}-${dd}`;
+    const nextYear = `${yyyy + 1}-${mm}-${dd}`;
+    return { today, nextYear };
+  }, []);
+
+  React.useEffect(() => {
+    if (isCreateOpen) {
+      const { today, nextYear } = computeDefaultDates();
+      setStartsAt((prev) => prev || today);
+      setEndsAt((prev) => prev || nextYear);
+    } else {
+      // * Reset form when closed
+      setNewName("");
+      setStartsAt("");
+      setEndsAt("");
+    }
+  }, [isCreateOpen, computeDefaultDates]);
+
+  // * When sessions are fetched and none is active, prompt admin to select/create
+  React.useEffect(() => {
+    if (user.role !== 'Admin') return;
+    if (!Array.isArray(sessions)) return;
+
+    // * Determine active via explicit active flag or store's activeSessionId
+    const hasActive = sessions.some((s) => s.active === true) || !!activeSessionId;
+    const hasAny = sessions.length > 0;
+
+    if (!hasAny || !hasActive) setShowNoActiveModal(true);
+    else setShowNoActiveModal(false);
+  }, [sessions, activeSessionId, user.role]);
+
   const handleCreate = async () => {
     if (!newName.trim()) return;
     setIsSubmitting(true);
-    const created = await createAndActivate({ name: newName.trim() });
+    // * Convert date inputs (yyyy-mm-dd) to ISO strings
+    const startsIso = startsAt ? new Date(`${startsAt}T00:00:00Z`).toISOString() : undefined;
+    const endsIso = endsAt ? new Date(`${endsAt}T00:00:00Z`).toISOString() : undefined;
+    const created = await createAndActivate({ name: newName.trim(), starts_at: startsIso, ends_at: endsIso });
     setIsSubmitting(false);
     if (created) {
       setNewName('');
@@ -178,6 +220,24 @@ export function Header({ user, onMenuClick }: HeaderProps) {
                       value={newName}
                       onChange={(e) => setNewName(e.target.value)}
                     />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-sm text-neutral-600 mb-1">Start date</label>
+                        <Input
+                          type="date"
+                          value={startsAt}
+                          onChange={(e) => setStartsAt(e.target.value)}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm text-neutral-600 mb-1">End date</label>
+                        <Input
+                          type="date"
+                          value={endsAt}
+                          onChange={(e) => setEndsAt(e.target.value)}
+                        />
+                      </div>
+                    </div>
                     <div className="flex justify-end gap-2">
                       <Button variant="ghost" onClick={() => setIsCreateOpen(false)}>
                         Cancel
@@ -186,6 +246,64 @@ export function Header({ user, onMenuClick }: HeaderProps) {
                         {isSubmitting ? 'Creating…' : 'Create & set current'}
                       </Button>
                     </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
+
+              {/* * No active session prompt */}
+              <Dialog open={showNoActiveModal} onOpenChange={setShowNoActiveModal}>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>No active academic session</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-3">
+                    {sessions.length > 0 ? (
+                      <>
+                        <p className="text-sm text-neutral-700">Select a session to activate or create a new one.</p>
+                        <Select
+                          value={selectedValue}
+                          onValueChange={(val) => {
+                            if (val === '__create__') {
+                              setShowNoActiveModal(false);
+                              setIsCreateOpen(true);
+                              setSelectedValue(activeSessionId ? String(activeSessionId) : undefined);
+                              return;
+                            }
+                            setSelectedValue(val);
+                          }}
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Choose a session" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="__create__">
+                              <span className="flex items-center"><Plus className="w-4 h-4 mr-2" /> Create new session…</span>
+                            </SelectItem>
+                            {sessions.map((s) => (
+                              <SelectItem key={s.id} value={String(s.id)}>
+                                {s.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <div className="flex justify-end gap-2">
+                          <Button variant="ghost" onClick={() => setShowNoActiveModal(false)}>Close</Button>
+                          <Button onClick={async () => {
+                            if (selectedValue) {
+                              await activateSession(Number(selectedValue));
+                              setShowNoActiveModal(false);
+                            }
+                          }}>Activate</Button>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <p className="text-sm text-neutral-700">No sessions exist. Create one to continue.</p>
+                        <div className="flex justify-end">
+                          <Button onClick={() => { setShowNoActiveModal(false); setIsCreateOpen(true); }}>Create session</Button>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </DialogContent>
               </Dialog>

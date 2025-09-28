@@ -18,8 +18,6 @@ import { useApp } from '@/context/AppContext';
 import { getErrorMessage, getErrorTitle, getSuccessTitle, getSuccessMessage } from '@/lib/error-handling';
 
 export default function AdminSkillsPage() {
-  console.log('🎯 AdminSkillsPage component mounted');
-  
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
@@ -30,7 +28,7 @@ export default function AdminSkillsPage() {
   const queryClient = useQueryClient();
   const { addNotification } = useApp();
 
-  // * React Query for data fetching - only run on client
+  // * Simple data fetching
   const {
     data: skills,
     isLoading,
@@ -40,10 +38,12 @@ export default function AdminSkillsPage() {
     queryKey: ['skills'],
     queryFn: async () => {
       const response = await skillsApi.getAll();
-      // * skillsApi.getAll returns Skill[] directly
-      return response.data ?? [];
+      console.log('Skills API response:', response);
+      return response.data.items || response.data || [];
     },
   });
+
+  console.log('Skills state:', { skills, isLoading, error });
 
   // * Create skill mutation
   const createSkillMutation = useMutation({
@@ -390,17 +390,6 @@ export default function AdminSkillsPage() {
         </ModalContent>
       </Modal>
 
-      {/* * Debug Information */}
-      <div className="bg-neutral-50 p-4 rounded-lg">
-        <h3 className="font-semibold text-neutral-900 mb-2">Debug Information</h3>
-        <div className="text-sm text-neutral-600 space-y-1">
-          <p><strong>Loading:</strong> {isLoading ? 'Yes' : 'No'}</p>
-          <p><strong>Error:</strong> {error ? error.message : 'None'}</p>
-          <p><strong>Data Count:</strong> {skills?.length || 0}</p>
-          <p><strong>Query Key:</strong> [&apos;skills&apos;]</p>
-          <p><strong>Mutations:</strong> Create: {createSkillMutation.isPending ? 'Pending' : 'Idle'}, Update: {updateSkillMutation.isPending ? 'Pending' : 'Idle'}, Delete: {deleteSkillMutation.isPending ? 'Pending' : 'Idle'}</p>
-        </div>
-      </div>
     </div>
   );
 }

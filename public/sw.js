@@ -1,5 +1,6 @@
 // * Service Worker for KWASU VTE PWA
-// * Handles offline functionality, caching, and push notifications
+// * Handles offline functionality and caching for static assets only
+// * API requests are not intercepted to avoid conflicts
 
 const CACHE_NAME = 'kwasu-vte-v1';
 const STATIC_CACHE_NAME = 'kwasu-vte-static-v1';
@@ -73,6 +74,12 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
+    // * Skip API requests - let them pass through without interception
+    if (url.pathname.startsWith('/api/')) {
+        console.log('Service Worker: Skipping API request', request.url);
+        return;
+    }
+
     // * Handle different types of requests
     if (request.destination === 'document') {
         // * For HTML pages, use Network First strategy
@@ -80,9 +87,6 @@ self.addEventListener('fetch', (event) => {
     } else if (['style', 'script', 'image', 'font'].includes(request.destination)) {
         // * For static assets, use Cache First strategy
         event.respondWith(cacheFirstStrategy(request));
-    } else if (url.pathname.startsWith('/api/')) {
-        // * For API calls, use Network First with timeout
-        event.respondWith(apiStrategy(request));
     } else {
         // * Default to Network First for other requests
         event.respondWith(networkFirstStrategy(request));
@@ -141,36 +145,9 @@ async function cacheFirstStrategy(request) {
     }
 }
 
-// * API Strategy - network first with timeout
-async function apiStrategy(request) {
-    try {
-        // * Set a timeout for API requests
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
 
-        const networkResponse = await fetch(request, {
-            signal: controller.signal
-        });
-
-        clearTimeout(timeoutId);
-
-        // * Don't cache API responses by default
-        return networkResponse;
-    } catch (error) {
-        console.error('Service Worker: API request failed', request.url, error);
-
-        // * Return cached response if available
-        const cachedResponse = await caches.match(request);
-        if (cachedResponse) {
-            return cachedResponse;
-        }
-
-        throw error;
-    }
-}
-
-// * Note: Push notification functionality has been removed
-// * This service worker focuses on offline functionality and caching
+// * Note: This service worker focuses on offline functionality and caching for static assets
+// * API requests are not intercepted to prevent conflicts with React Query and other API calls
 
 // * Background sync event handler
 self.addEventListener('sync', (event) => {

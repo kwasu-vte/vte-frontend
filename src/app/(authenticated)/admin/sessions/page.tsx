@@ -68,7 +68,6 @@ export default function AdminSessionsPage() {
     mutationFn: async () => {
       if (editing) {
         return (await academicSessionsApi.update(editing.id, {
-          name: form.name || undefined,
           starts_at: form.starts_at || undefined,
           ends_at: form.ends_at || undefined,
         })).data;

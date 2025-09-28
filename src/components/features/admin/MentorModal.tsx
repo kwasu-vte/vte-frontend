@@ -6,12 +6,12 @@
 
 import { useState, useEffect } from 'react';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, Select, SelectItem, Textarea } from '@nextui-org/react';
-import { User, CreateUserPayload, UpdateUserPayload } from '@/lib/types';
+import { User, CreateMentorProfilePayload, UpdateUserPayload } from '@/lib/types';
 
 interface MentorModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: CreateUserPayload | UpdateUserPayload) => void;
+  onSubmit: (data: CreateMentorProfilePayload | UpdateUserPayload) => void;
   mentor?: User | null;
   isLoading?: boolean;
 }
@@ -30,9 +30,10 @@ export function MentorModal({
     password: '',
     password_confirmation: '',
     specialization: '',
-    experience: '',
-    bio: '',
-    role: 'Mentor'
+    phone: '',
+    is_available: true,
+    is_active: true,
+    meta: ''
   });
 
   // * Reset form when modal opens/closes or mentor changes
@@ -46,9 +47,10 @@ export function MentorModal({
           password: '',
           password_confirmation: '',
           specialization: mentor.specialization || '',
-          experience: mentor.experience || '',
-          bio: mentor.bio || '',
-          role: mentor.role
+          phone: '',
+          is_available: true,
+          is_active: mentor.is_active,
+          meta: ''
         });
       } else {
         setFormData({
@@ -58,9 +60,10 @@ export function MentorModal({
           password: '',
           password_confirmation: '',
           specialization: '',
-          experience: '',
-          bio: '',
-          role: 'Mentor'
+          phone: '',
+          is_available: true,
+          is_active: true,
+          meta: ''
         });
       }
     }
@@ -69,7 +72,7 @@ export function MentorModal({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.first_name || !formData.last_name || !formData.email) {
+    if (!formData.first_name || !formData.last_name || !formData.email || !formData.specialization) {
       return;
     }
 
@@ -83,14 +86,15 @@ export function MentorModal({
       return;
     }
 
-    const submitData: CreateUserPayload | UpdateUserPayload = {
+    const submitData: CreateMentorProfilePayload | UpdateUserPayload = {
       first_name: formData.first_name,
       last_name: formData.last_name,
       email: formData.email,
-      role: formData.role as 'Mentor',
-      specialization: formData.specialization || null,
-      experience: formData.experience || null,
-      bio: formData.bio || null,
+      specialization: formData.specialization,
+      phone: formData.phone || null,
+      is_available: formData.is_available,
+      is_active: formData.is_active,
+      meta: formData.meta || null,
       ...(mentor ? {} : {
         password: formData.password,
         password_confirmation: formData.password_confirmation
@@ -100,14 +104,14 @@ export function MentorModal({
     onSubmit(submitData);
   };
 
-  const handleInputChange = (field: string, value: string) => {
+  const handleInputChange = (field: string, value: string | boolean) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
     }));
   };
 
-  const isFormValid = formData.first_name && formData.last_name && formData.email && 
+  const isFormValid = formData.first_name && formData.last_name && formData.email && formData.specialization && 
     (mentor ? true : formData.password && formData.password_confirmation);
 
   const isPasswordMatch = !formData.password || !formData.password_confirmation || 
@@ -182,6 +186,7 @@ export function MentorModal({
                   const selectedKey = Array.from(keys)[0] as string;
                   handleInputChange('specialization', selectedKey);
                 }}
+                isRequired
                 variant="bordered"
               >
                 {specializationOptions.map((option) => (
@@ -191,21 +196,48 @@ export function MentorModal({
                 ))}
               </Select>
               <Input
-                label="Years of Experience"
-                placeholder="e.g., 5 years"
-                value={formData.experience}
-                onChange={(e) => handleInputChange('experience', e.target.value)}
+                label="Phone Number"
+                placeholder="Enter phone number"
+                value={formData.phone}
+                onChange={(e) => handleInputChange('phone', e.target.value)}
                 variant="bordered"
               />
             </div>
 
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="is_available"
+                  checked={formData.is_available}
+                  onChange={(e) => handleInputChange('is_available', e.target.checked)}
+                  className="rounded border-gray-300"
+                />
+                <label htmlFor="is_available" className="text-sm font-medium">
+                  Available for assignment
+                </label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="is_active"
+                  checked={formData.is_active}
+                  onChange={(e) => handleInputChange('is_active', e.target.checked)}
+                  className="rounded border-gray-300"
+                />
+                <label htmlFor="is_active" className="text-sm font-medium">
+                  Active mentor
+                </label>
+              </div>
+            </div>
+
             <Textarea
-              label="Bio"
-              placeholder="Tell us about the mentor's background and expertise"
-              value={formData.bio}
-              onChange={(e) => handleInputChange('bio', e.target.value)}
+              label="Meta Information"
+              placeholder="Additional notes or metadata (optional)"
+              value={formData.meta}
+              onChange={(e) => handleInputChange('meta', e.target.value)}
               variant="bordered"
-              minRows={3}
+              minRows={2}
             />
 
             {!mentor && (

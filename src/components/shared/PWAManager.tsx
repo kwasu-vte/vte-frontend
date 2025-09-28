@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { InstallPrompt } from './InstallPrompt';
+import { FloatingInstallPrompt } from './FloatingInstallPrompt';
 
 interface PWAManagerProps {
   children: React.ReactNode;
@@ -70,6 +71,9 @@ export function PWAManager({ children }: PWAManagerProps) {
       
       {/* * Install Prompt Modal */}
       <InstallPrompt />
+
+      {/* * Floating Install Prompt (dismissible) */}
+      <FloatingInstallPrompt />
       
       {/* * Online/Offline Status Indicator */}
       {!isOnline && (

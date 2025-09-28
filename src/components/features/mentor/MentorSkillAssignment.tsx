@@ -30,7 +30,7 @@ export default function MentorSkillAssignment(props: MentorSkillAssignmentProps)
     queryKey: ["skills"],
     queryFn: async () => {
       const res = await skillsApi.getAll()
-      return res?.data ?? []
+      return res?.data?.items ?? []
     },
   })
 

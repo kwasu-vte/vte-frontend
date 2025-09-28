@@ -26,24 +26,22 @@ export function StateRenderer<T>({
   emptyComponent,
   children,
 }: StateRendererProps<T>) {
-  // * State 1: Loading
-  if (isLoading) {
+  // * Show loading state if loading OR if data is undefined/null and no error
+  if (isLoading || (data == null && !error)) {
     return <>{loadingComponent ?? <DefaultLoadingComponent />}</>;
   }
 
-  // * State 2: Error
+  // * Show error state
   if (error) {
     return <>{errorComponent ?? <DefaultErrorComponent error={error} onRetry={onRetry} />}</>;
   }
 
-  // * State 3: Empty - Only show empty state for explicitly empty arrays
-  // * Don't show empty state for undefined data (which happens during initial load)
+  // * Show empty state for empty arrays
   if (Array.isArray(data) && data.length === 0) {
     return <>{emptyComponent ?? <DefaultEmptyComponent message="No items to display." />}</>;
   }
 
-  // * State 4: Success - Render the data (including undefined/null data)
-  // * Let the child component handle undefined/null data gracefully
+  // * Show data
   return children(data as NonNullable<T>);
 }
 

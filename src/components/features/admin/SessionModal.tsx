@@ -37,11 +37,28 @@ const schema = z.object({
 type FormValues = z.infer<typeof schema>
 
 export default function SessionModal({ isOpen, mode, session, onClose }: SessionModalProps) {
-  const defaultValues: FormValues = useMemo(() => ({
-    name: session?.name || "",
-    starts_at: session?.starts_at || "",
-    ends_at: session?.ends_at || "",
-  }), [session])
+  const defaultValues: FormValues = useMemo(() => {
+    const toDate = (iso?: string | null) => {
+      if (!iso) return ""
+      const d = new Date(iso)
+      const yyyy = d.getFullYear()
+      const mm = String(d.getMonth() + 1).padStart(2, '0')
+      const dd = String(d.getDate()).padStart(2, '0')
+      return `${yyyy}-${mm}-${dd}`
+    }
+    const today = new Date()
+    const yyyy = today.getFullYear()
+    const mm = String(today.getMonth() + 1).padStart(2, '0')
+    const dd = String(today.getDate()).padStart(2, '0')
+    const todayStr = `${yyyy}-${mm}-${dd}`
+    const nextYearStr = `${yyyy + 1}-${mm}-${dd}`
+
+    return {
+      name: session?.name || "",
+      starts_at: toDate(session?.starts_at) || (mode === 'create' ? todayStr : ""),
+      ends_at: toDate(session?.ends_at) || (mode === 'create' ? nextYearStr : ""),
+    }
+  }, [session, mode])
 
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -52,8 +69,13 @@ export default function SessionModal({ isOpen, mode, session, onClose }: Session
 
   const createMutation = useMutation({
     mutationFn: async (payload: FormValues) => {
-      const res = await academicSessionsApi.create({ name: payload.name, starts_at: payload.starts_at || null, ends_at: payload.ends_at || null })
-      return res.data
+      const toIso = (d?: string | null) => d ? new Date(`${d}T00:00:00Z`).toISOString() : null
+      const created = await academicSessionsApi.create({ name: payload.name, starts_at: toIso(payload.starts_at), ends_at: toIso(payload.ends_at) })
+      // * Immediately send update with date fields (omit name) after creation
+      if (created?.success && created.data?.id) {
+        await academicSessionsApi.update(created.data.id, { /* name: payload.name, */ starts_at: toIso(payload.starts_at) ?? undefined, ends_at: toIso(payload.ends_at) ?? undefined })
+      }
+      return created.data
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["academic-sessions", "list"] })
@@ -64,7 +86,9 @@ export default function SessionModal({ isOpen, mode, session, onClose }: Session
   const updateMutation = useMutation({
     mutationFn: async (payload: FormValues) => {
       if (!session?.id && mode === 'edit') throw new Error('Missing session id')
-      const res = await academicSessionsApi.update(session!.id, { name: payload.name, starts_at: payload.starts_at || undefined, ends_at: payload.ends_at || undefined })
+      const toIsoU = (d?: string | null) => d ? new Date(`${d}T00:00:00Z`).toISOString() : undefined
+      // * Do not pass name on update; only update dates
+      const res = await academicSessionsApi.update(session!.id, { /* name: payload.name, */ starts_at: toIsoU(payload.starts_at), ends_at: toIsoU(payload.ends_at) })
       return res
     },
     onSuccess: () => {
