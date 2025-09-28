@@ -1,9 +1,11 @@
 // * Service Worker for KWASU VTE PWA
-// * Handles offline functionality, caching, and push notifications
+// * Strategy: Always serve from network, cache images/stylesheets in background
+// * Pages are NEVER cached - always fresh from network
+// * Images and stylesheets: Network First with background cache update
+// * API requests are not intercepted to avoid conflicts
 
-const CACHE_NAME = 'kwasu-vte-v1';
-const STATIC_CACHE_NAME = 'kwasu-vte-static-v1';
-const DYNAMIC_CACHE_NAME = 'kwasu-vte-dynamic-v1';
+const CACHE_NAME = 'kwasu-vte-v2';
+const IMAGES_STYLES_CACHE_NAME = 'kwasu-vte-images-styles-v2';
 
 // * Static assets to cache on install
 const STATIC_ASSETS = [
@@ -20,7 +22,7 @@ self.addEventListener('install', (event) => {
     console.log('Service Worker: Installing...');
 
     event.waitUntil(
-        caches.open(STATIC_CACHE_NAME)
+        caches.open(IMAGES_STYLES_CACHE_NAME)
             .then((cache) => {
                 console.log('Service Worker: Caching static assets');
                 return cache.addAll(STATIC_ASSETS);
@@ -44,7 +46,7 @@ self.addEventListener('activate', (event) => {
             .then((cacheNames) => {
                 return Promise.all(
                     cacheNames.map((cacheName) => {
-                        if (cacheName !== STATIC_CACHE_NAME && cacheName !== DYNAMIC_CACHE_NAME) {
+                        if (cacheName !== IMAGES_STYLES_CACHE_NAME) {
                             console.log('Service Worker: Deleting old cache', cacheName);
                             return caches.delete(cacheName);
                         }
@@ -73,43 +75,34 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
+    // * Skip API requests - let them pass through without interception
+    if (url.pathname.startsWith('/api/')) {
+        console.log('Service Worker: Skipping API request', request.url);
+        return;
+    }
+
     // * Handle different types of requests
     if (request.destination === 'document') {
-        // * For HTML pages, use Network First strategy
+        // * For HTML pages, ALWAYS fetch from network - never cache
+        event.respondWith(alwaysNetworkStrategy(request));
+    } else if (['image', 'style'].includes(request.destination)) {
+        // * For images and stylesheets only, use Network First strategy (always try network first)
         event.respondWith(networkFirstStrategy(request));
-    } else if (['style', 'script', 'image', 'font'].includes(request.destination)) {
-        // * For static assets, use Cache First strategy
-        event.respondWith(cacheFirstStrategy(request));
-    } else if (url.pathname.startsWith('/api/')) {
-        // * For API calls, use Network First with timeout
-        event.respondWith(apiStrategy(request));
     } else {
-        // * Default to Network First for other requests
-        event.respondWith(networkFirstStrategy(request));
+        // * For all other requests (scripts, fonts, etc.), always fetch from network
+        event.respondWith(alwaysNetworkStrategy(request));
     }
 });
 
-// * Network First Strategy - try network first, fallback to cache
-async function networkFirstStrategy(request) {
+// * Always Network Strategy - always fetch from network, never cache
+async function alwaysNetworkStrategy(request) {
     try {
         const networkResponse = await fetch(request);
-
-        // * Cache successful responses
-        if (networkResponse.ok) {
-            const cache = await caches.open(DYNAMIC_CACHE_NAME);
-            cache.put(request, networkResponse.clone());
-        }
-
         return networkResponse;
     } catch (error) {
-        console.log('Service Worker: Network failed, trying cache', request.url);
+        console.log('Service Worker: Network failed for', request.url);
 
-        const cachedResponse = await caches.match(request);
-        if (cachedResponse) {
-            return cachedResponse;
-        }
-
-        // * Return offline page for navigation requests
+        // * Return offline page for navigation requests only
         if (request.destination === 'document') {
             return caches.match('/offline.html');
         }
@@ -118,50 +111,32 @@ async function networkFirstStrategy(request) {
     }
 }
 
-// * Cache First Strategy - try cache first, fallback to network
-async function cacheFirstStrategy(request) {
-    const cachedResponse = await caches.match(request);
-
-    if (cachedResponse) {
-        return cachedResponse;
-    }
-
+// * Network First with Background Cache Update - always serve from network, update cache in background
+async function networkFirstStrategy(request) {
     try {
+        // * Always fetch from network first
         const networkResponse = await fetch(request);
 
-        if (networkResponse.ok) {
-            const cache = await caches.open(STATIC_CACHE_NAME);
-            cache.put(request, networkResponse.clone());
+        // * If successful, update cache in background for images and stylesheets
+        if (networkResponse.ok && ['image', 'style'].includes(request.destination)) {
+            // * Clone the response and cache it in background
+            const responseClone = networkResponse.clone();
+            caches.open(IMAGES_STYLES_CACHE_NAME).then(cache => {
+                cache.put(request, responseClone);
+                console.log('Service Worker: Background cache updated for', request.url);
+            }).catch(error => {
+                console.log('Service Worker: Background cache update failed for', request.url, error);
+            });
         }
 
         return networkResponse;
     } catch (error) {
-        console.error('Service Worker: Failed to fetch', request.url, error);
-        throw error;
-    }
-}
+        console.log('Service Worker: Network failed, trying cache', request.url);
 
-// * API Strategy - network first with timeout
-async function apiStrategy(request) {
-    try {
-        // * Set a timeout for API requests
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
-
-        const networkResponse = await fetch(request, {
-            signal: controller.signal
-        });
-
-        clearTimeout(timeoutId);
-
-        // * Don't cache API responses by default
-        return networkResponse;
-    } catch (error) {
-        console.error('Service Worker: API request failed', request.url, error);
-
-        // * Return cached response if available
+        // * Only fallback to cache if network fails
         const cachedResponse = await caches.match(request);
         if (cachedResponse) {
+            console.log('Service Worker: Serving from cache', request.url);
             return cachedResponse;
         }
 
@@ -169,8 +144,12 @@ async function apiStrategy(request) {
     }
 }
 
-// * Note: Push notification functionality has been removed
-// * This service worker focuses on offline functionality and caching
+
+
+// * Note: This service worker implements "Network First with Background Cache Update"
+// * - Pages: Always served from network, never cached
+// * - Images/Stylesheets: Served from network immediately, cached in background for offline fallback
+// * - API requests: Not intercepted to prevent conflicts with React Query
 
 // * Background sync event handler
 self.addEventListener('sync', (event) => {

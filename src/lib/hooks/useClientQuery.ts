@@ -6,13 +6,8 @@ import { useQuery, UseQueryOptions } from '@tanstack/react-query';
 export function useClientQuery<TData, TError = Error>(
   options: UseQueryOptions<TData, TError>
 ) {
-  // * Use the standard pattern but with better configuration
-  const query = useQuery({
+  return useQuery({
     ...options,
     enabled: typeof window !== 'undefined' && (options.enabled !== false),
-    // * Prevent showing empty state during initial load
-    placeholderData: (previousData) => previousData,
   });
-
-  return query;
 }

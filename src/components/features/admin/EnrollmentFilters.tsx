@@ -4,6 +4,7 @@ import { Select, SelectItem, Button } from "@nextui-org/react"
 import { academicSessionsApi, skillsApi } from "@/lib/api"
 import { useQuery } from "@tanstack/react-query"
 import type { AcademicSession, Skill } from "@/lib/types"
+import { useSessionStore } from "@/lib/stores/sessionStore"
 
 /**
  * * EnrollmentFilters
@@ -22,6 +23,7 @@ export type EnrollmentFiltersProps = {
 }
 
 export function EnrollmentFilters({ value, onChange, defaultPerPage = 25 }: EnrollmentFiltersProps) {
+  const { activeSessionId } = useSessionStore()
   const { data: sessionsResp } = useQuery({
     queryKey: ["academic-sessions"],
     queryFn: () => academicSessionsApi.getAll(),
@@ -34,8 +36,31 @@ export function EnrollmentFilters({ value, onChange, defaultPerPage = 25 }: Enro
 
   const [filters, setFilters] = React.useState<{ academic_session_id?: number; skill_id?: string; per_page?: number }>(value || { per_page: defaultPerPage })
 
-  const sessions = (sessionsResp?.data as AcademicSession[]) || []
-  const skills = (skillsResp?.data as Skill[]) || []
+  const sessions = React.useMemo(() => (sessionsResp?.data as AcademicSession[]) || [], [sessionsResp?.data])
+  const skills = Array.isArray((skillsResp as any)?.data)
+    ? ((skillsResp?.data as unknown) as Skill[])
+    : ((((skillsResp as any)?.data?.items as unknown) as Skill[]) || [])
+
+  // * Prefer the globally active session from the store when absent
+  React.useEffect(() => {
+    if (!filters.academic_session_id && activeSessionId) {
+      const next = { ...filters, academic_session_id: Number(activeSessionId) }
+      setFilters(next)
+      onChange(next)
+    }
+  }, [activeSessionId, filters, onChange])
+
+  // * Fallback: if store is not yet populated, use the session marked active from API list
+  React.useEffect(() => {
+    if (!filters.academic_session_id && sessions.length > 0 && !activeSessionId) {
+      const active = sessions.find((s) => (s as any).active === true)
+      if (active) {
+        const next = { ...filters, academic_session_id: Number(active.id) }
+        setFilters(next)
+        onChange(next)
+      }
+    }
+  }, [sessions, activeSessionId, filters, onChange])
 
   const handleChange = (key: keyof EnrollmentFiltersProps["value"], nextValue: number | string | undefined) => {
     const next = { ...filters, [key]: nextValue }
@@ -60,7 +85,7 @@ export function EnrollmentFilters({ value, onChange, defaultPerPage = 25 }: Enro
           size="sm"
         >
           {sessions.map((s) => (
-            <SelectItem key={s.id} value={s.id}>
+            <SelectItem key={String(s.id)} value={s.id}>
               {s.name}
             </SelectItem>
           ))}

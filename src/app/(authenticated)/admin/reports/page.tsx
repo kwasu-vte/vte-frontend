@@ -2,7 +2,8 @@
 
 import { useMemo, useState } from 'react';
 import { skillGroupsApi, qrCodesApi } from '@/lib/api';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
+import { useClientQuery } from '@/lib/hooks/useClientQuery';
 import { Button, Select, SelectItem } from '@nextui-org/react';
 import { DefaultErrorComponent, DefaultLoadingComponent } from '@/components/shared/StateRenderer';
 
@@ -10,7 +11,7 @@ export default function AdminReportsPage() {
   const [groupId, setGroupId] = useState<string>('');
   const [type, setType] = useState<'attendance' | 'capacity'>('attendance');
 
-  const { data: groupsData } = useQuery({
+  const { data: groupsData } = useClientQuery({
     queryKey: ['skill-groups', { per_page: 100 }],
     queryFn: async () => {
       const res = await skillGroupsApi.list({ per_page: 100 })

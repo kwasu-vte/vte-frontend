@@ -9,31 +9,12 @@ import React, { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import { Card, CardHeader, CardBody, Input, Button, Link, Spinner, Checkbox } from '@nextui-org/react';
 import { Eye, EyeOff } from 'lucide-react';
-import { signInActionSafe } from '@/lib/actions';
 import logo from '@/assets/kwasulogo.png';
 import { NotificationContainer } from '@/components/shared/NotificationContainer';
-import { useFormState, useFormStatus } from 'react-dom';
 import { useRouter, useSearchParams } from 'next/navigation';
-
-function SubmitButton() {
-  const { pending } = useFormStatus();
-  return (
-    <Button
-      type="submit"
-      color="primary"
-      size="lg"
-      className="w-full font-semibold"
-      isDisabled={pending}
-      startContent={pending ? <Spinner size="sm" color="white" /> : null}
-    >
-      {pending ? 'Signing In…' : 'Sign In'}
-    </Button>
-  );
-}
 
 export default function SignInPage() {
   const [isVisible, setIsVisible] = useState(false);
-  const [formState, formAction] = useFormState(signInActionSafe as any, { error: null });
   const [clientError, setClientError] = useState<string | null>(null);
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -48,7 +29,8 @@ export default function SignInPage() {
     let isMounted = true;
     const checkAuth = async () => {
       try {
-        const res = await fetch('/api/v1/users/auth/me', { headers: { Accept: 'application/json' } });
+        const url = '/api/v1/users/auth/me';
+        const res = await fetch(url, { headers: { Accept: 'application/json' } });
         if (!res.ok) return;
         const json = await res.json();
         const role = String(json?.data?.role || '').toLowerCase();
@@ -101,7 +83,8 @@ export default function SignInPage() {
           </CardHeader>
           <CardBody className="space-y-6">
             <form
-              action={formAction}
+              action="/auth/login"
+              method="POST"
               className="space-y-4"
               onSubmit={(e) => {
                 setClientError(null);
@@ -175,14 +158,17 @@ export default function SignInPage() {
                   {clientError}
                 </div>
               ) : null}
-              {formState?.error ? (
-                <div className="text-sm text-danger-600" role="alert" aria-live="assertive">
-                  {formState.error}
-                </div>
-              ) : null}
+              {/* * No server action errors in this flow */}
 
               {/* * Submit Button */}
-              <SubmitButton />
+              <Button
+                type="submit"
+                color="primary"
+                size="lg"
+                className="w-full font-semibold"
+              >
+                Sign In
+              </Button>
             </form>
 
             {/* * Sign Up Link */}

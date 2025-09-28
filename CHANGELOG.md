@@ -3,6 +3,13 @@
 ### Changed
 - NextUI theme hardened in `tailwind.config.ts` per DESIGN_GUIDE: added `layout.borderRadius.medium=0.5rem`, `layout.boxShadow.small/medium`, and aligned `colors.foreground` to neutral-600.
 
+### Fixed
+- Auth: Removed all POST fallbacks for `/v1/users/auth/me`; endpoint is GET-only everywhere.
+- Auth: Proxy clears `session_token` when `/v1/users/auth/me` returns 401 or refresh fails, preventing stale-cookie loops.
+
+### Added
+- Auth: `POST /auth/login` route handler that logs in via proxy, sets `session_token` on browser response, fetches `/api/v1/users/auth/me`, and redirects to role dashboard. Sign-in form now posts to this route.
+
 ## [Unreleased] - 2025-09-24
 ### Changed
 - Align `/auth/sign_in` page content & layout to ROUTE_SPECS and DESIGN_GUIDE (NextUI-themed, neutral bg, Card shadow=sm, inline errors, a11y).
@@ -10,6 +17,7 @@
 
 - Admin Dashboard: Implemented server-side data fetch for sessions, group statistics, and enrollments; added StatCard grid, Recent Activity list, and Quick Actions panel with resilient fallbacks per docs/ROUTE_SPECS.md and docs/DESIGN_GUIDE.md.
 - Admin: Added Enrollments page with filters/table; added nested Skills → Groups page; added QR Codes (main/print/distribution) pages; added Reports page; updated Sidebar with Enrollments, QR Codes, Reports links.
+
 
 ## [Unreleased]
 
@@ -450,3 +458,16 @@
 
 ### Fixed
 - Type issues in dashboard pages and hooks
+\n## [0.2.1] - 2025-09-26\n### Fixed\n- Auth: Avoid cookie mutations in non-route contexts; handle 401 by returning null from  and allowing access in .\n- Auth:  now falls back to POST on 405.\n
+
+## [0.2.1] - 2025-09-26
+### Fixed
+- Auth: Avoid cookie mutations in non-route contexts;  now returns null on 401/refresh failures.
+- Auth:  allows access to auth pages when session is invalid without mutating cookies.
+- Auth:  falls back to POST when GET returns 405.
+
+## [0.2.1] - 2025-09-26
+### Fixed
+- Auth: Avoid cookie mutations in non-route contexts;  now returns null on 401/refresh failures.
+- Auth:  allows access to auth pages when session is invalid without mutating cookies.
+- Auth:  falls back to POST when GET returns 405.

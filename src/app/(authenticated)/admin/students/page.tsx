@@ -5,7 +5,8 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useClientQuery } from '@/lib/hooks/useClientQuery';
 import { StudentsTable } from '@/components/features/admin/StudentsTable';
 // import { StudentModal } from '@/components/features/admin/StudentModal';
 import { StudentProfileModal } from '@/components/features/admin/StudentProfileModal';
@@ -40,13 +41,12 @@ export default function AdminStudentsPage() {
     isLoading,
     error,
     refetch,
-  } = useQuery({
+  } = useClientQuery({
     queryKey: ['students', { search: debouncedSearch }],
     queryFn: async () => {
       const response = await studentsApi.searchStudents({ search: debouncedSearch || undefined, per_page: 25 });
       return response.data;
     },
-    enabled: typeof window !== 'undefined',
   });
 
   const students = useMemo(() => studentsResponse?.items ?? [], [studentsResponse]);
