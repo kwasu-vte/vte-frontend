@@ -471,3 +471,22 @@
 - Auth: Avoid cookie mutations in non-route contexts;  now returns null on 401/refresh failures.
 - Auth:  allows access to auth pages when session is invalid without mutating cookies.
 - Auth:  falls back to POST when GET returns 405.
+## 2025-09-28 20:42:42 - Fix Authentication Race Condition
+
+### Fixed
+- **Authentication Flow Race Condition**: Fixed race condition where sign-in page useEffect would call /api/v1/users/auth/me immediately after form submission, racing with cookie-setting process and causing 401 errors
+- **Simplified Authentication**: Updated sign-in page to use dedicated /auth/login route directly instead of Server Actions with callback flow
+- **Improved UX**: Added proper loading states and disabled submit button during authentication
+
+### Technical Details
+- Removed Server Action (signInActionSafe) usage in favor of direct form submission to /auth/login
+- Added isSubmitting state to prevent race condition in useEffect auth check
+- Updated form handling to use dedicated /auth/login route that immediately sets cookie and redirects
+- Eliminated unnecessary /auth/callback route complexity that was causing timing issues
+
+### Impact
+- Users can now successfully sign in without being redirected back to sign-in page
+- Authentication flow is more reliable and faster
+- Simplified codebase by removing unnecessary Server Action complexity
+
+
