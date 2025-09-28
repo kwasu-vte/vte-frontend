@@ -7,6 +7,7 @@
 import { useState, useEffect } from 'react';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, Select, SelectItem, Textarea } from '@nextui-org/react';
 import { User, CreateMentorProfilePayload, UpdateUserPayload } from '@/lib/types';
+import { getSpecializationOptions } from '@/lib/utils/specialization';
 
 interface MentorModalProps {
   isOpen: boolean;
@@ -117,18 +118,7 @@ export function MentorModal({
   const isPasswordMatch = !formData.password || !formData.password_confirmation || 
     formData.password === formData.password_confirmation;
 
-  const specializationOptions = [
-    { key: 'web-development', value: 'web-development', label: 'Web Development' },
-    { key: 'mobile-development', value: 'mobile-development', label: 'Mobile Development' },
-    { key: 'data-science', value: 'data-science', label: 'Data Science' },
-    { key: 'cybersecurity', value: 'cybersecurity', label: 'Cybersecurity' },
-    { key: 'cloud-computing', value: 'cloud-computing', label: 'Cloud Computing' },
-    { key: 'artificial-intelligence', value: 'artificial-intelligence', label: 'Artificial Intelligence' },
-    { key: 'digital-marketing', value: 'digital-marketing', label: 'Digital Marketing' },
-    { key: 'graphic-design', value: 'graphic-design', label: 'Graphic Design' },
-    { key: 'project-management', value: 'project-management', label: 'Project Management' },
-    { key: 'other', value: 'other', label: 'Other' }
-  ];
+  const specializationOptions = getSpecializationOptions();
 
   return (
     <Modal

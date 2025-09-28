@@ -33,6 +33,14 @@ export function SkillsTable({
   isLoading = false,
   error = null,
 }: SkillsTableProps) {
+  console.log('🔍 [SkillsTable] Received props:', {
+    skills,
+    skillsLength: skills?.length,
+    isLoading,
+    error,
+    skillsType: typeof skills,
+    skillsIsArray: Array.isArray(skills)
+  });
   // * Format date for display
   const formatDate = (dateString: string | null) => {
     if (!dateString) return 'Not set';

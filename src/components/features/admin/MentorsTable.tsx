@@ -7,6 +7,7 @@
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Button, Chip, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@nextui-org/react';
 import { MentorProfile } from '@/lib/types';
 import { MoreVertical, Eye, User as UserIcon, Users } from 'lucide-react';
+import { getSpecializationLabel } from '@/lib/utils/specialization';
 
 interface MentorsTableProps {
   mentors: MentorProfile[];
@@ -70,7 +71,7 @@ export function MentorsTable({
             </TableCell>
             <TableCell>
               <div className="flex flex-col">
-                <span className="font-medium text-neutral-900">{mentor.specialization || 'General'}</span>
+                <span className="font-medium text-neutral-900">{getSpecializationLabel(mentor.specialization)}</span>
               </div>
             </TableCell>
             <TableCell>

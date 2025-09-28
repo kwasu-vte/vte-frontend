@@ -4,7 +4,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useClientQuery } from '@/lib/hooks/useClientQuery';
 import { StateRenderer, DefaultLoadingComponent, DefaultErrorComponent, DefaultEmptyComponent } from '@/components/shared/StateRenderer';
@@ -37,13 +37,28 @@ export default function AdminSkillsPage() {
   } = useClientQuery({
     queryKey: ['skills'],
     queryFn: async () => {
+      console.log('🔍 [Skills] Starting API call...');
       const response = await skillsApi.getAll();
-      console.log('Skills API response:', response);
-      return response.data.items || response.data || [];
+      console.log('🔍 [Skills] Raw API response:', response);
+      console.log('🔍 [Skills] Response.data:', response.data);
+      console.log('🔍 [Skills] Response.data.items:', response.data?.items);
+      console.log('🔍 [Skills] Items length:', response.data?.items?.length);
+      
+      const extractedItems = response.data.items || [];
+      console.log('🔍 [Skills] Extracted items:', extractedItems);
+      console.log('🔍 [Skills] Extracted items length:', extractedItems.length);
+      
+      return extractedItems;
     },
   });
 
-  console.log('Skills state:', { skills, isLoading, error });
+  console.log('🔍 [Skills] Component state:', { 
+    skills, 
+    skillsLength: skills?.length,
+    isLoading, 
+    error,
+    hasWindow: typeof window !== 'undefined'
+  });
 
   // * Create skill mutation
   const createSkillMutation = useMutation({
@@ -124,7 +139,7 @@ export default function AdminSkillsPage() {
   });
 
   // * Handle create skill
-  const handleCreateSkill = async (data: CreateSkillPayload | UpdateSkillPayload) => {
+  const handleCreateSkill = useCallback(async (data: CreateSkillPayload | UpdateSkillPayload) => {
     console.log('🎯 Creating skill with data:', data);
     setIsSubmitting(true);
     try {
@@ -135,17 +150,17 @@ export default function AdminSkillsPage() {
     } finally {
       setIsSubmitting(false);
     }
-  };
+  }, [createSkillMutation]);
 
   // * Handle edit skill
-  const handleEditSkill = async (data: CreateSkillPayload | UpdateSkillPayload) => {
+  const handleEditSkill = useCallback(async (data: CreateSkillPayload | UpdateSkillPayload) => {
     setIsSubmitting(true);
     try {
       await updateSkillMutation.mutateAsync(data as UpdateSkillPayload);
     } finally {
       setIsSubmitting(false);
     }
-  };
+  }, [updateSkillMutation]);
 
   // Basic date range update action (trigger example)
   async function handleUpdateDateRange(skill: Skill, payload: SkillDateRangePayload) {
@@ -173,40 +188,37 @@ export default function AdminSkillsPage() {
   };
 
   // * Open create modal
-  const openCreateModal = () => {
-    console.log('🎯 Opening create modal...');
-    alert('Button clicked! Modal should open now.');
+  const openCreateModal = useCallback(() => {
     setSelectedSkill(null);
     setIsCreateModalOpen(true);
-    console.log('🎯 Modal state set to true');
-  };
+  }, []);
 
   // * Open view modal
-  const openViewModal = (skill: Skill) => {
+  const openViewModal = useCallback((skill: Skill) => {
     setSelectedSkill(skill);
     setIsViewModalOpen(true);
-  };
+  }, []);
 
   // * Open edit modal
-  const openEditModal = (skill: Skill) => {
+  const openEditModal = useCallback((skill: Skill) => {
     setSelectedSkill(skill);
     setIsEditModalOpen(true);
-  };
+  }, []);
 
   // * Open delete modal
-  const openDeleteModal = (skill: Skill) => {
+  const openDeleteModal = useCallback((skill: Skill) => {
     setSelectedSkill(skill);
     setIsDeleteModalOpen(true);
-  };
+  }, []);
 
   // * Close all modals
-  const closeModals = () => {
+  const closeModals = useCallback(() => {
     setIsCreateModalOpen(false);
     setIsEditModalOpen(false);
     setIsViewModalOpen(false);
     setIsDeleteModalOpen(false);
     setSelectedSkill(null);
-  };
+  }, []);
 
   return (
     <div className="space-y-6">

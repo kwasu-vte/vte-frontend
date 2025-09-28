@@ -12,6 +12,7 @@ import { StateRenderer } from '@/components/shared/StateRenderer';
 import { Card, CardBody, CardHeader, Skeleton, Button, Avatar, Chip, Divider } from '@nextui-org/react';
 import { ArrowLeft, Users, User, Calendar, Mail, Phone } from 'lucide-react';
 import Link from 'next/link';
+import { getSpecializationLabel } from '@/lib/utils/specialization';
 
 export const dynamic = 'force-dynamic';
 
@@ -251,7 +252,7 @@ export default async function StudentMyGroup() {
                     <div className="flex-1 space-y-3">
                       <div>
                         <h3 className="text-lg font-medium text-neutral-900">{data.groupDetails.mentor.name}</h3>
-                        <p className="text-sm text-neutral-600">{data.groupDetails.mentor.specialization}</p>
+                        <p className="text-sm text-neutral-600">{getSpecializationLabel(data.groupDetails.mentor.specialization)}</p>
                       </div>
                       <div className="space-y-2">
                         <div className="flex items-center gap-2 text-sm">
