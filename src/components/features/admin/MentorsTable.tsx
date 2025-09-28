@@ -32,14 +32,6 @@ export function MentorsTable({
   isLoading = false,
   error = null,
 }: MentorsTableProps) {
-  console.log('🔍 [MentorsTable] Received props:', {
-    mentors,
-    mentorsLength: mentors?.length,
-    isLoading,
-    error,
-    mentorsType: typeof mentors,
-    mentorsIsArray: Array.isArray(mentors)
-  });
 
   const getStatusColor = (mentor: MentorProfile) => {
     if (!mentor.is_active) return 'danger';

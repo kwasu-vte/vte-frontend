@@ -6,14 +6,14 @@
 
 import { useState, useEffect } from 'react';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, Select, SelectItem, Textarea } from '@nextui-org/react';
-import { User, CreateMentorProfilePayload, UpdateUserPayload } from '@/lib/types';
+import { User, CreateMentorProfilePayload, UpdateUserPayload, MentorProfile } from '@/lib/types';
 import { getSpecializationOptions } from '@/lib/utils/specialization';
 
 interface MentorModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (data: CreateMentorProfilePayload | UpdateUserPayload) => void;
-  mentor?: User | null;
+  mentor?: MentorProfile | null;
   isLoading?: boolean;
 }
 
@@ -42,16 +42,16 @@ export function MentorModal({
     if (isOpen) {
       if (mentor) {
         setFormData({
-          first_name: mentor.first_name,
-          last_name: mentor.last_name,
-          email: mentor.email,
+          first_name: mentor.user.first_name,
+          last_name: mentor.user.last_name,
+          email: mentor.user.email,
           password: '',
           password_confirmation: '',
           specialization: mentor.specialization || '',
-          phone: '',
-          is_available: true,
+          phone: mentor.phone || '',
+          is_available: mentor.is_available,
           is_active: mentor.is_active,
-          meta: ''
+          meta: mentor.meta ? (Array.isArray(mentor.meta) ? mentor.meta.join(', ') : String(mentor.meta)) : ''
         });
       } else {
         setFormData({
