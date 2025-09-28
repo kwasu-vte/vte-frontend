@@ -70,7 +70,7 @@ function generateBreadcrumbs(pathname: string) {
 export function Header({ user, onMenuClick }: HeaderProps) {
   const pathname = usePathname();
   const breadcrumbs = generateBreadcrumbs(pathname);
-  const { sessions, activeSessionId, refresh, activateSession, createAndActivate } = useSessionStore();
+  const { sessions, activeSessionId, isLoading, refresh, activateSession, createAndActivate } = useSessionStore();
   const [isCreateOpen, setIsCreateOpen] = React.useState(false);
   const [newName, setNewName] = React.useState('');
   const [isSubmitting, setIsSubmitting] = React.useState(false);
@@ -115,14 +115,23 @@ export function Header({ user, onMenuClick }: HeaderProps) {
   React.useEffect(() => {
     if (user.role !== 'Admin') return;
     if (!Array.isArray(sessions)) return;
+    
+    // * Don't show modal while loading
+    if (isLoading) return;
 
-    // * Determine active via explicit active flag or store's activeSessionId
+    // * Only show modal if we have sessions but no active session
+    // * Don't show modal if sessions array is empty (still loading)
     const hasActive = sessions.some((s) => s.active === true) || !!activeSessionId;
     const hasAny = sessions.length > 0;
 
-    if (!hasAny || !hasActive) setShowNoActiveModal(true);
-    else setShowNoActiveModal(false);
-  }, [sessions, activeSessionId, user.role]);
+    // * Only show modal if we have sessions but no active one
+    // * This prevents the modal from flashing during initial load
+    if (hasAny && !hasActive) {
+      setShowNoActiveModal(true);
+    } else {
+      setShowNoActiveModal(false);
+    }
+  }, [sessions, activeSessionId, user.role, isLoading]);
 
   const handleCreate = async () => {
     if (!newName.trim()) return;
@@ -182,6 +191,7 @@ export function Header({ user, onMenuClick }: HeaderProps) {
             <div className="flex items-center gap-2">
               <Select
                 value={selectedValue}
+                disabled={isLoading}
                 onValueChange={(val) => {
                   if (val === '__create__') {
                     // * Open modal and revert back to previous selection without triggering activation
@@ -194,7 +204,7 @@ export function Header({ user, onMenuClick }: HeaderProps) {
                 }}
               >
                 <SelectTrigger className="w-[220px]">
-                  <SelectValue placeholder={sessions.length ? 'Select session' : 'No sessions'} />
+                  <SelectValue placeholder={isLoading ? 'Loading sessions...' : sessions.length ? 'Select session' : 'No sessions'} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="__create__">

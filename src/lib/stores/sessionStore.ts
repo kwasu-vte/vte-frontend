@@ -10,6 +10,7 @@ import type { AcademicSession } from "@/lib/types"
 type SessionStore = {
   sessions: AcademicSession[];
   activeSessionId: number | null;
+  isLoading: boolean;
   setSessions: (sessions: AcademicSession[]) => void;
   /**
    * * Activates the session on the server and updates local state
@@ -28,6 +29,7 @@ type SessionStore = {
 export const useSessionStore = create<SessionStore>((set, get) => ({
   sessions: [],
   activeSessionId: null,
+  isLoading: false,
   setSessions: (sessions) => set({
     sessions,
     activeSessionId: sessions.find((s) => s.active)?.id ?? null,
@@ -38,6 +40,7 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
     await get().refresh()
   },
   refresh: async () => {
+    set({ isLoading: true });
     try {
       const res = await academicSessionsApi.getAll()
       if (res?.success) {
@@ -45,10 +48,14 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
         set({
           sessions,
           activeSessionId: sessions.find((s) => s.active)?.id ?? null,
+          isLoading: false,
         })
+      } else {
+        set({ isLoading: false });
       }
     } catch (error) {
       // ! Swallow errors at store level; UI handles surfacing
+      set({ isLoading: false });
     }
   },
   createAndActivate: async ({ name, starts_at = null, ends_at = null }) => {
@@ -79,5 +86,3 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
     }
   },
 }))
-
-
