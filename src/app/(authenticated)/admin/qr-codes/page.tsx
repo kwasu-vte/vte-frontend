@@ -5,7 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { QRGenerationForm } from '@/components/features/admin/QRGenerationForm';
 import { QRDistributionTracker } from '@/components/features/admin/QRDistributionTracker';
 import { Select, SelectItem } from '@nextui-org/react';
-import { useQuery } from '@tanstack/react-query';
+import { useClientQuery } from '@/lib/hooks/useClientQuery';
 import { skillsApi, skillGroupsApi } from '@/lib/api';
 
 export default function AdminQrCodesPage() {
@@ -15,22 +15,20 @@ export default function AdminQrCodesPage() {
   const [selectedGroupId, setSelectedGroupId] = useState<number | null>(null);
 
   // * Load skills for selector
-  const { data: skillsResp } = useQuery({
+  const { data: skillsResp } = useClientQuery({
     queryKey: ['qr-skills'],
     queryFn: async () => (await skillsApi.getAll()).data,
-    enabled: typeof window !== 'undefined',
   });
   const skills = useMemo(() => (skillsResp as any)?.items ?? skillsResp ?? [], [skillsResp]);
 
   // * Load groups for selected skill
-  const { data: groupsResp } = useQuery({
+  const { data: groupsResp } = useClientQuery({
     queryKey: ['qr-groups', selectedSkillId],
     queryFn: async () => {
       if (!selectedSkillId) return [] as any[];
       const res = await skillGroupsApi.list({ per_page: 100, skill_id: Number(selectedSkillId) });
       return res.data?.items ?? [];
     },
-    enabled: typeof window !== 'undefined' && !!selectedSkillId,
   });
   const groups = useMemo(() => groupsResp ?? [], [groupsResp]);
 

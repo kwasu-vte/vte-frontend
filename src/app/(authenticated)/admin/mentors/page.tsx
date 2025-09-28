@@ -5,7 +5,8 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useClientQuery } from '@/lib/hooks/useClientQuery';
 import { MentorsTable } from '@/components/features/admin/MentorsTable';
 import { MentorModal } from '@/components/features/admin/MentorModal';
 import { mentorsApi } from '@/lib/api';
@@ -29,13 +30,12 @@ export default function AdminMentorsPage() {
     return () => clearTimeout(t)
   }, [search])
 
-  const { data, isLoading, error, refetch } = useQuery({
+  const { data, isLoading, error, refetch } = useClientQuery({
     queryKey: ['mentors', { search: debouncedSearch }],
     queryFn: async () => {
       const res = await mentorsApi.list({ search: debouncedSearch || undefined, per_page: '25' })
       return res.data
     },
-    enabled: typeof window !== 'undefined',
   })
 
   const mentors = useMemo(() => data ?? [], [data])

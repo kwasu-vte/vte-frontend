@@ -5,7 +5,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useClientQuery } from '@/lib/hooks/useClientQuery';
 import { StateRenderer, DefaultLoadingComponent, DefaultErrorComponent, DefaultEmptyComponent } from '@/components/shared/StateRenderer';
 import { GroupsTable } from '@/components/features/admin/GroupsTable';
 import { skillGroupsApi } from '@/lib/api';
@@ -23,7 +23,7 @@ export default function AdminGroupsPage() {
     isLoading,
     error,
     refetch
-  } = useQuery({
+  } = useClientQuery({
     queryKey: ['groups'],
     queryFn: async () => {
       // * No direct groups list API; derive from skill groups
@@ -41,7 +41,6 @@ export default function AdminGroupsPage() {
       })) as unknown as Group[];
       return mapped;
     },
-    enabled: typeof window !== 'undefined', // * Only enable on client side
   });
 
   // * Read-only view: open details modal

@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useClientQuery } from '@/lib/hooks/useClientQuery';
 import { StateRenderer, DefaultLoadingComponent, DefaultErrorComponent, DefaultEmptyComponent } from '@/components/shared/StateRenderer';
 import { authApi, academicSessionsApi } from '@/lib/api';
 import type { AcademicSession, User } from '@/lib/types';
@@ -46,22 +47,20 @@ export default function AdminSessionsPage() {
     data: currentUser,
     isLoading: userLoading,
     error: userError
-  } = useQuery({
+  } = useClientQuery({
     queryKey: ['currentUser'],
     queryFn: async () => {
       const response = await authApi.getCurrentUser();
       return response.data;
     },
-    enabled: typeof window !== 'undefined',
   });
 
-  const { data: sessions, isLoading, error, refetch } = useQuery({
+  const { data: sessions, isLoading, error, refetch } = useClientQuery({
     queryKey: ['admin-sessions'],
     queryFn: async () => {
       const res = await academicSessionsApi.getAll();
       return res.data as AcademicSession[];
     },
-    enabled: typeof window !== 'undefined',
   });
 
   const upsertMutation = useMutation({

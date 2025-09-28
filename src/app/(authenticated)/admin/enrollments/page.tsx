@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useClientQuery } from '@/lib/hooks/useClientQuery';
 import { enrollmentsApi, skillGroupsApi, skillsApi } from '@/lib/api';
 import type { Enrollment, PaginatedResponse } from '@/lib/types';
 import { StateRenderer, DefaultLoadingComponent, DefaultErrorComponent } from '@/components/shared/StateRenderer';
@@ -16,18 +16,16 @@ export default function AdminEnrollmentsPage() {
   const [assignEnrollmentId, setAssignEnrollmentId] = useState<number | null>(null);
   const [selectedGroupId, setSelectedGroupId] = useState<string>("");
 
-  const { data, isLoading, error, refetch } = useQuery({
+  const { data, isLoading, error, refetch } = useClientQuery({
     queryKey: ['admin-enrollments', filters],
     queryFn: async () => (await enrollmentsApi.getAll(filters)).data as PaginatedResponse<Enrollment>,
-    enabled: typeof window !== 'undefined',
   });
-  const { data: groupsData } = useQuery({
+  const { data: groupsData } = useClientQuery({
     queryKey: ['skill-groups', { skill_id: filters.skill_id }],
     queryFn: async () => {
       const res = await skillGroupsApi.list({ per_page: 100, ...(filters.skill_id ? { skill_id: Number(filters.skill_id) } : {}) })
       return res.data?.items ?? []
     },
-    enabled: typeof window !== 'undefined',
   })
   const groupOptions = (groupsData || []).map((g) => ({ id: String(g.id), name: g.group_display_name || `Group ${g.group_number}` }))
 
