@@ -1,104 +1,112 @@
 "use client";
 
-import { useEffect, useMemo, useState } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
-import { QRGenerationForm } from '@/components/features/admin/QRGenerationForm';
+import { useState } from 'react';
+import { Card, CardBody, CardHeader, Button, Progress } from '@nextui-org/react';
+import { QRWizard } from '@/components/features/admin/QRWizard';
 import { QRDistributionTracker } from '@/components/features/admin/QRDistributionTracker';
-import { Select, SelectItem } from '@nextui-org/react';
-import { useClientQuery } from '@/lib/hooks/useClientQuery';
-import { skillsApi, skillGroupsApi } from '@/lib/api';
+
+type WizardStep = 'purpose' | 'context' | 'configuration' | 'confirmation' | 'complete';
 
 export default function AdminQrCodesPage() {
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const [selectedSkillId, setSelectedSkillId] = useState<string | null>(null);
+  const [currentStep, setCurrentStep] = useState<WizardStep>('purpose');
+  const [wizardData, setWizardData] = useState<any>({});
   const [selectedGroupId, setSelectedGroupId] = useState<number | null>(null);
 
-  // * Load skills for selector
-  const { data: skillsResp } = useClientQuery({
-    queryKey: ['qr-skills'],
-    queryFn: async () => (await skillsApi.getAll()).data,
-  });
-  const skills = useMemo(() => (skillsResp as any)?.items ?? skillsResp ?? [], [skillsResp]);
+  const steps = [
+    { key: 'purpose', title: 'What do you want to do?', description: 'Choose your main task' },
+    { key: 'context', title: 'Choose your training program', description: 'Select skill and group' },
+    { key: 'configuration', title: 'Set up QR codes', description: 'Configure the details' },
+    { key: 'confirmation', title: 'Review and create', description: 'Confirm your settings' },
+    { key: 'complete', title: 'All done!', description: 'QR codes created successfully' }
+  ];
 
-  // * Load groups for selected skill
-  const { data: groupsResp } = useClientQuery({
-    queryKey: ['qr-groups', selectedSkillId],
-    queryFn: async () => {
-      if (!selectedSkillId) return [] as any[];
-      const res = await skillGroupsApi.list({ per_page: 100, skill_id: Number(selectedSkillId) });
-      return res.data?.items ?? [];
-    },
-  });
-  const groups = useMemo(() => groupsResp ?? [], [groupsResp]);
+  const currentStepIndex = steps.findIndex(step => step.key === currentStep);
+  const progress = ((currentStepIndex + 1) / steps.length) * 100;
 
-  // * Initialize from query params: ?skillId=...&groupId=...
-  useEffect(() => {
-    const qSkill = searchParams.get('skillId');
-    const qGroup = searchParams.get('groupId');
-    if (qSkill) setSelectedSkillId(qSkill);
-    if (qGroup) setSelectedGroupId(Number(qGroup));
-  }, [searchParams]);
+  const handleWizardComplete = (data: any) => {
+    setWizardData(data);
+    setSelectedGroupId(data.groupId);
+    setCurrentStep('complete');
+  };
 
-  // * Keep URL in sync when selections change
-  useEffect(() => {
-    const params = new URLSearchParams(searchParams.toString());
-    if (selectedSkillId) params.set('skillId', selectedSkillId);
-    else params.delete('skillId');
-    if (selectedGroupId) params.set('groupId', String(selectedGroupId));
-    else params.delete('groupId');
-    router.replace(`?${params.toString()}`);
-  }, [selectedSkillId, selectedGroupId]);
+  const handleStartOver = () => {
+    setCurrentStep('purpose');
+    setWizardData({});
+    setSelectedGroupId(null);
+  };
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-neutral-900">QR Codes</h1>
-        <p className="text-neutral-600 mt-1">Generate and track QR codes per group.</p>
+        <h1 className="text-3xl font-bold text-neutral-900">QR Codes for Practical Sessions</h1>
+        <p className="text-neutral-600 mt-1">Create and manage QR codes for student attendance tracking during practical training sessions.</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* * Context selectors */}
-        <div className="bg-white rounded-lg shadow-sm border border-neutral-200 p-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Select
-              label="Skill"
-              selectedKeys={selectedSkillId ? [selectedSkillId] : []}
-              onChange={(e) => {
-                const nextSkill = e.target.value || null;
-                setSelectedSkillId(nextSkill);
-                // * Reset group when skill changes
-                setSelectedGroupId(null);
-              }}
-              placeholder="Select a skill"
+      {/* * Progress indicator */}
+      {currentStep !== 'complete' && (
+        <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+          <CardBody className="py-4">
+            <div className="flex items-center justify-between mb-2">
+              <div>
+                <h3 className="text-lg font-semibold text-blue-900">
+                  {steps[currentStepIndex]?.title}
+                </h3>
+                <p className="text-sm text-blue-700">
+                  {steps[currentStepIndex]?.description}
+                </p>
+              </div>
+              <div className="text-sm text-blue-600 font-medium">
+                Step {currentStepIndex + 1} of {steps.length}
+              </div>
+            </div>
+            <Progress 
+              value={progress} 
+              className="w-full" 
+              color="primary"
               size="sm"
-            >
-              {skills.map((s: any) => (
-                <SelectItem key={String(s.id)}>{s.title}</SelectItem>
-              ))}
-            </Select>
+            />
+          </CardBody>
+        </Card>
+      )}
 
-            <Select
-              label="Group"
-              isDisabled={!selectedSkillId}
-              selectedKeys={selectedGroupId ? [String(selectedGroupId)] : []}
-              onChange={(e) => setSelectedGroupId(e.target.value ? Number(e.target.value) : null)}
-              placeholder={selectedSkillId ? "Select a group" : "Select a skill first"}
-              size="sm"
-            >
-              {groups.map((g: any) => (
-                <SelectItem key={String(g.id)}>{g.group_display_name || `Group ${g.group_number}`}</SelectItem>
-              ))}
-            </Select>
-          </div>
+      {/* * Main content area */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* * Wizard - takes up 2 columns */}
+        <div className="lg:col-span-2">
+          <QRWizard
+            currentStep={currentStep}
+            onStepChange={setCurrentStep}
+            onComplete={handleWizardComplete}
+            initialData={wizardData}
+          />
         </div>
-        <div className="bg-white rounded-lg shadow-sm border border-neutral-200 p-4">
-          <QRGenerationForm onGroupSelected={(id) => setSelectedGroupId(id)} />
-        </div>
-        <div className="bg-white rounded-lg shadow-sm border border-neutral-200 p-4">
-          <QRDistributionTracker selectedGroupId={selectedGroupId} />
+
+        {/* * Distribution tracker - takes up 1 column */}
+        <div className="lg:col-span-1">
+          <Card className="h-fit">
+            <CardHeader>
+              <h3 className="text-lg font-semibold">QR Code Status</h3>
+            </CardHeader>
+            <CardBody>
+              <QRDistributionTracker selectedGroupId={selectedGroupId} />
+            </CardBody>
+          </Card>
         </div>
       </div>
+
+      {/* * Start over button */}
+      {currentStep === 'complete' && (
+        <div className="flex justify-center">
+          <Button 
+            color="primary" 
+            variant="bordered" 
+            size="lg"
+            onPress={handleStartOver}
+          >
+            Create More QR Codes
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
