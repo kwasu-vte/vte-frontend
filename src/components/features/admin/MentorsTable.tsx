@@ -77,6 +77,27 @@ export function MentorsTable({
       ),
     },
     {
+      key: 'skills',
+      label: 'Skills',
+      render: (mentor: MentorProfile) => {
+        let count = 0
+        if (mentor.statistics?.assigned_skills_count) {
+          const n = Number(mentor.statistics.assigned_skills_count as unknown as string)
+          count = Number.isFinite(n) ? n : 0
+        } else if (mentor.assigned_skills) {
+          try {
+            const parsed = typeof mentor.assigned_skills === 'string' ? JSON.parse(mentor.assigned_skills) : mentor.assigned_skills as any
+            if (Array.isArray(parsed)) count = parsed.length
+          } catch {
+            count = 0
+          }
+        }
+        return (
+          <Chip variant="flat" size="sm">{count}</Chip>
+        )
+      },
+    },
+    {
       key: 'students',
       label: 'Current Students',
       render: (mentor: MentorProfile) => (

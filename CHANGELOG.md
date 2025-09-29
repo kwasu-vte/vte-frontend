@@ -490,3 +490,11 @@
 - Simplified codebase by removing unnecessary Server Action complexity
 
 
+
+## [Unreleased] - 2025-09-29
+### Added
+- Admin Mentors: Added Assign Skills action with modal using existing MentorSkillAssignment component on mentors page.
+
+## [Unreleased] - 2025-09-29
+### Added
+- Admin Mentors: Added Skills column in mentors table showing assigned skills count; mentor details already display assigned skills.

@@ -199,13 +199,6 @@ export function Sidebar({ isOpen, user }: SidebarProps) {
 
         {/* * Footer Actions */}
         <div className="px-4 py-6 border-t border-neutral-200">
-          <Link
-            href="/settings"
-            className="flex items-center space-x-3 px-3 py-2 text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900 rounded-lg transition-colors"
-          >
-            <Settings className="w-5 h-5" />
-            <span className="font-medium">Settings</span>
-          </Link>
           
           <form action={signOutAction}>
             <button
