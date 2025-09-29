@@ -9,6 +9,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { User, NavigationItem } from '@/lib/types';
 import { filterNavigationByPermissions } from '@/lib/permissions';
+import { signOutAction } from '@/lib/actions';
 import { 
   BookOpen, 
   Users, 
@@ -94,15 +95,33 @@ const navigationItems: NavigationItem[] = [
     role: ['Mentor'],
   },
   {
+    href: '/mentor/my-skills',
+    label: 'My Skills',
+    icon: BookOpen,
+    role: ['Mentor'],
+  },
+  {
     href: '/mentor/my-groups',
     label: 'My Groups',
     icon: Users,
     role: ['Mentor'],
   },
   {
+    href: '/mentor/schedule',
+    label: 'Schedule',
+    icon: Calendar,
+    role: ['Mentor'],
+  },
+  {
     href: '/mentor/calendar',
     label: 'Calendar',
     icon: Calendar,
+    role: ['Mentor'],
+  },
+  {
+    href: '/mentor/my-qr-codes',
+    label: 'My QR Codes',
+    icon: QrCode,
     role: ['Mentor'],
   },
 
@@ -198,24 +217,16 @@ export function Sidebar({ isOpen, user }: SidebarProps) {
 
         {/* * Footer Actions */}
         <div className="px-4 py-6 border-t border-neutral-200">
-          <Link
-            href="/settings"
-            className="flex items-center space-x-3 px-3 py-2 text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900 rounded-lg transition-colors"
-          >
-            <Settings className="w-5 h-5" />
-            <span className="font-medium">Settings</span>
-          </Link>
           
-          <button
-            onClick={() => {
-              // TODO: Implement logout via AuthContext
-              console.log('Logout clicked');
-            }}
-            className="flex items-center space-x-3 px-3 py-2 text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900 rounded-lg transition-colors w-full mt-2"
-          >
-            <LogOut className="w-5 h-5" />
-            <span className="font-medium">Logout</span>
-          </button>
+          <form action={signOutAction}>
+            <button
+              type="submit"
+              className="flex items-center space-x-3 px-3 py-2 text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900 rounded-lg transition-colors w-full mt-2"
+            >
+              <LogOut className="w-5 h-5" />
+              <span className="font-medium">Logout</span>
+            </button>
+          </form>
         </div>
       </div>
     </aside>

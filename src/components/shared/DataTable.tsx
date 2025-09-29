@@ -37,6 +37,15 @@ export function DataTable<T>({
   emptyComponent,
   emptyActionButton,
 }: DataTableProps<T>) {
+  console.log('🔍 [DataTable] Received props:', {
+    data,
+    dataLength: Array.isArray(data) ? data.length : 'not-array',
+    isLoading,
+    error,
+    dataType: typeof data,
+    dataIsArray: Array.isArray(data)
+  });
+  
   return (
     <StateRenderer
       data={data}

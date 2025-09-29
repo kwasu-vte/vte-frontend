@@ -13,10 +13,12 @@ export const academicSessionsApi = {
     });
   },
 
-  update(id: number, sessionData: { name?: string; starts_at?: string; ends_at?: string; }): Promise<ApiResponse<AcademicSession>> {
+  update(id: number, sessionData: { /* name?: string; */ starts_at?: string; ends_at?: string; }): Promise<ApiResponse<AcademicSession>> {
+    // * Only send date fields; omit name from update payload per requirement
+    const { /* name, */ starts_at, ends_at } = sessionData;
     return apiRequest(`v1/academic-sessions/${id}`, {
       method: 'PATCH',
-      body: JSON.stringify(sessionData),
+      body: JSON.stringify({ starts_at, ends_at }),
     });
   },
 

@@ -45,11 +45,13 @@ export function useAdminDashboardData(): AdminDashboardData {
 
   // Determine active session
   const activeSession = (() => {
-    if (!sessions || sessions.length === 0) return null;
+    // * Ensure sessions is an array before using array methods
+    const sessionsArray = Array.isArray(sessions) ? sessions : [];
+    if (sessionsArray.length === 0) return null;
     
     const now = new Date();
-    return sessions.find((s) => s.active) ||
-           sessions.find((s) => {
+    return sessionsArray.find((s) => s.active) ||
+           sessionsArray.find((s) => {
              if (!s.starts_at || !s.ends_at) return false;
              const start = new Date(s.starts_at);
              const end = new Date(s.ends_at);
@@ -65,7 +67,7 @@ export function useAdminDashboardData(): AdminDashboardData {
   const error = sessionsError || statsError || enrollmentsError;
 
   return {
-    sessions: sessions || [],
+    sessions: Array.isArray(sessions) ? sessions : [],
     activeSession,
     statistics: statistics || null,
     recentEnrollments: recentEnrollments || null,

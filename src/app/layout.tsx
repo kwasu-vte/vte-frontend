@@ -116,9 +116,9 @@ export default function RootLayout({
         <Providers>
           <QueryProvider>
             <AppProvider>
-              {/* <PWAManager> */}
+              <PWAManager>
                 {children}
-              {/* </PWAManager> */}
+              </PWAManager>
             </AppProvider>
           </QueryProvider>
         </Providers>

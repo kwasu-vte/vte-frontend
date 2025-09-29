@@ -51,7 +51,7 @@ export async function getSession(): Promise<AuthSession | null> {
             };
           }
         }
-        console.log('Session refresh failed, session is invalid');
+        console.log('Session refresh failed; treating session as invalid');
         return null;
       }
     } catch (error) {
@@ -75,6 +75,7 @@ export async function getSession(): Promise<AuthSession | null> {
         console.error('Failed to refresh session:', refreshError);
       }
       
+      // * At this point, treat session as invalid
       return null;
     }
   } catch (error) {
@@ -145,8 +146,9 @@ export async function refreshAccessToken(): Promise<string | null> {
 
 // * Clear all authentication cookies
 export async function clearAuthCookies(): Promise<void> {
-  const cookieStore = await cookies();
-  cookieStore.delete('session_token');
+  // ! No-op: Cookie mutations are only allowed in Route Handlers/Server Actions.
+  // ! Expose a dedicated Route Handler to clear cookies from the client when needed.
+  return;
 }
 
 // * Validate and decode JWT token (placeholder for production)

@@ -8,11 +8,7 @@ import { qrCodesApi } from "@/lib/api"
 /**
  * * QRDistributionTracker
  * Track which QR codes have been given to which mentors.
- * TODO: Build table with QR batch, mentor, group, date, status; actions to mark distributed and print labels.
- *
- * Props:
- * - qrBatches: Array<{ id: string; mentor: string; group: string; date: string; status: 'distributed' | 'pending' }>
- * - onMarkDistributed: (batchId: string) => void
+ * Simplified for better UX - shows recent QR codes and their status.
  */
 export type QRDistributionTrackerProps = {
   selectedGroupId?: number | null
@@ -24,8 +20,6 @@ export function QRDistributionTracker(props: QRDistributionTrackerProps) {
   const { selectedGroupId, qrBatches, onMarkDistributed } = props
   const [status, setStatus] = useState<"all" | "active" | "expired">("all")
   const [page, setPage] = useState(1)
-  // TODO: Persist distribution status via API when backend endpoint is available.
-  // TODO: Support global (multi-group) distribution view when a list-all endpoint exists.
 
   // * If parent did not provide batches, fetch codes and aggregate
   const shouldFetch = (!!selectedGroupId) && (!qrBatches || qrBatches.length === 0)
@@ -49,70 +43,124 @@ export function QRDistributionTracker(props: QRDistributionTrackerProps) {
   const totalPages = Math.max(1, Math.ceil(rows.length / 10))
   const paged = rows.slice((page - 1) * 10, page * 10)
 
+  // * Show helpful message when no group is selected
+  if (!selectedGroupId) {
+    return (
+      <div className="text-center py-8">
+        <div className="text-4xl mb-3">📋</div>
+        <h3 className="text-lg font-semibold text-gray-700 mb-2">QR Code Status</h3>
+        <p className="text-sm text-gray-500">
+          Select a training group to view QR code status and distribution tracking.
+        </p>
+      </div>
+    )
+  }
+
   return (
-    <Card shadow="sm">
-      <CardHeader className="flex items-center justify-between">
-        <p className="text-sm font-medium">QR Distribution</p>
-        <div className="flex items-center gap-2">
-          <Select size="sm" selectedKeys={[status]} onChange={(e) => setStatus((e.target.value as any) || "all")}> 
-            <SelectItem key="all">All</SelectItem>
-            <SelectItem key="active">Active</SelectItem>
-            <SelectItem key="expired">Expired/Distributed</SelectItem>
-          </Select>
+    <div className="space-y-4">
+      {/* * Status filter */}
+      <div className="flex items-center justify-between">
+        <h4 className="text-sm font-medium text-gray-700">Filter by status:</h4>
+        <Select 
+          size="sm" 
+          selectedKeys={[status]} 
+          onChange={(e) => setStatus((e.target.value as any) || "all")}
+          className="w-32"
+        > 
+          <SelectItem key="all">All</SelectItem>
+          <SelectItem key="active">Active</SelectItem>
+          <SelectItem key="expired">Expired</SelectItem>
+        </Select>
+      </div>
+
+      {/* * Content */}
+      {isLoading ? (
+        <div className="flex items-center justify-center py-8">
+          <Spinner size="sm" label="Loading QR codes..." />
         </div>
-      </CardHeader>
-      <CardBody>
-        {/* TODO: Add a print labels dialog with preview and printer tips. */}
-        {isLoading ? (
-          <div className="flex items-center justify-center py-8"><Spinner label="Loading..." /></div>
-        ) : isError ? (
-          <div className="py-6 text-sm text-red-500">Failed to load QR batches.</div>
-        ) : rows.length === 0 ? (
-          <div className="py-6 text-sm text-neutral-500">No QR batches found.</div>
-        ) : (
-          <>
-            <Table aria-label="QR distribution table">
-              <TableHeader>
-                <TableColumn>Mentor</TableColumn>
-                <TableColumn>Group</TableColumn>
-                <TableColumn>Date</TableColumn>
-                <TableColumn>Status</TableColumn>
-                <TableColumn className="w-[140px]">Actions</TableColumn>
-              </TableHeader>
-              <TableBody>
-                {paged.map((b: any) => (
-                  <TableRow key={b.id}>
-                    <TableCell>{b.mentor || "-"}</TableCell>
-                    <TableCell>{b.group || "-"}</TableCell>
-                    <TableCell>{b.date || "-"}</TableCell>
-                    <TableCell>
-                      <Chip size="sm" color={b.status === "distributed" ? "success" : b.status === "pending" ? "warning" : "default"}>{b.status}</Chip>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-2">
-                        {onMarkDistributed && (
-                          <Tooltip content="Mark as distributed">
-                            <Button size="sm" color="primary" variant="bordered" onPress={() => onMarkDistributed(String(b.id))} isDisabled={b.status === "distributed"}>
-                            Mark Distributed
-                            </Button>
-                          </Tooltip>
-                        )}
-                        <Tooltip content="Print labels">
-                          <Button size="sm" variant="ghost">Print</Button>
-                        </Tooltip>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-            <div className="mt-4 flex justify-end">
-              <Pagination page={page} total={totalPages} onChange={setPage} showControls size="sm" />
+      ) : isError ? (
+        <div className="py-6 text-sm text-red-500 text-center">
+          Failed to load QR codes. Please try again.
+        </div>
+      ) : rows.length === 0 ? (
+        <div className="text-center py-8">
+          <div className="text-4xl mb-3">📱</div>
+          <h4 className="text-sm font-semibold text-gray-700 mb-2">No QR Codes Yet</h4>
+          <p className="text-xs text-gray-500">
+            Create QR codes for practical sessions using the wizard to see them here.
+          </p>
+        </div>
+      ) : (
+        <>
+          {/* * Summary cards */}
+          <div className="grid grid-cols-2 gap-2 mb-4">
+            <div className="bg-green-50 p-3 rounded-lg text-center">
+              <div className="text-lg font-semibold text-green-700">
+                {rows.filter((r: any) => r.status === 'active').length}
+              </div>
+              <div className="text-xs text-green-600">Active</div>
             </div>
-          </>
-        )}
-      </CardBody>
-    </Card>
+            <div className="bg-gray-50 p-3 rounded-lg text-center">
+              <div className="text-lg font-semibold text-gray-700">
+                {rows.filter((r: any) => r.status !== 'active').length}
+              </div>
+              <div className="text-xs text-gray-600">Used/Expired</div>
+            </div>
+          </div>
+
+          {/* * QR codes table */}
+          <div className="space-y-2">
+            {paged.map((b: any, index: number) => (
+              <div key={b.id || index} className="bg-white border border-gray-200 rounded-lg p-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <div className="text-sm font-medium text-gray-900">
+                      {b.group || b.group_display_name || `Group ${b.group_number}` || 'Unknown Group'}
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      {b.date ? new Date(b.date).toLocaleDateString() : 'No date'}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Chip 
+                      size="sm" 
+                      color={b.status === "active" ? "success" : b.status === "pending" ? "warning" : "default"}
+                    >
+                      {b.status || 'unknown'}
+                    </Chip>
+                    {onMarkDistributed && b.status !== "distributed" && (
+                      <Tooltip content="Mark as distributed">
+                        <Button 
+                          size="sm" 
+                          color="primary" 
+                          variant="bordered"
+                          onPress={() => onMarkDistributed(String(b.id))}
+                        >
+                          Mark Done
+                        </Button>
+                      </Tooltip>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* * Pagination */}
+          {totalPages > 1 && (
+            <div className="flex justify-center pt-4">
+              <Pagination 
+                page={page} 
+                total={totalPages} 
+                onChange={setPage} 
+                showControls 
+                size="sm" 
+              />
+            </div>
+          )}
+        </>
+      )}
+    </div>
   )
 }
 

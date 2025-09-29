@@ -2,6 +2,18 @@
 
 ### Changed
 - NextUI theme hardened in `tailwind.config.ts` per DESIGN_GUIDE: added `layout.borderRadius.medium=0.5rem`, `layout.boxShadow.small/medium`, and aligned `colors.foreground` to neutral-600.
+- Mentor: Merged `/mentor/calendar` and `/mentor/schedule` pages - both now use unified `MentorCalendarView` component with enhanced session details and dual tab interface.
+
+### Fixed
+- Auth: Removed all POST fallbacks for `/v1/users/auth/me`; endpoint is GET-only everywhere.
+- Auth: Proxy clears `session_token` when `/v1/users/auth/me` returns 401 or refresh fails, preventing stale-cookie loops.
+- Header: Fixed 403 error on academic sessions API for non-admin users - session store now only loads for Admin role.
+
+### Added
+- Auth: `POST /auth/login` route handler that logs in via proxy, sets `session_token` on browser response, fetches `/api/v1/users/auth/me`, and redirects to role dashboard. Sign-in form now posts to this route.
+
+### Removed
+- Mentor: `MentorScheduleView` component - functionality merged into `MentorCalendarView`.
 
 ## [Unreleased] - 2025-09-24
 ### Changed
@@ -10,6 +22,7 @@
 
 - Admin Dashboard: Implemented server-side data fetch for sessions, group statistics, and enrollments; added StatCard grid, Recent Activity list, and Quick Actions panel with resilient fallbacks per docs/ROUTE_SPECS.md and docs/DESIGN_GUIDE.md.
 - Admin: Added Enrollments page with filters/table; added nested Skills → Groups page; added QR Codes (main/print/distribution) pages; added Reports page; updated Sidebar with Enrollments, QR Codes, Reports links.
+
 
 ## [Unreleased]
 
@@ -450,3 +463,69 @@
 
 ### Fixed
 - Type issues in dashboard pages and hooks
+\n## [0.2.1] - 2025-09-26\n### Fixed\n- Auth: Avoid cookie mutations in non-route contexts; handle 401 by returning null from  and allowing access in .\n- Auth:  now falls back to POST on 405.\n
+
+## [0.2.1] - 2025-09-26
+### Fixed
+- Auth: Avoid cookie mutations in non-route contexts;  now returns null on 401/refresh failures.
+- Auth:  allows access to auth pages when session is invalid without mutating cookies.
+- Auth:  falls back to POST when GET returns 405.
+
+## [0.2.1] - 2025-09-26
+### Fixed
+- Auth: Avoid cookie mutations in non-route contexts;  now returns null on 401/refresh failures.
+- Auth:  allows access to auth pages when session is invalid without mutating cookies.
+- Auth:  falls back to POST when GET returns 405.
+## 2025-09-28 20:42:42 - Fix Authentication Race Condition
+
+### Fixed
+- **Authentication Flow Race Condition**: Fixed race condition where sign-in page useEffect would call /api/v1/users/auth/me immediately after form submission, racing with cookie-setting process and causing 401 errors
+- **Simplified Authentication**: Updated sign-in page to use dedicated /auth/login route directly instead of Server Actions with callback flow
+- **Improved UX**: Added proper loading states and disabled submit button during authentication
+
+### Technical Details
+- Removed Server Action (signInActionSafe) usage in favor of direct form submission to /auth/login
+- Added isSubmitting state to prevent race condition in useEffect auth check
+- Updated form handling to use dedicated /auth/login route that immediately sets cookie and redirects
+- Eliminated unnecessary /auth/callback route complexity that was causing timing issues
+
+### Impact
+- Users can now successfully sign in without being redirected back to sign-in page
+- Authentication flow is more reliable and faster
+- Simplified codebase by removing unnecessary Server Action complexity
+
+
+
+## [Unreleased] - 2025-09-29
+### Added
+- Admin Mentors: Added Assign Skills action with modal using existing MentorSkillAssignment component on mentors page.
+
+## [Unreleased] - 2025-09-29
+### Added
+- Admin Mentors: Added Skills column in mentors table showing assigned skills count; mentor details already display assigned skills.
+## [2025-09-29] - Mentor Calendar Implementation
+
+### Added
+- Created mentor calendar page at /mentor/calendar/page.tsx
+- Implemented MentorCalendarView component with tabs for calendar and list views
+- Added SessionDetails dialog component for session detail viewing
+- Updated sidebar navigation to include complete mentor menu items:
+  - My Skills
+  - Schedule
+  - Calendar
+  - My QR Codes
+  - Attendance Reports
+
+### Technical Details
+- Used timezone-safe date handling with custom utility functions
+- Implemented proper session ordering (upcoming first, then past)
+- Added session click functionality to open detail dialogs
+- Supports both calendar and list view modes as per documentation specs
+- All type-safe with proper SkillGroup interface usage
+
+### Components
+- MentorCalendarView: Main calendar component with tabs
+- SessionDetails: Dialog component for session information
+- Updated Sidebar: Complete mentor navigation menu
+
+

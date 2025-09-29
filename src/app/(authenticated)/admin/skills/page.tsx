@@ -4,7 +4,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useClientQuery } from '@/lib/hooks/useClientQuery';
 import { StateRenderer, DefaultLoadingComponent, DefaultErrorComponent, DefaultEmptyComponent } from '@/components/shared/StateRenderer';
@@ -18,8 +18,6 @@ import { useApp } from '@/context/AppContext';
 import { getErrorMessage, getErrorTitle, getSuccessTitle, getSuccessMessage } from '@/lib/error-handling';
 
 export default function AdminSkillsPage() {
-  console.log('🎯 AdminSkillsPage component mounted');
-  
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
@@ -30,7 +28,7 @@ export default function AdminSkillsPage() {
   const queryClient = useQueryClient();
   const { addNotification } = useApp();
 
-  // * React Query for data fetching - only run on client
+  // * Simple data fetching
   const {
     data: skills,
     isLoading,
@@ -39,10 +37,27 @@ export default function AdminSkillsPage() {
   } = useClientQuery({
     queryKey: ['skills'],
     queryFn: async () => {
+      console.log('🔍 [Skills] Starting API call...');
       const response = await skillsApi.getAll();
-      // * skillsApi.getAll returns Skill[] directly
-      return response.data ?? [];
+      console.log('🔍 [Skills] Raw API response:', response);
+      console.log('🔍 [Skills] Response.data:', response.data);
+      console.log('🔍 [Skills] Response.data.items:', response.data?.items);
+      console.log('🔍 [Skills] Items length:', response.data?.items?.length);
+      
+      const extractedItems = response.data.items || [];
+      console.log('🔍 [Skills] Extracted items:', extractedItems);
+      console.log('🔍 [Skills] Extracted items length:', extractedItems.length);
+      
+      return extractedItems;
     },
+  });
+
+  console.log('🔍 [Skills] Component state:', { 
+    skills, 
+    skillsLength: skills?.length,
+    isLoading, 
+    error,
+    hasWindow: typeof window !== 'undefined'
   });
 
   // * Create skill mutation
@@ -124,7 +139,7 @@ export default function AdminSkillsPage() {
   });
 
   // * Handle create skill
-  const handleCreateSkill = async (data: CreateSkillPayload | UpdateSkillPayload) => {
+  const handleCreateSkill = useCallback(async (data: CreateSkillPayload | UpdateSkillPayload) => {
     console.log('🎯 Creating skill with data:', data);
     setIsSubmitting(true);
     try {
@@ -135,17 +150,17 @@ export default function AdminSkillsPage() {
     } finally {
       setIsSubmitting(false);
     }
-  };
+  }, [createSkillMutation]);
 
   // * Handle edit skill
-  const handleEditSkill = async (data: CreateSkillPayload | UpdateSkillPayload) => {
+  const handleEditSkill = useCallback(async (data: CreateSkillPayload | UpdateSkillPayload) => {
     setIsSubmitting(true);
     try {
       await updateSkillMutation.mutateAsync(data as UpdateSkillPayload);
     } finally {
       setIsSubmitting(false);
     }
-  };
+  }, [updateSkillMutation]);
 
   // Basic date range update action (trigger example)
   async function handleUpdateDateRange(skill: Skill, payload: SkillDateRangePayload) {
@@ -173,40 +188,37 @@ export default function AdminSkillsPage() {
   };
 
   // * Open create modal
-  const openCreateModal = () => {
-    console.log('🎯 Opening create modal...');
-    alert('Button clicked! Modal should open now.');
+  const openCreateModal = useCallback(() => {
     setSelectedSkill(null);
     setIsCreateModalOpen(true);
-    console.log('🎯 Modal state set to true');
-  };
+  }, []);
 
   // * Open view modal
-  const openViewModal = (skill: Skill) => {
+  const openViewModal = useCallback((skill: Skill) => {
     setSelectedSkill(skill);
     setIsViewModalOpen(true);
-  };
+  }, []);
 
   // * Open edit modal
-  const openEditModal = (skill: Skill) => {
+  const openEditModal = useCallback((skill: Skill) => {
     setSelectedSkill(skill);
     setIsEditModalOpen(true);
-  };
+  }, []);
 
   // * Open delete modal
-  const openDeleteModal = (skill: Skill) => {
+  const openDeleteModal = useCallback((skill: Skill) => {
     setSelectedSkill(skill);
     setIsDeleteModalOpen(true);
-  };
+  }, []);
 
   // * Close all modals
-  const closeModals = () => {
+  const closeModals = useCallback(() => {
     setIsCreateModalOpen(false);
     setIsEditModalOpen(false);
     setIsViewModalOpen(false);
     setIsDeleteModalOpen(false);
     setSelectedSkill(null);
-  };
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -390,17 +402,6 @@ export default function AdminSkillsPage() {
         </ModalContent>
       </Modal>
 
-      {/* * Debug Information */}
-      <div className="bg-neutral-50 p-4 rounded-lg">
-        <h3 className="font-semibold text-neutral-900 mb-2">Debug Information</h3>
-        <div className="text-sm text-neutral-600 space-y-1">
-          <p><strong>Loading:</strong> {isLoading ? 'Yes' : 'No'}</p>
-          <p><strong>Error:</strong> {error ? error.message : 'None'}</p>
-          <p><strong>Data Count:</strong> {skills?.length || 0}</p>
-          <p><strong>Query Key:</strong> [&apos;skills&apos;]</p>
-          <p><strong>Mutations:</strong> Create: {createSkillMutation.isPending ? 'Pending' : 'Idle'}, Update: {updateSkillMutation.isPending ? 'Pending' : 'Idle'}, Delete: {deleteSkillMutation.isPending ? 'Pending' : 'Idle'}</p>
-        </div>
-      </div>
     </div>
   );
 }

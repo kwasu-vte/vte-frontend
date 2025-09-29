@@ -26,24 +26,39 @@ export function StateRenderer<T>({
   emptyComponent,
   children,
 }: StateRendererProps<T>) {
-  // * State 1: Loading
-  if (isLoading) {
+  console.log('🔍 [StateRenderer] Decision logic:', {
+    data,
+    dataLength: Array.isArray(data) ? data.length : 'not-array',
+    isLoading,
+    error,
+    dataIsNull: data == null,
+    dataIsArray: Array.isArray(data),
+    dataIsEmptyArray: Array.isArray(data) && data.length === 0,
+    condition1: isLoading || (data == null && !error),
+    condition2: !!error,
+    condition3: Array.isArray(data) && data.length === 0
+  });
+
+  // * Show loading state if loading OR if data is undefined/null and no error
+  if (isLoading || (data == null && !error)) {
+    console.log('🔍 [StateRenderer] Showing LOADING state');
     return <>{loadingComponent ?? <DefaultLoadingComponent />}</>;
   }
 
-  // * State 2: Error
+  // * Show error state
   if (error) {
+    console.log('🔍 [StateRenderer] Showing ERROR state');
     return <>{errorComponent ?? <DefaultErrorComponent error={error} onRetry={onRetry} />}</>;
   }
 
-  // * State 3: Empty - Only show empty state for explicitly empty arrays
-  // * Don't show empty state for undefined data (which happens during initial load)
+  // * Show empty state for empty arrays
   if (Array.isArray(data) && data.length === 0) {
+    console.log('🔍 [StateRenderer] Showing EMPTY state');
     return <>{emptyComponent ?? <DefaultEmptyComponent message="No items to display." />}</>;
   }
 
-  // * State 4: Success - Render the data (including undefined/null data)
-  // * Let the child component handle undefined/null data gracefully
+  // * Show data
+  console.log('🔍 [StateRenderer] Showing DATA state with:', data);
   return children(data as NonNullable<T>);
 }
 

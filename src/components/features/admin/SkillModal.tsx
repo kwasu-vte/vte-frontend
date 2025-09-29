@@ -4,7 +4,7 @@
 
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, memo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -46,7 +46,7 @@ interface SkillModalProps {
   isLoading?: boolean;
 }
 
-export function SkillModal({
+export const SkillModal = memo(function SkillModal({
   isOpen,
   onClose,
   onSubmit,
@@ -344,4 +344,4 @@ export function SkillModal({
       </ModalContent>
     </Modal>
   );
-}
+});

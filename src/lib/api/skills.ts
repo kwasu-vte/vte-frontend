@@ -8,11 +8,12 @@ import type {
   SkillDateRangePayload, 
   SkillGroup, 
   AutoAssignPayload, 
-  AutoAssignResponse 
+  AutoAssignResponse, 
+  PaginatedResponse,
 } from '../types';
 
 export const skillsApi = {
-  getAll(): Promise<ApiResponse<Skill[]>> {
+  getAll(): Promise<ApiResponse<PaginatedResponse<Skill>>> {
     return apiRequest('v1/skills');
   },
 

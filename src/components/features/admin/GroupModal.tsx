@@ -37,7 +37,7 @@ export function GroupModal({
     queryKey: ['skills'],
     queryFn: async () => {
       const response = await skillsApi.getAll();
-      return response.data;
+      return response.data.items;
     },
   });
 
