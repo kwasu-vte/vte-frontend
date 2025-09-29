@@ -80,9 +80,11 @@ export function Header({ user, onMenuClick }: HeaderProps) {
   const [showNoActiveModal, setShowNoActiveModal] = React.useState(false);
 
   React.useEffect(() => {
-    // * Load sessions when header mounts
-    refresh();
-  }, [refresh]);
+    // * Load sessions when header mounts (admin only)
+    if (user.role === 'Admin') {
+      refresh();
+    }
+  }, [refresh, user.role]);
 
   React.useEffect(() => {
     setSelectedValue(activeSessionId ? String(activeSessionId) : undefined);

@@ -2,13 +2,18 @@
 
 ### Changed
 - NextUI theme hardened in `tailwind.config.ts` per DESIGN_GUIDE: added `layout.borderRadius.medium=0.5rem`, `layout.boxShadow.small/medium`, and aligned `colors.foreground` to neutral-600.
+- Mentor: Merged `/mentor/calendar` and `/mentor/schedule` pages - both now use unified `MentorCalendarView` component with enhanced session details and dual tab interface.
 
 ### Fixed
 - Auth: Removed all POST fallbacks for `/v1/users/auth/me`; endpoint is GET-only everywhere.
 - Auth: Proxy clears `session_token` when `/v1/users/auth/me` returns 401 or refresh fails, preventing stale-cookie loops.
+- Header: Fixed 403 error on academic sessions API for non-admin users - session store now only loads for Admin role.
 
 ### Added
 - Auth: `POST /auth/login` route handler that logs in via proxy, sets `session_token` on browser response, fetches `/api/v1/users/auth/me`, and redirects to role dashboard. Sign-in form now posts to this route.
+
+### Removed
+- Mentor: `MentorScheduleView` component - functionality merged into `MentorCalendarView`.
 
 ## [Unreleased] - 2025-09-24
 ### Changed
@@ -498,3 +503,29 @@
 ## [Unreleased] - 2025-09-29
 ### Added
 - Admin Mentors: Added Skills column in mentors table showing assigned skills count; mentor details already display assigned skills.
+## [2025-09-29] - Mentor Calendar Implementation
+
+### Added
+- Created mentor calendar page at /mentor/calendar/page.tsx
+- Implemented MentorCalendarView component with tabs for calendar and list views
+- Added SessionDetails dialog component for session detail viewing
+- Updated sidebar navigation to include complete mentor menu items:
+  - My Skills
+  - Schedule
+  - Calendar
+  - My QR Codes
+  - Attendance Reports
+
+### Technical Details
+- Used timezone-safe date handling with custom utility functions
+- Implemented proper session ordering (upcoming first, then past)
+- Added session click functionality to open detail dialogs
+- Supports both calendar and list view modes as per documentation specs
+- All type-safe with proper SkillGroup interface usage
+
+### Components
+- MentorCalendarView: Main calendar component with tabs
+- SessionDetails: Dialog component for session information
+- Updated Sidebar: Complete mentor navigation menu
+
+
