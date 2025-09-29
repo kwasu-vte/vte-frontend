@@ -34,7 +34,14 @@ const deleteSessionCookie = async () => {
   });
 };
 
-
+// * Cookie options helper
+const cookieOptions = (maxAgeSeconds: number) => ({
+  path: '/',
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'lax' as const,
+  maxAge: maxAgeSeconds,
+});
 
 // * Universal request handler
 const handleRequest = async (request: NextRequest, { params }: { params: Promise<{ proxy: string[] }> }) => {
