@@ -9,6 +9,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useClientQuery } from '@/lib/hooks/useClientQuery';
 import { MentorsTable } from '@/components/features/admin/MentorsTable';
 import { MentorModal } from '@/components/features/admin/MentorModal';
+import MentorSkillAssignment from '@/components/features/mentor/MentorSkillAssignment';
 import { mentorsApi } from '@/lib/api';
 import { MentorProfile, CreateMentorProfilePayload } from '@/lib/types';
 import { Button, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@nextui-org/react';
@@ -21,6 +22,7 @@ export default function AdminMentorsPage() {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isAssignSkillsOpen, setIsAssignSkillsOpen] = useState(false);
   const [selectedMentor, setSelectedMentor] = useState<MentorProfile | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [search, setSearch] = useState('');
@@ -153,12 +155,19 @@ export default function AdminMentorsPage() {
     setIsDeleteModalOpen(true);
   }, []);
 
+  // * Open assign skills modal
+  const openAssignSkillsModal = useCallback((mentor: MentorProfile) => {
+    setSelectedMentor(mentor);
+    setIsAssignSkillsOpen(true);
+  }, []);
+
   // * Close all modals
   const closeModals = useCallback(() => {
     setIsCreateModalOpen(false);
     setIsViewModalOpen(false);
     setIsEditModalOpen(false);
     setIsDeleteModalOpen(false);
+    setIsAssignSkillsOpen(false);
     setSelectedMentor(null);
   }, []);
 
@@ -198,6 +207,7 @@ export default function AdminMentorsPage() {
               message: `Groups management for ${mentor.full_name || `${mentor.user.first_name} ${mentor.user.last_name}`} will be available soon.`,
             });
           }}
+          onAssignSkills={openAssignSkillsModal}
           onCreate={openCreateModal}
         />
       </div>
@@ -334,6 +344,34 @@ export default function AdminMentorsPage() {
               }}
             >
               Delete Mentor
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* * Assign Skills Modal */}
+      <Modal
+        isOpen={isAssignSkillsOpen}
+        onClose={closeModals}
+        size="xl"
+      >
+        <ModalContent>
+          <ModalHeader>
+            <div className="flex items-center gap-2">
+              <h2 className="text-lg font-semibold">Assign Skills</h2>
+            </div>
+          </ModalHeader>
+          <ModalBody>
+            {selectedMentor && (
+              <MentorSkillAssignment
+                userId={selectedMentor.user_id}
+                mentorProfileId={Number(selectedMentor.id)}
+              />
+            )}
+          </ModalBody>
+          <ModalFooter>
+            <Button color="default" variant="light" onClick={closeModals}>
+              Close
             </Button>
           </ModalFooter>
         </ModalContent>

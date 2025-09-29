@@ -17,6 +17,7 @@ export type MentorSkillAssignmentProps = {
 export default function MentorSkillAssignment(props: MentorSkillAssignmentProps) {
   const { userId, mentorProfileId } = props
   const qc = useQueryClient()
+  const [selectedSkillId, setSelectedSkillId] = React.useState<string | null>(null)
 
   const { data: assigned, isLoading: loadingAssigned } = useQuery({
     queryKey: ["mentor-assigned-skills", userId],
@@ -40,6 +41,7 @@ export default function MentorSkillAssignment(props: MentorSkillAssignmentProps)
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["mentor-assigned-skills", userId] })
+      setSelectedSkillId(null)
     },
   })
 
@@ -105,7 +107,18 @@ export default function MentorSkillAssignment(props: MentorSkillAssignmentProps)
             <p className="text-sm text-neutral-500">No available skills.</p>
           ) : (
             <div className="flex items-center gap-3">
-              <Select aria-label="Select skill" className="flex-1" selectedKeys={new Set<string>()} onSelectionChange={() => { /* noop */ }}>
+              <Select
+                aria-label="Select skill"
+                className="flex-1"
+                selectedKeys={selectedSkillId ? new Set([selectedSkillId]) : new Set([])}
+                onSelectionChange={(keys) => {
+                  if (keys === "all") return
+                  const first = Array.from(keys as Set<any>)[0]
+                  setSelectedSkillId(first ?? null)
+                }}
+                placeholder="Select a skill"
+                selectionMode="single"
+              >
                 {available.map((s) => (
                   <SelectItem key={s.id} value={s.id}>
                     {s.title}
@@ -114,11 +127,9 @@ export default function MentorSkillAssignment(props: MentorSkillAssignmentProps)
               </Select>
               <Button
                 color="primary"
-                isDisabled={assignMutation.isPending}
+                isDisabled={assignMutation.isPending || !selectedSkillId}
                 onPress={() => {
-                  // * Select is uncontrolled here; pick first available for simple MVP
-                  const first = available[0]
-                  if (first) assignMutation.mutate(first.id)
+                  if (selectedSkillId) assignMutation.mutate(selectedSkillId)
                 }}
               >
                 Add
