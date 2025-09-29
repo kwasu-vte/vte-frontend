@@ -8,7 +8,7 @@ import { cookies } from 'next/headers';
 
 // * Helper to generate unique trace ID
 const generateTraceId = () => Math.random().toString(36).substring(2, 10);
-
+ 
 // * Set secure session cookie
 const setSessionCookie = async (token: string, maxAgeSeconds: number) => {
   const cookieStore = await cookies();
@@ -52,7 +52,7 @@ const handleRequest = async (request: NextRequest, { params }: { params: Promise
   // * Ensure proper URL construction regardless of trailing slash
   const baseUrl = apiBaseUrl.endsWith('/') ? apiBaseUrl.slice(0, -1) : apiBaseUrl;
   const pathWithSlash = path.startsWith('/') ? path : `/${path}`;
-  const targetUrl = `${baseUrl}${pathWithSlash}${request.nextUrl.search}`;
+  const targetUrl = `${baseUrl}/api${pathWithSlash}${request.nextUrl.search}`;
   console.debug(`[BFF Proxy ${traceId}] Target URL: ${targetUrl}`);
 
   // * Prepare headers for the real API

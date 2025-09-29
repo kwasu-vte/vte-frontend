@@ -75,11 +75,17 @@ function ProfileForm({ onSubmit, initialData, isLoading = false }: ProfileFormPr
   }
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (validateForm()) {
-      onSubmit(formData)
-    }
+    console.log('Form submitted, validating...')
+  e.preventDefault()
+  console.log('Form data:', formData)
+  
+  if (validateForm()) {
+    console.log('Validation passed, calling onSubmit')
+    onSubmit(formData)
+  } else {
+    console.log('Validation failed, errors:', errors)
   }
+}
 
   const handleInputChange = (field: keyof CreateStudentProfilePayload, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }))
@@ -223,6 +229,7 @@ function ProfileForm({ onSubmit, initialData, isLoading = false }: ProfileFormPr
 
           {/* Submit Button */}
           <div className="flex justify-end pt-4">
+            
             <Button
               type="submit"
               color="primary"

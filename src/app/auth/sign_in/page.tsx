@@ -1,7 +1,7 @@
 // * Sign-In Page
-// * Secure authentication using Server Actions and NextUI components
+// * Secure authentication using dedicated /auth/login route and NextUI components
 // * No client-side token handling - pure server-side authentication
-// * Uses signInAction from @/lib/actions for secure authentication
+// * Avoids race conditions by using direct form submission to /auth/login
 
 'use client';
 
@@ -9,32 +9,14 @@ import React, { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import { Card, CardHeader, CardBody, Input, Button, Link, Spinner, Checkbox } from '@nextui-org/react';
 import { Eye, EyeOff } from 'lucide-react';
-import { signInActionSafe } from '@/lib/actions';
 import logo from '@/assets/kwasulogo.png';
 import { NotificationContainer } from '@/components/shared/NotificationContainer';
-import { useFormState, useFormStatus } from 'react-dom';
 import { useRouter, useSearchParams } from 'next/navigation';
-
-function SubmitButton() {
-  const { pending } = useFormStatus();
-  return (
-    <Button
-      type="submit"
-      color="primary"
-      size="lg"
-      className="w-full font-semibold"
-      isDisabled={pending}
-      startContent={pending ? <Spinner size="sm" color="white" /> : null}
-    >
-      {pending ? 'Signing In…' : 'Sign In'}
-    </Button>
-  );
-}
 
 export default function SignInPage() {
   const [isVisible, setIsVisible] = useState(false);
-  const [formState, formAction] = useFormState(signInActionSafe as any, { error: null });
   const [clientError, setClientError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -44,11 +26,15 @@ export default function SignInPage() {
   const passwordLabel = useMemo(() => 'Password', []);
 
   // * If already authenticated, redirect by role (public page guard)
+  // * Skip auth check during form submission to avoid race condition
   useEffect(() => {
+    if (isSubmitting) return; // * Prevent race condition during login
+    
     let isMounted = true;
     const checkAuth = async () => {
       try {
-        const res = await fetch('/api/v1/users/auth/me', { headers: { Accept: 'application/json' } });
+        const url = '/api/v1/users/auth/me';
+        const res = await fetch(url, { headers: { Accept: 'application/json' } });
         if (!res.ok) return;
         const json = await res.json();
         const role = String(json?.data?.role || '').toLowerCase();
@@ -63,7 +49,7 @@ export default function SignInPage() {
     };
     checkAuth();
     return () => { isMounted = false; };
-  }, [router, searchParams]);
+  }, [router, searchParams, isSubmitting]);
 
   return (
     <div className="min-h-screen bg-neutral-50 flex items-center justify-center p-6">
@@ -101,17 +87,45 @@ export default function SignInPage() {
           </CardHeader>
           <CardBody className="space-y-6">
             <form
-              action={formAction}
+              action="/auth/login"
+              method="POST"
               className="space-y-4"
-              onSubmit={(e) => {
+              onSubmit={async (e) => {
+                e.preventDefault();
                 setClientError(null);
+                setIsSubmitting(true);
+                
                 const form = e.currentTarget as HTMLFormElement;
                 const data = new FormData(form);
                 const username = String(data.get('username') || '').trim();
                 const password = String(data.get('password') || '').trim();
+                
                 if (!username || !password) {
-                  e.preventDefault();
                   setClientError('Username and password are required');
+                  setIsSubmitting(false);
+                  return;
+                }
+
+                try {
+                  const response = await fetch('/auth/login', {
+                    method: 'POST',
+                    body: data,
+                  });
+
+                  if (response.redirected) {
+                    // * Successful login - redirect is handled by the server
+                    window.location.href = response.url;
+                    return;
+                  }
+
+                  const result = await response.json();
+                  if (!result.success) {
+                    setClientError(result.message || 'Authentication failed');
+                  }
+                } catch (error) {
+                  setClientError(error instanceof Error ? error.message : 'Login failed');
+                } finally {
+                  setIsSubmitting(false);
                 }
               }}
             >
@@ -170,19 +184,23 @@ export default function SignInPage() {
               </div>
 
               {/* * Inline error */}
-              {clientError ? (
+              {clientError && (
                 <div className="text-sm text-danger-600" role="alert" aria-live="assertive">
                   {clientError}
                 </div>
-              ) : null}
-              {formState?.error ? (
-                <div className="text-sm text-danger-600" role="alert" aria-live="assertive">
-                  {formState.error}
-                </div>
-              ) : null}
+              )}
 
               {/* * Submit Button */}
-              <SubmitButton />
+              <Button
+                type="submit"
+                color="primary"
+                size="lg"
+                className="w-full font-semibold"
+                isLoading={isSubmitting}
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? 'Signing In...' : 'Sign In'}
+              </Button>
             </form>
 
             {/* * Sign Up Link */}

@@ -22,7 +22,7 @@ interface StudentDashboardClientProps {
 export function StudentDashboardClient({ userId }: StudentDashboardClientProps) {
   const { profile, enrollment, upcomingPracticals, attendanceSummary, isLoading, error } = useStudentDashboardData(userId);
 
-  return (
+  return ( 
     <div className="space-y-6">
       {/* Page Header */}
       <div>
@@ -72,18 +72,18 @@ export function StudentDashboardClient({ userId }: StudentDashboardClientProps) 
               </Card>
             }
           >
-            {(enrollment) => (
-              <EnrollmentStatus 
-                enrollment={{
-                  id: enrollment.id.toString(),
-                  skillName: enrollment.skill?.title || 'Unknown Skill',
-                  status: enrollment.status.toUpperCase() as any,
-                  paymentStatus: enrollment.payment_status,
-                  group: enrollment.group_id?.toString()
-                }}
-                showTimeline={true}
-              />
-            )}
+          {(enrollment) => (
+  <EnrollmentStatus 
+    enrollment={{
+      id: String(enrollment?.id || ''),
+      skillName: enrollment?.skill?.title || 'Unknown Skill',
+      status: String(enrollment?.status || '').toUpperCase() as any,
+      paymentStatus: enrollment?.payment_status || '',
+      group: enrollment?.group_id ? String(enrollment.group_id) : undefined
+    }}
+    showTimeline={true}
+  />
+)}
           </StateRenderer>
 
           {/* Group Assignment */}

@@ -135,7 +135,7 @@ export default function SignUpPage() {
                   isRequired
                   autoComplete="given-name"
                   classNames={{
-                    input: "text-base",
+                    input: "text-base text-black",
                     label: "font-medium",
                   }}
                 />
@@ -147,7 +147,7 @@ export default function SignUpPage() {
                   isRequired
                   autoComplete="family-name"
                   classNames={{
-                    input: "text-base",
+                    input: "text-base text-black",
                     label: "font-medium",
                   }}
                 />
@@ -163,7 +163,7 @@ export default function SignUpPage() {
                 isRequired
                 autoComplete="email"
                 classNames={{
-                  input: "text-base",
+                  input: "text-base text-black",
                   label: "font-medium",
                 }}
               />
@@ -196,7 +196,7 @@ export default function SignUpPage() {
                     </button>
                   }
                   classNames={{
-                    input: "text-base",
+                    input: "text-base text-black",
                     label: "font-medium",
                   }}
                 />
@@ -209,7 +209,7 @@ export default function SignUpPage() {
                   isRequired
                   autoComplete="new-password"
                   classNames={{
-                    input: "text-base",
+                    input: "text-base text-black",
                     label: "font-medium",
                   }}
                 />

@@ -42,8 +42,14 @@ export default function StudentProfileCreate() {
     fetchUser();
   }, [addNotification]);
 
-  const handleSubmit = async (data: CreateStudentProfilePayload) => {
-    if (!user) return;
+  const handleSubmit = async (data: CreateStudentProfilePayload): Promise<void> => {
+     console.log('Submit clicked, user:', user, 'data:', data);
+     alert('red)irecting to dashboard');
+  
+  if (!user) {
+    console.log('No user found, aborting submit');
+    return;
+  }
 
     setIsLoading(true);
     try {
