@@ -319,13 +319,7 @@ export function Header({ user, onMenuClick }: HeaderProps) {
               </Dialog>
             </div>
           )}
-          {/* * Notifications */}
-          <button className="relative p-2 rounded-lg hover:bg-neutral-100 transition-colors">
-            <Bell className="w-5 h-5 text-neutral-600" />
-            {/* * TODO: Add notification badge */}
-            <span className="absolute top-1 right-1 w-2 h-2 bg-error rounded-full"></span>
-          </button>
-          
+
           {/* * User Profile Dropdown */}
           <div className="relative">
             <button className="flex items-center space-x-3 p-2 rounded-lg hover:bg-neutral-100 transition-colors">
@@ -342,7 +336,6 @@ export function Header({ user, onMenuClick }: HeaderProps) {
                   {user.role}
                 </p>
               </div>
-              <ChevronDown className="w-4 h-4 text-neutral-600" />
             </button>
             
             {/* * TODO: Implement dropdown menu */}
