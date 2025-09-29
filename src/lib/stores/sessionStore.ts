@@ -55,6 +55,8 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
       }
     } catch (error) {
       // ! Swallow errors at store level; UI handles surfacing
+      // * Safely handle 403 errors for non-admin users
+      console.warn('Session store: Failed to fetch academic sessions (expected for non-admin users):', error);
       set({ isLoading: false });
     }
   },
