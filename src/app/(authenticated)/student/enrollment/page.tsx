@@ -14,6 +14,7 @@ import { StateRenderer } from '@/components/shared/StateRenderer';
 import { Card, CardBody, CardHeader, Skeleton, Button } from '@nextui-org/react';
 import { ArrowLeft, BookOpen, CreditCard, Users } from 'lucide-react';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,9 +23,7 @@ interface EnrollmentPageData {
   selectedSkill: any | null;
 }
 
-function redirect (url) {
-  window.location.href = url
-}
+//
 
 async function getEnrollmentPageData(userId: string, skillId: string | null): Promise<EnrollmentPageData> {
   try {
@@ -128,18 +127,15 @@ export default async function StudentEnrollment({ searchParams }: { searchParams
   const confirmParam = Array.isArray(sp?.confirm) ? sp.confirm[0] : sp?.confirm ?? null;
   console.info('[EnrollmentPage] query.confirm =', confirmParam, 'hasEnrollment=', !!data.enrollment, 'hasSelectedSkill=', !!data.selectedSkill);
   if (!data.enrollment && skillParam && confirmParam === '1') {
-    try {
-      const created = await enrollmentsApi.createForUser(user.id, { skill_id: skillParam });
-      if (!created.success) {
-        console.error('[EnrollmentPage] Failed to create enrollment for skill:', skillParam);
-      } else {
-        const pay = await enrollmentsApi.payForUser(user.id, { enrollment_id: created.data.id });
-        if (pay.success && pay.data?.payment_url) {
-          redirect(pay.data.payment_url);
-        }
+    const created = await enrollmentsApi.createForUser(user.id, { skill_id: skillParam });
+    if (!created.success) {
+      console.error('[EnrollmentPage] Failed to create enrollment for skill:', skillParam);
+    } else {
+      const pay = await enrollmentsApi.payForUser(user.id, { enrollment_id: created.data.id });
+      if (pay.success && pay.data?.payment_url) {
+        // Use Next.js server redirect (throws NEXT_REDIRECT to short-circuit rendering)
+        redirect(pay.data.payment_url);
       }
-    } catch (e) {
-      console.error('[EnrollmentPage] Enrollment/payment error', e);
     }
   }
 
