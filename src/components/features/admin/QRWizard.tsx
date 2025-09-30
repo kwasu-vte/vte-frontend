@@ -44,9 +44,9 @@ const WizardDataSchema = z.object({
   skillId: z.string().optional(),
   groupId: z.string().optional(),
   mentorId: z.string().optional(),
-  count: z.number().min(1).max(500).default(20),
-  expiresInDays: z.number().min(1).max(90).default(7),
-  pointsPerScan: z.number().min(1).max(100).default(1),
+  count: z.number().min(1).max(500),
+  expiresInDays: z.number().min(1).max(90),
+  pointsPerScan: z.number().min(1).max(100),
 });
 
 export function QRWizard({ currentStep, onStepChange, onComplete, initialData = {} }: QRWizardProps) {
@@ -94,7 +94,14 @@ export function QRWizard({ currentStep, onStepChange, onComplete, initialData = 
       case 'context':
         return !!data.skillId && (data.purpose === 'bulk' || !!data.groupId);
       case 'configuration':
-        return !!data.count && !!data.expiresInDays && !!data.pointsPerScan;
+        {
+          const count = Number(data.count);
+          const days = Number(data.expiresInDays);
+          const points = Number(data.pointsPerScan);
+          return Number.isFinite(count) && count >= 1
+            && Number.isFinite(days) && days >= 1
+            && Number.isFinite(points) && points >= 1;
+        }
       case 'confirmation':
         return true;
       default:
@@ -216,10 +223,10 @@ export function QRWizard({ currentStep, onStepChange, onComplete, initialData = 
         <Select
           label="Which vocational skill are you managing?"
           placeholder="Select a skill"
-          selectedKeys={data.skillId ? [data.skillId] : []}
-          onChange={(e) => {
-            const skillId = e.target.value || null;
-            updateData({ skillId: skillId || undefined, groupId: undefined }); // Reset group when skill changes
+          selectedKeys={data.skillId ? new Set([String(data.skillId)]) : new Set([])}
+          onSelectionChange={(keys) => {
+            const first = Array.from(keys as Set<string>)[0] || '';
+            updateData({ skillId: first || undefined, groupId: undefined });
           }}
           size="lg"
           isRequired
@@ -235,8 +242,11 @@ export function QRWizard({ currentStep, onStepChange, onComplete, initialData = 
           <Select
             label="Which training group?"
             placeholder="Select a group"
-            selectedKeys={data.groupId ? [String(data.groupId)] : []}
-            onChange={(e) => updateData({ groupId: e.target.value || undefined })}
+            selectedKeys={data.groupId ? new Set([String(data.groupId)]) : new Set([])}
+            onSelectionChange={(keys) => {
+              const first = Array.from(keys as Set<string>)[0] || '';
+              updateData({ groupId: first || undefined });
+            }}
             size="lg"
             isDisabled={!data.skillId || groups.length === 0}
             isRequired
@@ -286,8 +296,11 @@ export function QRWizard({ currentStep, onStepChange, onComplete, initialData = 
         <Input
           label="How many QR codes do you need?"
           type="number"
-          value={String(data.count || 20)}
-          onChange={(e) => updateData({ count: Number(e.target.value) })}
+          value={data.count === undefined ? '' : String(data.count)}
+          onChange={(e) => {
+            const val = e.target.value;
+            updateData({ count: val === '' ? undefined : Number(val) });
+          }}
           min={1}
           max={500}
           size="lg"
@@ -298,8 +311,11 @@ export function QRWizard({ currentStep, onStepChange, onComplete, initialData = 
         <Input
           label="How long should they be valid?"
           type="number"
-          value={String(data.expiresInDays || 7)}
-          onChange={(e) => updateData({ expiresInDays: Number(e.target.value) })}
+          value={data.expiresInDays === undefined ? '' : String(data.expiresInDays)}
+          onChange={(e) => {
+            const val = e.target.value;
+            updateData({ expiresInDays: val === '' ? undefined : Number(val) });
+          }}
           min={1}
           max={90}
           size="lg"
@@ -311,8 +327,11 @@ export function QRWizard({ currentStep, onStepChange, onComplete, initialData = 
         <Input
           label="Attendance points per scan"
           type="number"
-          value={String(data.pointsPerScan || 1)}
-          onChange={(e) => updateData({ pointsPerScan: Number(e.target.value) })}
+          value={data.pointsPerScan === undefined ? '' : String(data.pointsPerScan)}
+          onChange={(e) => {
+            const val = e.target.value;
+            updateData({ pointsPerScan: val === '' ? undefined : Number(val) });
+          }}
           min={1}
           max={100}
           size="lg"
@@ -323,8 +342,11 @@ export function QRWizard({ currentStep, onStepChange, onComplete, initialData = 
         <Select
           label="Assign to instructor (optional)"
           placeholder="Select an instructor"
-          selectedKeys={data.mentorId ? [data.mentorId] : []}
-          onChange={(e) => updateData({ mentorId: e.target.value || undefined })}
+          selectedKeys={data.mentorId ? new Set([String(data.mentorId)]) : new Set([])}
+          onSelectionChange={(keys) => {
+            const first = Array.from(keys as Set<string>)[0] || '';
+            updateData({ mentorId: first || undefined });
+          }}
           size="lg"
         >
           {mentors.map((mentor: MentorProfile) => (
