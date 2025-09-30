@@ -302,7 +302,11 @@ export default async function StudentEnrollment({ searchParams }: { searchParams
               </CardHeader>
               <CardBody className="p-6">
                 <div className="space-y-4">
-                  {enrollment.status === 'pending' && (
+                  {(() => {
+                    const status = (enrollment.status || '').toString().toLowerCase();
+                    const payStatus = (enrollment.payment_status || '').toString().toLowerCase();
+                    return status.includes('pending') || payStatus.includes('pending') || status === 'unpaid' || payStatus === 'unpaid';
+                  })() && (
                     <div className="flex items-start gap-3 p-4 bg-warning-50 rounded-lg">
                       <div className="text-warning-600 mt-1">
                         <CreditCard className="h-4 w-4" />
@@ -317,8 +321,23 @@ export default async function StudentEnrollment({ searchParams }: { searchParams
                       </div>
                     </div>
                   )}
-                  
-                  {enrollment.status === 'paid' && (
+                  {(() => (enrollment.payment_status || '').toString().toLowerCase() === 'failed')() && (
+                    <div className="flex items-start gap-3 p-4 bg-danger-50 rounded-lg">
+                      <div className="text-danger-600 mt-1">
+                        <CreditCard className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-danger-800">
+                          Payment Failed
+                        </p>
+                        <p className="text-xs text-danger-700">
+                          Your last payment attempt failed. Retry payment using the button above.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {(() => (enrollment.status || '').toString().toLowerCase() === 'paid' && !enrollment.group_id)() && (
                     <div className="flex items-start gap-3 p-4 bg-primary-50 rounded-lg">
                       <div className="text-primary-600 mt-1">
                         <Users className="h-4 w-4" />
@@ -333,8 +352,7 @@ export default async function StudentEnrollment({ searchParams }: { searchParams
                       </div>
                     </div>
                   )}
-                  
-                  {enrollment.status === 'assigned' && (
+                  {(() => (enrollment.status || '').toString().toLowerCase() === 'assigned')() && (
                     <div className="flex items-start gap-3 p-4 bg-success-50 rounded-lg">
                       <div className="text-success-600 mt-1">
                         <Users className="h-4 w-4" />
@@ -349,8 +367,7 @@ export default async function StudentEnrollment({ searchParams }: { searchParams
                       </div>
                     </div>
                   )}
-                  
-                  {enrollment.status === 'active' && (
+                  {(() => (enrollment.status || '').toString().toLowerCase() === 'active')() && (
                     <div className="flex items-start gap-3 p-4 bg-success-50 rounded-lg">
                       <div className="text-success-600 mt-1">
                         <BookOpen className="h-4 w-4" />
@@ -361,6 +378,21 @@ export default async function StudentEnrollment({ searchParams }: { searchParams
                         </p>
                         <p className="text-xs text-success-700">
                           Your enrollment is active. Attend practical sessions and track your progress.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                  {(() => (enrollment.status || '').toString().toLowerCase() === 'cancelled')() && (
+                    <div className="flex items-start gap-3 p-4 bg-warning-50 rounded-lg">
+                      <div className="text-warning-600 mt-1">
+                        <BookOpen className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-warning-800">
+                          Enrollment Cancelled
+                        </p>
+                        <p className="text-xs text-warning-700">
+                          You can browse skills and enroll again at any time.
                         </p>
                       </div>
                     </div>
