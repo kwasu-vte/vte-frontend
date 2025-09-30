@@ -194,7 +194,7 @@ export default async function StudentEnrollment({ searchParams }: { searchParams
                 <Card className="mb-6 border-neutral-200 bg-neutral-50">
                   <CardBody className="p-4">
                     <p className="text-sm text-neutral-700">
-                      You selected <span className="font-medium">{data.selectedSkill?.title || skillParam}</span>. Click "Enroll and Pay" to create your enrollment and proceed to payment.
+                      You selected <span className="font-medium">{data.selectedSkill?.title || skillParam}</span>. Click &quot;Enroll and Pay&quot; to create your enrollment and proceed to payment.
                     </p>
                   </CardBody>
                 </Card>
