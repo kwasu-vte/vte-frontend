@@ -280,14 +280,14 @@ export default async function StudentEnrollment({ searchParams }: { searchParams
             )}
 
             {/* Group Assignment */}
-            {enrollment.group_id && (
+            {(['assigned','active'].includes((enrollment.status || '').toString().toLowerCase()) || enrollment.group_id) && (
               <GroupAssignmentCard
                 enrollment={{
                   id: enrollment.id.toString(),
                   status: enrollment.status
                 }}
                 group={{
-                  number: parseInt(enrollment.group_id),
+                  number: parseInt(String(enrollment.group_id || 0)),
                   mentorName: 'Loading...', // This would come from group details API
                   schedule: 'Loading...'
                 }}

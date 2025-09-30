@@ -139,15 +139,24 @@ export function StudentDashboardClient({ userId }: StudentDashboardClientProps) 
                     );
                   }
 
-                  if (status === 'paid' && !enrollment.group_id) {
+                  if (['paid','assigned','active'].includes(status)) {
                     return (
                       <Card shadow="sm" className="w-full border-success-200 bg-success-50">
                         <CardHeader className="flex items-center gap-2">
                           <Users className="h-5 w-5 text-success" />
-                          <p className="text-lg font-medium leading-normal">Awaiting Group Assignment</p>
+                          <p className="text-lg font-medium leading-normal">{status === 'paid' && !enrollment.group_id ? 'Awaiting Group Assignment' : 'Group Assigned'}</p>
                         </CardHeader>
                         <CardBody className="p-6">
-                          <p className="text-sm text-neutral-700">You will be assigned to a group soon. You can review your schedule once assigned.</p>
+                          <div className="flex items-center justify-between gap-4">
+                            <p className="text-sm text-neutral-700">
+                              {status === 'paid' && !enrollment.group_id
+                                ? 'You will be assigned to a group soon. You can review your schedule once assigned.'
+                                : 'Check your group roster and practical schedule.'}
+                            </p>
+                            <Button as={Link} href={status === 'paid' && !enrollment.group_id ? '/student/enrollment' : '/student/my-group'} color="success" size="sm">
+                              {status === 'paid' && !enrollment.group_id ? 'View Enrollment' : 'View Group'}
+                            </Button>
+                          </div>
                         </CardBody>
                       </Card>
                     );
