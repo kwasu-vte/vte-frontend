@@ -171,7 +171,7 @@ export function StudentDashboardClient({ userId }: StudentDashboardClientProps) 
                         </CardHeader>
                         <CardBody className="p-6">
                           <div className="flex items-center justify-between gap-4">
-                            <p className="text-sm text-neutral-700">Check your group roster and practical schedule.</p>
+                            <p className="text-base md:text-sm text-neutral-700">Check your group roster and practical schedule.</p>
                             {cta('/student/my-group', 'View Group')}
                           </div>
                         </CardBody>

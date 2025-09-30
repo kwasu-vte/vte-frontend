@@ -10,6 +10,7 @@ import { usePathname } from 'next/navigation';
 import { User, NavigationItem } from '@/lib/types';
 import { filterNavigationByPermissions } from '@/lib/permissions';
 import { signOutAction } from '@/lib/actions';
+import { useApp } from '@/context/AppContext';
 import { 
   BookOpen, 
   Users, 
@@ -149,14 +150,16 @@ const navigationItems: NavigationItem[] = [
 export function Sidebar({ isOpen, user }: SidebarProps) {
   const pathname = usePathname();
   
+  const { isSidebarOpen, toggleSidebar } = useApp();
   // * Filter navigation items by user role
   const userNavigation = filterNavigationByPermissions(navigationItems, user.role);
 
   return (
+    <>
     <aside 
       className={`
         fixed inset-y-0 left-0 z-50 w-70 bg-white shadow-lg transform transition-transform duration-200 ease-in-out
-        ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+        ${isOpen ? '-translate-x-full' : '-translate-x-0'} 
         md:relative md:translate-x-0
       `}
     >
@@ -229,6 +232,14 @@ export function Sidebar({ isOpen, user }: SidebarProps) {
           </form>
         </div>
       </div>
+      
     </aside>
+     {!isSidebarOpen && (
+        <div 
+          className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-40"
+          onClick={toggleSidebar}
+        />
+      )}
+      </>
   );
 }
