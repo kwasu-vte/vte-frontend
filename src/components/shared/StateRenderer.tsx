@@ -34,13 +34,13 @@ export function StateRenderer<T>({
     dataIsNull: data == null,
     dataIsArray: Array.isArray(data),
     dataIsEmptyArray: Array.isArray(data) && data.length === 0,
-    condition1: isLoading || (data == null && !error),
+    condition1: isLoading,
     condition2: !!error,
     condition3: Array.isArray(data) && data.length === 0
   });
 
-  // * Show loading state if loading OR if data is undefined/null and no error
-  if (isLoading || (data == null && !error)) {
+  // * Show loading state only when explicitly loading
+  if (isLoading) {
     console.log('🔍 [StateRenderer] Showing LOADING state');
     return <>{loadingComponent ?? <DefaultLoadingComponent />}</>;
   }
@@ -51,8 +51,8 @@ export function StateRenderer<T>({
     return <>{errorComponent ?? <DefaultErrorComponent error={error} onRetry={onRetry} />}</>;
   }
 
-  // * Show empty state for empty arrays
-  if (Array.isArray(data) && data.length === 0) {
+  // * Show empty state for null/undefined or empty arrays when not loading and no error
+  if (data == null || (Array.isArray(data) && data.length === 0)) {
     console.log('🔍 [StateRenderer] Showing EMPTY state');
     return <>{emptyComponent ?? <DefaultEmptyComponent message="No items to display." />}</>;
   }

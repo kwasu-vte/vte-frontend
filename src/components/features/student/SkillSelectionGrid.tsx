@@ -1,7 +1,7 @@
 "use client"
 import React from "react"
 import { Card, CardBody, CardHeader, Button, Chip, Badge } from "@nextui-org/react"
-import { BookOpen, Users, Calendar, AlertCircle, CheckCircle } from "lucide-react"
+import { BookOpen, AlertCircle, CheckCircle } from "lucide-react"
 
 /**
  * * SkillSelectionGrid
@@ -156,26 +156,14 @@ function SkillSelectionGrid({
                   </p>
                 )}
                 
-                {/* Stats */}
-                <div className="grid grid-cols-2 gap-3 text-xs">
-                  <div className="flex items-center gap-1">
-                    <Users className="h-3 w-3 text-neutral-400" />
-                    <span className="text-neutral-600">
-                      {skill.enrollments_count} enrolled
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Calendar className="h-3 w-3 text-neutral-400" />
-                    <span className="text-neutral-600">
-                      {skill.groups_count} groups
-                    </span>
-                  </div>
-                </div>
+                {/* Stats removed per request */}
                 
                 {/* Enrollment Period */}
-                <div className="text-xs text-neutral-500">
-                  <p>Enrollment: {formatDate(skill.date_range_start)} - {formatDate(skill.date_range_end)}</p>
-                </div>
+                {skill.date_range_start && skill.date_range_end && (
+                  <div className="text-xs text-neutral-500">
+                    <p>Enrollment: {formatDate(skill.date_range_start)} - {formatDate(skill.date_range_end)}</p>
+                  </div>
+                )}
                 
                 {/* Disabled Reason */}
                 {isDisabled && (
@@ -193,6 +181,7 @@ function SkillSelectionGrid({
                   className="w-full"
                   isDisabled={isDisabled}
                   startContent={<BookOpen className="h-4 w-4" />}
+                  onPress={() => !isDisabled && onSelectSkill(skill.id)}
                 >
                   {isDisabled ? 'Not Available' : 'View Details'}
                 </Button>

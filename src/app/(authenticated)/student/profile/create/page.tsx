@@ -22,13 +22,17 @@ export default function StudentProfileCreate() {
   const [currentStep, setCurrentStep] = React.useState(1);
   const [user, setUser] = React.useState<any>(null);
 
-  // Fetch user data on mount
+  // Fetch authenticated user via "me" endpoint on mount (required for student profile creation)
   React.useEffect(() => {
+    let isMounted = true;
     const fetchUser = async () => {
       try {
-        // This would typically come from a client-side auth hook
-        // For now, we'll use a placeholder
-        setUser({ id: '1', first_name: 'Student' });
+        const res = await fetch('/api/v1/users/auth/me', { headers: { Accept: 'application/json' } });
+        if (!res.ok) throw new Error('Failed to fetch current user');
+        const json = await res.json();
+        const me = json?.data;
+        if (!me?.id) throw new Error('Invalid user payload');
+        if (isMounted) setUser({ id: me.id, first_name: me.first_name || 'Student' });
       } catch (error) {
         console.error('Error fetching user:', error);
         addNotification({
@@ -40,6 +44,7 @@ export default function StudentProfileCreate() {
     };
 
     fetchUser();
+    return () => { isMounted = false; };
   }, [addNotification]);
 
   const handleSubmit = async (data: CreateStudentProfilePayload) => {

@@ -5,7 +5,7 @@
 import React from 'react';
 import { getCurrentUser } from '@/lib/auth';
 import { studentsApi } from '@/lib/api';
-import { SkillSelectionGrid } from '@/components/features/student/SkillSelectionGrid';
+import StudentSkillsClient from './StudentSkillsClient';
 import { NotificationContainer } from '@/components/shared/NotificationContainer';
 import { StateRenderer } from '@/components/shared/StateRenderer';
 import { Card, CardBody, CardHeader, Skeleton, Button } from '@nextui-org/react';
@@ -107,14 +107,6 @@ export default async function StudentSkills() {
     );
   }
 
-  const handleSelectSkill = (skillId: string) => {
-    // This would typically open a skill detail modal or navigate to enrollment
-    console.log('Selected skill:', skillId);
-    // For now, we'll just log it - in a real implementation, this would:
-    // 1. Open a SkillDetailModal with enrollment options
-    // 2. Or navigate to /student/enrollment with the skill pre-selected
-  };
-
   return (
     <div className="space-y-6">
       {/* Page Header */}
@@ -137,6 +129,15 @@ export default async function StudentSkills() {
           </p>
         </div>
       </div>
+
+      {/* Instructional Banner */}
+      <Card shadow="sm" className="w-full border-neutral-200 bg-neutral-50">
+        <CardBody className="p-4">
+          <p className="text-sm text-neutral-700">
+            Select a skill to see details, then click Enroll on the skill panel. You can confirm on the Enrollment page.
+          </p>
+        </CardBody>
+      </Card>
 
       {/* Skills Grid */}
       <StateRenderer
@@ -167,11 +168,9 @@ export default async function StudentSkills() {
         }
       >
         {(skills) => (
-          <SkillSelectionGrid
+          <StudentSkillsClient
             availableSkills={skills}
             studentLevel={data.profile.student_level}
-            onSelectSkill={handleSelectSkill}
-            isLoading={false}
           />
         )}
       </StateRenderer>
