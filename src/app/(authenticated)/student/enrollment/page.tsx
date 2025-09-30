@@ -189,6 +189,16 @@ export default async function StudentEnrollment({ searchParams }: { searchParams
               <p className="text-neutral-600 mb-6">
                 You haven&apos;t enrolled in any skills yet. Browse available skills to get started.
               </p>
+              {/* Guidance when skill is pre-selected */}
+              {(data.selectedSkill || skillParam) && (
+                <Card className="mb-6 border-neutral-200 bg-neutral-50">
+                  <CardBody className="p-4">
+                    <p className="text-sm text-neutral-700">
+                      You selected <span className="font-medium">{data.selectedSkill?.title || skillParam}</span>. Click "Enroll and Pay" to create your enrollment and proceed to payment.
+                    </p>
+                  </CardBody>
+                </Card>
+              )}
               {(data.selectedSkill || skillParam) ? (
                 <div className="space-y-4">
                   <div className="text-left inline-block">

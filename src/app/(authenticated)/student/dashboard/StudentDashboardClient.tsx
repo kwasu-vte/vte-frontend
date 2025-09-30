@@ -15,7 +15,7 @@ import { StateRenderer } from '@/components/shared/StateRenderer';
 import { Card, CardBody, CardHeader, Skeleton, Button } from '@nextui-org/react';
 import { ListSkeleton, CardGridSkeleton } from '@/components/shared/Skeletons';
 import Link from 'next/link';
-import { BookOpen } from 'lucide-react';
+import { BookOpen, CreditCard, Users } from 'lucide-react';
 
 interface StudentDashboardClientProps {
   userId: string;
@@ -85,16 +85,110 @@ export function StudentDashboardClient({ userId }: StudentDashboardClientProps) 
             }
           >
             {(enrollment) => (
-              <EnrollmentStatus 
-                enrollment={{
-                  id: enrollment.id.toString(),
-                  skillName: enrollment.skill?.title || 'Unknown Skill',
-                  status: enrollment.status.toUpperCase() as any,
-                  paymentStatus: enrollment.payment_status,
-                  group: enrollment.group_id?.toString()
-                }}
-                showTimeline={true}
-              />
+              <>
+                <EnrollmentStatus 
+                  enrollment={{
+                    id: enrollment.id.toString(),
+                    skillName: enrollment.skill?.title || 'Unknown Skill',
+                    status: enrollment.status.toUpperCase() as any,
+                    paymentStatus: enrollment.payment_status,
+                    group: enrollment.group_id?.toString()
+                  }}
+                  showTimeline={true}
+                />
+
+                {/* Contextual Guidance */}
+                {(() => {
+                  const status = (enrollment.status || '').toString().toLowerCase();
+                  const payStatus = (enrollment.payment_status || '').toString().toLowerCase();
+                  const cta = (href: string, label: string) => (
+                    <Button as={Link} href={href} color="primary" size="sm">{label}</Button>
+                  );
+
+                  if (payStatus === 'failed') {
+                    return (
+                      <Card shadow="sm" className="w-full border-danger-200 bg-danger-50">
+                        <CardHeader className="flex items-center gap-2">
+                          <CreditCard className="h-5 w-5 text-danger" />
+                          <p className="text-lg font-medium leading-normal">Payment Failed</p>
+                        </CardHeader>
+                        <CardBody className="p-6">
+                          <div className="flex items-center justify-between gap-4">
+                            <p className="text-sm text-neutral-700">Your last payment attempt failed. Please try again.</p>
+                            {cta('/student/enrollment', 'Retry Payment')}
+                          </div>
+                        </CardBody>
+                      </Card>
+                    );
+                  }
+
+                  if (status.includes('pending') || payStatus.includes('pending') || payStatus === 'unpaid' || status === 'unpaid') {
+                    return (
+                      <Card shadow="sm" className="w-full border-primary-200 bg-primary-50">
+                        <CardHeader className="flex items-center gap-2">
+                          <CreditCard className="h-5 w-5 text-primary" />
+                          <p className="text-lg font-medium leading-normal">Payment Pending</p>
+                        </CardHeader>
+                        <CardBody className="p-6">
+                          <div className="flex items-center justify-between gap-4">
+                            <p className="text-sm text-neutral-700">Complete your payment to secure your spot and continue.</p>
+                            {cta('/student/enrollment', 'Go to Payment')}
+                          </div>
+                        </CardBody>
+                      </Card>
+                    );
+                  }
+
+                  if (status === 'paid' && !enrollment.group_id) {
+                    return (
+                      <Card shadow="sm" className="w-full border-success-200 bg-success-50">
+                        <CardHeader className="flex items-center gap-2">
+                          <Users className="h-5 w-5 text-success" />
+                          <p className="text-lg font-medium leading-normal">Awaiting Group Assignment</p>
+                        </CardHeader>
+                        <CardBody className="p-6">
+                          <p className="text-sm text-neutral-700">You will be assigned to a group soon. You can review your schedule once assigned.</p>
+                        </CardBody>
+                      </Card>
+                    );
+                  }
+
+                  if (status === 'assigned') {
+                    return (
+                      <Card shadow="sm" className="w-full border-success-200 bg-success-50">
+                        <CardHeader className="flex items-center gap-2">
+                          <Users className="h-5 w-5 text-success" />
+                          <p className="text-lg font-medium leading-normal">Group Assigned</p>
+                        </CardHeader>
+                        <CardBody className="p-6">
+                          <div className="flex items-center justify-between gap-4">
+                            <p className="text-sm text-neutral-700">Check your group roster and practical schedule.</p>
+                            {cta('/student/my-group', 'View Group')}
+                          </div>
+                        </CardBody>
+                      </Card>
+                    );
+                  }
+
+                  if (status === 'cancelled') {
+                    return (
+                      <Card shadow="sm" className="w-full border-warning-200 bg-warning-50">
+                        <CardHeader className="flex items-center gap-2">
+                          <BookOpen className="h-5 w-5 text-warning" />
+                          <p className="text-lg font-medium leading-normal">Enrollment Cancelled</p>
+                        </CardHeader>
+                        <CardBody className="p-6">
+                          <div className="flex items-center justify-between gap-4">
+                            <p className="text-sm text-neutral-700">You can choose another skill and enroll again.</p>
+                            {cta('/student/skills', 'Browse Skills')}
+                          </div>
+                        </CardBody>
+                      </Card>
+                    );
+                  }
+                  return null;
+                })()}
+              </>
             )}
           </StateRenderer>
 
