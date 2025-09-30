@@ -1,15 +1,15 @@
 import { apiRequest } from './base';
-import type { 
-  ApiResponse, 
-  Skill, 
-  CreateSkillPayload, 
-  UpdateSkillPayload, 
-  SkillDateRange, 
-  SkillDateRangePayload, 
-  SkillGroup, 
-  AutoAssignPayload, 
-  AutoAssignResponse, 
-  PaginatedResponse,
+import type {
+  ApiResponse,
+  Skill,
+  CreateSkillPayload,
+  UpdateSkillPayload,
+  SkillDateRange,
+  SkillDateRangePayload,
+  SkillGroup,
+  AutoAssignPayload,
+  AutoAssignResponse,
+  PaginatedResponse
 } from '../types';
 
 export const skillsApi = {
@@ -56,7 +56,8 @@ export const skillsApi = {
   getGroupsBySkill(skillId: string, params?: { academic_session_id?: number; include_full?: boolean }): Promise<ApiResponse<SkillGroup[]>> {
     const query = new URLSearchParams();
     if (params?.academic_session_id) query.append('academic_session_id', params.academic_session_id.toString());
-    if (params?.include_full !== undefined) query.append('include_full', params.include_full.toString());
+    // Some backends are strict about boolean query encoding; use 1/0 for maximum compatibility
+    if (params?.include_full !== undefined) query.append('include_full', params.include_full ? '1' : '0');
     
     const queryString = query.toString();
     return apiRequest(`v1/skills/${skillId}/groups${queryString ? `?${queryString}` : ''}`);

@@ -4,13 +4,13 @@
 
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { User, AuthSession } from './types';
+import { User, AuthSession, ApiResponse } from './types';
 import { authApi } from './api';
 import { apiRequest } from './api/base';
 
 // * Normalize backend role casing to frontend canonical type
-function normalizeUserRole(role: any): 'Admin' | 'Mentor' | 'Student' {
-  const r = String(role || '').toLowerCase();
+function normalizeUserRole(role: unknown): 'Admin' | 'Mentor' | 'Student' {
+  const r = String(role ?? '').toLowerCase();
   if (r === 'admin' || r === 'superadmin') return 'Admin';
   if (r === 'mentor') return 'Mentor';
   return 'Student';
@@ -32,7 +32,7 @@ export async function getSession(): Promise<AuthSession | null> {
       const response = await authApi.getCurrentUser();
       
       if (response.success && response.data) {
-        const normalizedUser = { ...response.data, role: normalizeUserRole((response as any)?.data?.role) } as User;
+        const normalizedUser: User = { ...response.data, role: normalizeUserRole(response.data.role) };
         return {
           user: normalizedUser,
           access_token: sessionToken.value,
@@ -43,11 +43,11 @@ export async function getSession(): Promise<AuthSession | null> {
         const newToken = await refreshAccessToken();
         if (newToken) {
           // * Retry getCurrentUser after refresh using the fresh token header
-          const retryResponse = await apiRequest('v1/users/auth/me', {
+          const retryResponse = await apiRequest<ApiResponse<User>>('v1/users/auth/me', {
             headers: { Authorization: `Bearer ${newToken}` },
           });
           if (retryResponse.success && retryResponse.data) {
-            const normalizedUser = { ...retryResponse.data, role: normalizeUserRole((retryResponse as any)?.data?.role) } as User;
+            const normalizedUser: User = { ...retryResponse.data, role: normalizeUserRole(retryResponse.data.role) };
             return {
               user: normalizedUser,
               access_token: newToken,
@@ -65,11 +65,11 @@ export async function getSession(): Promise<AuthSession | null> {
       try {
         const newToken = await refreshAccessToken();
         if (newToken) {
-          const retryResponse = await apiRequest('v1/users/auth/me', {
+          const retryResponse = await apiRequest<ApiResponse<User>>('v1/users/auth/me', {
             headers: { Authorization: `Bearer ${newToken}` },
           });
           if (retryResponse.success && retryResponse.data) {
-            const normalizedUser = { ...retryResponse.data, role: normalizeUserRole((retryResponse as any)?.data?.role) } as User;
+            const normalizedUser: User = { ...retryResponse.data, role: normalizeUserRole(retryResponse.data.role) };
             return {
               user: normalizedUser,
               access_token: newToken,
@@ -138,8 +138,8 @@ export async function refreshAccessToken(): Promise<string | null> {
     
     if (response.success) {
       // * Proxy updates cookie; return token for immediate use if needed
-      const token = (response as any)?.data?.access_token ?? (response as any)?.access_token;
-      return token || null;
+      const token = response.data?.access_token;
+      return token ?? null;
     }
     
     return null;

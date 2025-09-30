@@ -189,6 +189,16 @@ export default async function StudentEnrollment({ searchParams }: { searchParams
               <p className="text-neutral-600 mb-6">
                 You haven&apos;t enrolled in any skills yet. Browse available skills to get started.
               </p>
+              {/* Guidance when skill is pre-selected */}
+              {(data.selectedSkill || skillParam) && (
+                <Card className="mb-6 border-neutral-200 bg-neutral-50">
+                  <CardBody className="p-4">
+                    <p className="text-sm text-neutral-700">
+                      You selected <span className="font-medium">{data.selectedSkill?.title || skillParam}</span>. Click &quot;Enroll and Pay&quot; to create your enrollment and proceed to payment.
+                    </p>
+                  </CardBody>
+                </Card>
+              )}
               {(data.selectedSkill || skillParam) ? (
                 <div className="space-y-4">
                   <div className="text-left inline-block">
@@ -270,14 +280,14 @@ export default async function StudentEnrollment({ searchParams }: { searchParams
             )}
 
             {/* Group Assignment */}
-            {enrollment.group_id && (
+            {(['assigned','active'].includes((enrollment.status || '').toString().toLowerCase()) || enrollment.group_id) && (
               <GroupAssignmentCard
                 enrollment={{
                   id: enrollment.id.toString(),
                   status: enrollment.status
                 }}
                 group={{
-                  number: parseInt(enrollment.group_id),
+                  number: parseInt(String(enrollment.group_id || 0)),
                   mentorName: 'Loading...', // This would come from group details API
                   schedule: 'Loading...'
                 }}
@@ -292,7 +302,11 @@ export default async function StudentEnrollment({ searchParams }: { searchParams
               </CardHeader>
               <CardBody className="p-6">
                 <div className="space-y-4">
-                  {enrollment.status === 'pending' && (
+                  {(() => {
+                    const status = (enrollment.status || '').toString().toLowerCase();
+                    const payStatus = (enrollment.payment_status || '').toString().toLowerCase();
+                    return status.includes('pending') || payStatus.includes('pending') || status === 'unpaid' || payStatus === 'unpaid';
+                  })() && (
                     <div className="flex items-start gap-3 p-4 bg-warning-50 rounded-lg">
                       <div className="text-warning-600 mt-1">
                         <CreditCard className="h-4 w-4" />
@@ -307,8 +321,23 @@ export default async function StudentEnrollment({ searchParams }: { searchParams
                       </div>
                     </div>
                   )}
-                  
-                  {enrollment.status === 'paid' && (
+                  {(() => (enrollment.payment_status || '').toString().toLowerCase() === 'failed')() && (
+                    <div className="flex items-start gap-3 p-4 bg-danger-50 rounded-lg">
+                      <div className="text-danger-600 mt-1">
+                        <CreditCard className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-danger-800">
+                          Payment Failed
+                        </p>
+                        <p className="text-xs text-danger-700">
+                          Your last payment attempt failed. Retry payment using the button above.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {(() => (enrollment.status || '').toString().toLowerCase() === 'paid' && !enrollment.group_id)() && (
                     <div className="flex items-start gap-3 p-4 bg-primary-50 rounded-lg">
                       <div className="text-primary-600 mt-1">
                         <Users className="h-4 w-4" />
@@ -323,8 +352,7 @@ export default async function StudentEnrollment({ searchParams }: { searchParams
                       </div>
                     </div>
                   )}
-                  
-                  {enrollment.status === 'assigned' && (
+                  {(() => (enrollment.status || '').toString().toLowerCase() === 'assigned')() && (
                     <div className="flex items-start gap-3 p-4 bg-success-50 rounded-lg">
                       <div className="text-success-600 mt-1">
                         <Users className="h-4 w-4" />
@@ -339,8 +367,7 @@ export default async function StudentEnrollment({ searchParams }: { searchParams
                       </div>
                     </div>
                   )}
-                  
-                  {enrollment.status === 'active' && (
+                  {(() => (enrollment.status || '').toString().toLowerCase() === 'active')() && (
                     <div className="flex items-start gap-3 p-4 bg-success-50 rounded-lg">
                       <div className="text-success-600 mt-1">
                         <BookOpen className="h-4 w-4" />
@@ -351,6 +378,21 @@ export default async function StudentEnrollment({ searchParams }: { searchParams
                         </p>
                         <p className="text-xs text-success-700">
                           Your enrollment is active. Attend practical sessions and track your progress.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                  {(() => (enrollment.status || '').toString().toLowerCase() === 'cancelled')() && (
+                    <div className="flex items-start gap-3 p-4 bg-warning-50 rounded-lg">
+                      <div className="text-warning-600 mt-1">
+                        <BookOpen className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-warning-800">
+                          Enrollment Cancelled
+                        </p>
+                        <p className="text-xs text-warning-700">
+                          You can browse skills and enroll again at any time.
                         </p>
                       </div>
                     </div>

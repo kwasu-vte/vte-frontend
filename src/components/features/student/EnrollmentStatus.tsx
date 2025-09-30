@@ -35,7 +35,7 @@ function EnrollmentStatus({ enrollment, showTimeline = true }: EnrollmentStatusP
         <Chip color={statusColor[enrollment.status]} variant="solid">{enrollment.status}</Chip>
       </CardHeader>
       <CardBody className="space-y-3">
-        {enrollment.paymentStatus && (
+        {enrollment.paymentStatus && (enrollment.status === 'SELECTED' || enrollment.status === 'PAID') && (
           <p className="text-sm text-neutral-600">Payment: {enrollment.paymentStatus}</p>
         )}
         {enrollment.group && (

@@ -130,6 +130,15 @@ export default async function StudentSkills() {
         </div>
       </div>
 
+      {/* Instructional Banner */}
+      <Card shadow="sm" className="w-full border-neutral-200 bg-neutral-50">
+        <CardBody className="p-4">
+          <p className="text-sm text-neutral-700">
+            Select a skill to see details, then click Enroll on the skill panel. You can confirm on the Enrollment page.
+          </p>
+        </CardBody>
+      </Card>
+
       {/* Skills Grid */}
       <StateRenderer
         isLoading={false}
