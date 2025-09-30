@@ -3,7 +3,7 @@
 // * Provides loading states and error handling
 
 import { useQuery } from '@tanstack/react-query';
-import { studentsApi, enrollmentsApi, qrCodesApi } from '@/lib/api';
+import { authApi, enrollmentsApi, qrCodesApi } from '@/lib/api';
 import type { StudentProfile, Enrollment, AttendanceReport } from '@/lib/types';
 
 interface StudentDashboardData {
@@ -21,14 +21,15 @@ interface StudentDashboardData {
 }
 
 export function useStudentDashboardData(userId: string): StudentDashboardData {
-  // Fetch profile data
+  // Fetch profile data via "me" endpoint and map to studentProfile
   const { data: profile, isLoading: profileLoading, error: profileError } = useQuery({
-    queryKey: ['student-profile', userId],
+    queryKey: ['student-profile', 'me'],
     queryFn: async () => {
-      const response = await studentsApi.getProfile(userId);
-      return response.data;
+      const response = await authApi.getCurrentUser();
+      const me = response.data as any;
+      return (me && me.studentProfile) ? (me.studentProfile as StudentProfile) : null;
     },
-    enabled: !!userId,
+    enabled: true,
   });
 
   // Fetch enrollment data

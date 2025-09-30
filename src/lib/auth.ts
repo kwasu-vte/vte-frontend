@@ -6,6 +6,7 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { User, AuthSession } from './types';
 import { authApi } from './api';
+import { apiRequest } from './api/base';
 
 // * Normalize backend role casing to frontend canonical type
 function normalizeUserRole(role: any): 'Admin' | 'Mentor' | 'Student' {
@@ -41,8 +42,10 @@ export async function getSession(): Promise<AuthSession | null> {
         console.log('Session validation failed, attempting refresh...');
         const newToken = await refreshAccessToken();
         if (newToken) {
-          // * Retry getCurrentUser after refresh
-          const retryResponse = await authApi.getCurrentUser();
+          // * Retry getCurrentUser after refresh using the fresh token header
+          const retryResponse = await apiRequest('v1/users/auth/me', {
+            headers: { Authorization: `Bearer ${newToken}` },
+          });
           if (retryResponse.success && retryResponse.data) {
             const normalizedUser = { ...retryResponse.data, role: normalizeUserRole((retryResponse as any)?.data?.role) } as User;
             return {
@@ -62,7 +65,9 @@ export async function getSession(): Promise<AuthSession | null> {
       try {
         const newToken = await refreshAccessToken();
         if (newToken) {
-          const retryResponse = await authApi.getCurrentUser();
+          const retryResponse = await apiRequest('v1/users/auth/me', {
+            headers: { Authorization: `Bearer ${newToken}` },
+          });
           if (retryResponse.success && retryResponse.data) {
             const normalizedUser = { ...retryResponse.data, role: normalizeUserRole((retryResponse as any)?.data?.role) } as User;
             return {

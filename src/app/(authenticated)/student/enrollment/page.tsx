@@ -4,7 +4,7 @@
 
 import React from 'react';
 import { getCurrentUser } from '@/lib/auth';
-import { enrollmentsApi } from '@/lib/api';
+import { enrollmentsApi, skillsApi } from '@/lib/api';
 import { StatusTimeline } from '@/components/features/student/StatusTimeline';
 import { EnrollmentStatus } from '@/components/features/student/EnrollmentStatus';
 import { PaymentRedirect } from '@/components/features/student/PaymentRedirect';
@@ -19,31 +19,129 @@ export const dynamic = 'force-dynamic';
 
 interface EnrollmentPageData {
   enrollment: any;
+  selectedSkill: any | null;
 }
 
-async function getEnrollmentPageData(userId: string): Promise<EnrollmentPageData> {
+function redirect (url) {
+  window.location.href = url
+}
+
+async function getEnrollmentPageData(userId: string, skillId: string | null): Promise<EnrollmentPageData> {
   try {
+    console.info('[EnrollmentPage:getEnrollmentPageData] userId=', userId, 'skillId=', skillId);
     const enrollmentResponse = await enrollmentsApi.getUserEnrollment(userId);
     const enrollment = enrollmentResponse.success ? enrollmentResponse.data : null;
+    console.info('[EnrollmentPage:getEnrollmentPageData] enrollmentExists=', !!enrollment);
+  let selectedSkill: any | null = null;
+    if (skillId) {
+      try {
+        console.info('[EnrollmentPage:getEnrollmentPageData] fetching skill by id (apiRequest):', skillId);
+        const skillRes = await skillsApi.getById(skillId);
+        const shapeKeys = skillRes && typeof skillRes === 'object' ? Object.keys(skillRes as any) : [];
+        const raw = skillRes as any;
+        try {
+          console.info('[EnrollmentPage:getEnrollmentPageData] skillRes.raw (apiRequest)=', JSON.stringify(raw).slice(0, 1000));
+        } catch (_) {
+          console.info('[EnrollmentPage:getEnrollmentPageData] skillRes.raw (apiRequest)=', raw);
+        }
+        const parsedSkill = raw?.data ?? raw?.skill ?? raw?.data?.skill ?? null;
+        selectedSkill = parsedSkill || null;
+        console.info('[EnrollmentPage:getEnrollmentPageData] skillRes.keys (apiRequest)=', shapeKeys, 'skillParsed=', !!selectedSkill, 'title=', selectedSkill?.title);
+      } catch (err: any) {
+        console.error('[EnrollmentPage:getEnrollmentPageData] skillFetchError (apiRequest) for id:', skillId, 'err=', err);
+        // Secondary fallback A: try list endpoint and find by id (handles 403 on detail route)
+        try {
+          const allSkills = await skillsApi.getAll().catch(() => null);
+          const list = (allSkills as any)?.data?.data || (allSkills as any)?.data || [];
+          const found = Array.isArray(list)
+            ? list.find((s: any) => (s?.id != null ? String(s.id) : null) === String(skillId))
+            : null;
+          if (found) {
+            selectedSkill = found;
+            console.info('[EnrollmentPage:getEnrollmentPageData] recovered skill via list endpoint. title=', selectedSkill?.title);
+          }
+        } catch (_) {
+          // ignore and try raw fetch fallback next
+        }
+
+        // Secondary fallback B: raw fetch to proxy with absolute URL (server-safe)
+        if (!selectedSkill) {
+          try {
+            const { cookies: getCookies } = await import('next/headers');
+            const cookieStore = await getCookies();
+            const sessionToken = cookieStore.get('session_token');
+            const headers: Record<string, string> = { 'Accept': 'application/json' };
+            if (sessionToken?.value) headers['Authorization'] = `Bearer ${sessionToken.value}`;
+            const isServer = typeof window === 'undefined';
+            const origin = isServer
+              ? (process.env.NEXT_PUBLIC_APP_URL
+                  || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000'))
+              : '';
+            const url = `${origin}/api/v1/skills/${skillId}`;
+            console.info('[EnrollmentPage:getEnrollmentPageData] fetching skill by id (fallback fetch):', url, 'authHdr=', !!headers['Authorization']);
+            const resp = await fetch(url, { headers, cache: 'no-store' as any });
+            const status = resp.status;
+            const text = await resp.text();
+            console.info('[EnrollmentPage:getEnrollmentPageData] fallback status=', status, 'bodySnippet=', text.slice(0, 500));
+            if (resp.ok) {
+              try {
+                const json = JSON.parse(text);
+                const parsedSkill = json?.data ?? json?.skill ?? json?.data?.skill ?? json ?? null;
+                selectedSkill = parsedSkill || null;
+                console.info('[EnrollmentPage:getEnrollmentPageData] fallback parsed title=', selectedSkill?.title);
+              } catch (parseErr) {
+                console.error('[EnrollmentPage:getEnrollmentPageData] fallback JSON parse error:', parseErr);
+              }
+            }
+          } catch (fallbackErr) {
+            console.error('[EnrollmentPage:getEnrollmentPageData] skillFetchError (fallback) for id:', skillId, 'err=', fallbackErr);
+          }
+        }
+      }
+    }
 
     return {
-      enrollment
+      enrollment,
+      selectedSkill
     };
   } catch (error) {
     console.error('Error fetching enrollment page data:', error);
     return {
-      enrollment: null
+      enrollment: null,
+      selectedSkill: null
     };
   }
 }
 
-export default async function StudentEnrollment() {
+export default async function StudentEnrollment({ searchParams }: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {
   const user = await getCurrentUser();
   if (!user) {
     return <div>Error: User not found</div>;
   }
 
-  const data = await getEnrollmentPageData(user.id);
+  const sp = await searchParams;
+  const skillParam = Array.isArray(sp?.skill) ? sp.skill[0] : sp?.skill ?? null;
+  console.info('[EnrollmentPage] query.skill =', skillParam);
+  const data = await getEnrollmentPageData(user.id, skillParam);
+
+  // If user has no enrollment and provided a skill with explicit confirmation, create enrollment and redirect to payment
+  const confirmParam = Array.isArray(sp?.confirm) ? sp.confirm[0] : sp?.confirm ?? null;
+  console.info('[EnrollmentPage] query.confirm =', confirmParam, 'hasEnrollment=', !!data.enrollment, 'hasSelectedSkill=', !!data.selectedSkill);
+  if (!data.enrollment && skillParam && confirmParam === '1') {
+    try {
+      const created = await enrollmentsApi.createForUser(user.id, { skill_id: skillParam });
+      if (!created.success) {
+        console.error('[EnrollmentPage] Failed to create enrollment for skill:', skillParam);
+      } else {
+        const pay = await enrollmentsApi.payForUser(user.id, { enrollment_id: created.data.id });
+        if (pay.success && pay.data?.payment_url) {
+          redirect(pay.data.payment_url);
+        }
+      }
+    } catch (e) {
+      console.error('[EnrollmentPage] Enrollment/payment error', e);
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -95,14 +193,32 @@ export default async function StudentEnrollment() {
               <p className="text-neutral-600 mb-6">
                 You haven&apos;t enrolled in any skills yet. Browse available skills to get started.
               </p>
-              <Button
-                as={Link}
-                href="/student/skills"
-                color="primary"
-                startContent={<BookOpen className="h-4 w-4" />}
-              >
-                Browse Skills
-              </Button>
+              {(data.selectedSkill || skillParam) ? (
+                <div className="space-y-4">
+                  <div className="text-left inline-block">
+                    <p className="text-sm font-medium text-neutral-900">Selected Skill</p>
+                    <p className="text-sm text-neutral-700">
+                      {data.selectedSkill?.title || skillParam}
+                    </p>
+                  </div>
+                  <Button
+                    as={Link}
+                    href={`/student/enrollment?skill=${data.selectedSkill?.id || skillParam}&confirm=1`}
+                    color="primary"
+                  >
+                    Enroll and Pay
+                  </Button>
+                </div>
+              ) : (
+                <Button
+                  as={Link}
+                  href="/student/skills"
+                  color="primary"
+                  startContent={<BookOpen className="h-4 w-4" />}
+                >
+                  Browse Skills
+                </Button>
+              )}
             </CardBody>
           </Card>
         }

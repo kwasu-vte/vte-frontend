@@ -12,8 +12,10 @@ import { UpcomingPracticals } from '@/components/features/student/UpcomingPracti
 import { QuickActions } from '@/components/features/student/QuickActions';
 import { NotificationContainer } from '@/components/shared/NotificationContainer';
 import { StateRenderer } from '@/components/shared/StateRenderer';
-import { Card, CardBody, CardHeader, Skeleton } from '@nextui-org/react';
+import { Card, CardBody, CardHeader, Skeleton, Button } from '@nextui-org/react';
 import { ListSkeleton, CardGridSkeleton } from '@/components/shared/Skeletons';
+import Link from 'next/link';
+import { BookOpen } from 'lucide-react';
 
 interface StudentDashboardClientProps {
   userId: string;
@@ -61,13 +63,23 @@ export function StudentDashboardClient({ userId }: StudentDashboardClientProps) 
             }
             emptyComponent={
               <Card shadow="sm" className="w-full">
-                <CardHeader>
+                <CardHeader className="flex flex-col items-center justify-center">
+                  <BookOpen className="h-10 w-10 text-primary mb-2" />
                   <p className="text-xl font-medium leading-normal">No Active Enrollment</p>
                 </CardHeader>
-                <CardBody>
+                <CardBody className="flex flex-col items-center justify-center text-center">
                   <p className="text-sm text-neutral-600">
                     You haven&apos;t enrolled in any skills yet. Browse available skills to get started.
                   </p>
+                  <div className="mt-4 flex items-center justify-center">
+                    <Button
+                      as={Link}
+                      href="/student/skills"
+                      color="primary"
+                    >
+                      Browse Skills
+                    </Button>
+                  </div>
                 </CardBody>
               </Card>
             }

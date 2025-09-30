@@ -3,6 +3,33 @@ import React from "react"
 import { Card, CardBody, CardHeader, Input, Select, SelectItem, Button, Divider } from "@nextui-org/react"
 import { AlertTriangle, User, GraduationCap, Building, Phone, Users } from "lucide-react"
 import { CreateStudentProfilePayload } from "@/lib/types"
+import { faculties, type Faculty } from "@/lib/data/faculties"
+
+// * Normalizes phone numbers to an E.164-like format.
+// * Rules (Nigeria-focused, but permissive):
+// * - If starts with '+', keep digits if length 10-15
+// * - If starts with '234' and 13 digits, prefix '+'
+// * - If starts with '0' and 11 digits, convert to '+234' + without leading 0
+// * - Otherwise, if 10-15 digits, return with '+'
+function normalizePhone(input: string): string | null {
+  const only = input.replace(/[^0-9+]/g, '')
+  if (!only) return null
+  if (only.startsWith('+')) {
+    const digits = only.replace(/[^0-9]/g, '')
+    return digits.length >= 10 && digits.length <= 15 ? only : null
+  }
+  if (only.startsWith('234') && only.length === 13) {
+    return `+${only}`
+  }
+  if (only.startsWith('0') && only.length === 11) {
+    return `+234${only.slice(1)}`
+  }
+  const digits = only.replace(/[^0-9]/g, '')
+  if (digits.length >= 10 && digits.length <= 15) {
+    return `+${digits}`
+  }
+  return null
+}
 
 /**
  * * ProfileForm
@@ -33,14 +60,32 @@ function ProfileForm({ onSubmit, initialData, isLoading = false }: ProfileFormPr
 
   const [errors, setErrors] = React.useState<Partial<Record<keyof CreateStudentProfilePayload, string>>>({})
 
+  // Dependent select state (store IDs internally but submit names expected by payload)
+  const [selectedFacultyId, setSelectedFacultyId] = React.useState<string>("")
+  const [selectedDepartmentId, setSelectedDepartmentId] = React.useState<string>("")
+
+  React.useEffect(() => {
+    // Initialize select IDs from initialData names if provided
+    if (!selectedFacultyId && formData.faculty) {
+      const f = faculties.find(x => x.name === formData.faculty || x.id === formData.faculty || x.slug === formData.faculty)
+      if (f) setSelectedFacultyId(f.id)
+    }
+    if (!selectedDepartmentId && formData.department) {
+      // Try match within selected faculty first
+      const fac: Faculty | undefined = faculties.find(f => f.id === selectedFacultyId) || faculties.find(f => f.departments.some(d => d.name === formData.department || d.id === formData.department || d.slug === formData.department))
+      const dep = fac?.departments.find(d => d.name === formData.department || d.id === formData.department || d.slug === formData.department)
+      if (dep) setSelectedDepartmentId(dep.id)
+    }
+  }, [formData.faculty, formData.department, selectedFacultyId, selectedDepartmentId])
+
   const validateForm = (): boolean => {
     const newErrors: Partial<Record<keyof CreateStudentProfilePayload, string>> = {}
 
-    // Matric number validation (basic format check)
+    // Matric number validation (format: 11/22AB/12345)
     if (!formData.matric_number.trim()) {
       newErrors.matric_number = 'Matric number is required'
-    } else if (!/^[A-Z0-9]{6,12}$/i.test(formData.matric_number.trim())) {
-      newErrors.matric_number = 'Matric number must be 6-12 alphanumeric characters'
+    } else if (!/^\d{2}\/\d{2}[A-Z]{2}\/\d{5}$/i.test(formData.matric_number.trim())) {
+      newErrors.matric_number = 'Format must be like 11/22AB/12345'
     }
 
     // Level validation
@@ -48,21 +93,24 @@ function ProfileForm({ onSubmit, initialData, isLoading = false }: ProfileFormPr
       newErrors.student_level = 'Student level is required'
     }
 
-    // Department validation
-    if (!formData.department.trim()) {
+    // Faculty validation (must pick from list)
+    if (!selectedFacultyId) {
+      newErrors.faculty = 'Faculty is required'
+    }
+    // Department validation (must pick from list)
+    if (!selectedDepartmentId) {
       newErrors.department = 'Department is required'
     }
 
-    // Faculty validation
-    if (!formData.faculty.trim()) {
-      newErrors.faculty = 'Faculty is required'
-    }
-
-    // Phone validation
-    if (!formData.phone.trim()) {
+    // Phone validation (Nigerian local format e.g., 07012345678)
+    const rawPhone = formData.phone.trim()
+    if (!rawPhone) {
       newErrors.phone = 'Phone number is required'
-    } else if (!/^[0-9+\-\s()]{10,15}$/.test(formData.phone.trim())) {
-      newErrors.phone = 'Please enter a valid phone number'
+    } else {
+      const digits = rawPhone.replace(/[^0-9]/g, '')
+      if (!(digits.length === 11 && digits.startsWith('0'))) {
+        newErrors.phone = 'Please enter a valid Nigerian phone number in local format e.g. 07012345678.'
+      }
     }
 
     // Gender validation
@@ -77,7 +125,15 @@ function ProfileForm({ onSubmit, initialData, isLoading = false }: ProfileFormPr
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (validateForm()) {
-      onSubmit(formData)
+      // Prepare submission: map selected IDs to names and keep local-format phone
+      const faculty = faculties.find(f => f.id === selectedFacultyId)
+      const department = faculty?.departments.find(d => d.id === selectedDepartmentId)
+      onSubmit({
+        ...formData,
+        faculty: faculty?.name || formData.faculty,
+        department: department?.name || formData.department,
+        phone: formData.phone.trim().replace(/[^0-9]/g, '')
+      })
     }
   }
 
@@ -129,7 +185,7 @@ function ProfileForm({ onSubmit, initialData, isLoading = false }: ProfileFormPr
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Input
                 label="Matric Number"
-                placeholder="e.g., 20/12345"
+                placeholder="e.g., 25/67CE/00150"
                 value={formData.matric_number}
                 onValueChange={(value) => handleInputChange('matric_number', value)}
                 isInvalid={!!errors.matric_number}
@@ -180,7 +236,7 @@ function ProfileForm({ onSubmit, initialData, isLoading = false }: ProfileFormPr
 
               <Input
                 label="Phone Number"
-                placeholder="e.g., +234 801 234 5678"
+                placeholder="e.g., 07012345678"
                 value={formData.phone}
                 onValueChange={(value) => handleInputChange('phone', value)}
                 isInvalid={!!errors.phone}
@@ -199,25 +255,50 @@ function ProfileForm({ onSubmit, initialData, isLoading = false }: ProfileFormPr
             </h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Input
-                label="Department"
-                placeholder="e.g., Computer Science"
-                value={formData.department}
-                onValueChange={(value) => handleInputChange('department', value)}
-                isInvalid={!!errors.department}
-                errorMessage={errors.department}
-                isRequired
-              />
-              
-              <Input
+              <Select
                 label="Faculty"
-                placeholder="e.g., Faculty of Engineering"
-                value={formData.faculty}
-                onValueChange={(value) => handleInputChange('faculty', value)}
+                placeholder="Select faculty"
+                selectedKeys={selectedFacultyId ? [selectedFacultyId] : []}
+                onSelectionChange={(keys) => {
+                  const value = Array.from(keys)[0] as string
+                  setSelectedFacultyId(value)
+                  setSelectedDepartmentId("")
+                  const fac = faculties.find(f => f.id === value)
+                  handleInputChange('faculty', fac?.name || '')
+                }}
                 isInvalid={!!errors.faculty}
                 errorMessage={errors.faculty}
                 isRequired
-              />
+              >
+                {faculties.map((f) => (
+                  <SelectItem key={f.id} value={f.id}>
+                    {f.name}
+                  </SelectItem>
+                ))}
+              </Select>
+
+              <Select
+                label="Department"
+                placeholder={selectedFacultyId ? "Select department" : "Select faculty first"}
+                selectedKeys={selectedDepartmentId ? [selectedDepartmentId] : []}
+                isDisabled={!selectedFacultyId}
+                onSelectionChange={(keys) => {
+                  const value = Array.from(keys)[0] as string
+                  setSelectedDepartmentId(value)
+                  const fac = faculties.find(f => f.id === selectedFacultyId)
+                  const dep = fac?.departments.find(d => d.id === value)
+                  handleInputChange('department', dep?.name || '')
+                }}
+                isInvalid={!!errors.department}
+                errorMessage={errors.department}
+                isRequired
+              >
+                {(faculties.find(f => f.id === selectedFacultyId)?.departments || []).map((d) => (
+                  <SelectItem key={d.id} value={d.id}>
+                    {d.name}
+                  </SelectItem>
+                ))}
+              </Select>
             </div>
           </div>
 

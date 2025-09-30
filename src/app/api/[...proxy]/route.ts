@@ -35,7 +35,10 @@ const handleRequest = async (request: NextRequest, { params }: { params: Promise
   }
 
   // * Ensure proper URL construction regardless of trailing slash
-  const baseUrl = apiBaseUrl.endsWith('/') ? apiBaseUrl.slice(0, -1) : apiBaseUrl;
+  const baseUrlRaw = apiBaseUrl.endsWith('/') ? apiBaseUrl.slice(0, -1) : apiBaseUrl;
+  // * Auto-prefix "/api" if base URL doesn't include it but path starts with v1
+  const needsApiPrefix = !/\/api$/i.test(baseUrlRaw) && /^v1\//i.test(path);
+  const baseUrl = needsApiPrefix ? `${baseUrlRaw}/api` : baseUrlRaw;
   const pathWithSlash = path.startsWith('/') ? path : `/${path}`;
   const targetUrl = `${baseUrl}${pathWithSlash}${request.nextUrl.search}`;
   console.debug(`[BFF Proxy ${traceId}] Target URL: ${targetUrl}`);

@@ -1,5 +1,12 @@
 ## [Unreleased]
 
+### Added
+- Student Enrollment page now processes `skill` query param and fetches skill details.
+- Added enrollment creation and payment redirect flow using `confirm=1` guard.
+
+### Changed
+- Empty state now shows selected skill title and provides "Enroll and Pay" action.
+
 ### Changed
 - NextUI theme hardened in `tailwind.config.ts` per DESIGN_GUIDE: added `layout.borderRadius.medium=0.5rem`, `layout.boxShadow.small/medium`, and aligned `colors.foreground` to neutral-600.
 - Mentor: Merged `/mentor/calendar` and `/mentor/schedule` pages - both now use unified `MentorCalendarView` component with enhanced session details and dual tab interface.
