@@ -24,7 +24,7 @@ type WizardStep = 'purpose' | 'context' | 'configuration' | 'confirmation' | 'co
 interface WizardData {
   purpose?: 'single' | 'bulk';
   skillId?: string;
-  groupId?: number;
+  groupId?: string; // keep as string for Select keys; convert to number on submit
   mentorId?: string;
   count?: number;
   expiresInDays?: number;
@@ -42,7 +42,7 @@ interface QRWizardProps {
 const WizardDataSchema = z.object({
   purpose: z.enum(['single', 'bulk']),
   skillId: z.string().optional(),
-  groupId: z.number().optional(),
+  groupId: z.string().optional(),
   mentorId: z.string().optional(),
   count: z.number().min(1).max(500).default(20),
   expiresInDays: z.number().min(1).max(90).default(7),
@@ -132,7 +132,11 @@ export function QRWizard({ currentStep, onStepChange, onComplete, initialData = 
       
       if (validatedData.purpose === 'single') {
         if (!validatedData.groupId) throw new Error('Group is required for single mode');
-        await qrCodesApi.generateForGroup(validatedData.groupId, {
+        const numericGroupId = Number(validatedData.groupId);
+        if (!Number.isFinite(numericGroupId) || numericGroupId <= 0) {
+          throw new Error('Invalid group selected');
+        }
+        await qrCodesApi.generateForGroup(numericGroupId, {
           quantity: validatedData.count,
           mark_value: validatedData.pointsPerScan,
           expires_at: new Date(Date.now() + validatedData.expiresInDays * 24 * 60 * 60 * 1000).toISOString(),
@@ -232,9 +236,9 @@ export function QRWizard({ currentStep, onStepChange, onComplete, initialData = 
             label="Which training group?"
             placeholder="Select a group"
             selectedKeys={data.groupId ? [String(data.groupId)] : []}
-            onChange={(e) => updateData({ groupId: e.target.value ? Number(e.target.value) : undefined })}
+            onChange={(e) => updateData({ groupId: e.target.value || undefined })}
             size="lg"
-            isDisabled={!data.skillId}
+            isDisabled={!data.skillId || groups.length === 0}
             isRequired
           >
             {groups.map((group: SkillGroup) => (
@@ -245,16 +249,26 @@ export function QRWizard({ currentStep, onStepChange, onComplete, initialData = 
           </Select>
         )}
 
+        {data.purpose === 'single' && data.skillId && groups.length === 0 && (
+          <div className="text-sm text-amber-600 bg-amber-50 border border-amber-200 rounded-md p-3">
+            No groups available for the selected skill.
+          </div>
+        )}
+
         {data.purpose === 'bulk' && data.skillId && (
           <div className="bg-blue-50 p-4 rounded-lg">
             <h4 className="font-semibold text-blue-900 mb-2">Training groups that will get QR codes:</h4>
-            <div className="flex flex-wrap gap-2">
-              {groups.map((group: SkillGroup) => (
-                <Chip key={group.id} color="primary" variant="flat">
-                  {group.group_display_name || `Group ${group.group_number}`}
-                </Chip>
-              ))}
-            </div>
+            {groups.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                {groups.map((group: SkillGroup) => (
+                  <Chip key={group.id} color="primary" variant="flat">
+                    {group.group_display_name || `Group ${group.group_number}`}
+                  </Chip>
+                ))}
+              </div>
+            ) : (
+              <div className="text-sm text-amber-700">No groups found for this skill.</div>
+            )}
           </div>
         )}
       </CardBody>
