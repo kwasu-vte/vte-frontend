@@ -245,7 +245,16 @@ export default async function StudentEnrollment({ searchParams }: { searchParams
             />
 
             {/* Payment Section */}
-            {(enrollment.status === 'pending' || enrollment.payment_status === 'pending') && (
+            {(() => {
+              const status = (enrollment.status || '').toString().toLowerCase();
+              const payStatus = (enrollment.payment_status || '').toString().toLowerCase();
+              const hasPendingKeyword = (s: string) => s.includes('pending');
+              const isPaymentPending = hasPendingKeyword(status)
+                || hasPendingKeyword(payStatus)
+                || status === 'unpaid'
+                || payStatus === 'unpaid';
+              return isPaymentPending;
+            })() && (
               <Card shadow="sm" className="w-full">
                 <CardHeader className="flex items-center gap-2">
                   <CreditCard className="h-5 w-5 text-primary" />
@@ -254,11 +263,7 @@ export default async function StudentEnrollment({ searchParams }: { searchParams
                 <CardBody className="p-6">
                   <PaymentRedirect
                     enrollment={{ id: enrollment.id.toString() }}
-                    amount={5000} // This would come from the enrollment data
-                    onProceed={() => {
-                      // This would typically redirect to payment gateway
-                      console.log('Proceeding to payment...')
-                    }}
+                    userId={user.id}
                   />
                 </CardBody>
               </Card>
