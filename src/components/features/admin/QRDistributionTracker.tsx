@@ -4,6 +4,8 @@ import { useMemo, useState } from "react"
 import { Button, Card, CardBody, CardHeader, Chip, Pagination, Select, SelectItem, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tooltip } from "@nextui-org/react"
 import { useQuery } from "@tanstack/react-query"
 import { qrCodesApi } from "@/lib/api"
+import { Printer } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 /**
  * * QRDistributionTracker
@@ -20,6 +22,7 @@ export function QRDistributionTracker(props: QRDistributionTrackerProps) {
   const { selectedGroupId, qrBatches, onMarkDistributed } = props
   const [status, setStatus] = useState<"all" | "active" | "expired">("all")
   const [page, setPage] = useState(1)
+  const router = useRouter()
 
   // * If parent did not provide batches, fetch codes and aggregate
   const shouldFetch = (!!selectedGroupId) && (!qrBatches || qrBatches.length === 0)
@@ -42,6 +45,11 @@ export function QRDistributionTracker(props: QRDistributionTrackerProps) {
 
   const totalPages = Math.max(1, Math.ceil(rows.length / 10))
   const paged = rows.slice((page - 1) * 10, page * 10)
+
+  // * Handle print QR code
+  const handlePrintQRCode = (qrToken: string) => {
+    router.push(`/admin/qr-codes/print/${qrToken}`)
+  }
 
   // * Show helpful message when no group is selected
   if (!selectedGroupId) {
@@ -128,6 +136,19 @@ export function QRDistributionTracker(props: QRDistributionTrackerProps) {
                     >
                       {b.status || 'unknown'}
                     </Chip>
+                    {b.token && (
+                      <Tooltip content="Print QR code">
+                        <Button 
+                          size="sm" 
+                          color="secondary" 
+                          variant="bordered"
+                          onPress={() => handlePrintQRCode(b.token)}
+                          startContent={<Printer className="h-3 w-3" />}
+                        >
+                          Print
+                        </Button>
+                      </Tooltip>
+                    )}
                     {onMarkDistributed && b.status !== "distributed" && (
                       <Tooltip content="Mark as distributed">
                         <Button 

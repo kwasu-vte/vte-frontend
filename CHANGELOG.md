@@ -536,3 +536,72 @@
 - Updated Sidebar: Complete mentor navigation menu
 
 
+## [2025-10-03] - Excel Export & QR Code Printing
+
+### Added
+- Excel export functionality for attendance reports with formatted columns and auto-generated filenames
+- Individual QR code print view with group and instructor information
+- Print button in admin QR code list for easy access to printable QR codes
+- Real QR code generation using qrcode library
+- Optimized print styling with proper page margins and color preservation
+
+### Changed
+- Enhanced attendance report component with Excel export button
+- Updated QR distribution tracker with print functionality
+- Improved print page styling for professional output
+
+### Technical Details
+- Added xlsx dependency for Excel file generation
+- Added qrcode and @types/qrcode for QR code generation
+- Created print-optimized page at /admin/qr-codes/print/[qrToken]
+- Enhanced QR code information display with session details and instructions
+## [2025-10-03] - QR Code Print Optimization & Admin Page Restructure
+
+### Added
+- Optimized A4 print layout with larger QR code (256x256px) as main focus
+- New QRCodeTable component with skill/group selection and table view
+- Modal-based QR creation wizard for better UX
+- Print button integration in QR codes table
+
+### Changed
+- Restructured admin QR codes page with skill/group selection first
+- QR code print page now uses A4 paper with 0.25in margins
+- QR code is now the primary visual element (16rem x 16rem)
+- Information section made more compact for better print layout
+- Moved multi-step QR generation form to modal
+
+### Technical Details
+- Enhanced print styling with proper A4 dimensions
+- Improved QR code visibility and readability
+- Better responsive design for print media
+- Modal integration with existing QR wizard component
+- Skill/group selection with dependent dropdowns
+## [2025-10-03] - QR Code Styling Enhancement
+
+### Changed
+- Replaced qrcode library with qr-code-styling for better customization
+- Added logo integration using kwasulogo.png from public directory
+- Implemented extra-rounded dots and corners for modern appearance
+- Enhanced QR code visual design while maintaining black and white color scheme
+
+### Technical Details
+- Logo positioned in center with 30% size and 10px margin
+- Extra-rounded dots and corner squares for modern look
+- SVG output for crisp printing and scaling
+- Proper cleanup of QR code instances on component unmount
+- Maintained 256x256px dimensions for optimal print quality
+## [2025-10-03] - QR Code Configuration Enhancement
+
+### Changed
+- Updated QR code implementation to follow proper qr-code-styling patterns
+- Added proper TypeScript imports for all QR code styling types
+- Implemented proper options configuration with error correction level
+- Enhanced logo integration with hideBackgroundDots and proper sizing
+- Improved QR code update mechanism for dynamic token changes
+
+### Technical Details
+- Added proper TypeScript type imports (DrawType, TypeNumber, Mode, etc.)
+- Configured error correction level to 'Q' for better reliability
+- Set logo size to 40% with 20px margin for optimal visibility
+- Implemented hideBackgroundDots for cleaner logo presentation
+- Proper QR code instance management with update functionality
