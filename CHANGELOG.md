@@ -605,3 +605,83 @@
 - Set logo size to 40% with 20px margin for optimal visibility
 - Implemented hideBackgroundDots for cleaner logo presentation
 - Proper QR code instance management with update functionality
+## [2025-10-03] - Fix Skills API Call
+
+### Fixed
+- Changed skillsApi.list() to skillsApi.getAll() to match working admin skills page
+- Updated skillGroupsApi.listBySkill() to skillGroupsApi.list() with skill_id parameter
+- Fixed skill selection dropdown not showing any skills
+
+### Technical Details
+- Skills API now uses the correct getAll() method that returns paginated response
+- Skill groups API now uses list() method with skill_id filter parameter
+- Both API calls now match the working patterns from other admin pages
+## [2025-10-03] - Fix Groups API Call
+
+### Fixed
+- Changed skillGroupsApi.list() to skillsApi.getGroupsBySkill() to match working skill groups page
+- Updated data structure from groupsData?.data?.items to groupsData?.data
+- Fixed group display to use group_display_name or group_number instead of name
+- Group options should now show proper group names
+
+### Technical Details
+- Groups API now uses getGroupsBySkill() method that returns groups array directly
+- Group display format matches other admin pages: 'Group {group_display_name || group_number}'
+- Removed unused skillGroupsApi import
+- Both skills and groups now use the correct API methods from working admin pages
+## [2025-10-03] - Fix Select Component Value Handling
+
+### Fixed
+- Changed selectedKeys from array to Set object for NextUI Select component
+- Updated onChange to onSelectionChange with proper key extraction
+- Fixed selected values not displaying in Select components
+- Proper handling of Set to string conversion for state management
+
+### Technical Details
+- selectedKeys now uses new Set([selectedSkillId]) instead of [selectedSkillId]
+- onSelectionChange extracts first key using Array.from(keys)[0]
+- Proper TypeScript casting for string values
+- Maintains null handling for empty selections
+## [2025-10-03] - Hybrid QR Code Implementation
+
+### Added
+- Server-side QR code image as primary source with client-side fallback
+- Image error handling that automatically switches to client-side generation
+- Environment variable support for API base URL configuration
+- Hybrid approach: try server image first, fallback to qr-code-styling if failed
+
+### Technical Details
+- Primary: Server-generated QR code image from API endpoint
+- Fallback: Client-side QR code generation using qr-code-styling library
+- URL construction: `${baseUrl}/files/qr-codes/qr_${token}.png`
+- Automatic fallback on image load error
+- Maintains logo integration and styling in fallback mode
+## [2025-10-03] - QR Code Print Route Restructure
+
+### Changed
+- Updated QR code print route from /admin/qr-codes/print/[qrToken] to /admin/qr-codes/print
+- Added proper TypeScript types for GroupQrCode based on API structure
+- Implemented session storage for passing QR code data to print page
+- Added redirect to QR codes page if no data found in session storage
+- Updated print button to store complete QR code object
+
+### Technical Details
+- GroupQrCode interface: id (number), skill_group_id (number), token (string), path (string), mark_value (number), expires_at (string)
+- Session storage key: 'qrCodePrintData' with complete QR code object
+- Automatic redirect if session storage data is missing or invalid
+- Server image URL construction using qrCodeData.path
+- Maintains hybrid approach: server image with client-side fallback
+## [2025-10-03] - Hide Sidebar in Print Output
+
+### Added
+- Global print styles to hide sidebar, header, and navigation elements
+- CSS selectors targeting common layout elements
+- Full-width main content during print
+- Comprehensive print media query with layout hiding
+
+### Technical Details
+- Used `<style jsx global>` to apply styles globally during print
+- Hide elements: [data-sidebar], [data-header], nav, header, aside, .sidebar, .header, .notification-container
+- Main content gets full width with no padding/margins during print
+- Print-specific styles only apply when @media print is active
+- Ensures clean print output without UI elements

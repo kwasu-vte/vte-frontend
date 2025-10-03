@@ -7,6 +7,7 @@ import { useQuery } from "@tanstack/react-query"
 import { qrCodesApi } from "@/lib/api"
 import { Printer, Plus } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { GroupQrCode } from "@/lib/types"
 
 /**
  * * QRCodeTable
@@ -43,8 +44,10 @@ export function QRCodeTable({ skillId, groupId, onCreateClick }: QRCodeTableProp
   const paged = qrCodes.slice((page - 1) * 10, page * 10)
 
   // * Handle print QR code
-  const handlePrintQRCode = (qrToken: string) => {
-    router.push(`/admin/qr-codes/print/${qrToken}`)
+  const handlePrintQRCode = (qrCode: GroupQrCode) => {
+    // * Store QR code data in session storage
+    sessionStorage.setItem('qrCodePrintData', JSON.stringify(qrCode))
+    router.push('/admin/qr-codes/print')
   }
 
   // * Get status color
@@ -165,7 +168,7 @@ export function QRCodeTable({ skillId, groupId, onCreateClick }: QRCodeTableProp
                 <TableColumn className="w-24">ACTIONS</TableColumn>
               </TableHeader>
               <TableBody>
-                {paged.map((qrCode: any) => (
+                {paged.map((qrCode: GroupQrCode) => (
                   <TableRow key={qrCode.id}>
                     <TableCell>
                       <div className="font-mono text-xs text-gray-600">
@@ -197,7 +200,7 @@ export function QRCodeTable({ skillId, groupId, onCreateClick }: QRCodeTableProp
                           size="sm"
                           color="secondary"
                           variant="bordered"
-                          onPress={() => handlePrintQRCode(qrCode.token)}
+                          onPress={() => handlePrintQRCode(qrCode)}
                           startContent={<Printer className="h-3 w-3" />}
                         >
                           Print

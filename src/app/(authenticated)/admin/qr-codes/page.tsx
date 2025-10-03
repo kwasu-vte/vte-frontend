@@ -5,7 +5,7 @@ import { Card, CardBody, CardHeader, Select, SelectItem, Modal, ModalContent, Mo
 import { QRCodeTable } from '@/components/features/admin/QRCodeTable';
 import { QRWizard } from '@/components/features/admin/QRWizard';
 import { useQuery } from '@tanstack/react-query';
-import { skillsApi, skillGroupsApi } from '@/lib/api';
+import { skillsApi } from '@/lib/api';
 
 type WizardStep = 'purpose' | 'context' | 'configuration' | 'confirmation' | 'complete';
 
@@ -20,18 +20,18 @@ export default function AdminQrCodesPage() {
   // * Fetch skills
   const { data: skillsData } = useQuery({
     queryKey: ['skills'],
-    queryFn: () => skillsApi.list(),
+    queryFn: () => skillsApi.getAll(),
   });
 
   // * Fetch groups for selected skill
   const { data: groupsData } = useQuery({
     queryKey: ['skill-groups', selectedSkillId],
-    queryFn: () => skillGroupsApi.listBySkill(selectedSkillId!),
+    queryFn: () => skillsApi.getGroupsBySkill(selectedSkillId!, { include_full: true }),
     enabled: !!selectedSkillId,
   });
 
   const skills = skillsData?.data?.items || [];
-  const groups = groupsData?.data?.items || [];
+  const groups = groupsData?.data || [];
 
   const steps = [
     { key: 'purpose', title: 'What do you want to do?', description: 'Choose your main task' },
@@ -86,9 +86,10 @@ export default function AdminQrCodesPage() {
             <Select
               label="Skill"
               placeholder="Select a skill"
-              selectedKeys={selectedSkillId ? [selectedSkillId] : []}
-              onChange={(e) => {
-                setSelectedSkillId(e.target.value);
+              selectedKeys={selectedSkillId ? new Set([selectedSkillId]) : new Set()}
+              onSelectionChange={(keys) => {
+                const skillId = Array.from(keys)[0] as string || null;
+                setSelectedSkillId(skillId);
                 setSelectedGroupId(null); // Reset group when skill changes
               }}
               isRequired
@@ -103,14 +104,17 @@ export default function AdminQrCodesPage() {
             <Select
               label="Group"
               placeholder="Select a group"
-              selectedKeys={selectedGroupId ? [selectedGroupId] : []}
-              onChange={(e) => setSelectedGroupId(e.target.value)}
+              selectedKeys={selectedGroupId ? new Set([selectedGroupId]) : new Set()}
+              onSelectionChange={(keys) => {
+                const groupId = Array.from(keys)[0] as string || null;
+                setSelectedGroupId(groupId);
+              }}
               isDisabled={!selectedSkillId}
               isRequired
             >
               {groups.map((group: any) => (
                 <SelectItem key={group.id} value={group.id}>
-                  {group.name}
+                  Group {group.group_display_name || group.group_number}
                 </SelectItem>
               ))}
             </Select>
