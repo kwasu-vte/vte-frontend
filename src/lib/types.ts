@@ -249,11 +249,11 @@ export interface EnrollmentPaymentResponse {
 
 // * QR Code Management
 export interface GroupQrCode {
-  id: string;
-  skill_group_id: string;
+  id: number;
+  skill_group_id: number;
   token: string;
   path: string;
-  mark_value: string;
+  mark_value: number;
   expires_at: string;
 }
 
