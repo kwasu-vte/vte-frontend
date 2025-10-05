@@ -301,9 +301,17 @@ export interface AttendanceReport {
     group_number: number;
     skill_title: string;
     practical_date: string | null;
-    total_enrolled: string;
+    total_enrolled: number;
   };
-  students: string[];
+  students: Array<{
+    student_id: string;
+    full_name: string;
+    matric_number: string;
+    total_attendance: number;
+    total_points: number;
+    last_attendance: string | null;
+    attendance_dates: string[];
+  }>;
 }
 
 // * Skill Groups Management

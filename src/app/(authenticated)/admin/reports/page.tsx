@@ -5,6 +5,9 @@ import { skillGroupsApi, qrCodesApi } from '@/lib/api';
 import { useMutation } from '@tanstack/react-query';
 import { useClientQuery } from '@/lib/hooks/useClientQuery';
 import { Button, Select, SelectItem } from '@nextui-org/react';
+import { FileSpreadsheet } from 'lucide-react';
+import { exportAttendanceReportToExcel } from '@/lib/utils/excel-export';
+import { AttendanceReport } from '@/lib/types';
 import { DefaultErrorComponent, DefaultLoadingComponent } from '@/components/shared/StateRenderer';
 
 export default function AdminReportsPage() {
@@ -75,10 +78,37 @@ export default function AdminReportsPage() {
           <div className="p-4"><DefaultErrorComponent error={reportMutation.error as Error} /></div>
         )}
         {reportMutation.isSuccess && (
-          // TODO: Replace JSON dump with visual report viewer and export options (CSV/PDF).
-          <pre className="bg-neutral-50 border border-neutral-200 rounded p-4 overflow-auto text-xs">
+          <div className="space-y-4">
+            {/* * Export buttons for attendance reports */}
+            {type === 'attendance' && reportMutation.data && (
+              <div className="flex items-center gap-2 p-4 bg-green-50 border border-green-200 rounded-lg">
+                <div className="flex-1">
+                  <h3 className="font-medium text-green-800">Report Generated Successfully</h3>
+                  <p className="text-sm text-green-600">
+                    Group {(reportMutation.data as AttendanceReport).group_info.group_number} - 
+                    {(reportMutation.data as AttendanceReport).group_info.skill_title}
+                  </p>
+                </div>
+                <Button
+                  color="success"
+                  variant="bordered"
+                  size="sm"
+                  startContent={<FileSpreadsheet className="h-4 w-4" />}
+                  onPress={() => exportAttendanceReportToExcel(reportMutation.data as AttendanceReport)}
+                >
+                  Export Excel
+                </Button>
+              </div>
+            )}
+
+            {/* * Report data display */}
+            <div className="bg-neutral-50 border border-neutral-200 rounded p-4">
+              <h3 className="font-medium text-neutral-800 mb-2">Report Data</h3>
+              <pre className="overflow-auto text-xs">
 {JSON.stringify(reportMutation.data, null, 2)}
-          </pre>
+              </pre>
+            </div>
+          </div>
         )}
       </div>
     </div>
