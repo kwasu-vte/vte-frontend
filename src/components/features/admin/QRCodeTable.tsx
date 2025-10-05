@@ -198,8 +198,8 @@ export function QRCodeTable({ skillId, groupId, onCreateClick }: QRCodeTableProp
                       <Tooltip content="Print QR code">
                         <Button
                           size="sm"
-                          color="secondary"
-                          variant="bordered"
+                          color="primary"
+                          variant="solid"
                           onPress={() => handlePrintQRCode(qrCode)}
                           startContent={<Printer className="h-3 w-3" />}
                         >

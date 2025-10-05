@@ -11,7 +11,7 @@ type WizardStep = 'purpose' | 'context' | 'configuration' | 'confirmation' | 'co
 
 export default function AdminQrCodesPage() {
   const [selectedSkillId, setSelectedSkillId] = useState<string | null>(null);
-  const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
+  const [selectedGroupId, setSelectedGroupId] = useState<number | null>(null);
   const [wizardData, setWizardData] = useState<any>({});
   const [currentStep, setCurrentStep] = useState<WizardStep>('purpose');
   
@@ -57,7 +57,7 @@ export default function AdminQrCodesPage() {
     // * Pre-populate wizard with selected skill and group
     setWizardData({
       skillId: selectedSkillId,
-      groupId: selectedGroupId,
+      groupId: selectedGroupId ? String(selectedGroupId) : null,
     });
     setCurrentStep('purpose');
     onOpen();
@@ -83,41 +83,47 @@ export default function AdminQrCodesPage() {
         </CardHeader>
         <CardBody>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Select
-              label="Skill"
-              placeholder="Select a skill"
-              selectedKeys={selectedSkillId ? new Set([selectedSkillId]) : new Set()}
-              onSelectionChange={(keys) => {
-                const skillId = Array.from(keys)[0] as string || null;
-                setSelectedSkillId(skillId);
-                setSelectedGroupId(null); // Reset group when skill changes
-              }}
-              isRequired
-            >
-              {skills.map((skill: any) => (
-                <SelectItem key={skill.id} value={skill.id}>
-                  {skill.title}
-                </SelectItem>
-              ))}
-            </Select>
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium text-gray-700">Skill *</label>
+              <select
+                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={selectedSkillId || ""}
+                onChange={(e) => {
+                  const skillId = e.target.value || null;
+                  setSelectedSkillId(skillId);
+                  setSelectedGroupId(null); // Reset group when skill changes
+                }}
+                required
+              >
+                <option value="">Select a skill</option>
+                {skills.map((skill: any) => (
+                  <option key={skill.id} value={skill.id}>
+                    {skill.title}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-            <Select
-              label="Group"
-              placeholder="Select a group"
-              selectedKeys={selectedGroupId ? new Set([selectedGroupId]) : new Set()}
-              onSelectionChange={(keys) => {
-                const groupId = Array.from(keys)[0] as string || null;
-                setSelectedGroupId(groupId);
-              }}
-              isDisabled={!selectedSkillId}
-              isRequired
-            >
-              {groups.map((group: any) => (
-                <SelectItem key={group.id} value={group.id}>
-                  Group {group.group_display_name || group.group_number}
-                </SelectItem>
-              ))}
-            </Select>
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium text-gray-700">Group *</label>
+              <select
+                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={selectedGroupId ? String(selectedGroupId) : ""}
+                onChange={(e) => {
+                  const groupId = e.target.value ? Number(e.target.value) : null;
+                  setSelectedGroupId(groupId);
+                }}
+                disabled={!selectedSkillId}
+                required
+              >
+                <option value="">Select a group</option>
+                {groups.map((group: any) => (
+                  <option key={String(group.id)} value={String(group.id)}>
+                    Group {group.group_display_name || group.group_number}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
         </CardBody>
       </Card>
@@ -125,7 +131,7 @@ export default function AdminQrCodesPage() {
       {/* * QR Codes Table */}
       <QRCodeTable
         skillId={selectedSkillId}
-        groupId={selectedGroupId}
+        groupId={selectedGroupId ? String(selectedGroupId) : null}
         onCreateClick={handleCreateClick}
       />
 

@@ -140,8 +140,8 @@ export function QRDistributionTracker(props: QRDistributionTrackerProps) {
                       <Tooltip content="Print QR code">
                         <Button 
                           size="sm" 
-                          color="secondary" 
-                          variant="bordered"
+                          color="primary" 
+                          variant="solid"
                           onPress={() => handlePrintQRCode(b.token)}
                           startContent={<Printer className="h-3 w-3" />}
                         >
