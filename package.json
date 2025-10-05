@@ -39,6 +39,7 @@
     "react-hook-form": "^7.62.0",
     "react-intersection-observer": "^9.13.1",
     "react-qr-barcode-scanner": "^2.0.0",
+    "react-qr-scanner": "1.0.0-alpha.11",
     "react-router-dom": "^6.26.1",
     "react-toastify": "^11.0.3",
     "react-typewriter-effect": "^1.1.0",
