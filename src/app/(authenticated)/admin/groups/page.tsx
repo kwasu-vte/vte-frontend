@@ -65,6 +65,11 @@ export default function AdminGroupsPage() {
         </div>
       </div>
 
+      {/* Info: How to use */}
+      <div className="bg-blue-50 border border-blue-200 text-blue-800 rounded-md p-3 text-sm">
+        View groups and their capacity. Use the eye icon to view group details. Creation and editing are disabled here.
+      </div>
+
       {/* * Groups Table with StateRenderer */}
       <Card shadow="sm">
         <CardHeader className="flex items-center justify-between px-4 pt-4">

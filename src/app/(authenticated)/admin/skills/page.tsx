@@ -239,6 +239,11 @@ export default function AdminSkillsPage() {
         </Button>
       </div>
 
+      {/* Info: How to use */}
+      <div className="bg-blue-50 border border-blue-200 text-blue-800 rounded-md p-3 text-sm">
+        Manage skills, update details, and set date ranges. Use the actions to view, edit, or delete. Assignments and schedules are managed from their dedicated pages.
+      </div>
+
       {/* * Skills Table */}
       <Card shadow="sm">
         <CardHeader className="flex items-center justify-between px-4 pt-4">

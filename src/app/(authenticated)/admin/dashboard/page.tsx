@@ -51,6 +51,11 @@ export default function AdminDashboard() {
         <StatCard title="With Capacity" value={groupsWithCapacity} color="neutral" />
       </StatCardGrid>
 
+      {/* * Info: Guidance */}
+      <div className="bg-blue-50 border border-blue-200 text-blue-800 rounded-md p-3 text-sm">
+        Tip: Use Quick Actions to generate QR codes or manage sessions. Recent Activity shows latest enrollments; click View all to see the full list with filters.
+      </div>
+
       {/* * Content: Activity | Quick Actions */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* * Activity Feed */}

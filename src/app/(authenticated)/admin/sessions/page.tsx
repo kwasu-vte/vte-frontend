@@ -175,6 +175,11 @@ export default function AdminSessionsPage() {
         </Button>
       </div>
 
+      {/* Info: How to use */}
+      <div className="bg-blue-50 border border-blue-200 text-blue-800 rounded-md p-3 text-sm">
+        Create and manage academic sessions. Only one session should be active at a time. Use Start/End actions to control the active period.
+      </div>
+
       {/* * Summary */}
       <Card shadow="sm">
         <CardBody className="px-4 py-3">

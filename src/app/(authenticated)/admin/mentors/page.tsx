@@ -192,6 +192,11 @@ export default function AdminMentorsPage() {
         </div>
       </div>
 
+      {/* Info: How to use */}
+      <div className="bg-blue-50 border border-blue-200 text-blue-800 rounded-md p-3 text-sm">
+        Search mentors by name or email. Use Add Mentor to create profiles, Assign Skills to link mentors to skills, and View to inspect details.
+      </div>
+
       <Card shadow="sm">
         <CardHeader className="flex items-center justify-between px-4 pt-4">
           <div className="flex items-center gap-3">

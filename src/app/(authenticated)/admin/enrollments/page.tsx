@@ -69,6 +69,11 @@ export default function AdminEnrollmentsPage() {
         </Button>
       </div>
 
+      {/* Info: How to use */}
+      <div className="bg-blue-50 border border-blue-200 text-blue-800 rounded-md p-3 text-sm">
+        Filter by academic session and skill to narrow results. Use the Assign action to place students into groups, or Auto-assign to distribute automatically.
+      </div>
+
       <Card shadow="sm">
         <CardHeader className="flex items-center justify-between px-4 pt-4">
           <div className="flex items-center gap-3">
