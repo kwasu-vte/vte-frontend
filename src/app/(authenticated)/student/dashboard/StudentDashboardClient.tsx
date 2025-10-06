@@ -17,7 +17,6 @@ import { ListSkeleton, CardGridSkeleton } from '@/components/shared/Skeletons';
 import Link from 'next/link';
 import { BookOpen, CreditCard, Users } from 'lucide-react';
 import { StartTourButton } from '@/components/shared/StartTourButton';
-import { UpcomingPracticals } from '@/components/features/student/UpcomingPracticals';
 import { useQueryClient } from '@tanstack/react-query';
 
 interface StudentDashboardClientProps {
@@ -36,12 +35,12 @@ export function StudentDashboardClient({ userId }: StudentDashboardClientProps) 
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
-      <div id="student-welcome">
-        <div className="flex items-start justify-between gap-3">
+      {/* Page Hero */}
+      <div id="student-welcome" className="rounded-xl bg-gradient-to-r from-primary-50 to-neutral-50 border border-neutral-200 p-5">
+        <div className="flex items-start justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-neutral-900 mb-2">Welcome back!</h1>
-            <p className="text-neutral-600">Here&apos;s what&apos;s happening with your practical training.</p>
+            <h1 className="text-2xl md:text-3xl font-bold text-neutral-900">Welcome back</h1>
+            <p className="text-neutral-600 mt-1">Track your enrollment, group, and upcoming practicals at a glance.</p>
             <div className="mt-3">
               <StartTourButton tour="student-dashboard" label="Start Tour" />
             </div>
@@ -324,6 +323,8 @@ export function StudentDashboardClient({ userId }: StudentDashboardClientProps) 
             </Card>
           )}
 
+          {null}
+
         </div>
 
         {/* Right Column - Quick Actions + Widgets */}
@@ -344,14 +345,7 @@ export function StudentDashboardClient({ userId }: StudentDashboardClientProps) 
               </CardBody>
             </Card>
 
-            <Card shadow="sm">
-              <CardHeader className="px-4 pt-4">
-                <p className="text-base font-medium text-neutral-900">Upcoming Practicals</p>
-              </CardHeader>
-              <CardBody className="p-4">
-                <UpcomingPracticals practicals={[]} limit={5} />
-              </CardBody>
-            </Card>
+            {/* Keep sidebar minimal for focus */}
           </div>
         </div>
       </div>

@@ -1,6 +1,7 @@
 "use client"
 import React from "react"
-import { Card, CardBody, CardHeader, Chip, Divider } from "@nextui-org/react"
+import { Card, CardBody, CardHeader, Chip, Divider, Button } from "@nextui-org/react"
+import Link from "next/link"
 import { Calendar, MapPin, User, Clock } from "lucide-react"
 
 /**
@@ -60,6 +61,9 @@ function UpcomingPracticals({ practicals, limit = 5 }: UpcomingPracticalsProps) 
           <div className="text-center py-8">
             <Calendar className="h-12 w-12 text-neutral-400 mx-auto mb-4" />
             <p className="text-sm text-neutral-600">No upcoming practicals scheduled.</p>
+            <div className="mt-4">
+              <Button as={Link} href="/student/schedule" size="sm" variant="bordered" color="primary">Open Schedule</Button>
+            </div>
           </div>
         ) : (
           <div className="space-y-4">
@@ -109,6 +113,9 @@ function UpcomingPracticals({ practicals, limit = 5 }: UpcomingPracticalsProps) 
                 </div>
               </div>
             ))}
+            <div className="text-right">
+              <Button as={Link} href="/student/schedule" size="sm" variant="light" color="primary">View full schedule</Button>
+            </div>
           </div>
         )}
       </CardBody>

@@ -1,3 +1,12 @@
+## feat(student): redesign student homepage UI/UX
+
+- Added gradient hero with quick refresh and tour entry
+- Clear next-step callout based on profile/enrollment/payment status
+- Restructured layout: prominent enrollment overview
+- Enhanced QuickActions with tooltips, hover/focus states, and clearer copy
+- Improved GroupAssignmentCard layout with divider and guidance text
+- Better empty state for UpcomingPracticals with Schedule links
+
 ## [Unreleased]
 
 ### Added
