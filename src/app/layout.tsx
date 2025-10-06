@@ -5,9 +5,7 @@ import { AppProvider } from "@/context/AppContext";
 import { QueryProvider } from "@/components/providers/QueryProvider";
 import { Providers } from "./providers";
 import PWAManager from "@/components/shared/PWAManager";
-import { Onborda, OnbordaProvider } from "onborda";
-import { steps } from "@/onborda/steps";
-import { TourCard } from "@/onborda/TourCard";
+ 
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -121,17 +119,7 @@ export default function RootLayout({
           <QueryProvider>
             <AppProvider>
               <PWAManager>
-                <OnbordaProvider>
-                  <Onborda
-                    steps={steps}
-                    showOnborda={false}
-                    shadowRgb="55,48,163"
-                    shadowOpacity="0.8"
-                    cardComponent={TourCard}
-                  >
-                    {children}
-                  </Onborda>
-                </OnbordaProvider>
+                {children}
               </PWAManager>
             </AppProvider>
           </QueryProvider>

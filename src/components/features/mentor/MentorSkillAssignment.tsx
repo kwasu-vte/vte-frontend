@@ -69,15 +69,17 @@ export default function MentorSkillAssignment(props: MentorSkillAssignmentProps)
     )
   }
 
-  const assignedSet = new Set((assigned as Skill[]).map((s) => s.id))
-  const available = (allSkills as Skill[]).filter((s) => !assignedSet.has(s.id))
+  const assignedList: Skill[] = Array.isArray(assigned) ? (assigned as Skill[]) : []
+  const allSkillsList: Skill[] = Array.isArray(allSkills) ? (allSkills as Skill[]) : []
+  const assignedSet = new Set(assignedList.map((s) => s.id))
+  const available = allSkillsList.filter((s) => !assignedSet.has(s.id))
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <Card shadow="sm" className="p-4">
         <CardHeader className="flex items-center justify-between">
           <p className="text-base font-medium text-neutral-900">Assigned Skills</p>
-          <Chip variant="flat">{assigned?.length ?? 0}</Chip>
+          <Chip variant="flat">{assignedList.length}</Chip>
         </CardHeader>
         <CardBody className="space-y-3">
           {(assigned as Skill[]).length === 0 ? (
