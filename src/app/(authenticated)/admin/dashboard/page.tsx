@@ -6,7 +6,6 @@
 
 import React from 'react';
 import PWATestPanel from '@/components/shared/PWATestPanel';
-import { StartTourButton } from '@/components/shared/StartTourButton';
 import { StatCard, StatCardGrid } from '@/components/shared/StatCard';
 import { useAdminDashboardData } from '@/lib/hooks/use-admin-dashboard-data';
 import Link from 'next/link';
@@ -37,8 +36,7 @@ export default function AdminDashboard() {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <StartTourButton tour="admin-dashboard" label="Start Tour" className="px-3 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary-600" />
-            <PWATestPanel />
+            {/* <PWATestPanel /> */}
           </div>
         </div>
       </div>

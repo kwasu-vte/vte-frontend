@@ -16,7 +16,6 @@ import { Card, CardBody, CardHeader, Skeleton, Button, Chip } from '@nextui-org/
 import { ListSkeleton, CardGridSkeleton } from '@/components/shared/Skeletons';
 import Link from 'next/link';
 import { BookOpen, CreditCard, Users } from 'lucide-react';
-import { StartTourButton } from '@/components/shared/StartTourButton';
 import { useQueryClient } from '@tanstack/react-query';
 
 interface StudentDashboardClientProps {
@@ -41,9 +40,7 @@ export function StudentDashboardClient({ userId }: StudentDashboardClientProps) 
           <div>
             <h1 className="text-2xl md:text-3xl font-bold text-neutral-900">Welcome back</h1>
             <p className="text-neutral-600 mt-1">Track your enrollment, group, and upcoming practicals at a glance.</p>
-            <div className="mt-3">
-              <StartTourButton tour="student-dashboard" label="Start Tour" />
-            </div>
+            <div className="mt-3" />
           </div>
           <div className="shrink-0">
             <Button

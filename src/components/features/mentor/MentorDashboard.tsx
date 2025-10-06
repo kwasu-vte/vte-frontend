@@ -5,7 +5,6 @@ import { useMentorDashboardData } from "@/lib/hooks/use-mentor-dashboard-data"
 import MentorGroupsList from "@/components/features/mentor/MentorGroupsList"
 import PracticalCalendar from "@/components/features/student/PracticalCalendar"
 import { StateRenderer, DefaultLoadingComponent, DefaultEmptyComponent } from "@/components/shared/StateRenderer"
-import { StartTourButton } from "@/components/shared/StartTourButton"
 import { useQueryClient } from "@tanstack/react-query"
 
 export type MentorDashboardProps = {
@@ -44,7 +43,6 @@ export default function MentorDashboard(props: MentorDashboardProps) {
           <p className="text-neutral-600">Daily overview of your groups and attendance.</p>
         </div>
         <div className="flex items-center gap-3">
-          <StartTourButton tour="mentor-dashboard" label="Start Tour" />
           <Button
             color="primary"
             variant="bordered"
