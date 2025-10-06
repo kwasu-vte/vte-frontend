@@ -2,11 +2,12 @@
 import React from "react"
 import { Card, CardBody, CardHeader, Button, Input, Spinner, Tabs, Tab } from "@nextui-org/react"
 import { Camera, AlertCircle } from "lucide-react"
-import { qrCodesApi } from "@/lib/api"
+import { qrCodesApi } from "@/lib/api/qr-codes"
 import ScanResultModal from "./ScanResultModal"
 import ScanConfirmationModal from "./ScanConfirmationModal"
 import ScanProgressIndicator from "./ScanProgressIndicator"
 import dynamic from "next/dynamic"
+import type { ProcessQrScanPayload, QrScanResponse } from "@/lib/types" // Add this import
 
 // Dynamically import QR scanner to avoid SSR issues
 const QrScanner = dynamic(() => import("react-qr-scanner"), { ssr: false })
@@ -67,13 +68,13 @@ function StudentQRScanner({
       
       // Handle different error types
       if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
-        setCameraError('Camera access denied. Please enable camera permissions in your browser settings and ensure you are using HTTPS.')
+        setCameraError('Camera access denied. This may be due to browser permissions or security policy. Please check your browser settings and ensure you are accessing the site via HTTPS.')
       } else if (error.name === 'NotFoundError' || error.name === 'DevicesNotFoundError') {
         setCameraError('No camera found on this device.')
       } else if (error.name === 'NotReadableError' || error.name === 'TrackStartError') {
         setCameraError('Camera is already in use by another application.')
       } else if (error.message?.includes('not supported') || error.message?.includes('policy')) {
-        setCameraError('Camera access is blocked by browser security policy. Please ensure the app is running on HTTPS.')
+        setCameraError('Camera access is blocked by browser security policy. Please ensure the app is running on HTTPS and not in an embedded frame.')
       } else {
         setCameraError(`Unable to access camera: ${error.message || 'Unknown error'}`)
       }
@@ -82,107 +83,51 @@ function StudentQRScanner({
     }
   }
 
-  const processToken = async (scannedToken: string) => {
-    if (!scannedToken.trim()) {
-      console.warn('Empty token provided')
-      return
-    }
-    
-    setIsSubmitting(true)
-    
-    try {
-      console.log('🔍 Processing token:', scannedToken.trim())
-      console.log('👤 Student ID:', studentId)
-      
-      // Call the API - response is ApiResponse<QrScanResponse>
-      const response = await qrCodesApi.processScan({ 
-        token: scannedToken.trim(), 
-        student_id: studentId 
-      })
-      
-      console.log('✅ Full API response:', response)
-      
-      // Extract data from ApiResponse wrapper
-      const scanData = response.data
-      const success = scanData.success
-      const message = scanData.message
-      const points = scanData.points
-      const timestamp = scanData.timestamp
-      const studentName = scanData.student_name
+ const processToken = async (scannedToken: string) => {
+  if (!scannedToken.trim()) return
+  
+  setIsSubmitting(true)
+  try {
+    // Use proper typing for the API call
+    const response = await qrCodesApi.processScan({ 
+      token: scannedToken.trim(), 
+      student_id: studentId 
+    })
 
-      console.log('📊 Parsed scan data:', { success, message, points, timestamp, studentName })
+    // The response is now properly typed
+    const { data } = response
+    const success = data.success
+    const points = data.points
+    const timestamp = data.timestamp
+    const studentName = data.student_name
+    const message = data.message
 
-      // Update scan result state
-      setScanResult({ 
-        success, 
-        message, 
-        points, 
-        timestamp, 
-        studentName 
-      })
+    setScanResult({ success, message, points, timestamp, studentName })
 
-      if (success) {
-        // Success - show confirmation modal
-        console.log('✨ Scan successful! Earned points:', points)
-        setConfirmOpen(true)
-        setRemainingScans((prev) => Math.max(0, prev - 1))
-        
-        // Call success callback
-        if (points && timestamp) {
-          onScanSuccess({ 
-            token: scannedToken.trim(), 
-            points, 
-            timestamp 
-          })
-        }
-      } else {
-        // Failed - show error modal
-        console.warn('⚠️ Scan failed:', message)
-        setResultOpen(true)
-        onScanError(message || "Scan failed")
+    if (success) {
+      setConfirmOpen(true)
+      setRemainingScans((r) => Math.max(0, r - 1))
+      if (points && timestamp) {
+        onScanSuccess({ token: scannedToken.trim(), points, timestamp })
       }
-      
-      // Clear token input
-      setToken("")
-      
-    } catch (error: any) {
-      console.error('❌ Error processing scan:', error)
-      console.error('Error details:', {
-        message: error.message,
-        response: error.response,
-        data: error.response?.data
-      })
-      
-      // Parse error message from different possible locations
-      const errorMessage = 
-        error.response?.data?.message || 
-        error.response?.data?.error ||
-        error.response?.data?.data?.message ||
-        error.message || 
-        'Network error. Please check your connection and try again.'
-      
-      console.error('📛 Final error message:', errorMessage)
-      
-      // Update scan result state
-      setScanResult({ 
-        success: false, 
-        message: errorMessage 
-      })
-      
-      // Show error modal
+    } else {
       setResultOpen(true)
-      onScanError(errorMessage)
-      
-    } finally {
-      setIsSubmitting(false)
+      onScanError(message || "Scan failed")
     }
+    setToken("")
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Network error"
+    setScanResult({ success: false, message })
+    setResultOpen(true)
+    onScanError(message)
+  } finally {
+    setIsSubmitting(false)
   }
+}
 
   const handleScan = (data: any) => {
     if (data && !isSubmitting) {
-      const scannedText = data.text || data
-      console.log('QR code scanned:', scannedText)
-      processToken(scannedText)
+      processToken(data.text || data)
     }
   }
 
@@ -194,7 +139,7 @@ function StudentQRScanner({
 
   const handleManualSubmit = () => {
     if (!token.trim()) {
-      setScanResult({ success: false, message: "Please enter a valid token" })
+      setScanResult({ success: false, message: "Enter a valid token" })
       setResultOpen(true)
       return
     }
@@ -216,12 +161,12 @@ function StudentQRScanner({
             </p>
           </div>
           <div className="bg-blue-50 p-4 rounded-lg text-left">
-            <p className="text-sm font-medium text-blue-900 mb-2">Troubleshooting:</p>
+            <p className="text-sm font-medium text-blue-900 mb-2">How to enable camera:</p>
             <ol className="text-sm text-blue-800 space-y-1 list-decimal list-inside">
-              <li>Ensure you're using HTTPS (not HTTP)</li>
-              <li>Click the lock icon in the address bar</li>
-              <li>Set Camera permission to "Allow"</li>
-              <li>Refresh the page and try again</li>
+              <li>Click the lock/info icon in your browser's address bar</li>
+              <li>Find "Camera" in the permissions list</li>
+              <li>Change the setting to "Allow"</li>
+              <li>Click "Try Again" below</li>
             </ol>
           </div>
           <div className="flex gap-2 justify-center">
@@ -264,7 +209,6 @@ function StudentQRScanner({
             {isSubmitting && (
               <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
                 <Spinner size="lg" color="white" />
-                <p className="text-white text-sm ml-3">Processing...</p>
               </div>
             )}
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/70 text-white px-4 py-2 rounded-full text-sm">
@@ -376,9 +320,8 @@ function StudentQRScanner({
                   color="primary" 
                   onPress={handleManualSubmit} 
                   isDisabled={!token.trim() || isSubmitting}
-                  isLoading={isSubmitting}
                 >
-                  Submit
+                  {isSubmitting ? <Spinner size="sm" /> : "Submit"}
                 </Button>
               </div>
               <p className="text-xs text-neutral-500">

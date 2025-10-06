@@ -1,7 +1,8 @@
 "use client"
 import React from "react"
 import { Button, Chip, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Card, CardBody, CardHeader, Divider } from "@nextui-org/react"
-import { Download, Calendar } from "lucide-react"
+import { Download, Calendar, FileSpreadsheet } from "lucide-react"
+import * as XLSX from 'xlsx'
 
 /**
  * * AttendanceReport
@@ -23,6 +24,45 @@ function AttendanceReport({ groupId, dateRange, attendanceData }: AttendanceRepo
   const start = new Date(dateRange.start).toLocaleDateString()
   const end = new Date(dateRange.end).toLocaleDateString()
 
+  // * Export attendance data to Excel
+  const exportToExcel = () => {
+    // * Prepare data for Excel export
+    const excelData = attendanceData.map((row, index) => ({
+      'S/N': index + 1,
+      'Student Name': row.student,
+      'Total Scans': row.scans,
+      'Points Earned': row.points,
+      'Completion %': `${row.percentage}%`,
+      'Status': row.percentage >= 75 ? 'Excellent' : row.percentage >= 50 ? 'Good' : 'Needs Improvement'
+    }))
+
+    // * Create workbook and worksheet
+    const wb = XLSX.utils.book_new()
+    const ws = XLSX.utils.json_to_sheet(excelData)
+
+    // * Set column widths
+    const colWidths = [
+      { wch: 5 },   // S/N
+      { wch: 25 },  // Student Name
+      { wch: 12 },  // Total Scans
+      { wch: 15 },  // Points Earned
+      { wch: 15 },  // Completion %
+      { wch: 20 }   // Status
+    ]
+    ws['!cols'] = colWidths
+
+    // * Add worksheet to workbook
+    XLSX.utils.book_append_sheet(wb, ws, 'Attendance Report')
+
+    // * Generate filename with date range
+    const startDate = new Date(dateRange.start).toLocaleDateString('en-GB').replace(/\//g, '-')
+    const endDate = new Date(dateRange.end).toLocaleDateString('en-GB').replace(/\//g, '-')
+    const filename = `Attendance_Report_Group_${groupId}_${startDate}_to_${endDate}.xlsx`
+
+    // * Download the file
+    XLSX.writeFile(wb, filename)
+  }
+
   return (
     <Card shadow="sm" className="w-full">
       <CardHeader className="flex items-center justify-between">
@@ -34,6 +74,14 @@ function AttendanceReport({ groupId, dateRange, attendanceData }: AttendanceRepo
           </div>
         </div>
         <div className="flex items-center gap-2">
+          <Button 
+            variant="bordered" 
+            size="sm"
+            startContent={<FileSpreadsheet className="h-4 w-4" />}
+            onPress={exportToExcel}
+          >
+            Export Excel
+          </Button>
           <Button 
             variant="bordered" 
             size="sm"

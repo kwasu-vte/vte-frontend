@@ -536,3 +536,152 @@
 - Updated Sidebar: Complete mentor navigation menu
 
 
+## [2025-10-03] - Excel Export & QR Code Printing
+
+### Added
+- Excel export functionality for attendance reports with formatted columns and auto-generated filenames
+- Individual QR code print view with group and instructor information
+- Print button in admin QR code list for easy access to printable QR codes
+- Real QR code generation using qrcode library
+- Optimized print styling with proper page margins and color preservation
+
+### Changed
+- Enhanced attendance report component with Excel export button
+- Updated QR distribution tracker with print functionality
+- Improved print page styling for professional output
+
+### Technical Details
+- Added xlsx dependency for Excel file generation
+- Added qrcode and @types/qrcode for QR code generation
+- Created print-optimized page at /admin/qr-codes/print/[qrToken]
+- Enhanced QR code information display with session details and instructions
+## [2025-10-03] - QR Code Print Optimization & Admin Page Restructure
+
+### Added
+- Optimized A4 print layout with larger QR code (256x256px) as main focus
+- New QRCodeTable component with skill/group selection and table view
+- Modal-based QR creation wizard for better UX
+- Print button integration in QR codes table
+
+### Changed
+- Restructured admin QR codes page with skill/group selection first
+- QR code print page now uses A4 paper with 0.25in margins
+- QR code is now the primary visual element (16rem x 16rem)
+- Information section made more compact for better print layout
+- Moved multi-step QR generation form to modal
+
+### Technical Details
+- Enhanced print styling with proper A4 dimensions
+- Improved QR code visibility and readability
+- Better responsive design for print media
+- Modal integration with existing QR wizard component
+- Skill/group selection with dependent dropdowns
+## [2025-10-03] - QR Code Styling Enhancement
+
+### Changed
+- Replaced qrcode library with qr-code-styling for better customization
+- Added logo integration using kwasulogo.png from public directory
+- Implemented extra-rounded dots and corners for modern appearance
+- Enhanced QR code visual design while maintaining black and white color scheme
+
+### Technical Details
+- Logo positioned in center with 30% size and 10px margin
+- Extra-rounded dots and corner squares for modern look
+- SVG output for crisp printing and scaling
+- Proper cleanup of QR code instances on component unmount
+- Maintained 256x256px dimensions for optimal print quality
+## [2025-10-03] - QR Code Configuration Enhancement
+
+### Changed
+- Updated QR code implementation to follow proper qr-code-styling patterns
+- Added proper TypeScript imports for all QR code styling types
+- Implemented proper options configuration with error correction level
+- Enhanced logo integration with hideBackgroundDots and proper sizing
+- Improved QR code update mechanism for dynamic token changes
+
+### Technical Details
+- Added proper TypeScript type imports (DrawType, TypeNumber, Mode, etc.)
+- Configured error correction level to 'Q' for better reliability
+- Set logo size to 40% with 20px margin for optimal visibility
+- Implemented hideBackgroundDots for cleaner logo presentation
+- Proper QR code instance management with update functionality
+## [2025-10-03] - Fix Skills API Call
+
+### Fixed
+- Changed skillsApi.list() to skillsApi.getAll() to match working admin skills page
+- Updated skillGroupsApi.listBySkill() to skillGroupsApi.list() with skill_id parameter
+- Fixed skill selection dropdown not showing any skills
+
+### Technical Details
+- Skills API now uses the correct getAll() method that returns paginated response
+- Skill groups API now uses list() method with skill_id filter parameter
+- Both API calls now match the working patterns from other admin pages
+## [2025-10-03] - Fix Groups API Call
+
+### Fixed
+- Changed skillGroupsApi.list() to skillsApi.getGroupsBySkill() to match working skill groups page
+- Updated data structure from groupsData?.data?.items to groupsData?.data
+- Fixed group display to use group_display_name or group_number instead of name
+- Group options should now show proper group names
+
+### Technical Details
+- Groups API now uses getGroupsBySkill() method that returns groups array directly
+- Group display format matches other admin pages: 'Group {group_display_name || group_number}'
+- Removed unused skillGroupsApi import
+- Both skills and groups now use the correct API methods from working admin pages
+## [2025-10-03] - Fix Select Component Value Handling
+
+### Fixed
+- Changed selectedKeys from array to Set object for NextUI Select component
+- Updated onChange to onSelectionChange with proper key extraction
+- Fixed selected values not displaying in Select components
+- Proper handling of Set to string conversion for state management
+
+### Technical Details
+- selectedKeys now uses new Set([selectedSkillId]) instead of [selectedSkillId]
+- onSelectionChange extracts first key using Array.from(keys)[0]
+- Proper TypeScript casting for string values
+- Maintains null handling for empty selections
+## [2025-10-03] - Hybrid QR Code Implementation
+
+### Added
+- Server-side QR code image as primary source with client-side fallback
+- Image error handling that automatically switches to client-side generation
+- Environment variable support for API base URL configuration
+- Hybrid approach: try server image first, fallback to qr-code-styling if failed
+
+### Technical Details
+- Primary: Server-generated QR code image from API endpoint
+- Fallback: Client-side QR code generation using qr-code-styling library
+- URL construction: `${baseUrl}/files/qr-codes/qr_${token}.png`
+- Automatic fallback on image load error
+- Maintains logo integration and styling in fallback mode
+## [2025-10-03] - QR Code Print Route Restructure
+
+### Changed
+- Updated QR code print route from /admin/qr-codes/print/[qrToken] to /admin/qr-codes/print
+- Added proper TypeScript types for GroupQrCode based on API structure
+- Implemented session storage for passing QR code data to print page
+- Added redirect to QR codes page if no data found in session storage
+- Updated print button to store complete QR code object
+
+### Technical Details
+- GroupQrCode interface: id (number), skill_group_id (number), token (string), path (string), mark_value (number), expires_at (string)
+- Session storage key: 'qrCodePrintData' with complete QR code object
+- Automatic redirect if session storage data is missing or invalid
+- Server image URL construction using qrCodeData.path
+- Maintains hybrid approach: server image with client-side fallback
+## [2025-10-03] - Hide Sidebar in Print Output
+
+### Added
+- Global print styles to hide sidebar, header, and navigation elements
+- CSS selectors targeting common layout elements
+- Full-width main content during print
+- Comprehensive print media query with layout hiding
+
+### Technical Details
+- Used `<style jsx global>` to apply styles globally during print
+- Hide elements: [data-sidebar], [data-header], nav, header, aside, .sidebar, .header, .notification-container
+- Main content gets full width with no padding/margins during print
+- Print-specific styles only apply when @media print is active
+- Ensures clean print output without UI elements
