@@ -59,9 +59,15 @@ export default function EnrollmentsTable({ enrollments, perPage = 25, onAssignGr
     }},
     { key: "created_at", label: "Enrolled On", render: (e: Enrollment) => new Date(e.created_at).toLocaleString() },
     ...(onAssignGroup ? [{ key: "actions", label: "Actions", render: (e: Enrollment) => {
-      const alreadyAssigned = Boolean(e.group?.id) || String(e.status).toLowerCase() === 'assigned'
+      const status = String(e.status || '').toLowerCase()
+      const reference = (e as any)?.reference
+      const isPaid = e.payment_status === 'paid' || (!!reference && (status === 'assigned' || status === 'paid'))
+      const alreadyAssigned = Boolean(e.group?.id) || status === 'assigned'
       if (alreadyAssigned) {
         return <span className="text-neutral-400 text-sm cursor-not-allowed">Assigned</span>
+      }
+      if (!isPaid) {
+        return <span className="text-neutral-400 text-sm cursor-not-allowed" title="Payment required before assignment">Unpaid</span>
       }
       return (
         <button
