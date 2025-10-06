@@ -58,6 +58,9 @@ export default function MentorGroupsPageView(props: { userId: string }) {
 
   return (
     <div className="p-4 md:p-6 space-y-6">
+      <div className="bg-blue-50 border border-blue-200 text-blue-800 rounded-md p-3 text-sm">
+        Tip: Filter by skill or search by group name to find a group quickly. Select a group to view roster and attendance.
+      </div>
       <div className="flex items-end gap-3 flex-wrap">
         <div className="flex-1 min-w-[220px]">
           <Input

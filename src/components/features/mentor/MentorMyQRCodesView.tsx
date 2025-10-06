@@ -61,6 +61,11 @@ export default function MentorMyQRCodesView(props: { userId: string }) {
 
   return (
     <div className="p-4 md:p-6 grid gap-6 md:grid-cols-3">
+      <div className="md:col-span-3">
+        <div className="bg-blue-50 border border-blue-200 text-blue-800 rounded-md p-3 text-sm">
+          Tip: Select a group to view all QR codes. Use the Scan Report to review attendance history for a selected token.
+        </div>
+      </div>
       <div className="md:col-span-2 space-y-6">
         <Card shadow="sm" className="p-4">
           <CardHeader>

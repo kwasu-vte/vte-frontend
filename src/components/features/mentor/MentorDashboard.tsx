@@ -16,6 +16,14 @@ export default function MentorDashboard(props: MentorDashboardProps) {
   const { userId } = props
   const { profile, skills, groups, todaysGroups, attendanceReport, isLoading, error } = useMentorDashboardData(userId)
   const queryClient = useQueryClient()
+  const refetchAll = async () => {
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: ['mentor-profile', userId] }),
+      queryClient.invalidateQueries({ queryKey: ['mentor-assigned-skills', userId] }),
+      queryClient.invalidateQueries({ queryKey: ['mentor-skill-groups', userId] }),
+      queryClient.invalidateQueries({ queryKey: ['group-attendance-report'] }),
+    ])
+  }
 
   // Pick a primary group for right-panel reports (fallback logic)
   const primaryGroup = React.useMemo(() => (groups && groups.length > 0 ? groups[0] : null), [groups])
@@ -42,19 +50,24 @@ export default function MentorDashboard(props: MentorDashboardProps) {
             variant="bordered"
             aria-label="Refresh dashboard data"
             isDisabled={isLoading}
-            onPress={async () => {
-              await Promise.all([
-                queryClient.invalidateQueries({ queryKey: ['mentor-profile', userId] }),
-                queryClient.invalidateQueries({ queryKey: ['mentor-assigned-skills', userId] }),
-                queryClient.invalidateQueries({ queryKey: ['mentor-skill-groups', userId] }),
-                queryClient.invalidateQueries({ queryKey: ['group-attendance-report'] }),
-              ])
-            }}
+            onPress={refetchAll}
           >
             {isLoading ? 'Refreshing…' : 'Refresh'}
           </Button>
         </div>
       </div>
+
+      {/* Guidance */}
+      <div className="bg-blue-50 border border-blue-200 text-blue-800 rounded-md p-3 text-sm">
+        Tip: Today’s Schedule shows upcoming practicals for your assigned groups. Use My Groups to view rosters and attendance summaries.
+      </div>
+
+      {/* No groups hint */}
+      {!isLoading && !error && (Array.isArray(groups) && groups.length === 0) && (
+        <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-md p-3 text-sm">
+          You have no groups assigned yet. Contact an administrator to assign you to a skill group.
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left: TodaySchedule + RecentScans */}
@@ -66,14 +79,17 @@ export default function MentorDashboard(props: MentorDashboardProps) {
                 <p className="text-base font-medium text-neutral-900">Today&apos;s Schedule</p>
                 <p className="text-sm text-neutral-500">Derived from your assigned groups</p>
               </div>
-              <Chip variant="flat">{today.toLocaleDateString()}</Chip>
+              <div className="flex items-center gap-2">
+                <Chip variant="flat">{today.toLocaleDateString()}</Chip>
+                <Chip size="sm" variant="flat">{(todaysGroups ?? []).length}</Chip>
+              </div>
             </CardHeader>
             <CardBody className="px-4 pb-4">
               <StateRenderer
                 data={todaysGroups}
                 isLoading={isLoading}
                 error={error}
-                onRetry={() => window.location.reload()}
+                onRetry={refetchAll}
                 loadingComponent={<DefaultLoadingComponent />}
                 emptyComponent={<DefaultEmptyComponent message="No practicals scheduled for today." />}
               >
@@ -158,14 +174,17 @@ export default function MentorDashboard(props: MentorDashboardProps) {
       {/* All Groups quick glance (optional summary) */}
       <Card shadow="sm">
         <CardHeader className="px-4 pt-4">
-          <p className="text-base font-medium text-neutral-900">My Groups</p>
+          <div className="flex items-center justify-between w-full">
+            <p className="text-base font-medium text-neutral-900">My Groups</p>
+            <Chip size="sm" variant="flat">{(groups ?? []).length}</Chip>
+          </div>
         </CardHeader>
         <CardBody className="px-4 pb-4">
           <StateRenderer
             data={groups}
             isLoading={isLoading}
             error={error}
-            onRetry={() => window.location.reload()}
+            onRetry={refetchAll}
             loadingComponent={<DefaultLoadingComponent />}
             emptyComponent={<DefaultEmptyComponent message="No groups assigned yet." />}
           >
