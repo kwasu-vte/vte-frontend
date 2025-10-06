@@ -315,9 +315,7 @@ export function StudentDashboardClient({ userId }: StudentDashboardClientProps) 
                         status: enrollment.status
                       }}
                       group={{
-                        number: parseInt(String(groupId)),
-                        mentorName: 'Loading...',
-                        schedule: 'Loading...'
+                        number: parseInt(String(groupId))
                       }}
                     />
                   )}
