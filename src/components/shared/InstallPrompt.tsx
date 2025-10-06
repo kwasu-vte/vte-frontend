@@ -23,6 +23,7 @@ export function InstallPrompt({ className }: InstallPromptProps) {
   const [showInstallPrompt, setShowInstallPrompt] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
+  const [isFirefox, setIsFirefox] = useState(false);
   const [isStandalone, setIsStandalone] = useState(false);
 
   // * Check if app is already installed
@@ -40,13 +41,18 @@ export function InstallPrompt({ className }: InstallPromptProps) {
       const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
       setIsIOS(iOS);
 
+      // * Detect Firefox (no beforeinstallprompt support)
+      const ff = /firefox/i.test(navigator.userAgent);
+      setIsFirefox(ff);
+
       // * Check localStorage for install prompt timing
       const lastPromptTime = localStorage.getItem('pwa-install-prompt-time');
       const now = Date.now();
       const sevenDaysInMs = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
 
-      if (!standalone && !iOS) {
+      if (!standalone) {
         // * Show prompt if never shown or if 7 days have passed
+        // * On iOS, we also show the informational guide (since no native prompt)
         if (!lastPromptTime || (now - parseInt(lastPromptTime)) > sevenDaysInMs) {
           setShowInstallPrompt(true);
         }
