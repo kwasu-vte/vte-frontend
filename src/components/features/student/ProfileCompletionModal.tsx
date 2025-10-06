@@ -10,8 +10,34 @@ export type ProfileCompletionModalProps = {
 
 function ProfileCompletionModal({ profile }: ProfileCompletionModalProps) {
   const missingFields = React.useMemo(() => {
+    const fields: string[] = []
     const hasMatric = Boolean((profile.matric_number || '').toString().trim())
-    return hasMatric ? [] : ["Matric Number"]
+    const hasLevel = Boolean((profile.student_level || '').toString().trim())
+    const hasDepartment = Boolean((profile.department || '').toString().trim())
+    const hasPhone = Boolean((profile.phone || '').toString().trim())
+    const hasGender = Boolean((profile.gender || '').toString().trim())
+
+    if (!hasMatric) fields.push("Matric Number")
+    if (!hasLevel) fields.push("Level")
+    if (!hasDepartment) fields.push("Department")
+    // Faculty optional
+    if (!hasPhone) fields.push("Phone Number")
+    if (!hasGender) fields.push("Gender")
+
+    console.log('[ProfileCompletionModal] completeness-check', {
+      values: {
+        matric_number: profile.matric_number,
+        student_level: profile.student_level,
+        department: profile.department,
+        faculty: profile.faculty,
+        phone: profile.phone,
+        gender: profile.gender,
+      },
+      flags: { hasMatric, hasLevel, hasDepartment, hasPhone, hasGender },
+      missingFields: [...fields],
+    })
+
+    return fields
   }, [profile])
 
   const isIncomplete = missingFields.length > 0

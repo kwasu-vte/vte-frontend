@@ -70,7 +70,7 @@ function QuickActions({ enrollment, hasProfile = false }: QuickActionsProps) {
   }, [enrollment])
 
   return (
-    <Card shadow="sm" className="w-full">
+    <Card shadow="sm" className="w-full" id="student-actions">
       <CardHeader className="pb-2">
         <p className="text-xl font-medium leading-normal">Quick Actions</p>
       </CardHeader>

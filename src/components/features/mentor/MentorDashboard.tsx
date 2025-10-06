@@ -117,7 +117,7 @@ export default function MentorDashboard(props: MentorDashboardProps) {
           </Card>
 
           {/* Attendance Summary */}
-          <Card shadow="sm" id="mentor-attendance-summary">
+          <Card shadow="sm" id="mentor-workload">
             <CardHeader className="flex items-center justify-between px-4 pt-4">
               <p className="text-base font-medium text-neutral-900">Attendance Summary</p>
               {primaryGroup && <Chip variant="flat">Group #{primaryGroup.group_number ?? primaryGroup.id}</Chip>}
@@ -155,8 +155,25 @@ export default function MentorDashboard(props: MentorDashboardProps) {
 
         {/* Right: Upcoming Calendar */}
         <div className="lg:col-span-1 space-y-6">
+          {/* Quick Access (QR & Reports) */}
+          <Card shadow="sm" id="mentor-qr-quick">
+            <CardHeader className="px-4 pt-4">
+              <p className="text-base font-medium text-neutral-900">Quick Access</p>
+            </CardHeader>
+            <CardBody className="px-4 pb-4">
+              <div className="space-y-3">
+                <Button as="a" href="/mentor/my-qr-codes" color="primary" className="w-full justify-start" aria-label="My QR Codes">
+                  My QR Codes
+                </Button>
+                <Button as="a" href="/mentor/attendance/reports" variant="bordered" className="w-full justify-start" aria-label="Attendance Reports">
+                  Attendance Reports
+                </Button>
+              </div>
+            </CardBody>
+          </Card>
+
           {/* Upcoming Calendar */}
-          <Card shadow="sm">
+          <Card shadow="sm" id="mentor-calendar">
             <CardHeader className="px-4 pt-4">
               <p className="text-base font-medium text-neutral-900">Upcoming Calendar</p>
             </CardHeader>
@@ -172,7 +189,7 @@ export default function MentorDashboard(props: MentorDashboardProps) {
       </div>
 
       {/* All Groups quick glance (optional summary) */}
-      <Card shadow="sm">
+      <Card shadow="sm" id="mentor-groups">
         <CardHeader className="px-4 pt-4">
           <div className="flex items-center justify-between w-full">
             <p className="text-base font-medium text-neutral-900">My Groups</p>
@@ -188,7 +205,12 @@ export default function MentorDashboard(props: MentorDashboardProps) {
             loadingComponent={<DefaultLoadingComponent />}
             emptyComponent={<DefaultEmptyComponent message="No groups assigned yet." />}
           >
-            {(data) => <MentorGroupsList groups={data} viewMode="grid" />}
+            {(data) => (
+              <div>
+                <div id="mentor-reports" className="sr-only" aria-hidden="true" />
+                <MentorGroupsList groups={data} viewMode="grid" />
+              </div>
+            )}
           </StateRenderer>
         </CardBody>
       </Card>

@@ -272,7 +272,7 @@ function StudentQRScanner({
   }
 
   return (
-    <Card shadow="sm" className="w-full max-w-xl">
+    <Card shadow="sm" className="w-full max-w-xl" id="student-scan">
       <CardHeader className="flex flex-col items-start gap-2">
         <p className="text-xl font-medium leading-normal">Scan Mentor QR</p>
         <p className="text-sm text-neutral-600">
