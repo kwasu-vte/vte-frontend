@@ -78,10 +78,10 @@ export function EnrollmentFilters({ value, onChange, defaultPerPage = 25 }: Enro
     <div className="flex flex-col md:flex-row gap-4 items-end">
       <div className="w-full md:w-64">
         <Select
-          label="Academic Session"
+          // label="Academic Session"
           selectedKeys={filters.academic_session_id ? new Set([String(filters.academic_session_id)]) : new Set([])}
           onChange={(e) => handleChange("academic_session_id", e.target.value ? Number(e.target.value) : undefined)}
-          placeholder="All sessions"
+          placeholder="Academic sessions"
           size="sm"
         >
           {sessions.map((s) => (
@@ -94,7 +94,7 @@ export function EnrollmentFilters({ value, onChange, defaultPerPage = 25 }: Enro
 
       <div className="w-full md:w-64">
         <Select
-          label="Skill"
+          // label="Skill"
           isLoading={skillsLoading}
           selectedKeys={filters.skill_id ? new Set([String(filters.skill_id)]) : new Set([])}
           onChange={(e) => handleChange("skill_id", e.target.value || undefined)}

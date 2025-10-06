@@ -114,7 +114,7 @@ export default function AdminEnrollmentsPage() {
           <ModalHeader>Assign to Group</ModalHeader>
           <ModalBody>
             <Select
-              label="Group"
+              // label="Group"
               placeholder="Select group"
               selectedKeys={selectedGroupId ? [selectedGroupId] : []}
               onChange={(e) => setSelectedGroupId(e.target.value)}

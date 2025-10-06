@@ -68,7 +68,7 @@ export default function SignUpPage() {
 
   return (
     <div className="min-h-screen bg-neutral-50 flex items-center justify-center p-6">
-      <div className="w-full max-w-xl">
+      <div className="w-full max-w-xl ">
         <NotificationContainer />
         {/* * Logo and Brand */}
         <div className="text-center mb-8">
@@ -80,10 +80,10 @@ export default function SignUpPage() {
               height={48}
               className="mr-3"
             />
-            <div className="text-left">
+            {/* <div className="text-left">
               <h1 className="text-2xl font-bold text-primary">Kwara State</h1>
               <h2 className="text-xl font-bold text-primary">University</h2>
-            </div>
+            </div> */}
           </div>
           <h3 className="text-3xl font-bold text-neutral-900 mb-2">
             Get Started
@@ -129,7 +129,7 @@ export default function SignUpPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Input
                   name="firstName"
-                  label={firstNameLabel}
+                  // label={firstNameLabel}
                   placeholder="Enter your first name"
                   variant="bordered"
                   isRequired
@@ -141,7 +141,7 @@ export default function SignUpPage() {
                 />
                 <Input
                   name="lastName"
-                  label={lastNameLabel}
+                  // label={lastNameLabel}
                   placeholder="Enter your last name"
                   variant="bordered"
                   isRequired
@@ -156,7 +156,7 @@ export default function SignUpPage() {
               {/* * Email */}
               <Input
                 name="email"
-                label={emailLabel}
+                // label={emailLabel}
                 placeholder="Enter your email"
                 type="email"
                 variant="bordered"
@@ -176,7 +176,7 @@ export default function SignUpPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Input
                   name="password"
-                  label={passwordLabel}
+                  // label={passwordLabel}
                   placeholder="Enter your password"
                   variant="bordered"
                   type={isVisible ? "text" : "password"}
@@ -202,7 +202,7 @@ export default function SignUpPage() {
                 />
                 <Input
                   name="password2"
-                  label={confirmPasswordLabel}
+                  // label={confirmPasswordLabel}
                   placeholder="Confirm your password"
                   variant="bordered"
                   type="password"

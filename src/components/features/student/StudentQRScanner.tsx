@@ -305,7 +305,7 @@ function StudentQRScanner({
             <div className="py-4 space-y-4">
               <div className="flex items-end gap-2">
                 <Input
-                  label="QR Token"
+                  // label="QR Token"
                   placeholder="Enter token (e.g., ABC123)"
                   value={token}
                   onValueChange={setToken}

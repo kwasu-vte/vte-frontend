@@ -84,7 +84,7 @@ export default function AdminReportsPage() {
       <div className="bg-white rounded-lg shadow-sm border border-neutral-200 p-4 space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <Select
-            label="Report Type"
+            placeholder="Report Type"
             selectedKeys={[type]}
             onChange={(e) => setType(e.target.value as 'attendance' | 'capacity')}
           >
@@ -92,7 +92,7 @@ export default function AdminReportsPage() {
             <SelectItem key="capacity" value="capacity">Capacity Overview</SelectItem>
           </Select>
           <Select
-            label="Group (for attendance)"
+            // label="Group (for attendance)"
             placeholder="Select group"
             selectedKeys={groupId ? [groupId] : []}
             onChange={(e) => setGroupId(e.target.value)}

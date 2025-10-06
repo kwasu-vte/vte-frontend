@@ -53,7 +53,7 @@ export default function SignInPage() {
 
   return (
     <div className="min-h-screen bg-neutral-50 flex items-center justify-center p-6">
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-md shadow-2xl p-2">
         <NotificationContainer />
         {/* * Logo and Brand */}
         <div className="text-center mb-8">
@@ -65,15 +65,15 @@ export default function SignInPage() {
               height={48}
               className="mr-3"
             />
-            <div className="text-left">
+            {/* <div className="text-left">
               <h1 className="text-2xl font-bold text-primary">Kwara State</h1>
               <h2 className="text-xl font-bold text-primary">University</h2>
-            </div>
+            </div> */}
           </div>
-          <h3 className="text-3xl font-bold text-neutral-900 mb-2">
+          <h3 className="text-xl font-bold text-neutral-900 mb-2">
             Welcome Back
           </h3>
-          <p className="text-neutral-600">
+          <p className="text-neutral-600 text-sm">
             Sign in to your VTE account
           </p>
         </div>
@@ -81,7 +81,7 @@ export default function SignInPage() {
         {/* * Sign-In Form */}
         <Card shadow="sm">
           <CardHeader className="pb-0">
-            <h4 className="text-xl font-semibold text-foreground">
+            <h4 className="text-lg font-semibold text-foreground">
               Sign In
             </h4>
           </CardHeader>
@@ -132,7 +132,7 @@ export default function SignInPage() {
               {/* * Username/Matric Number Field */}
               <Input
                 name="username"
-                label={usernameLabel}
+                // label={usernameLabel}
                 placeholder="Enter your matric number or email"
                 variant="bordered"
                 isRequired
@@ -141,14 +141,15 @@ export default function SignInPage() {
                 autoComplete="username email"
                 classNames={{
                   input: "text-base",
-                  label: "font-medium",
+                  label: "font-medium", 
+                  inputWrapper: "border-neutral-300",
                 }}
               />
 
               {/* * Password Field */}
               <Input
                 name="password"
-                label={passwordLabel}
+                // label={passwordLabel}
                 placeholder="Enter your password"
                 variant="bordered"
                 type={isVisible ? "text" : "password"}

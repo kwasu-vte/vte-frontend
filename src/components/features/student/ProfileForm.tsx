@@ -184,8 +184,8 @@ function ProfileForm({ onSubmit, initialData, isLoading = false }: ProfileFormPr
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Input
-                label="Matric Number"
-                placeholder="e.g., 25/67CE/00150"
+                // label="Matric Number"
+                placeholder="Matric Number e.g., 25/67CE/00150"
                 value={formData.matric_number}
                 onValueChange={(value) => handleInputChange('matric_number', value)}
                 isInvalid={!!errors.matric_number}
@@ -195,7 +195,7 @@ function ProfileForm({ onSubmit, initialData, isLoading = false }: ProfileFormPr
               />
               
               <Select
-                label="Student Level"
+                // label="Student Level"
                 placeholder="Select your level"
                 selectedKeys={formData.student_level ? [formData.student_level] : []}
                 onSelectionChange={(keys) => {
@@ -216,7 +216,7 @@ function ProfileForm({ onSubmit, initialData, isLoading = false }: ProfileFormPr
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Select
-                label="Gender"
+                // label="Gender"
                 placeholder="Select gender"
                 selectedKeys={formData.gender ? [formData.gender] : []}
                 onSelectionChange={(keys) => {
@@ -235,8 +235,8 @@ function ProfileForm({ onSubmit, initialData, isLoading = false }: ProfileFormPr
               </Select>
 
               <Input
-                label="Phone Number"
-                placeholder="e.g., 07012345678"
+                // label="Phone Number"
+                placeholder="Phone Number e.g., 07012345678"
                 value={formData.phone}
                 onValueChange={(value) => handleInputChange('phone', value)}
                 isInvalid={!!errors.phone}
@@ -256,7 +256,7 @@ function ProfileForm({ onSubmit, initialData, isLoading = false }: ProfileFormPr
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Select
-                label="Faculty"
+                // label="Faculty"
                 placeholder="Select faculty"
                 selectedKeys={selectedFacultyId ? [selectedFacultyId] : []}
                 onSelectionChange={(keys) => {
@@ -278,7 +278,7 @@ function ProfileForm({ onSubmit, initialData, isLoading = false }: ProfileFormPr
               </Select>
 
               <Select
-                label="Department"
+                // label="Department"
                 placeholder={selectedFacultyId ? "Select department" : "Select faculty first"}
                 selectedKeys={selectedDepartmentId ? [selectedDepartmentId] : []}
                 isDisabled={!selectedFacultyId}
