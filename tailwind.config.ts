@@ -7,6 +7,7 @@ const config: Config = {
     './components/**/*.{ts,tsx,js,jsx}',
     './app/**/*.{ts,tsx,js,jsx}',
     './src/**/*.{ts,tsx,js,jsx}',
+    './node_modules/onborda/dist/**/*.{js,ts,jsx,tsx}',
     "./node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}",
   ],
   prefix: "",

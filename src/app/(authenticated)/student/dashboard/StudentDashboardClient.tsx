@@ -16,6 +16,8 @@ import { Card, CardBody, CardHeader, Skeleton, Button } from '@nextui-org/react'
 import { ListSkeleton, CardGridSkeleton } from '@/components/shared/Skeletons';
 import Link from 'next/link';
 import { BookOpen, CreditCard, Users } from 'lucide-react';
+import { StartTourButton } from '@/components/shared/StartTourButton';
+import { UpcomingPracticals } from '@/components/features/student/UpcomingPracticals';
 
 interface StudentDashboardClientProps {
   userId: string;
@@ -27,13 +29,16 @@ export function StudentDashboardClient({ userId }: StudentDashboardClientProps) 
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      <div>
+      <div id="student-welcome">
         <h1 className="text-3xl font-bold text-neutral-900 mb-2">
           Welcome back!
         </h1>
         <p className="text-neutral-600">
           Here&apos;s what&apos;s happening with your practical training.
         </p>
+        <div className="mt-3">
+          <StartTourButton tour="student-dashboard" label="Start Tour" />
+        </div>
       </div>
 
       {/* Profile Completion - Permanent Modal + Dismissible Banner */}
@@ -52,6 +57,7 @@ export function StudentDashboardClient({ userId }: StudentDashboardClientProps) 
         {/* Left Column - Status Cards */}
         <div className="lg:col-span-2 space-y-6">
           {/* Enrollment Status */}
+          <div id="student-enrollment-status">
           <StateRenderer
             data={enrollment}
             isLoading={isLoading}
@@ -79,6 +85,7 @@ export function StudentDashboardClient({ userId }: StudentDashboardClientProps) 
                       as={Link}
                       href="/student/skills"
                       color="primary"
+                      variant="solid"
                     >
                       Browse Skills
                     </Button>
@@ -203,6 +210,7 @@ export function StudentDashboardClient({ userId }: StudentDashboardClientProps) 
               </>
             )}
           </StateRenderer>
+          </div>
 
           {/* Group Assignment */}
           {enrollment && (
@@ -238,15 +246,20 @@ export function StudentDashboardClient({ userId }: StudentDashboardClientProps) 
 
         </div>
 
-        {/* Right Column - Quick Actions */}
-        <div>
-          <QuickActions 
-            enrollment={enrollment ? {
-              status: enrollment.status,
-              group: enrollment.group?.id ? { id: enrollment.group.id.toString() } : undefined
-            } : undefined}
-            hasProfile={!!profile}
-          />
+        {/* Right Column - Quick Actions + Widgets */}
+        <div className="lg:col-span-1">
+          <div id="student-quick-actions" className="space-y-6 lg:sticky lg:top-24">
+            <QuickActions 
+              enrollment={enrollment ? {
+                status: enrollment.status,
+                group: enrollment.group?.id ? { id: enrollment.group.id.toString() } : undefined
+              } : undefined}
+              hasProfile={!!profile}
+            />
+
+            {/* Upcoming Practicals - shows empty state if none */}
+            <UpcomingPracticals practicals={[]} limit={5} />
+          </div>
         </div>
       </div>
 
