@@ -5,10 +5,10 @@ const nextConfig = {
 
   // * Temporarily disable type checking and ESLint during production builds
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
   },
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: false,
   },
 
   // * PWA Security Headers
