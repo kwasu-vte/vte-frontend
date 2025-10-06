@@ -5,9 +5,9 @@
 'use client';
 
 import React from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { User } from '@/lib/types';
-import { Menu, Bell, ChevronDown, Plus } from 'lucide-react';
+import { Menu, Bell, ChevronDown, Plus, QrCode } from 'lucide-react';
 import { useSessionStore } from '@/lib/stores/sessionStore';
 import { 
   Select,
@@ -69,6 +69,7 @@ function generateBreadcrumbs(pathname: string) {
 
 export function Header({ user, onMenuClick }: HeaderProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const breadcrumbs = generateBreadcrumbs(pathname);
   const { sessions, activeSessionId, isLoading, refresh, activateSession, createAndActivate } = useSessionStore();
   const [isCreateOpen, setIsCreateOpen] = React.useState(false);
@@ -147,6 +148,25 @@ export function Header({ user, onMenuClick }: HeaderProps) {
       setNewName('');
       setIsCreateOpen(false);
     }
+  };
+
+  const handleProfileClick = () => {
+    // * Only navigate to profile page if it exists (currently only students have profile pages)
+    if (user.role === 'Student') {
+      router.push('/student/profile');
+    } else {
+      // * For mentors and admins, navigate to their dashboard instead
+      if (user.role === 'Mentor') {
+        router.push('/mentor/dashboard');
+      } else if (user.role === 'Admin') {
+        router.push('/admin/dashboard');
+      }
+    }
+  };
+
+  const handleQRScannerClick = () => {
+    // * Navigate to QR scanner page for students
+    router.push('/student/scan-qr');
   };
 
   return (
@@ -322,9 +342,23 @@ export function Header({ user, onMenuClick }: HeaderProps) {
             </div>
           )}
 
+          {/* * QR Scanner Button (Students only) */}
+          {user.role === 'Student' && (
+            <button
+              onClick={handleQRScannerClick}
+              className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+              title="Scan QR Code"
+            >
+              <QrCode className="h-5 w-5" />
+            </button>
+          )}
+
           {/* * User Profile Dropdown */}
           <div className="relative">
-            <button className="flex items-center space-x-3 p-2 rounded-lg hover:bg-neutral-100 transition-colors">
+            <button 
+              onClick={handleProfileClick}
+              className="flex items-center space-x-3 p-2 rounded-lg hover:bg-neutral-100 transition-colors"
+            >
               <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
                 <span className="text-primary-foreground text-sm font-semibold">
                   {user.first_name.charAt(0)}{user.last_name.charAt(0)}
