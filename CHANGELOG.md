@@ -728,3 +728,8 @@
 
 ## 2025-10-06T08:50:09+01:00
 - chore: update pnpm-lock.yaml to reflect deps changes (add html3pdf, remove html2pdf.js; align react-qr-scanner range)
+## 2025-10-06T00:00:00Z
+### Changed
+- UI: Hide all "Start Tour" buttons by rendering `StartTourButton` as a no-op component.
+### Fixed
+- PWA: Made student dashboard installation optional again. Removed hard `RequirePWA` gate and added non-blocking `FloatingInstallPrompt` for students.
