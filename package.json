@@ -31,7 +31,7 @@
     "clsx": "^2.1.1",
     "framer-motion": "^11.11.1",
     "grapheme-splitter": "^1.0.4",
-    "html2pdf.js": "^0.12.1",
+    "html3pdf": "^0.12.2",
     "html5-qrcode": "^2.3.8",
     "lucide-react": "^0.436.0",
     "next": "^15.1.7",

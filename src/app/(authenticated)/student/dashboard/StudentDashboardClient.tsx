@@ -6,6 +6,7 @@
 import React from 'react';
 import { useStudentDashboardData } from '@/lib/hooks/use-student-dashboard-data';
 import { ProfileCompletionAlert } from '@/components/features/student/ProfileCompletionAlert';
+import { ProfileCompletionModal } from '@/components/features/student/ProfileCompletionModal';
 import { EnrollmentStatus } from '@/components/features/student/EnrollmentStatus';
 import { GroupAssignmentCard } from '@/components/features/student/GroupAssignmentCard';
 import { QuickActions } from '@/components/features/student/QuickActions';
@@ -35,12 +36,15 @@ export function StudentDashboardClient({ userId }: StudentDashboardClientProps) 
         </p>
       </div>
 
-      {/* Profile Completion Alert */}
+      {/* Profile Completion - Permanent Modal + Dismissible Banner */}
       {profile && (
-        <ProfileCompletionAlert 
-          profile={profile as any}
-          dismissible={true}
-        />
+        <>
+          <ProfileCompletionModal profile={profile as any} />
+          <ProfileCompletionAlert 
+            profile={profile as any}
+            dismissible={true}
+          />
+        </>
       )}
 
       {/* Main Dashboard Grid */}

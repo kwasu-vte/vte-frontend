@@ -47,7 +47,7 @@ export function QRCodeTable({ skillId, groupId, onCreateClick }: QRCodeTableProp
   const handlePrintQRCode = (qrCode: GroupQrCode) => {
     // * Store QR code data in session storage
     sessionStorage.setItem('qrCodePrintData', JSON.stringify(qrCode))
-    router.push('/admin/qr-codes/print')
+    router.push('/admin/qr-codes/print-selector')
   }
 
   // * Get status color
