@@ -713,3 +713,6 @@
 - Main content gets full width with no padding/margins during print
 - Print-specific styles only apply when @media print is active
 - Ensures clean print output without UI elements
+
+## 2025-10-06T08:50:09+01:00
+- chore: update pnpm-lock.yaml to reflect deps changes (add html3pdf, remove html2pdf.js; align react-qr-scanner range)
