@@ -175,7 +175,7 @@ export function StudentDashboardClient({ userId }: StudentDashboardClientProps) 
                 }
               >
                 {(enrollment) => (
-                  <>
+                  <div className="space-y-4">
                     <EnrollmentStatus 
                       enrollment={{
                         id: enrollment.id.toString(),
@@ -287,7 +287,7 @@ export function StudentDashboardClient({ userId }: StudentDashboardClientProps) 
                       }
                       return null;
                     })()}
-                  </>
+                  </div>
                 )}
               </StateRenderer>
             </CardBody>
