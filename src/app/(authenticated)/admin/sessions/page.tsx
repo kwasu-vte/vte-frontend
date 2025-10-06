@@ -175,11 +175,34 @@ export default function AdminSessionsPage() {
         </Button>
       </div>
 
+      {/* Info: How to use */}
+      <div className="bg-blue-50 border border-blue-200 text-blue-800 rounded-md p-3 text-sm">
+        Create and manage academic sessions. Only one session should be active at a time. Use Start/End actions to control the active period.
+      </div>
+
+      {/* * Summary */}
+      <Card shadow="sm">
+        <CardBody className="px-4 py-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-neutral-600">Active Session</span>
+              <Chip size="sm" color={hasActive ? 'success' : 'warning'} variant="flat">
+                {hasActive ? 'Yes' : 'No'}
+              </Chip>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-neutral-600">Total Sessions</span>
+              <Chip size="sm" variant="flat">{(sessions || []).length}</Chip>
+            </div>
+          </div>
+        </CardBody>
+      </Card>
+
       {/* * Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* * Current User Profile */}
         <Card>
-          <CardHeader className="flex items-center gap-3">
+          <CardHeader className="flex items-center gap-3 px-4 pt-4">
             <div className="p-2 bg-blue-100 rounded-lg">
               <UserIcon className="w-5 h-5 text-blue-600" />
             </div>
@@ -188,7 +211,7 @@ export default function AdminSessionsPage() {
               <p className="text-sm text-neutral-600">Your account information</p>
             </div>
           </CardHeader>
-          <CardBody>
+          <CardBody className="px-4 pb-4">
             {userLoading ? (
               <div className="flex items-center justify-center py-8">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -261,7 +284,7 @@ export default function AdminSessionsPage() {
 
         {/* * Current Academic Session */}
         <Card>
-          <CardHeader className="flex items-center gap-3">
+          <CardHeader className="flex items-center gap-3 px-4 pt-4">
             <div className="p-2 bg-green-100 rounded-lg">
               <CalendarDays className="w-5 h-5 text-green-600" />
             </div>
@@ -270,7 +293,7 @@ export default function AdminSessionsPage() {
               <p className="text-sm text-neutral-600">Active session information</p>
             </div>
           </CardHeader>
-          <CardBody>
+          <CardBody className="px-4 pb-4">
             {isLoading ? (
               <div className="flex items-center justify-center py-8">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -318,6 +341,7 @@ export default function AdminSessionsPage() {
                         color="secondary"
                         startContent={<Edit2 className="w-3 h-3" />}
                         onClick={() => openEdit(currentSession)}
+                        aria-label="Edit current session"
                       >
                         Edit
                       </Button>
@@ -327,6 +351,8 @@ export default function AdminSessionsPage() {
                         startContent={<Edit2 className="w-3 h-3" />}
                         onClick={() => endMutation.mutate(currentSession.id)}
                         isLoading={endMutation.isPending}
+                        isDisabled={endMutation.isPending}
+                        aria-label="End current session"
                       >
                         End Session
                       </Button>
@@ -341,6 +367,7 @@ export default function AdminSessionsPage() {
                       color="primary"
                       startContent={<Plus className="w-3 h-3" />}
                       onClick={openCreate}
+                      aria-label="Create session"
                     >
                       Create Session
                     </Button>
@@ -355,6 +382,7 @@ export default function AdminSessionsPage() {
                   color="primary"
                   startContent={<Plus className="w-4 h-4" />}
                   onClick={openCreate}
+                  aria-label="Create first session"
                 >
                   Create First Session
                 </Button>
@@ -373,7 +401,7 @@ export default function AdminSessionsPage() {
 
       {/* * All Academic Sessions */}
       <Card>
-        <CardHeader className="flex items-center justify-between">
+        <CardHeader className="flex items-center justify-between px-4 pt-4">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-purple-100 rounded-lg">
               <CalendarDays className="w-5 h-5 text-purple-600" />
@@ -383,8 +411,9 @@ export default function AdminSessionsPage() {
               <p className="text-sm text-neutral-600">Manage all academic sessions</p>
             </div>
           </div>
+          <Chip variant="flat">{(sessions || []).length}</Chip>
         </CardHeader>
-        <CardBody>
+        <CardBody className="px-4 pb-4">
           <StateRenderer
             data={sessions}
             isLoading={isLoading}
@@ -397,23 +426,23 @@ export default function AdminSessionsPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {data.map((item) => (
                   <Card key={item.id}>
-                    <CardBody className="p-5 space-y-3">
+                    <CardBody className="px-4 py-4 space-y-3">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <CalendarDays className="w-5 h-5 text-blue-600" />
                           <h3 className="text-lg font-semibold text-neutral-900">{item.name}</h3>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Button size="sm" variant="light" startContent={<Edit2 className="w-4 h-4" />} onClick={() => openEdit(item)}>
+                          <Button size="sm" variant="light" startContent={<Edit2 className="w-4 h-4" />} onClick={() => openEdit(item)} aria-label={`Edit ${item.name}`}>
                             Edit
                           </Button>
                           {!item.active && (
-                            <Button size="sm" color="primary" isDisabled={startMutation.isPending} onClick={() => startMutation.mutate(item.id)}>
+                            <Button size="sm" color="primary" isDisabled={startMutation.isPending} onClick={() => startMutation.mutate(item.id)} aria-label={`Start ${item.name}`}>
                               Start
                             </Button>
                           )}
                           {item.active && (
-                            <Button size="sm" color="warning" variant="bordered" isDisabled={endMutation.isPending} onClick={() => endMutation.mutate(item.id)}>
+                            <Button size="sm" color="warning" variant="bordered" isDisabled={endMutation.isPending} onClick={() => endMutation.mutate(item.id)} aria-label={`End ${item.name}`}>
                               End
                             </Button>
                           )}

@@ -5,18 +5,38 @@ import { Button } from "@nextui-org/react"
 import Link from "next/link"
 
 export type ProfileCompletionModalProps = {
-  profile: Partial<{ matric_number: string; level: number; department: string; faculty: string; phone: string; gender: string }>
+  profile: Partial<{ matric_number: string; student_level: string; department: string; faculty: string | null; phone: string | null; gender: string | null }>
 }
 
 function ProfileCompletionModal({ profile }: ProfileCompletionModalProps) {
   const missingFields = React.useMemo(() => {
     const fields: string[] = []
-    if (!profile.matric_number) fields.push("Matric Number")
-    if (!profile.level) fields.push("Level")
-    if (!profile.department) fields.push("Department")
-    if (!profile.faculty) fields.push("Faculty")
-    if (!profile.phone) fields.push("Phone Number")
-    if (!profile.gender) fields.push("Gender")
+    const hasMatric = Boolean((profile.matric_number || '').toString().trim())
+    const hasLevel = Boolean((profile.student_level || '').toString().trim())
+    const hasDepartment = Boolean((profile.department || '').toString().trim())
+    const hasPhone = Boolean((profile.phone || '').toString().trim())
+    const hasGender = Boolean((profile.gender || '').toString().trim())
+
+    if (!hasMatric) fields.push("Matric Number")
+    if (!hasLevel) fields.push("Level")
+    if (!hasDepartment) fields.push("Department")
+    // Faculty optional
+    if (!hasPhone) fields.push("Phone Number")
+    if (!hasGender) fields.push("Gender")
+
+    console.log('[ProfileCompletionModal] completeness-check', {
+      values: {
+        matric_number: profile.matric_number,
+        student_level: profile.student_level,
+        department: profile.department,
+        faculty: profile.faculty,
+        phone: profile.phone,
+        gender: profile.gender,
+      },
+      flags: { hasMatric, hasLevel, hasDepartment, hasPhone, hasGender },
+      missingFields: [...fields],
+    })
+
     return fields
   }, [profile])
 
@@ -39,7 +59,7 @@ function ProfileCompletionModal({ profile }: ProfileCompletionModalProps) {
             </div>
           )}
           <div className="flex items-center justify-end gap-2">
-            <Button as={Link} href="/student/profile/create" color="warning" variant="solid">
+            <Button as={Link} href="/student/profile" color="warning" variant="solid">
               Go to Profile
             </Button>
           </div>

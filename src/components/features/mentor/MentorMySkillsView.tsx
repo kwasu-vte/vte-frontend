@@ -35,6 +35,9 @@ export default function MentorMySkillsView(props: MentorMySkillsViewProps) {
 
   return (
     <div className="p-4 md:p-6">
+      <div className="bg-blue-50 border border-blue-200 text-blue-800 rounded-md p-3 text-sm mb-4">
+        Tip: Use the assignment panel to add or remove skills you mentor. The groups panel shows groups linked to your assigned skills.
+      </div>
       <div className="mb-4">
         <h1 className="text-xl font-semibold">My Skills</h1>
         <p className="text-default-500">Manage your assigned skills and view associated groups.</p>

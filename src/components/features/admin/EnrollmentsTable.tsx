@@ -30,19 +30,54 @@ export default function EnrollmentsTable({ enrollments, perPage = 25, onAssignGr
   const rows = React.useMemo(() => enrollments.slice((page - 1) * perPage, page * perPage), [enrollments, page, perPage])
 
   const columns = [
-    { key: "student", label: "Student", render: (e: Enrollment) => `${e.user?.last_name ?? ''} ${e.user?.first_name ?? ''}`.trim() || e.user_id },
+    { key: "student", label: "Student", render: (e: Enrollment) => {
+      const apiStudent = (e as any)?.student
+      const user = (e as any)?.user
+      const first = apiStudent?.first_name ?? user?.first_name
+      const last = apiStudent?.last_name ?? user?.last_name
+      const full = `${last ?? ''} ${first ?? ''}`.trim()
+      return full || e.user_id
+    }},
     { key: "skill", label: "Skill", render: (e: Enrollment) => e.skill?.title ?? e.skill_id },
     { key: "status", label: "Status", render: (e: Enrollment) => <EnrollmentStatusBadge status={e.status.toUpperCase() as any} /> },
-    { key: "payment_status", label: "Payment", render: (e: Enrollment) => e.payment_status === 'paid' ? 'Paid' : e.payment_status === 'failed' ? 'Failed' : 'Pending' },
+    { key: "payment_status", label: "Payment", render: (e: Enrollment) => {
+      const ref = (e as any)?.reference
+      const status = String(e.status || '').toLowerCase()
+      const paid = e.payment_status === 'paid' || (!!ref && (status === 'assigned' || status === 'paid'))
+      return (
+        <div className="flex items-center gap-2">
+          <span>
+            {paid ? 'Paid' : e.payment_status === 'failed' ? 'Failed' : 'Pending'}
+          </span>
+          {ref && (
+            <span className="text-[11px] text-neutral-500 border border-neutral-200 rounded px-1 py-0.5" title={`Reference: ${ref}`}>
+              {String(ref).slice(-6)}
+            </span>
+          )}
+        </div>
+      )
+    }},
     { key: "created_at", label: "Enrolled On", render: (e: Enrollment) => new Date(e.created_at).toLocaleString() },
-    ...(onAssignGroup ? [{ key: "actions", label: "Actions", render: (e: Enrollment) => (
-      <button
-        className="text-primary hover:underline text-sm"
-        onClick={() => onAssignGroup?.(Number(e.id))}
-      >
-        Assign to Group
-      </button>
-    ) }] : [] as any),
+    ...(onAssignGroup ? [{ key: "actions", label: "Actions", render: (e: Enrollment) => {
+      const status = String(e.status || '').toLowerCase()
+      const reference = (e as any)?.reference
+      const isPaid = e.payment_status === 'paid' || (!!reference && (status === 'assigned' || status === 'paid'))
+      const alreadyAssigned = Boolean(e.group?.id) || status === 'assigned'
+      if (alreadyAssigned) {
+        return <span className="text-neutral-400 text-sm cursor-not-allowed">Assigned</span>
+      }
+      if (!isPaid) {
+        return <span className="text-neutral-400 text-sm cursor-not-allowed" title="Payment required before assignment">Unpaid</span>
+      }
+      return (
+        <button
+          className="text-primary hover:underline text-sm"
+          onClick={() => onAssignGroup?.(Number(e.id))}
+        >
+          Assign to Group
+        </button>
+      )
+    } }] : [] as any),
   ]
 
   return (

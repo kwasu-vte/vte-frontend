@@ -1,6 +1,6 @@
 "use client"
 import React from "react"
-import { Card, CardBody, CardHeader, Button } from "@nextui-org/react"
+import { Card, CardBody, CardHeader, Button, Tooltip } from "@nextui-org/react"
 import { BookOpen, Users, QrCode, Calendar, User } from "lucide-react"
 import Link from "next/link"
 
@@ -26,14 +26,14 @@ function QuickActions({ enrollment, hasProfile = false }: QuickActionsProps) {
         href: "/student/skills",
         icon: BookOpen,
         color: "primary" as const,
-        description: "Enroll in new skills"
+        description: "Find and enroll in skills"
       },
       {
         label: "My Profile",
         href: "/student/profile",
         icon: User,
         color: "default" as const,
-        description: "View profile details"
+        description: "View and update your details"
       }
     ]
 
@@ -70,27 +70,28 @@ function QuickActions({ enrollment, hasProfile = false }: QuickActionsProps) {
   }, [enrollment])
 
   return (
-    <Card shadow="sm" className="w-full">
+    <Card shadow="sm" className="w-full" id="student-actions">
       <CardHeader className="pb-2">
         <p className="text-xl font-medium leading-normal">Quick Actions</p>
       </CardHeader>
       <CardBody className="space-y-3">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {actions.map((action) => (
-            <Button
-              key={action.label}
-              as={Link}
-              href={action.href}
-              color={action.color}
-              variant="bordered"
-              className="h-auto p-4 justify-start hover:shadow-sm transition-shadow"
-              startContent={<action.icon className="h-5 w-5" />}
-            >
-              <div className="text-left">
-                <p className="text-sm font-medium">{action.label}</p>
-                <p className="text-xs text-neutral-600">{action.description}</p>
-              </div>
-            </Button>
+            <Tooltip key={action.label} content={action.description} placement="top" delay={200}>
+              <Button
+                as={Link}
+                href={action.href}
+                color={action.color}
+                variant="bordered"
+                className="h-auto p-4 justify-start hover:shadow-md transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                startContent={<action.icon className="h-5 w-5" aria-hidden="true" />}
+              >
+                <div className="text-left">
+                  <p className="text-sm font-medium">{action.label}</p>
+                  <p className="text-xs text-neutral-600">{action.description}</p>
+                </div>
+              </Button>
+            </Tooltip>
           ))}
         </div>
       </CardBody>

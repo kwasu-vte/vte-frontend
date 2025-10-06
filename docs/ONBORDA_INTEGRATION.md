@@ -239,3 +239,150 @@ Details: [Initializing & hooks](https://www.onborda.dev/docs/hooks).
 Onborda displays UI only and does not manage secrets. Avoid placing sensitive data in tour content. Keep environment variables and keys in standard `.env` files and never commit secrets.
 
 
+---
+
+## 9) Dashboard Tours Plan (Admin, Mentor, Student)
+
+This section plans the product tours for the three dashboards. It defines what to highlight, suggested `id` anchors to add, and recommended step options (e.g., `side`, `pointerPadding`). Keep ids stable to prevent breakage.
+
+### Admin Dashboard Tour
+
+- **Objective**: Help admins understand session context, KPIs, activity feed, and quick actions.
+- **Key anchors** (already present):
+  - `#admin-welcome` (header/session context)
+  - `#admin-stats` (KPI cards grid)
+  - `#admin-quick-actions` (quick actions + sessions list)
+- **Suggested steps**:
+```tsx
+// src/onborda/steps.tsx (excerpt)
+export const steps = [
+  {
+    tour: 'admin-dashboard',
+    steps: [
+      {
+        icon: <>👋</>,
+        title: 'Welcome to Admin Dashboard',
+        content: <>See current academic session and status here.</>,
+        selector: '#admin-welcome',
+        side: 'bottom',
+        showControls: true,
+        pointerPadding: 10,
+      },
+      {
+        icon: <>📊</>,
+        title: 'Key metrics',
+        content: <>Total Groups, Students, Full Groups, and With Capacity.</>,
+        selector: '#admin-stats',
+        side: 'right',
+        showControls: true,
+        pointerPadding: 12,
+      },
+      {
+        icon: <>📝</>,
+        title: 'Recent activity',
+        content: <>Review latest enrollments. Use “View all” for filters.</>,
+        selector: '#admin-quick-actions', // parent column; still visible contextually
+        side: 'left',
+        showControls: true,
+        pointerPadding: 12,
+      },
+      {
+        icon: <>⚡</>,
+        title: 'Quick actions',
+        content: <>Generate QR codes, manage sessions, and view reports.</>,
+        selector: '#admin-quick-actions',
+        side: 'left',
+        showControls: true,
+        pointerPadding: 12,
+      },
+    ],
+  },
+]
+```
+
+### Mentor Dashboard Tour
+
+- **Objective**: Show mentors schedule, groups, workload, QR codes, and reports.
+- **Add these ids in mentor components** (stable, descriptive):
+  - `#mentor-welcome` on the page header/container of `MentorDashboard`
+  - `#mentor-calendar` on `MentorCalendarView`
+  - `#mentor-groups` on `MentorGroupsList`/`MentorGroupsPageView`
+  - `#mentor-workload` on `MentorWorkloadView`
+  - `#mentor-qr` on `MentorMyQRCodesView` or `MyQRCodesDisplay`
+  - `#mentor-reports` on `MentorAttendanceReportsView` / `QRScanReport`
+- **Suggested steps**:
+```tsx
+export const steps = [
+  {
+    tour: 'mentor-dashboard',
+    steps: [
+      { icon: <>👋</>, title: 'Welcome Mentor', content: <>Your tools live here.</>, selector: '#mentor-welcome', side: 'bottom', showControls: true, pointerPadding: 10 },
+      { icon: <>📅</>, title: 'Calendar', content: <>See upcoming sessions and navigate dates.</>, selector: '#mentor-calendar', side: 'right', showControls: true, pointerPadding: 12 },
+      { icon: <>👥</>, title: 'My groups', content: <>Open a group to view roster and details.</>, selector: '#mentor-groups', side: 'right', showControls: true, pointerPadding: 12 },
+      { icon: <>📈</>, title: 'Workload', content: <>Track load across skills and sessions.</>, selector: '#mentor-workload', side: 'left', showControls: true, pointerPadding: 12 },
+      { icon: <>� QR</>, title: 'QR codes', content: <>Use codes for attendance scanning.</>, selector: '#mentor-qr', side: 'left', showControls: true, pointerPadding: 12 },
+      { icon: <>🧾</>, title: 'Reports', content: <>Generate attendance and scan reports.</>, selector: '#mentor-reports', side: 'left', showControls: true, pointerPadding: 12 },
+    ],
+  },
+]
+```
+
+### Student Dashboard Tour
+
+- **Objective**: Guide profile completion, enrollment status, QR scan, schedule, and payments.
+- **Add/confirm these ids in student components**:
+  - `#student-welcome` on the dashboard header/container
+  - `#student-profile` on `ProfileCompletionAlert`/`ProfileCompletionModal` trigger region
+  - `#student-enrollment` on `EnrollmentStatus`
+  - `#student-actions` on `QuickActions`
+  - `#student-scan` on `StudentQRScanner`/`StudentScanQR`
+  - `#student-schedule` on `PracticalCalendar`/`UpcomingPracticals`
+  - `#student-payment` on `PaymentRedirect` container (when visible)
+- **Suggested steps**:
+```tsx
+export const steps = [
+  {
+    tour: 'student-dashboard',
+    steps: [
+      { icon: <>👋</>, title: 'Welcome', content: <>Start by completing your profile.</>, selector: '#student-welcome', side: 'bottom', showControls: true, pointerPadding: 10 },
+      { icon: <>🪪</>, title: 'Profile', content: <>Open and fill required fields, then save.</>, selector: '#student-profile', side: 'right', showControls: true, pointerPadding: 12 },
+      { icon: <>✅</>, title: 'Enrollment status', content: <>Understand pending/approved/paid/enrolled.</>, selector: '#student-enrollment', side: 'right', showControls: true, pointerPadding: 12 },
+      { icon: <>⚡</>, title: 'Quick actions', content: <>Scan QR, view group, or open profile.</>, selector: '#student-actions', side: 'left', showControls: true, pointerPadding: 12 },
+      { icon: <>📷</>, title: 'Scan QR', content: <>Allow camera and follow scan feedback.</>, selector: '#student-scan', side: 'left', showControls: true, pointerPadding: 12 },
+      { icon: <>📅</>, title: 'Schedule', content: <>Track upcoming practicals and statuses.</>, selector: '#student-schedule', side: 'left', showControls: true, pointerPadding: 12 },
+      { icon: <>💳</>, title: 'Payments', content: <>Handle payments safely when prompted.</>, selector: '#student-payment', side: 'left', showControls: true, pointerPadding: 12 },
+    ],
+  },
+]
+```
+
+---
+
+## 10) Responsive Positioning and Overflow Safety
+
+Use the following conventions to keep tours readable on all screens and avoid clipping near viewport edges.
+
+- **Choose `side` intentionally**: Prefer `bottom` or `right` for wide headers and KPI grids; use `left` for right-rail cards. Keep consistency across steps to reduce eye travel.
+- **Use `pointerPadding` and `pointerRadius`**: Provide at least `10–14px` padding to avoid the card touching the highlight box and to create a readable pointer radius on small screens.
+- **Constrain card width in a custom `cardComponent`**: Apply responsive Tailwind classes like `max-w-sm md:max-w-md lg:max-w-lg` and `w-[calc(100vw-2rem)]` to ensure the card fits on small viewports without overflow.
+- **Respect safe areas**: Add padding inside your card using CSS env variables: `padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);` to avoid notches and rounded corners on mobile.
+- **Prevent viewport overflow**: Keep card content concise; favor bullet points and short sentences. If content is lengthy, use collapsible details or multiple steps instead of one verbose step.
+- **Scrollable targets**: Ensure target containers are not `overflow: hidden` when possible so the library can scroll them into view. For long pages, place anchors near the visible region of a section.
+- **Mobile-first copy**: Write step content to fit within ~3–4 lines on a 360–390px wide device. Avoid large images/iframes inside cards.
+- **QA in common breakpoints**: Manually test at 360×780, 768×1024, and 1440×900. Adjust `side` and content where necessary.
+
+Example custom card width constraint:
+```tsx
+// src/onborda/TourCard.tsx (excerpt)
+export const TourCard: React.FC<CardComponentProps> = (props) => {
+  return (
+    <div className="rounded-md bg-white p-4 shadow w-[calc(100vw-2rem)] max-w-sm md:max-w-md lg:max-w-lg">
+      {/* existing content */}
+    </div>
+  )
+}
+```
+
+Note: Keep `showOnborda` default `false` and trigger tours via `useOnborda().startOnborda('...')` from in-page buttons (e.g., Admin’s `StartTourButton`).
+
+

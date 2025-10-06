@@ -14,7 +14,7 @@ export const TourCard: React.FC<CardComponentProps> = ({
   const { closeOnborda } = useOnborda()
 
   return (
-    <div className="rounded-md bg-white p-4 shadow">
+    <div className="rounded-md bg-white p-4 shadow w-[calc(100vw-2rem)] max-w-sm md:max-w-md lg:max-w-lg">
       <p className="text-sm text-neutral-500">{currentStep + 1} of {totalSteps}</p>
       <p className="mt-1 text-lg font-semibold flex items-center gap-2">
         <span>{step.icon}</span> {step.title}

@@ -42,7 +42,7 @@ function PracticalCalendar({ practicalDates, viewMode = 'month' }: PracticalCale
   const keys = Object.keys(groups)
 
   return (
-    <Card shadow="sm" className="w-full">
+    <Card shadow="sm" className="w-full" id="student-schedule">
       <CardHeader className="flex items-center justify-between">
         <div>
           <p className="text-sm text-neutral-600">Practical Calendar</p>

@@ -12,7 +12,7 @@ import { SkillsTable } from '@/components/features/admin/SkillsTable';
 import { SkillModal } from '@/components/features/admin/SkillModal';
 import { skillsApi } from '@/lib/api';
 import { Skill, CreateSkillPayload, UpdateSkillPayload, SkillDateRangePayload } from '@/lib/types';
-import { Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@nextui-org/react';
+import { Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Card, CardHeader, CardBody, Chip } from '@nextui-org/react';
 import { Plus, AlertTriangle, Eye } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { getErrorMessage, getErrorTitle, getSuccessTitle, getSuccessMessage } from '@/lib/error-handling';
@@ -239,26 +239,39 @@ export default function AdminSkillsPage() {
         </Button>
       </div>
 
-      {/* * Skills Table */}
-      <div className="bg-white rounded-lg shadow-sm border border-neutral-200">
-        <SkillsTable
-          skills={skills ?? []}
-          isLoading={isLoading}
-          error={error}
-          onEdit={openEditModal}
-          onDelete={openDeleteModal}
-          onCreate={openCreateModal}
-          onView={openViewModal}
-          onManageGroups={(skill) => {
-            // TODO: Navigate to groups management for this skill
-            console.log('Manage groups for skill:', skill);
-          }}
-          onManageSchedule={(skill) => {
-            // TODO: Navigate to schedule management for this skill
-            console.log('Manage schedule for skill:', skill);
-          }}
-        />
+      {/* Info: How to use */}
+      <div className="bg-blue-50 border border-blue-200 text-blue-800 rounded-md p-3 text-sm">
+        Manage skills, update details, and set date ranges. Use the actions to view, edit, or delete. Assignments and schedules are managed from their dedicated pages.
       </div>
+
+      {/* * Skills Table */}
+      <Card shadow="sm">
+        <CardHeader className="flex items-center justify-between px-4 pt-4">
+          <div className="flex items-center gap-3">
+            <p className="text-base font-medium text-neutral-900">Skills</p>
+            <Chip variant="flat">{skills?.length || 0}</Chip>
+          </div>
+        </CardHeader>
+        <CardBody className="px-4 pb-4">
+          <SkillsTable
+            skills={skills ?? []}
+            isLoading={isLoading}
+            error={error}
+            onEdit={openEditModal}
+            onDelete={openDeleteModal}
+            onCreate={openCreateModal}
+            onView={openViewModal}
+            onManageGroups={(skill) => {
+              // TODO: Navigate to groups management for this skill
+              console.log('Manage groups for skill:', skill);
+            }}
+            onManageSchedule={(skill) => {
+              // TODO: Navigate to schedule management for this skill
+              console.log('Manage schedule for skill:', skill);
+            }}
+          />
+        </CardBody>
+      </Card>
 
       {/* * Create Skill Modal */}
       <SkillModal

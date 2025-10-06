@@ -1,9 +1,18 @@
+## feat(student): redesign student homepage UI/UX
+
+- Added gradient hero with quick refresh and tour entry
+- Clear next-step callout based on profile/enrollment/payment status
+- Restructured layout: prominent enrollment overview
+- Enhanced QuickActions with tooltips, hover/focus states, and clearer copy
+- Improved GroupAssignmentCard layout with divider and guidance text
+- Better empty state for UpcomingPracticals with Schedule links
+
 ## [Unreleased]
 
 ### Added
 - Onboarding: Integrated Onborda provider in root layout, added shared steps (`src/onborda/steps.tsx`) and custom card (`src/onborda/TourCard.tsx`), plus Start Tour buttons on Admin/Mentor/Student dashboards. Tailwind updated to scan Onborda dist for classes.
 - Docs: Role-based user flows guide (`docs/ROLES_AND_FLOWS.md`) mapping Admin, Mentor, and Student end-to-end flows, page routes, and key components.
-- Docs: Onborda product tours integration guide (`docs/ONBORDA_INTEGRATION.md`) with setup, Tailwind config, provider wiring, tours/steps examples, custom card, and hooks usage. References: https://www.onborda.dev/docs, https://www.onborda.dev/docs/app-router, https://www.onborda.dev/docs/tours-steps, https://www.onborda.dev/docs/card, https://www.onborda.dev/docs/hooks
+- Docs: Onborda product tours integration guide (`docs/ONBORDA_INTEGRATION.md`) with setup, Tailwind config, provider wiring, tours/steps examples, custom card, hooks usage, and dashboard tours plan (Admin, Mentor, Student) including responsive positioning guidelines.
 - Student: Permanent profile completion modal on dashboard when profile is incomplete. Includes missing fields list and CTA to `/student/profile/create`. Also shows existing dismissible banner.
 - **Dynamic QR Code Printing System**: New comprehensive QR code printing solution with quantity selection
   - QR Code Print Selector page (`/admin/qr-codes/print-selector`) with quantity selection (1 or multiples of 2, max 24)

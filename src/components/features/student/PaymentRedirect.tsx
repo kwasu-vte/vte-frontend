@@ -42,7 +42,7 @@ function PaymentRedirect({ enrollment, amount, onProceed, userId }: PaymentRedir
     }
   }
   return (
-    <Card shadow="sm" className="w-full max-w-lg">
+    <Card shadow="sm" className="w-full max-w-lg" id="student-payment">
       <CardHeader className="flex items-center justify-between">
         <div>
           <p className="text-sm text-neutral-600">Enrollment ID</p>

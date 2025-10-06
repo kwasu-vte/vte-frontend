@@ -7,7 +7,7 @@ import type { Enrollment, PaginatedResponse } from '@/lib/types';
 import { StateRenderer, DefaultLoadingComponent, DefaultErrorComponent } from '@/components/shared/StateRenderer';
 import EnrollmentFilters from '@/components/features/admin/EnrollmentFilters';
 import EnrollmentsTable from '@/components/features/admin/EnrollmentsTable';
-import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Select, SelectItem } from '@nextui-org/react';
+import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Select, SelectItem, Card, CardHeader, CardBody, Chip } from '@nextui-org/react';
 import { RefreshCw } from 'lucide-react';
 
 export default function AdminEnrollmentsPage() {
@@ -58,39 +58,55 @@ export default function AdminEnrollmentsPage() {
           <h1 className="text-3xl font-bold text-neutral-900">Enrollments</h1>
           <p className="text-neutral-600 mt-1">Filter, review and assign enrollments.</p>
         </div>
-        <Button variant="light" startContent={<RefreshCw className="w-4 h-4" />} onClick={() => refetch()}>
-          Refresh
+        <Button
+          variant="light"
+          startContent={<RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} aria-hidden="true" />}
+          aria-label="Refresh enrollments"
+          isDisabled={isLoading}
+          onClick={() => refetch()}
+        >
+          {isLoading ? 'Refreshing…' : 'Refresh'}
         </Button>
       </div>
 
-      <div className="bg-white rounded-lg shadow-sm border border-neutral-200">
-        <div className="p-4 border-b border-neutral-200">
-          <EnrollmentFilters
-            value={filters}
-            onChange={(v) => setFilters((s) => ({ ...s, ...v }))}
-            defaultPerPage={25}
-          />
-        </div>
+      {/* Info: How to use */}
+      <div className="bg-blue-50 border border-blue-200 text-blue-800 rounded-md p-3 text-sm">
+        Filter by academic session and skill to narrow results. Use the Assign action to place students into groups, or Auto-assign to distribute automatically.
+      </div>
 
-        <StateRenderer
-          data={rows}
-          isLoading={isLoading}
-          error={error as Error | null}
-          loadingComponent={<div className="p-6"><DefaultLoadingComponent /></div>}
-          errorComponent={<div className="p-6"><DefaultErrorComponent error={error as Error} onRetry={() => refetch()} /></div>}
-          emptyComponent={<div className="p-6 text-center text-neutral-600">No enrollments found.</div>}
-        >
-          {(items) => (
-            <div className="p-4">
+      <Card shadow="sm">
+        <CardHeader className="flex items-center justify-between px-4 pt-4">
+          <div className="flex items-center gap-3">
+            <p className="text-base font-medium text-neutral-900">Enrollments</p>
+            <Chip variant="flat">{rows.length}</Chip>
+          </div>
+        </CardHeader>
+        <CardBody className="px-4 pb-4">
+          <div className="mb-4">
+            <EnrollmentFilters
+              value={filters}
+              onChange={(v) => setFilters((s) => ({ ...s, ...v }))}
+              defaultPerPage={25}
+            />
+          </div>
+          <StateRenderer
+            data={rows}
+            isLoading={isLoading}
+            error={error as Error | null}
+            loadingComponent={<div className="py-2"><DefaultLoadingComponent /></div>}
+            errorComponent={<div className="py-2"><DefaultErrorComponent error={error as Error} onRetry={() => refetch()} /></div>}
+            emptyComponent={<div className="py-6 text-center text-neutral-600">No enrollments found.</div>}
+          >
+            {(items) => (
               <EnrollmentsTable
                 enrollments={items}
                 perPage={filters.per_page ?? 25}
                 onAssignGroup={(id) => openAssign(id)}
               />
-            </div>
-          )}
-        </StateRenderer>
-      </div>
+            )}
+          </StateRenderer>
+        </CardBody>
+      </Card>
 
       {/* Manual Assign Modal */}
       <Modal isOpen={assignOpen} onClose={() => setAssignOpen(false)} size="md">
