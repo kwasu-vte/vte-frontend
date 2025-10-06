@@ -240,7 +240,7 @@ export function QRWizard({ currentStep, onStepChange, onComplete, initialData = 
 
         {data.purpose === 'single' && (
           <Select
-            label="Which training group?"
+            // label="Which training group?"
             placeholder="Select a group"
             selectedKeys={data.groupId ? new Set([String(data.groupId)]) : new Set([])}
             onSelectionChange={(keys) => {
@@ -294,7 +294,7 @@ export function QRWizard({ currentStep, onStepChange, onComplete, initialData = 
       <CardBody className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Input
-          label="How many QR codes do you need?"
+          placeholder="How many QR codes do you need?"
           type="number"
           value={data.count === undefined ? '' : String(data.count)}
           onChange={(e) => {
@@ -309,7 +309,7 @@ export function QRWizard({ currentStep, onStepChange, onComplete, initialData = 
         />
 
         <Input
-          label="How long should they be valid?"
+          placeholder="How long should they be valid?"
           type="number"
           value={data.expiresInDays === undefined ? '' : String(data.expiresInDays)}
           onChange={(e) => {
@@ -325,7 +325,7 @@ export function QRWizard({ currentStep, onStepChange, onComplete, initialData = 
         </div>
 
         <Input
-          label="Attendance points per scan"
+          placeholder="Attendance points per scan"
           type="number"
           value={data.pointsPerScan === undefined ? '' : String(data.pointsPerScan)}
           onChange={(e) => {
@@ -340,7 +340,7 @@ export function QRWizard({ currentStep, onStepChange, onComplete, initialData = 
         />
 
         <Select
-          label="Assign to instructor (optional)"
+          // label="Assign to instructor (optional)"
           placeholder="Select an instructor"
           selectedKeys={data.mentorId ? new Set([String(data.mentorId)]) : new Set([])}
           onSelectionChange={(keys) => {
