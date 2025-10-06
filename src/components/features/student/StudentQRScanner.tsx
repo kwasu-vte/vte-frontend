@@ -96,11 +96,11 @@ function StudentQRScanner({
 
     // The response is now properly typed
     const { data } = response
-    const success = data.success
-    const points = data.points
-    const timestamp = data.timestamp
-    const studentName = data.student_name
-    const message = data.message
+    const success = data.data.success
+    const points = data.data.points_awarded ? parseInt(data.data.points_awarded) : undefined
+    const timestamp = data.data.scanned_at
+    const studentName = data.data.skill_title // Using skill_title as student identifier
+    const message = data.data.message
 
     setScanResult({ success, message, points, timestamp, studentName })
 

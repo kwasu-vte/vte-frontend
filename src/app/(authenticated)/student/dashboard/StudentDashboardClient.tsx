@@ -8,7 +8,6 @@ import { useStudentDashboardData } from '@/lib/hooks/use-student-dashboard-data'
 import { ProfileCompletionAlert } from '@/components/features/student/ProfileCompletionAlert';
 import { EnrollmentStatus } from '@/components/features/student/EnrollmentStatus';
 import { GroupAssignmentCard } from '@/components/features/student/GroupAssignmentCard';
-import { UpcomingPracticals } from '@/components/features/student/UpcomingPracticals';
 import { QuickActions } from '@/components/features/student/QuickActions';
 import { NotificationContainer } from '@/components/shared/NotificationContainer';
 import { StateRenderer } from '@/components/shared/StateRenderer';
@@ -22,7 +21,7 @@ interface StudentDashboardClientProps {
 }
 
 export function StudentDashboardClient({ userId }: StudentDashboardClientProps) {
-  const { profile, enrollment, upcomingPracticals, attendanceSummary, isLoading, error } = useStudentDashboardData(userId);
+  const { profile, enrollment, isLoading, error } = useStudentDashboardData(userId);
 
   return (
     <div className="space-y-6">
@@ -92,7 +91,7 @@ export function StudentDashboardClient({ userId }: StudentDashboardClientProps) 
                     skillName: enrollment.skill?.title || 'Unknown Skill',
                     status: enrollment.status.toUpperCase() as any,
                     paymentStatus: enrollment.payment_status,
-                    group: enrollment.group_id?.toString()
+                    group: enrollment.group?.id?.toString()
                   }}
                   showTimeline={true}
                 />
@@ -144,17 +143,17 @@ export function StudentDashboardClient({ userId }: StudentDashboardClientProps) 
                       <Card shadow="sm" className="w-full border-success-200 bg-success-50">
                         <CardHeader className="flex items-center gap-2">
                           <Users className="h-5 w-5 text-success" />
-                          <p className="text-lg font-medium leading-normal">{status === 'paid' && !enrollment.group_id ? 'Awaiting Group Assignment' : 'Group Assigned'}</p>
+                          <p className="text-lg font-medium leading-normal">{status === 'paid' && !enrollment.group?.id ? 'Awaiting Group Assignment' : 'Group Assigned'}</p>
                         </CardHeader>
                         <CardBody className="p-6">
                           <div className="flex items-center justify-between gap-4">
                             <p className="text-sm text-neutral-700">
-                              {status === 'paid' && !enrollment.group_id
+                              {status === 'paid' && !enrollment.group?.id
                                 ? 'You will be assigned to a group soon. You can review your schedule once assigned.'
                                 : 'Check your group roster and practical schedule.'}
                             </p>
-                            <Button as={Link} href={status === 'paid' && !enrollment.group_id ? '/student/enrollment' : '/student/my-group'} color="success" size="sm">
-                              {status === 'paid' && !enrollment.group_id ? 'View Enrollment' : 'View Group'}
+                            <Button as={Link} href={status === 'paid' && !enrollment.group?.id ? '/student/enrollment' : '/student/my-group'} color="success" size="sm">
+                              {status === 'paid' && !enrollment.group?.id ? 'View Enrollment' : 'View Group'}
                             </Button>
                           </div>
                         </CardBody>
@@ -204,7 +203,7 @@ export function StudentDashboardClient({ userId }: StudentDashboardClientProps) 
           {/* Group Assignment */}
           {enrollment && (
             <StateRenderer
-              data={enrollment.group_id}
+              data={enrollment.group?.id}
               isLoading={isLoading}
               error={error}
               onRetry={() => window.location.reload()}
@@ -233,11 +232,6 @@ export function StudentDashboardClient({ userId }: StudentDashboardClientProps) 
             </StateRenderer>
           )}
 
-          {/* Upcoming Practicals */}
-          <UpcomingPracticals 
-            practicals={upcomingPracticals}
-            limit={3}
-          />
         </div>
 
         {/* Right Column - Quick Actions */}
@@ -245,7 +239,7 @@ export function StudentDashboardClient({ userId }: StudentDashboardClientProps) 
           <QuickActions 
             enrollment={enrollment ? {
               status: enrollment.status,
-              group: enrollment.group_id ? { id: enrollment.group_id.toString() } : undefined
+              group: enrollment.group?.id ? { id: enrollment.group.id.toString() } : undefined
             } : undefined}
             hasProfile={!!profile}
           />

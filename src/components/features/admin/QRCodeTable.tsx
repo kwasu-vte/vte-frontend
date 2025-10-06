@@ -178,10 +178,10 @@ export function QRCodeTable({ skillId, groupId, onCreateClick }: QRCodeTableProp
                     <TableCell>
                       <Chip
                         size="sm"
-                        color={getStatusColor(qrCode.status)}
+                        color={getStatusColor(isExpired(qrCode.expires_at) ? 'expired' : 'active')}
                         variant="flat"
                       >
-                        {qrCode.status || (isExpired(qrCode.expires_at) ? 'expired' : 'active')}
+                        {isExpired(qrCode.expires_at) ? 'expired' : 'active'}
                       </Chip>
                     </TableCell>
                     <TableCell>

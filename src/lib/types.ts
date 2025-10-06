@@ -218,7 +218,11 @@ export interface Enrollment {
   payment_status: 'pending' | 'paid' | 'failed';
   created_at: string;
   updated_at: string;
-  group_id?: number; // Reference to assigned skill group
+  group?: {
+    id: string;
+    group_number: string;
+    group_display_name: string;
+  };
   user?: User;
   skill?: Skill;
   academic_session?: AcademicSession;

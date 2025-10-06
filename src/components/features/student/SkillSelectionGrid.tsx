@@ -11,6 +11,7 @@ import { BookOpen, AlertCircle, CheckCircle } from "lucide-react"
  * Props:
  * - availableSkills: Array<Skill>
  * - studentLevel: string
+ * - enrollment: Enrollment | null - Current user enrollment data
  * - onSelectSkill: (skillId: string) => void
  * - isLoading?: boolean
  */
@@ -29,6 +30,7 @@ export type SkillSelectionGridProps = {
     date_range_end: string | null
   }>
   studentLevel: string
+  enrollment: any
   onSelectSkill: (skillId: string) => void
   isLoading?: boolean
 }
@@ -36,10 +38,34 @@ export type SkillSelectionGridProps = {
 function SkillSelectionGrid({ 
   availableSkills, 
   studentLevel, 
+  enrollment,
   onSelectSkill, 
   isLoading = false 
 }: SkillSelectionGridProps) {
   const getSkillStatus = (skill: SkillSelectionGridProps['availableSkills'][0]) => {
+    // Check if user is already enrolled in this skill
+    // The enrollment object has a nested skill object with id
+    const enrolledSkillId = enrollment?.skill?.id;
+    const isEnrolled = enrollment && enrolledSkillId === skill.id;
+    
+    // If enrolled, show enrolled state
+    if (isEnrolled) {
+      return { 
+        status: 'enrolled', 
+        reason: 'You are enrolled in this skill',
+        color: 'success' as const
+      }
+    }
+    
+    // If user has any enrollment, disable other skills
+    if (enrollment) {
+      return { 
+        status: 'disabled', 
+        reason: 'You can only enroll in one skill at a time',
+        color: 'default' as const
+      }
+    }
+    
     // Check if student level is allowed
     const isLevelAllowed = !skill.allowed_levels || skill.allowed_levels.includes(studentLevel)
     
@@ -138,12 +164,13 @@ function SkillSelectionGrid({
                 variant="flat"
                 size="sm"
                 startContent={
-                  skillStatus.status === 'available' ? 
+                  skillStatus.status === 'available' || skillStatus.status === 'enrolled' ? 
                     <CheckCircle className="h-3 w-3" /> : 
                     <AlertCircle className="h-3 w-3" />
                 }
               >
-                {skillStatus.status === 'available' ? 'Available' : 'Unavailable'}
+                {skillStatus.status === 'available' ? 'Available' : 
+                 skillStatus.status === 'enrolled' ? 'Enrolled' : 'Unavailable'}
               </Chip>
             </CardHeader>
             
@@ -175,7 +202,7 @@ function SkillSelectionGrid({
                 
                 {/* Action Button */}
                 <Button
-                  color="primary"
+                  color={skillStatus.status === 'enrolled' ? "success" : "primary"}
                   variant={isDisabled ? "ghost" : "solid"}
                   size="sm"
                   className="w-full"
@@ -183,7 +210,8 @@ function SkillSelectionGrid({
                   startContent={<BookOpen className="h-4 w-4" />}
                   onPress={() => !isDisabled && onSelectSkill(skill.id)}
                 >
-                  {isDisabled ? 'Not Available' : 'View Details'}
+                  {skillStatus.status === 'enrolled' ? 'View Enrollment' : 
+                   isDisabled ? 'Not Available' : 'View Details'}
                 </Button>
               </div>
             </CardBody>

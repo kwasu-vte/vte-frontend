@@ -6,11 +6,10 @@ import React from 'react';
 import { getCurrentUser } from '@/lib/auth';
 import { enrollmentsApi, skillGroupsApi } from '@/lib/api';
 import { GroupAssignmentCard } from '@/components/features/student/GroupAssignmentCard';
-import { PracticalCalendar } from '@/components/features/student/PracticalCalendar';
 import { NotificationContainer } from '@/components/shared/NotificationContainer';
 import { StateRenderer } from '@/components/shared/StateRenderer';
 import { Card, CardBody, CardHeader, Skeleton, Button, Avatar, Chip, Divider } from '@nextui-org/react';
-import { ArrowLeft, Users, User, Calendar, Mail, Phone } from 'lucide-react';
+import { ArrowLeft, Users, User, Calendar, Mail, Phone, Clock, MapPin } from 'lucide-react';
 import Link from 'next/link';
 import { getSpecializationLabel } from '@/lib/utils/specialization';
 
@@ -28,9 +27,10 @@ async function getMyGroupPageData(userId: string): Promise<MyGroupPageData> {
 
     // Fetch real group details if user has a group assignment
     let groupDetails = null;
-    if (enrollment?.group_id) {
+    
+    if (enrollment?.group?.id) {
       try {
-        const groupResponse = await skillGroupsApi.getById(Number(enrollment.group_id));
+        const groupResponse = await skillGroupsApi.getById(Number(enrollment.group.id));
         const group = groupResponse.data;
         
         if (group) {
@@ -38,40 +38,35 @@ async function getMyGroupPageData(userId: string): Promise<MyGroupPageData> {
             id: group.id,
             name: group.group_display_name || `Group ${group.group_number}`,
             skill: group.skill,
-            mentor: null, // Mentor info would need to be fetched separately
-            members: group.enrollments?.map((enrollment: any) => ({
-              id: enrollment.user_id,
-              name: `${enrollment.user?.first_name || ''} ${enrollment.user?.last_name || ''}`.trim() || 'Unknown',
-              email: enrollment.user?.email || 'Not provided',
-              level: enrollment.user?.student_level || 'Unknown'
-            })) || [],
+            members: [], // Students cannot access member data
             schedule: {
-              start: group.created_at,
-              end: group.updated_at,
-              days: ['Monday', 'Wednesday', 'Friday'], // This would come from skill date range
-              location: 'Lab 1, Computer Science Building' // This would come from skill details
+              start: group.skill?.date_range_start || group.created_at,
+              end: group.skill?.date_range_end || group.updated_at,
+              excludeWeekends: group.skill?.exclude_weekends || false,
+              practicalDates: group.practical_dates || [],
+              assignedPracticalDate: group.assigned_practical_date
             },
-            capacity: parseInt(group.max_student_capacity) || 0,
-            currentSize: group.enrollments?.length || 0
+            capacity: 0, // Students cannot access capacity data
+            currentSize: 0 // Students cannot access member count
           };
         }
       } catch (error) {
         console.warn('Could not fetch group details:', error);
         // Fallback to basic group info from enrollment
         groupDetails = {
-          id: enrollment.group_id,
-          name: `Group ${enrollment.group_id}`,
+          id: enrollment.group.id,
+          name: enrollment.group.group_display_name || `Group ${enrollment.group.group_number}`,
           skill: enrollment.skill,
-          mentor: null,
           members: [],
           schedule: {
-            start: enrollment.created_at,
-            end: enrollment.updated_at,
-            days: ['Monday', 'Wednesday', 'Friday'],
-            location: 'Lab 1, Computer Science Building'
+            start: enrollment.skill?.date_range_start || enrollment.created_at,
+            end: enrollment.skill?.date_range_end || enrollment.updated_at,
+            excludeWeekends: enrollment.skill?.exclude_weekends || false,
+            practicalDates: [],
+            assignedPracticalDate: enrollment.group.assigned_practical_date
           },
-          capacity: 0,
-          currentSize: 0
+          capacity: 0, // Students cannot access capacity data
+          currentSize: 0 // Students cannot access member count
         };
       }
     }
@@ -195,8 +190,10 @@ export default async function StudentMyGroup() {
                 }}
                 group={{
                   number: parseInt(data.groupDetails.id),
-                  mentorName: data.groupDetails.mentor.name,
-                  schedule: `${data.groupDetails.schedule.days.join(', ')} at ${data.groupDetails.schedule.location}`
+                  mentorName: 'TBD',
+                  schedule: data.groupDetails.skill?.date_range_start && data.groupDetails.skill?.date_range_end 
+                    ? `${new Date(data.groupDetails.skill.date_range_start).toLocaleDateString()} - ${new Date(data.groupDetails.skill.date_range_end).toLocaleDateString()}`
+                    : 'Schedule will be announced by mentor'
                 }}
               />
 
@@ -218,90 +215,25 @@ export default async function StudentMyGroup() {
                       <span className="font-medium text-neutral-900">{data.groupDetails.skill?.title}</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-neutral-600">Duration</span>
+                      <span className="text-neutral-600">Practical Period</span>
                       <span className="font-medium text-neutral-900">
-                        {new Date(data.groupDetails.schedule.start).toLocaleDateString()} - {new Date(data.groupDetails.schedule.end).toLocaleDateString()}
+                        {data.groupDetails.skill?.date_range_start && data.groupDetails.skill?.date_range_end
+                          ? `${new Date(data.groupDetails.skill.date_range_start).toLocaleDateString()} - ${new Date(data.groupDetails.skill.date_range_end).toLocaleDateString()}`
+                          : 'TBD'
+                        }
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-neutral-600">Schedule</span>
-                      <span className="font-medium text-neutral-900">{data.groupDetails.schedule.days.join(', ')}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-neutral-600">Location</span>
-                      <span className="font-medium text-neutral-900">{data.groupDetails.schedule.location}</span>
+                      <span className="text-neutral-600">Schedule Type</span>
+                      <span className="font-medium text-neutral-900">
+                        {data.groupDetails.schedule.excludeWeekends ? 'Weekdays only' : 'All days'}
+                      </span>
                     </div>
                   </div>
                 </CardBody>
               </Card>
 
-              {/* Mentor Information */}
-              <Card shadow="sm" className="w-full">
-                <CardHeader className="flex items-center gap-2">
-                  <User className="h-5 w-5 text-primary" />
-                  <p className="text-xl font-medium leading-normal">Mentor</p>
-                </CardHeader>
-                <Divider />
-                <CardBody className="p-6">
-                  <div className="flex items-start gap-4">
-                    <Avatar
-                      name={data.groupDetails.mentor.name.split(' ').map((n: string) => n[0]).join('')}
-                      size="lg"
-                      className="text-lg"
-                    />
-                    <div className="flex-1 space-y-3">
-                      <div>
-                        <h3 className="text-lg font-medium text-neutral-900">{data.groupDetails.mentor.name}</h3>
-                        <p className="text-sm text-neutral-600">{getSpecializationLabel(data.groupDetails.mentor.specialization)}</p>
-                      </div>
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2 text-sm">
-                          <Mail className="h-4 w-4 text-neutral-400" />
-                          <span className="text-neutral-600">{data.groupDetails.mentor.email}</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-sm">
-                          <Phone className="h-4 w-4 text-neutral-400" />
-                          <span className="text-neutral-600">{data.groupDetails.mentor.phone}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </CardBody>
-              </Card>
 
-              {/* Group Members */}
-              <Card shadow="sm" className="w-full">
-                <CardHeader className="flex items-center gap-2">
-                  <Users className="h-5 w-5 text-primary" />
-                  <p className="text-xl font-medium leading-normal">Group Members</p>
-                </CardHeader>
-                <Divider />
-                <CardBody className="p-6">
-                  <div className="space-y-4">
-                    {data.groupDetails.members.map((member: any, index: number) => (
-                      <div key={member.id} className="flex items-center gap-3 p-3 border border-neutral-200 rounded-lg">
-                        <Avatar
-                          name={member.name.split(' ').map((n: string) => n[0]).join('')}
-                          size="md"
-                          className="text-sm"
-                        />
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2">
-                            <span className="font-medium text-neutral-900">{member.name}</span>
-                            {index === 0 && (
-                              <Chip size="sm" color="primary" variant="flat">
-                                You
-                              </Chip>
-                            )}
-                          </div>
-                          <p className="text-sm text-neutral-600">{member.email}</p>
-                          <p className="text-xs text-neutral-500">Level {member.level}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardBody>
-              </Card>
 
               {/* Practical Schedule */}
               <Card shadow="sm" className="w-full">
@@ -311,14 +243,65 @@ export default async function StudentMyGroup() {
                 </CardHeader>
                 <Divider />
                 <CardBody className="p-6">
-                  <PracticalCalendar
-                    practicalDates={data.groupDetails.schedule.days.map((day: string) => ({
-                      date: `${data.groupDetails.schedule.start}T09:00:00Z`, // Mock time
-                      venue: data.groupDetails.schedule.location,
-                      time: '09:00 AM'
-                    }))}
-                    viewMode="month"
-                  />
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-3">
+                        <h3 className="font-medium text-neutral-900">Schedule Information</h3>
+                        <div className="space-y-2 text-sm">
+                          {data.groupDetails.schedule.assignedPracticalDate ? (
+                            <>
+                              <div className="flex items-center gap-2">
+                                <Calendar className="h-4 w-4 text-neutral-400" />
+                                <span className="text-neutral-600">Assigned Date:</span>
+                                <span className="font-medium">
+                                  {new Date(data.groupDetails.schedule.assignedPracticalDate).toLocaleDateString()}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <Clock className="h-4 w-4 text-neutral-400" />
+                                <span className="text-neutral-600">Schedule:</span>
+                                <span className="font-medium">
+                                  {data.groupDetails.schedule.excludeWeekends ? 'Weekdays only' : 'All days'}
+                                </span>
+                              </div>
+                            </>
+                          ) : data.groupDetails.skill?.date_range_start && data.groupDetails.skill?.date_range_end ? (
+                            <>
+                              <div className="flex items-center gap-2">
+                                <Calendar className="h-4 w-4 text-neutral-400" />
+                                <span className="text-neutral-600">Period:</span>
+                                <span className="font-medium">
+                                  {new Date(data.groupDetails.skill.date_range_start).toLocaleDateString()} - {new Date(data.groupDetails.skill.date_range_end).toLocaleDateString()}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <Clock className="h-4 w-4 text-neutral-400" />
+                                <span className="text-neutral-600">Schedule:</span>
+                                <span className="font-medium">
+                                  {data.groupDetails.schedule.excludeWeekends ? 'Weekdays only' : 'All days'}
+                                </span>
+                              </div>
+                            </>
+                          ) : (
+                            <div className="flex items-center gap-2">
+                              <Calendar className="h-4 w-4 text-neutral-400" />
+                              <span className="text-neutral-600">Status:</span>
+                              <span className="font-medium">Schedule will be announced by mentor</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      <div className="space-y-3">
+                        <h3 className="font-medium text-neutral-900">Important Notes</h3>
+                        <div className="space-y-2 text-sm text-neutral-600">
+                          <p>• Bring your student ID and QR code scanner</p>
+                          <p>• Notify your mentor if you&apos;ll be late or absent</p>
+                          <p>• Check for schedule updates from your mentor</p>
+                          <p>• Specific session times will be announced by your mentor</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </CardBody>
               </Card>
             </div>

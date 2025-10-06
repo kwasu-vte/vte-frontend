@@ -1,12 +1,10 @@
 // * Student Schedule Page
-// * View practical schedule with PracticalCalendar and UpcomingPracticals
+// * View practical schedule information
 // * Follows design guide principles with NextUI components
 
 import React from 'react';
 import { getCurrentUser } from '@/lib/auth';
 import { enrollmentsApi } from '@/lib/api';
-import { PracticalCalendar } from '@/components/features/student/PracticalCalendar';
-import { UpcomingPracticals } from '@/components/features/student/UpcomingPracticals';
 import { NotificationContainer } from '@/components/shared/NotificationContainer';
 import { StateRenderer } from '@/components/shared/StateRenderer';
 import { Card, CardBody, CardHeader, Skeleton, Button, Chip, Divider } from '@nextui-org/react';
@@ -17,7 +15,6 @@ export const dynamic = 'force-dynamic';
 
 interface SchedulePageData {
   enrollment: any;
-  upcomingPracticals: any[];
 }
 
 async function getSchedulePageData(userId: string): Promise<SchedulePageData> {
@@ -25,36 +22,13 @@ async function getSchedulePageData(userId: string): Promise<SchedulePageData> {
     const enrollmentResponse = await enrollmentsApi.getUserEnrollment(userId);
     const enrollment = enrollmentResponse.success ? enrollmentResponse.data : null;
 
-    // Derive upcoming practicals from enrolled skill date range
-    const upcomingPracticals = (() => {
-      const skill = enrollment?.skill;
-      if (!skill?.date_range_start || !skill?.date_range_end) return [] as { id: string; date: string }[];
-      const start = new Date(skill.date_range_start);
-      const end = new Date(skill.date_range_end);
-      const now = new Date();
-      const items: { id: string; date: string }[] = [];
-      const stepDays = 7;
-      for (let d = new Date(start); d <= end; d.setDate(d.getDate() + stepDays)) {
-        const candidate = new Date(d);
-        if (candidate >= now) {
-          const isWeekend = candidate.getDay() === 0 || candidate.getDay() === 6;
-          if (skill.exclude_weekends && isWeekend) continue;
-          items.push({ id: `${candidate.getTime()}`, date: candidate.toISOString() });
-          if (items.length >= 12) break;
-        }
-      }
-      return items;
-    })();
-
     return {
       enrollment,
-      upcomingPracticals
     };
   } catch (error) {
     console.error('Error fetching schedule page data:', error);
     return {
       enrollment: null,
-      upcomingPracticals: []
     };
   }
 }
@@ -147,7 +121,7 @@ export default async function StudentSchedule() {
                       Current status: <span className="font-medium capitalize">{enrollment.status}</span>
                     </p>
                     <p className="text-sm text-neutral-500">
-                      Group assignment: <span className="font-medium">{enrollment.group_id ? `Group ${enrollment.group_id}` : 'Not assigned'}</span>
+                      Group assignment: <span className="font-medium">{enrollment.group?.id ? `Group ${enrollment.group.group_number}` : 'Not assigned'}</span>
                     </p>
                   </div>
                 </CardBody>
@@ -178,7 +152,7 @@ export default async function StudentSchedule() {
                         <MapPin className="h-4 w-4 text-neutral-400" />
                         <span className="text-sm text-neutral-600">Group</span>
                       </div>
-                      <p className="font-medium text-neutral-900">Group {enrollment.group_id}</p>
+                      <p className="font-medium text-neutral-900">Group {enrollment.group?.group_number}</p>
                     </div>
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
@@ -197,74 +171,114 @@ export default async function StudentSchedule() {
                 </CardBody>
               </Card>
 
-              {/* Upcoming Practicals */}
-              <UpcomingPracticals
-                practicals={data.upcomingPracticals}
-                limit={5}
-              />
-
-              {/* Practical Calendar */}
-              <Card shadow="sm" className="w-full">
-                <CardHeader className="flex items-center gap-2">
-                  <Calendar className="h-5 w-5 text-primary" />
-                  <p className="text-xl font-medium leading-normal">Practical Calendar</p>
-                </CardHeader>
-                <Divider />
-                <CardBody className="p-6">
-                  <PracticalCalendar
-                    practicalDates={data.upcomingPracticals.map((practical: any) => ({
-                      date: practical.date,
-                      venue: practical.venue,
-                      time: practical.time
-                    }))}
-                    viewMode="month"
-                  />
-                </CardBody>
-              </Card>
-
-              {/* Schedule Information */}
-              <Card shadow="sm" className="w-full">
-                <CardHeader className="flex items-center gap-2">
-                  <Clock className="h-5 w-5 text-primary" />
-                  <p className="text-xl font-medium leading-normal">Schedule Information</p>
-                </CardHeader>
-                <Divider />
-                <CardBody className="p-6">
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="space-y-3">
-                        <h3 className="font-medium text-neutral-900">Regular Schedule</h3>
-                        <div className="space-y-2 text-sm">
-                          <div className="flex items-center gap-2">
-                            <Calendar className="h-4 w-4 text-neutral-400" />
-                            <span className="text-neutral-600">Days:</span>
-                            <span className="font-medium">Monday, Wednesday, Friday</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Clock className="h-4 w-4 text-neutral-400" />
-                            <span className="text-neutral-600">Time:</span>
-                            <span className="font-medium">10:00 AM - 12:00 PM</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <MapPin className="h-4 w-4 text-neutral-400" />
-                            <span className="text-neutral-600">Location:</span>
-                            <span className="font-medium">Lab 1, Computer Science Building</span>
+              {/* Skill Date Range Information */}
+              {enrollment.skill && (enrollment.skill.date_range_start || enrollment.skill.date_range_end) && (
+                <Card shadow="sm" className="w-full">
+                  <CardHeader className="flex items-center gap-2">
+                    <Clock className="h-5 w-5 text-primary" />
+                    <p className="text-xl font-medium leading-normal">Practical Schedule</p>
+                  </CardHeader>
+                  <Divider />
+                  <CardBody className="p-6">
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-3">
+                          <h3 className="font-medium text-neutral-900">Schedule Period</h3>
+                          <div className="space-y-2 text-sm">
+                            {enrollment.skill.date_range_start && (
+                              <div className="flex items-center gap-2">
+                                <Calendar className="h-4 w-4 text-neutral-400" />
+                                <span className="text-neutral-600">Start Date:</span>
+                                <span className="font-medium">
+                                  {new Date(enrollment.skill.date_range_start).toLocaleDateString()}
+                                </span>
+                              </div>
+                            )}
+                            {enrollment.skill.date_range_end && (
+                              <div className="flex items-center gap-2">
+                                <Calendar className="h-4 w-4 text-neutral-400" />
+                                <span className="text-neutral-600">End Date:</span>
+                                <span className="font-medium">
+                                  {new Date(enrollment.skill.date_range_end).toLocaleDateString()}
+                                </span>
+                              </div>
+                            )}
+                            {enrollment.skill.exclude_weekends && (
+                              <div className="flex items-center gap-2">
+                                <Clock className="h-4 w-4 text-neutral-400" />
+                                <span className="text-neutral-600">Schedule:</span>
+                                <span className="font-medium">Weekdays only</span>
+                              </div>
+                            )}
                           </div>
                         </div>
-                      </div>
-                      <div className="space-y-3">
-                        <h3 className="font-medium text-neutral-900">Important Notes</h3>
-                        <div className="space-y-2 text-sm text-neutral-600">
-                          <p>• Arrive 10 minutes before scheduled time</p>
-                          <p>• Bring your student ID and QR code scanner</p>
-                          <p>• Notify your mentor if you&apos;ll be late or absent</p>
-                          <p>• Check for schedule changes before each session</p>
+                        <div className="space-y-3">
+                          <h3 className="font-medium text-neutral-900">Important Notes</h3>
+                          <div className="space-y-2 text-sm text-neutral-600">
+                            <p>• Bring your student ID and QR code scanner</p>
+                            <p>• Notify your mentor if you&apos;ll be late or absent</p>
+                            <p>• Check for schedule updates from your mentor</p>
+                            <p>• Specific session times will be announced by your mentor</p>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                </CardBody>
-              </Card>
+                  </CardBody>
+                </Card>
+              )}
+
+              {/* Academic Session Information */}
+              {enrollment.academic_session && (
+                <Card shadow="sm" className="w-full">
+                  <CardHeader className="flex items-center gap-2">
+                    <Calendar className="h-5 w-5 text-primary" />
+                    <p className="text-xl font-medium leading-normal">Academic Session</p>
+                  </CardHeader>
+                  <Divider />
+                  <CardBody className="p-6">
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-3">
+                          <h3 className="font-medium text-neutral-900">Session Details</h3>
+                          <div className="space-y-2 text-sm">
+                            <div className="flex items-center gap-2">
+                              <Calendar className="h-4 w-4 text-neutral-400" />
+                              <span className="text-neutral-600">Session:</span>
+                              <span className="font-medium">{enrollment.academic_session.name}</span>
+                            </div>
+                            {enrollment.academic_session.starts_at && (
+                              <div className="flex items-center gap-2">
+                                <Clock className="h-4 w-4 text-neutral-400" />
+                                <span className="text-neutral-600">Start Date:</span>
+                                <span className="font-medium">
+                                  {new Date(enrollment.academic_session.starts_at).toLocaleDateString()}
+                                </span>
+                              </div>
+                            )}
+                            {enrollment.academic_session.ends_at && (
+                              <div className="flex items-center gap-2">
+                                <Clock className="h-4 w-4 text-neutral-400" />
+                                <span className="text-neutral-600">End Date:</span>
+                                <span className="font-medium">
+                                  {new Date(enrollment.academic_session.ends_at).toLocaleDateString()}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        <div className="space-y-3">
+                          <h3 className="font-medium text-neutral-900">Session Status</h3>
+                          <div className="space-y-2 text-sm text-neutral-600">
+                            <p>• Current academic session for your enrollment</p>
+                            <p>• All practical activities occur within this period</p>
+                            <p>• Contact your mentor for specific session details</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </CardBody>
+                </Card>
+              )}
             </div>
           );
         }}

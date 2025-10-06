@@ -4,7 +4,7 @@
 
 import React from 'react';
 import { getCurrentUser } from '@/lib/auth';
-import { studentsApi } from '@/lib/api';
+import { studentsApi, enrollmentsApi } from '@/lib/api';
 import StudentSkillsClient from './StudentSkillsClient';
 import { NotificationContainer } from '@/components/shared/NotificationContainer';
 import { StateRenderer } from '@/components/shared/StateRenderer';
@@ -17,28 +17,33 @@ export const dynamic = 'force-dynamic';
 interface SkillsPageData {
   profile: any;
   availableSkills: any[];
+  enrollment: any;
 }
 
 async function getSkillsPageData(userId: string): Promise<SkillsPageData> {
   try {
-    // Fetch profile and available skills in parallel
-    const [profileResponse, skillsResponse] = await Promise.allSettled([
+    // Fetch profile, available skills, and enrollment in parallel
+    const [profileResponse, skillsResponse, enrollmentResponse] = await Promise.allSettled([
       studentsApi.getProfile(userId),
-      studentsApi.getAvailableSkills(userId)
+      studentsApi.getAvailableSkills(userId),
+      enrollmentsApi.getUserEnrollment(userId)
     ]);
 
     const profile = profileResponse.status === 'fulfilled' ? profileResponse.value.data : null;
     const availableSkills = skillsResponse.status === 'fulfilled' ? skillsResponse.value.data : [];
+    const enrollment = enrollmentResponse.status === 'fulfilled' ? enrollmentResponse.value.data : null;
 
     return {
       profile,
-      availableSkills
+      availableSkills,
+      enrollment
     };
   } catch (error) {
     console.error('Error fetching skills page data:', error);
     return {
       profile: null,
-      availableSkills: []
+      availableSkills: [],
+      enrollment: null
     };
   }
 }
@@ -171,6 +176,7 @@ export default async function StudentSkills() {
           <StudentSkillsClient
             availableSkills={skills}
             studentLevel={data.profile.student_level}
+            enrollment={data.enrollment}
           />
         )}
       </StateRenderer>

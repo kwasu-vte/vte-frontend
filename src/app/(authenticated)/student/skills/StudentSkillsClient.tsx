@@ -8,9 +8,10 @@ import SkillDetailModal from '@/components/features/student/SkillDetailModal'
 interface StudentSkillsClientProps {
   availableSkills: any[]
   studentLevel: string
+  enrollment: any
 }
 
-export default function StudentSkillsClient({ availableSkills, studentLevel }: StudentSkillsClientProps) {
+export default function StudentSkillsClient({ availableSkills, studentLevel, enrollment }: StudentSkillsClientProps) {
   const router = useRouter()
   const [selectedSkillId, setSelectedSkillId] = React.useState<string | null>(null)
   const selectedSkill = React.useMemo(() => availableSkills.find(s => s.id === selectedSkillId) || null, [availableSkills, selectedSkillId])
@@ -29,6 +30,7 @@ export default function StudentSkillsClient({ availableSkills, studentLevel }: S
       <SkillSelectionGrid
         availableSkills={availableSkills}
         studentLevel={studentLevel}
+        enrollment={enrollment}
         onSelectSkill={handleSelectSkill}
         isLoading={false}
       />
@@ -38,6 +40,7 @@ export default function StudentSkillsClient({ availableSkills, studentLevel }: S
         onEnroll={handleEnroll}
         skill={selectedSkill}
         studentLevel={studentLevel}
+        enrollment={enrollment}
       />
     </>
   )

@@ -50,7 +50,7 @@ async function getProfilePageData(userId: string): Promise<ProfilePageData> {
           
           if (attendanceData) {
             // Calculate attendance stats from the report
-            const totalEnrolled = parseInt(attendanceData.group_info?.total_enrolled || '0');
+            const totalEnrolled = parseInt(String(attendanceData.group_info?.total_enrolled || '0'));
             const attendedStudents = attendanceData.students?.length || 0;
             
             attendanceSummary = {
