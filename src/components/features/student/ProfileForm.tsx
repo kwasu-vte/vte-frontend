@@ -81,12 +81,12 @@ function ProfileForm({ onSubmit, initialData, isLoading = false }: ProfileFormPr
   const validateForm = (): boolean => {
     const newErrors: Partial<Record<keyof CreateStudentProfilePayload, string>> = {}
 
-    // Matric number validation (format: 11/22AB/12345)
-   if (!formData.matric_number.trim()) {
-  newErrors.matric_number = 'Matric number is required'
-} else if (!/^\d{2}\/\d{2}[A-Z]{2}\/\d{4,5}$/i.test(formData.matric_number.trim())) {
-  newErrors.matric_number = 'Format must be like 11/22AB/1234 or 11/22AB/12345'
-}
+    // Matric number validation (format: 11/22AB/12345 or 11/22AB/1234)
+    if (!formData.matric_number.trim()) {
+      newErrors.matric_number = 'Matric number is required'
+    } else if (!/^\d{2}\/\d{2}[A-Z]{2}\/\d{4,5}$/i.test(formData.matric_number.trim())) {
+      newErrors.matric_number = 'Format must be like 11/22AB/12345 or 11/22AB/1234'
+    }
 
     // Level validation
     if (!formData.student_level) {
