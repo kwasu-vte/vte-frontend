@@ -15,6 +15,7 @@ export function FloatingInstallPrompt() {
   const [visible, setVisible] = useState(false)
   const [isInstalled, setIsInstalled] = useState(false)
   const isIOS = useMemo(() => /iPad|iPhone|iPod/.test(typeof navigator !== 'undefined' ? navigator.userAgent : ''), [])
+  const isFirefox = useMemo(() => /firefox/i.test(typeof navigator !== 'undefined' ? navigator.userAgent : ''), [])
 
   useEffect(() => {
     // * Detect installed
@@ -29,6 +30,7 @@ export function FloatingInstallPrompt() {
     const throttleMs = 6 * 60 * 60 * 1000 // 6 hours
 
     // * Fallback visibility even if beforeinstallprompt hasn't fired yet
+    // * Includes Firefox (no native prompt)
     if (!isIOS && !standalone) {
       const last = localStorage.getItem(storageKey)
       const now = Date.now()
@@ -91,9 +93,15 @@ export function FloatingInstallPrompt() {
       </div>
       <div className="flex-1">
         <div className="font-medium text-neutral-900">Install KWASU VTE</div>
-        <div className="text-sm text-neutral-600 mt-0.5">Add the app for faster access and offline support.</div>
+        <div className="text-sm text-neutral-600 mt-0.5">
+          {isFirefox && !deferredPrompt
+            ? 'Add this site to your home screen from your browser menu.'
+            : 'Add the app for faster access and offline support.'}
+        </div>
         <div className="mt-3 flex items-center gap-2">
-          <Button onClick={onInstall} size="sm" disabled={!deferredPrompt}>Install</Button>
+          <Button onClick={onInstall} size="sm" disabled={!deferredPrompt}>
+            {isFirefox && !deferredPrompt ? 'How to install' : 'Install'}
+          </Button>
           <Button onClick={onDismiss} size="sm" variant="outline">Maybe later</Button>
         </div>
       </div>
