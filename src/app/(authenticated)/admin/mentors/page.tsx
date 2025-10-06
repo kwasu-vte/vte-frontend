@@ -12,7 +12,7 @@ import { MentorModal } from '@/components/features/admin/MentorModal';
 import MentorSkillAssignment from '@/components/features/mentor/MentorSkillAssignment';
 import { mentorsApi } from '@/lib/api';
 import { MentorProfile, CreateMentorProfilePayload } from '@/lib/types';
-import { Button, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@nextui-org/react';
+import { Button, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Card, CardHeader, CardBody, Chip } from '@nextui-org/react';
 import { Plus, Search, Eye, AlertTriangle } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { getErrorMessage, getErrorTitle, getSuccessTitle, getSuccessMessage } from '@/lib/error-handling';
@@ -192,25 +192,33 @@ export default function AdminMentorsPage() {
         </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow-sm border border-neutral-200">
-        <MentorsTable
-          mentors={mentors}
-          isLoading={isLoading}
-          error={error as Error | null}
-          onView={openViewModal}
-          onManageProfile={openEditModal}
-          onManageGroups={(mentor) => {
-            // TODO: Navigate to groups management for this mentor
-            addNotification({
-              type: 'info',
-              title: 'Feature Coming Soon',
-              message: `Groups management for ${mentor.full_name || `${mentor.user.first_name} ${mentor.user.last_name}`} will be available soon.`,
-            });
-          }}
-          onAssignSkills={openAssignSkillsModal}
-          onCreate={openCreateModal}
-        />
-      </div>
+      <Card shadow="sm">
+        <CardHeader className="flex items-center justify-between px-4 pt-4">
+          <div className="flex items-center gap-3">
+            <p className="text-base font-medium text-neutral-900">Mentors</p>
+            <Chip variant="flat">{mentors?.length || 0}</Chip>
+          </div>
+        </CardHeader>
+        <CardBody className="px-4 pb-4">
+          <MentorsTable
+            mentors={mentors}
+            isLoading={isLoading}
+            error={error as Error | null}
+            onView={openViewModal}
+            onManageProfile={openEditModal}
+            onManageGroups={(mentor) => {
+              // TODO: Navigate to groups management for this mentor
+              addNotification({
+                type: 'info',
+                title: 'Feature Coming Soon',
+                message: `Groups management for ${mentor.full_name || `${mentor.user.first_name} ${mentor.user.last_name}`} will be available soon.`,
+              });
+            }}
+            onAssignSkills={openAssignSkillsModal}
+            onCreate={openCreateModal}
+          />
+        </CardBody>
+      </Card>
 
       {/* * Create Mentor Modal */}
       <MentorModal
@@ -416,17 +424,19 @@ export default function AdminMentorsPage() {
         </ModalContent>
       </Modal>
 
-      {/* * Debug Information */}
-      <div className="bg-neutral-50 p-4 rounded-lg">
-        <h3 className="font-semibold text-neutral-900 mb-2">Debug Information</h3>
-        <div className="text-sm text-neutral-600 space-y-1">
-          <p><strong>Loading:</strong> {isLoading ? 'Yes' : 'No'}</p>
-          <p><strong>Error:</strong> {error ? error.message : 'None'}</p>
-          <p><strong>Data Count:</strong> {mentors?.length || 0}</p>
-          <p><strong>Query Key:</strong> [&#39;mentors&#39;]</p>
-          <p><strong>Mutations:</strong> Create: {createMentorMutation.isPending ? 'Pending' : 'Idle'}</p>
+      {/* * Debug Information (hidden in production) */}
+      {process.env.NODE_ENV !== 'production' && (
+        <div className="bg-neutral-50 p-4 rounded-lg">
+          <h3 className="font-semibold text-neutral-900 mb-2">Debug Information</h3>
+          <div className="text-sm text-neutral-600 space-y-1">
+            <p><strong>Loading:</strong> {isLoading ? 'Yes' : 'No'}</p>
+            <p><strong>Error:</strong> {error ? (error as Error).message : 'None'}</p>
+            <p><strong>Data Count:</strong> {mentors?.length || 0}</p>
+            <p><strong>Query Key:</strong> [&#39;mentors&#39;]</p>
+            <p><strong>Mutations:</strong> Create: {createMentorMutation.isPending ? 'Pending' : 'Idle'}</p>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

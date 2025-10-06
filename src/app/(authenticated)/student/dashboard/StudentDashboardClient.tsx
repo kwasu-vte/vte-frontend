@@ -12,7 +12,7 @@ import { GroupAssignmentCard } from '@/components/features/student/GroupAssignme
 import { QuickActions } from '@/components/features/student/QuickActions';
 import { NotificationContainer } from '@/components/shared/NotificationContainer';
 import { StateRenderer } from '@/components/shared/StateRenderer';
-import { Card, CardBody, CardHeader, Skeleton, Button } from '@nextui-org/react';
+import { Card, CardBody, CardHeader, Skeleton, Button, Chip } from '@nextui-org/react';
 import { ListSkeleton, CardGridSkeleton } from '@/components/shared/Skeletons';
 import Link from 'next/link';
 import { BookOpen, CreditCard, Users } from 'lucide-react';
@@ -51,6 +51,76 @@ export function StudentDashboardClient({ userId }: StudentDashboardClientProps) 
           />
         </>
       )}
+
+      {/* Guided Next Step Callout */}
+      <div>
+        <StateRenderer
+          data={{ profile, enrollment }}
+          isLoading={isLoading}
+          error={error}
+          onRetry={() => window.location.reload()}
+          loadingComponent={null}
+          emptyComponent={null}
+        >
+          {() => {
+            const status = (enrollment?.status || '').toString().toLowerCase()
+            const payStatus = (enrollment?.payment_status || '').toString().toLowerCase()
+            let title = 'You are all set'
+            let desc = 'Explore your dashboard to see upcoming practicals and quick actions.'
+            let ctaHref: string | null = null
+            let ctaLabel = ''
+
+            if (!profile) {
+              title = 'Complete your profile'
+              desc = 'Add your details to get personalized guidance and enable enrollment.'
+              ctaHref = '/student/profile'
+              ctaLabel = 'Complete Profile'
+            } else if (!enrollment) {
+              title = 'Enroll in a skill'
+              desc = 'Choose a practical training program to get started.'
+              ctaHref = '/student/skills'
+              ctaLabel = 'Browse Skills'
+            } else if (payStatus === 'failed') {
+              title = 'Payment failed'
+              desc = 'Retry your payment to continue with your enrollment.'
+              ctaHref = '/student/enrollment'
+              ctaLabel = 'Retry Payment'
+            } else if (payStatus.includes('pending') || payStatus === 'unpaid' || status === 'unpaid' || status.includes('pending')) {
+              title = 'Payment pending'
+              desc = 'Complete your payment to secure your spot.'
+              ctaHref = '/student/enrollment'
+              ctaLabel = 'Go to Payment'
+            } else if (['paid','assigned','active'].includes(status)) {
+              const awaitingGroup = status === 'paid' && !enrollment.group?.id
+              title = awaitingGroup ? 'Awaiting group assignment' : 'Group assigned'
+              desc = awaitingGroup ? 'You will be assigned to a group soon.' : 'Review your group and schedule.'
+              ctaHref = awaitingGroup ? '/student/enrollment' : '/student/my-group'
+              ctaLabel = awaitingGroup ? 'View Enrollment' : 'View Group'
+            } else if (status === 'cancelled') {
+              title = 'Enrollment cancelled'
+              desc = 'You can choose another skill and enroll again.'
+              ctaHref = '/student/skills'
+              ctaLabel = 'Browse Skills'
+            }
+
+            return (
+              <Card shadow="sm" className="w-full border-primary-200 bg-primary-50">
+                <CardHeader className="flex items-center justify-between px-4 pt-4">
+                  <div>
+                    <p className="text-lg font-medium leading-normal">{title}</p>
+                    <p className="text-sm text-neutral-700 mt-1">{desc}</p>
+                  </div>
+                  {ctaHref && (
+                    <Button as={Link} href={ctaHref} color="primary" size="sm">
+                      {ctaLabel}
+                    </Button>
+                  )}
+                </CardHeader>
+              </Card>
+            )
+          }}
+        </StateRenderer>
+      </div>
 
       {/* Main Dashboard Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

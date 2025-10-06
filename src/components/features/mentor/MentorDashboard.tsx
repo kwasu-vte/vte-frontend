@@ -6,6 +6,7 @@ import MentorGroupsList from "@/components/features/mentor/MentorGroupsList"
 import PracticalCalendar from "@/components/features/student/PracticalCalendar"
 import { StateRenderer, DefaultLoadingComponent, DefaultEmptyComponent } from "@/components/shared/StateRenderer"
 import { StartTourButton } from "@/components/shared/StartTourButton"
+import { useQueryClient } from "@tanstack/react-query"
 
 export type MentorDashboardProps = {
   userId: string
@@ -14,6 +15,7 @@ export type MentorDashboardProps = {
 export default function MentorDashboard(props: MentorDashboardProps) {
   const { userId } = props
   const { profile, skills, groups, todaysGroups, attendanceReport, isLoading, error } = useMentorDashboardData(userId)
+  const queryClient = useQueryClient()
 
   // Pick a primary group for right-panel reports (fallback logic)
   const primaryGroup = React.useMemo(() => (groups && groups.length > 0 ? groups[0] : null), [groups])
@@ -35,7 +37,22 @@ export default function MentorDashboard(props: MentorDashboardProps) {
         </div>
         <div className="flex items-center gap-3">
           <StartTourButton tour="mentor-dashboard" label="Start Tour" />
-          <Button color="primary" variant="bordered" onPress={() => window.location.reload()}>Refresh</Button>
+          <Button
+            color="primary"
+            variant="bordered"
+            aria-label="Refresh dashboard data"
+            isDisabled={isLoading}
+            onPress={async () => {
+              await Promise.all([
+                queryClient.invalidateQueries({ queryKey: ['mentor-profile', userId] }),
+                queryClient.invalidateQueries({ queryKey: ['mentor-assigned-skills', userId] }),
+                queryClient.invalidateQueries({ queryKey: ['mentor-skill-groups', userId] }),
+                queryClient.invalidateQueries({ queryKey: ['group-attendance-report'] }),
+              ])
+            }}
+          >
+            {isLoading ? 'Refreshing…' : 'Refresh'}
+          </Button>
         </div>
       </div>
 
@@ -43,15 +60,15 @@ export default function MentorDashboard(props: MentorDashboardProps) {
         {/* Left: TodaySchedule + RecentScans */}
         <div className="lg:col-span-2 space-y-6">
           {/* Today Schedule */}
-          <Card shadow="sm" className="p-4" id="mentor-today-schedule">
-            <CardHeader className="flex items-center justify-between">
+          <Card shadow="sm" id="mentor-today-schedule">
+            <CardHeader className="flex items-center justify-between px-4 pt-4">
               <div>
                 <p className="text-base font-medium text-neutral-900">Today&apos;s Schedule</p>
                 <p className="text-sm text-neutral-500">Derived from your assigned groups</p>
               </div>
               <Chip variant="flat">{today.toLocaleDateString()}</Chip>
             </CardHeader>
-            <CardBody>
+            <CardBody className="px-4 pb-4">
               <StateRenderer
                 data={todaysGroups}
                 isLoading={isLoading}
@@ -63,15 +80,15 @@ export default function MentorDashboard(props: MentorDashboardProps) {
                 {(data) => (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {data.map((g) => (
-                      <Card key={g.id} shadow="sm" className="p-4">
-                        <CardHeader className="flex items-center justify-between">
+                      <Card key={g.id} shadow="sm">
+                        <CardHeader className="flex items-center justify-between px-4 pt-4">
                           <div>
                             <p className="text-base font-medium text-neutral-900">{(g as any).group_display_name ?? `Group ${g.group_number ?? g.id}`}</p>
                             <p className="text-sm text-neutral-500">{g.skill?.title ?? "Unknown Skill"}</p>
                           </div>
                           <Chip size="sm" color="primary" variant="flat">#{g.group_number ?? g.id}</Chip>
                         </CardHeader>
-                        <CardBody>
+                        <CardBody className="px-4 pb-4">
                           <p className="text-sm text-neutral-600">Next practical</p>
                           <p className="text-sm font-medium text-neutral-900">{(g as any)?.next_practical_at ? new Date((g as any).next_practical_at as string).toLocaleString() : "—"}</p>
                         </CardBody>
@@ -84,37 +101,35 @@ export default function MentorDashboard(props: MentorDashboardProps) {
           </Card>
 
           {/* Attendance Summary */}
-          <Card shadow="sm" className="p-4" id="mentor-attendance-summary">
-            <CardHeader className="flex items-center justify-between">
+          <Card shadow="sm" id="mentor-attendance-summary">
+            <CardHeader className="flex items-center justify-between px-4 pt-4">
               <p className="text-base font-medium text-neutral-900">Attendance Summary</p>
               {primaryGroup && <Chip variant="flat">Group #{primaryGroup.group_number ?? primaryGroup.id}</Chip>}
             </CardHeader>
-            <CardBody>
+            <CardBody className="px-4 pb-4">
               {isLoading ? (
                 <div className="space-y-4">
                   <Skeleton className="h-8 w-48 rounded-md" />
                   <Skeleton className="h-64 w-full rounded-md" />
                 </div>
               ) : attendanceReport ? (
-                <Tabs aria-label="Attendance Summary" variant="underlined">
-                  <Tab key="report" title="Report">
-                    <div className="text-sm text-neutral-600 mb-3">Attendance summary for your primary group.</div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <Card shadow="sm" className="p-4">
-                        <CardHeader className="text-sm text-neutral-600">Skill</CardHeader>
-                        <CardBody className="text-base font-medium text-neutral-900">{attendanceReport.group_info.skill_title}</CardBody>
-                      </Card>
-                      <Card shadow="sm" className="p-4">
-                        <CardHeader className="text-sm text-neutral-600">Total Enrolled</CardHeader>
-                        <CardBody className="text-base font-medium text-neutral-900">{attendanceReport.group_info.total_enrolled}</CardBody>
-                      </Card>
-                      <Card shadow="sm" className="p-4">
-                        <CardHeader className="text-sm text-neutral-600">Practical Date</CardHeader>
-                        <CardBody className="text-base font-medium text-neutral-900">{attendanceReport.group_info.practical_date ? new Date(attendanceReport.group_info.practical_date).toLocaleDateString() : "—"}</CardBody>
-                      </Card>
-                    </div>
-                  </Tab>
-                </Tabs>
+                <div>
+                  <div className="text-sm text-neutral-600 mb-3">Attendance summary for your primary group.</div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <Card shadow="sm">
+                      <CardHeader className="text-sm text-neutral-600 px-4 pt-4">Skill</CardHeader>
+                      <CardBody className="text-base font-medium text-neutral-900 px-4 pb-4">{attendanceReport.group_info.skill_title}</CardBody>
+                    </Card>
+                    <Card shadow="sm">
+                      <CardHeader className="text-sm text-neutral-600 px-4 pt-4">Total Enrolled</CardHeader>
+                      <CardBody className="text-base font-medium text-neutral-900 px-4 pb-4">{attendanceReport.group_info.total_enrolled}</CardBody>
+                    </Card>
+                    <Card shadow="sm">
+                      <CardHeader className="text-sm text-neutral-600 px-4 pt-4">Practical Date</CardHeader>
+                      <CardBody className="text-base font-medium text-neutral-900 px-4 pb-4">{attendanceReport.group_info.practical_date ? new Date(attendanceReport.group_info.practical_date).toLocaleDateString() : "—"}</CardBody>
+                    </Card>
+                  </div>
+                </div>
               ) : (
                 <div className="text-sm text-neutral-500">No attendance report available.</div>
               )}
@@ -125,11 +140,11 @@ export default function MentorDashboard(props: MentorDashboardProps) {
         {/* Right: Upcoming Calendar */}
         <div className="lg:col-span-1 space-y-6">
           {/* Upcoming Calendar */}
-          <Card shadow="sm" className="p-4">
-            <CardHeader>
+          <Card shadow="sm">
+            <CardHeader className="px-4 pt-4">
               <p className="text-base font-medium text-neutral-900">Upcoming Calendar</p>
             </CardHeader>
-            <CardBody>
+            <CardBody className="px-4 pb-4">
               <PracticalCalendar
                 practicalDates={(groups ?? []).flatMap((g) =>
                   (g.practical_dates ?? []).map((d) => ({ date: d }))
@@ -141,11 +156,11 @@ export default function MentorDashboard(props: MentorDashboardProps) {
       </div>
 
       {/* All Groups quick glance (optional summary) */}
-      <Card shadow="sm" className="p-4">
-        <CardHeader>
+      <Card shadow="sm">
+        <CardHeader className="px-4 pt-4">
           <p className="text-base font-medium text-neutral-900">My Groups</p>
         </CardHeader>
-        <CardBody>
+        <CardBody className="px-4 pb-4">
           <StateRenderer
             data={groups}
             isLoading={isLoading}

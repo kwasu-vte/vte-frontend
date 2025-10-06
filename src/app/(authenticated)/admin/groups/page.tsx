@@ -9,7 +9,7 @@ import { useClientQuery } from '@/lib/hooks/useClientQuery';
 import { StateRenderer, DefaultLoadingComponent, DefaultErrorComponent, DefaultEmptyComponent } from '@/components/shared/StateRenderer';
 import { GroupsTable } from '@/components/features/admin/GroupsTable';
 import { skillGroupsApi } from '@/lib/api';
-import { Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@nextui-org/react';
+import { Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Card, CardHeader, CardBody, Chip } from '@nextui-org/react';
 import { Eye } from 'lucide-react';
 import type { Group } from '@/lib/types';
 
@@ -66,52 +66,45 @@ export default function AdminGroupsPage() {
       </div>
 
       {/* * Groups Table with StateRenderer */}
-      <div className="bg-white rounded-lg shadow-sm border border-neutral-200">
-        <StateRenderer
-          data={groups}
-          isLoading={isLoading}
-          error={error}
-          loadingComponent={
-            <div className="p-6">
-              <DefaultLoadingComponent />
-            </div>
-          }
-          errorComponent={
-            <div className="p-6">
-              <DefaultErrorComponent 
-                error={error!} 
-                onRetry={() => refetch()} 
+      <Card shadow="sm">
+        <CardHeader className="flex items-center justify-between px-4 pt-4">
+          <div className="flex items-center gap-3">
+            <p className="text-base font-medium text-neutral-900">Groups</p>
+            <Chip variant="flat">{groups?.length || 0}</Chip>
+          </div>
+        </CardHeader>
+        <CardBody className="px-4 pb-4">
+          <StateRenderer
+            data={groups}
+            isLoading={isLoading}
+            error={error}
+            loadingComponent={<div className="py-2"><DefaultLoadingComponent /></div>}
+            errorComponent={<div className="py-2"><DefaultErrorComponent error={error!} onRetry={() => refetch()} /></div>}
+            emptyComponent={<div className="py-6"><DefaultEmptyComponent message="No groups found." /></div>}
+          >
+            {(data) => (
+              <GroupsTable
+                groups={data}
+                onView={(group) => handleView(group)}
               />
-            </div>
-          }
-          emptyComponent={
-            <div className="p-6">
-              <DefaultEmptyComponent 
-                message="No groups found."
-              />
-            </div>
-          }
-        >
-          {(data) => (
-            <GroupsTable
-              groups={data}
-              onView={(group) => handleView(group)}
-            />
-          )}
-        </StateRenderer>
-      </div>
+            )}
+          </StateRenderer>
+        </CardBody>
+      </Card>
 
-      {/* * Debug Information */}
-      <div className="bg-neutral-50 p-4 rounded-lg">
-        <h3 className="font-semibold text-neutral-900 mb-2">Debug Information</h3>
-        <div className="text-sm text-neutral-600 space-y-1">
-          <p><strong>Loading:</strong> {isLoading ? 'Yes' : 'No'}</p>
-          <p><strong>Error:</strong> {error ? error.message : 'None'}</p>
-          <p><strong>Data Count:</strong> {groups?.length || 0}</p>
-          <p><strong>Query Key:</strong> [&apos;groups&apos;]</p>
-          <p><strong>Mode:</strong> Read-only</p>
+      {/* * Debug Information (hidden in production) */}
+      {process.env.NODE_ENV !== 'production' && (
+        <div className="bg-neutral-50 p-4 rounded-lg">
+          <h3 className="font-semibold text-neutral-900 mb-2">Debug Information</h3>
+          <div className="text-sm text-neutral-600 space-y-1">
+            <p><strong>Loading:</strong> {isLoading ? 'Yes' : 'No'}</p>
+            <p><strong>Error:</strong> {error ? (error as Error).message : 'None'}</p>
+            <p><strong>Data Count:</strong> {groups?.length || 0}</p>
+            <p><strong>Query Key:</strong> [&apos;groups&apos;]</p>
+            <p><strong>Mode:</strong> Read-only</p>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* * View Group Modal (read-only) */}
       <Modal isOpen={isViewOpen} onClose={closeView} size="lg" scrollBehavior="inside">

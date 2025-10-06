@@ -86,7 +86,7 @@ export default function MentorGroupsPageView(props: { userId: string }) {
             </Select>
           )}
         </div>
-        <Button variant="ghost" onPress={() => { setSkillFilter(null); setSearch("") }}>Reset</Button>
+        <Button variant="light" onPress={() => { setSkillFilter(null); setSearch("") }}>Reset</Button>
       </div>
 
       <Card shadow="sm" className="p-4">

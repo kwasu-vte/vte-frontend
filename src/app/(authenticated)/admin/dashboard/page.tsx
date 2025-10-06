@@ -11,6 +11,7 @@ import { StatCard, StatCardGrid } from '@/components/shared/StatCard';
 import { useAdminDashboardData } from '@/lib/hooks/use-admin-dashboard-data';
 import Link from 'next/link';
 import { ListSkeleton } from '@/components/shared/Skeletons';
+import { Button } from '@nextui-org/react';
 
 export default function AdminDashboard() {
   const { sessions, activeSession, statistics, recentEnrollments, isLoading, error } = useAdminDashboardData();
@@ -97,15 +98,15 @@ export default function AdminDashboard() {
         <div className="bg-white p-6 rounded-lg shadow-sm border border-neutral-200" id="admin-quick-actions">
           <h2 className="text-xl font-semibold text-neutral-900 mb-4">Quick Actions</h2>
           <div className="space-y-3">
-            <Link href="/admin/qr-codes" className="block w-full text-left px-4 py-3 rounded-lg bg-primary text-primary-foreground hover:bg-primary-600 transition-colors">
+            <Button as={Link} href="/admin/qr-codes" color="primary" className="w-full justify-start" aria-label="Generate QR Codes">
               Generate QR Codes
-            </Link>
-            <Link href="/admin/sessions" className="block w-full text-left px-4 py-3 rounded-lg bg-neutral-100 text-neutral-900 hover:bg-neutral-200 transition-colors">
+            </Button>
+            <Button as={Link} href="/admin/sessions" variant="bordered" className="w-full justify-start" aria-label="Manage Sessions">
               Manage Sessions
-            </Link>
-            <Link href="/admin/reports" className="block w-full text-left px-4 py-3 rounded-lg bg-neutral-100 text-neutral-900 hover:bg-neutral-200 transition-colors">
+            </Button>
+            <Button as={Link} href="/admin/reports" variant="bordered" className="w-full justify-start" aria-label="View Reports">
               View Reports
-            </Link>
+            </Button>
           </div>
           <div className="mt-6">
             <h3 className="text-sm font-medium text-neutral-900 mb-2">Sessions</h3>
