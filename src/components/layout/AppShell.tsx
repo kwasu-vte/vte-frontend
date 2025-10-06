@@ -11,7 +11,7 @@ import { Header } from './Header';
 import { NotificationContainer } from '@/components/shared/NotificationContainer';
 import { User } from '@/lib/types';
 import { useApp } from '@/context/AppContext';
-import RequirePWA from '@/components/shared/RequirePWA';
+import FloatingInstallPrompt from '@/components/shared/FloatingInstallPrompt';
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -39,13 +39,8 @@ export function AppShell({ children, user }: AppShellProps) {
         
         {/* * Page Content */}
         <main className="flex-1 overflow-y-auto p-6 md:p-8">
-          {user.role === 'Student' ? (
-            <RequirePWA>
-              {children}
-            </RequirePWA>
-          ) : (
-            <>{children}</>
-          )}
+          {children}
+          {user.role === 'Student' && <FloatingInstallPrompt />}
         </main>
       </div>
       

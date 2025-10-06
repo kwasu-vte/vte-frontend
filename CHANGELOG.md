@@ -731,3 +731,5 @@
 ## 2025-10-06T00:00:00Z
 ### Changed
 - UI: Hide all "Start Tour" buttons by rendering `StartTourButton` as a no-op component.
+### Fixed
+- PWA: Made student dashboard installation optional again. Removed hard `RequirePWA` gate and added non-blocking `FloatingInstallPrompt` for students.
