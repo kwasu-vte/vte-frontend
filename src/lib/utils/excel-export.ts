@@ -1,4 +1,5 @@
 import * as XLSX from 'xlsx';
+import { GroupStatistics, SkillGroup } from '../types';
 
 /**
  * * Excel Export Utilities
@@ -216,4 +217,143 @@ export function exportMultipleSheetsToExcel(
   });
   
   XLSX.writeFile(wb, filename);
+}
+
+/**
+ * * Export capacity overview report to Excel with proper formatting
+ * Creates a comprehensive Excel file with multiple sheets for capacity analysis
+ */
+export function exportCapacityOverviewToExcel(statistics: GroupStatistics, groups: SkillGroup[] = []): void {
+  // * Create new workbook
+  const wb = XLSX.utils.book_new();
+
+  // * Prepare summary sheet data
+  const summaryData = [
+    ['CAPACITY OVERVIEW REPORT SUMMARY'],
+    [''],
+    ['Report Generated', new Date().toLocaleString()],
+    [''],
+    ['SYSTEM STATISTICS'],
+    ['Total Groups', statistics.total_groups],
+    ['Total Students', statistics.total_students],
+    ['Average Students per Group', statistics.average_students_per_group],
+    ['Average Utilization', `${statistics.average_utilization}%`],
+    [''],
+    ['GROUP STATUS SUMMARY'],
+    ['Groups with Capacity', statistics.groups_with_capacity],
+    ['Full Groups', statistics.full_groups],
+    ['Empty Groups', statistics.empty_groups],
+    ['Partially Filled Groups', parseInt(statistics.total_groups) - parseInt(statistics.full_groups) - parseInt(statistics.empty_groups)],
+    [''],
+    ['UTILIZATION DISTRIBUTION'],
+    ['0-25%', statistics.utilization_distribution['0-25%']],
+    ['26-50%', statistics.utilization_distribution['26-50%']],
+    ['51-75%', statistics.utilization_distribution['51-75%']],
+    ['76-99%', statistics.utilization_distribution['76-99%']],
+    ['100%', statistics.utilization_distribution['100%']]
+  ];
+
+  // * Create summary worksheet
+  const summaryWs = XLSX.utils.aoa_to_sheet(summaryData);
+  
+  // * Style summary sheet
+  summaryWs['!cols'] = [
+    { wch: 25 }, // Column A
+    { wch: 20 }  // Column B
+  ];
+
+  // * Add summary sheet to workbook
+  XLSX.utils.book_append_sheet(wb, summaryWs, 'Summary');
+
+  // * Prepare detailed group data if available
+  if (groups.length > 0) {
+    const groupData = groups.map((group, index) => {
+      const current = parseInt(group.current_student_count);
+      const max = parseInt(group.max_student_capacity);
+      const utilization = max > 0 ? Math.round((current / max) * 100) : 0;
+      
+      return {
+        'S/N': index + 1,
+        'Group Name': group.group_display_name || `Group ${group.group_number}`,
+        'Skill Title': group.skill?.title || 'N/A',
+        'Current Students': current,
+        'Max Capacity': max,
+        'Utilization %': utilization,
+        'Capacity Remaining': group.capacity_remaining,
+        'Status': getCapacityStatus(current, max),
+        'Is Full': group.is_full ? 'Yes' : 'No',
+        'Has Capacity': group.has_capacity ? 'Yes' : 'No',
+        'Created Date': new Date(group.created_at).toLocaleDateString(),
+        'Updated Date': new Date(group.updated_at).toLocaleDateString()
+      };
+    });
+
+    // * Create groups worksheet
+    const groupsWs = XLSX.utils.json_to_sheet(groupData);
+
+    // * Set column widths for groups sheet
+    groupsWs['!cols'] = [
+      { wch: 5 },   // S/N
+      { wch: 20 },  // Group Name
+      { wch: 25 },  // Skill Title
+      { wch: 15 },  // Current Students
+      { wch: 12 },  // Max Capacity
+      { wch: 12 },  // Utilization %
+      { wch: 15 },  // Capacity Remaining
+      { wch: 12 },  // Status
+      { wch: 8 },   // Is Full
+      { wch: 12 },  // Has Capacity
+      { wch: 12 },  // Created Date
+      { wch: 12 }   // Updated Date
+    ];
+
+    // * Add groups sheet to workbook
+    XLSX.utils.book_append_sheet(wb, groupsWs, 'Group Details');
+  }
+
+  // * Prepare utilization analysis sheet
+  const utilizationData = [
+    ['UTILIZATION ANALYSIS'],
+    [''],
+    ['Range', 'Group Count', 'Percentage of Total'],
+    ['0-25%', statistics.utilization_distribution['0-25%'], `${Math.round((parseInt(statistics.utilization_distribution['0-25%']) / parseInt(statistics.total_groups)) * 100)}%`],
+    ['26-50%', statistics.utilization_distribution['26-50%'], `${Math.round((parseInt(statistics.utilization_distribution['26-50%']) / parseInt(statistics.total_groups)) * 100)}%`],
+    ['51-75%', statistics.utilization_distribution['51-75%'], `${Math.round((parseInt(statistics.utilization_distribution['51-75%']) / parseInt(statistics.total_groups)) * 100)}%`],
+    ['76-99%', statistics.utilization_distribution['76-99%'], `${Math.round((parseInt(statistics.utilization_distribution['76-99%']) / parseInt(statistics.total_groups)) * 100)}%`],
+    ['100%', statistics.utilization_distribution['100%'], `${Math.round((parseInt(statistics.utilization_distribution['100%']) / parseInt(statistics.total_groups)) * 100)}%`],
+    [''],
+    ['TOTAL', statistics.total_groups, '100%']
+  ];
+
+  // * Create utilization worksheet
+  const utilizationWs = XLSX.utils.aoa_to_sheet(utilizationData);
+  
+  // * Style utilization sheet
+  utilizationWs['!cols'] = [
+    { wch: 12 }, // Range
+    { wch: 15 }, // Group Count
+    { wch: 18 }  // Percentage
+  ];
+
+  // * Add utilization sheet to workbook
+  XLSX.utils.book_append_sheet(wb, utilizationWs, 'Utilization Analysis');
+
+  // * Generate filename
+  const currentDate = new Date().toISOString().split('T')[0];
+  const filename = `Capacity_Overview_Report_${currentDate}.xlsx`;
+
+  // * Download the file
+  XLSX.writeFile(wb, filename);
+}
+
+/**
+ * * Get capacity status based on current and max capacity
+ */
+function getCapacityStatus(current: number, max: number): string {
+  const percentage = max > 0 ? Math.round((current / max) * 100) : 0;
+  if (percentage >= 100) return 'Full';
+  if (percentage >= 80) return 'Near Full';
+  if (percentage >= 50) return 'Good';
+  if (percentage >= 25) return 'Low';
+  return 'Empty';
 }

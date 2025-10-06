@@ -7,8 +7,9 @@ import { useClientQuery } from '@/lib/hooks/useClientQuery';
 import { Button, Select, SelectItem, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Card, CardBody, CardHeader, Chip } from '@nextui-org/react';
 import { FileSpreadsheet, Calendar, Users } from 'lucide-react';
 import { exportAttendanceReportToExcel } from '@/lib/utils/excel-export';
-import { AttendanceReport } from '@/lib/types';
+import { AttendanceReport, GroupStatistics } from '@/lib/types';
 import { DefaultErrorComponent, DefaultLoadingComponent } from '@/components/shared/StateRenderer';
+import CapacityOverviewReport from '@/components/features/admin/CapacityOverviewReport';
 
 // * Helper functions for status and rating
 const getAttendanceStatus = (attendanceCount: number): string => {
@@ -66,7 +67,8 @@ export default function AdminReportsPage() {
         return (await qrCodesApi.getGroupAttendanceReport(Number(groupId))).data;
       }
       if (type === 'capacity') {
-        return (await skillGroupsApi.getStatistics()).data;
+        const statistics = (await skillGroupsApi.getStatistics()).data;
+        return { statistics, groups: groupsData || [] };
       }
       return null;
     },
@@ -231,20 +233,10 @@ export default function AdminReportsPage() {
 
             {/* * Capacity report display */}
             {type === 'capacity' && reportMutation.data && (
-              <Card shadow="sm" className="w-full">
-                <CardHeader className="flex items-center gap-2">
-                  <Users className="h-5 w-5 text-primary" />
-                  <div>
-                    <p className="text-xl font-medium leading-normal">Capacity Overview</p>
-                    <p className="text-sm text-neutral-600">System capacity statistics</p>
-                  </div>
-                </CardHeader>
-                <CardBody>
-                  <pre className="bg-neutral-50 border border-neutral-200 rounded p-4 overflow-auto text-xs">
-{JSON.stringify(reportMutation.data, null, 2)}
-                  </pre>
-                </CardBody>
-              </Card>
+              <CapacityOverviewReport 
+                statistics={reportMutation.data.statistics as GroupStatistics}
+                groups={reportMutation.data.groups || []}
+              />
             )}
           </div>
         )}

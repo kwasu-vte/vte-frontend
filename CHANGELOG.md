@@ -1,6 +1,12 @@
 ## [Unreleased]
 
 ### Added
+- **Capacity Overview Report**: New comprehensive capacity reporting system with Excel export functionality
+  - Viewable capacity overview with system statistics, utilization distribution, and group status summary
+  - Detailed group breakdown with capacity indicators and status chips
+  - Excel export with multiple sheets (Summary, Group Details, Utilization Analysis)
+  - Professional formatting with proper column widths and data organization
+  - Automatic date-stamped filename generation
 - Student Enrollment page now processes `skill` query param and fetches skill details.
 - Added enrollment creation and payment redirect flow using `confirm=1` guard.
 
