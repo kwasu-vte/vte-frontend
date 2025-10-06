@@ -71,7 +71,7 @@ function QuickActions({ enrollment, hasProfile = false }: QuickActionsProps) {
 
   return (
     <Card shadow="sm" className="w-full">
-      <CardHeader>
+      <CardHeader className="pb-2">
         <p className="text-xl font-medium leading-normal">Quick Actions</p>
       </CardHeader>
       <CardBody className="space-y-3">
@@ -83,7 +83,7 @@ function QuickActions({ enrollment, hasProfile = false }: QuickActionsProps) {
               href={action.href}
               color={action.color}
               variant="bordered"
-              className="h-auto p-4 justify-start"
+              className="h-auto p-4 justify-start hover:shadow-sm transition-shadow"
               startContent={<action.icon className="h-5 w-5" />}
             >
               <div className="text-left">

@@ -119,12 +119,6 @@ const navigationItems: NavigationItem[] = [
     icon: Calendar,
     role: ['Mentor'],
   },
-  {
-    href: '/mentor/my-qr-codes',
-    label: 'My QR Codes',
-    icon: QrCode,
-    role: ['Mentor'],
-  },
 
   // * Student Navigation
   {

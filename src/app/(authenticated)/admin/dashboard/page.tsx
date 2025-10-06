@@ -6,6 +6,7 @@
 
 import React from 'react';
 import PWATestPanel from '@/components/shared/PWATestPanel';
+import { StartTourButton } from '@/components/shared/StartTourButton';
 import { StatCard, StatCardGrid } from '@/components/shared/StatCard';
 import { useAdminDashboardData } from '@/lib/hooks/use-admin-dashboard-data';
 import Link from 'next/link';
@@ -22,7 +23,7 @@ export default function AdminDashboard() {
   return (
     <div className="space-y-6">
       {/* * Header */}
-      <div className="bg-white p-6 rounded-lg shadow-sm border border-neutral-200">
+      <div className="bg-white p-6 rounded-lg shadow-sm border border-neutral-200" id="admin-welcome">
         <div className="flex justify-between items-start">
           <div>
             <h1 className="text-3xl font-bold text-neutral-900 mb-2">Admin Dashboard</h1>
@@ -34,12 +35,15 @@ export default function AdminDashboard() {
               </span>
             </div>
           </div>
-          <PWATestPanel />
+          <div className="flex items-center gap-3">
+            <StartTourButton tour="admin-dashboard" label="Start Tour" className="px-3 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary-600" />
+            <PWATestPanel />
+          </div>
         </div>
       </div>
 
       {/* * Stats */}
-      <StatCardGrid>
+      <StatCardGrid id="admin-stats">
         <StatCard title="Total Groups" value={totalGroups} color="primary" />
         <StatCard title="Total Students" value={totalStudents} color="success" />
         <StatCard title="Full Groups" value={fullGroups} color="warning" />
@@ -90,7 +94,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* * Quick Actions */}
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-neutral-200">
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-neutral-200" id="admin-quick-actions">
           <h2 className="text-xl font-semibold text-neutral-900 mb-4">Quick Actions</h2>
           <div className="space-y-3">
             <Link href="/admin/qr-codes" className="block w-full text-left px-4 py-3 rounded-lg bg-primary text-primary-foreground hover:bg-primary-600 transition-colors">
