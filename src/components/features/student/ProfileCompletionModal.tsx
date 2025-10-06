@@ -10,20 +10,8 @@ export type ProfileCompletionModalProps = {
 
 function ProfileCompletionModal({ profile }: ProfileCompletionModalProps) {
   const missingFields = React.useMemo(() => {
-    const fields: string[] = []
     const hasMatric = Boolean((profile.matric_number || '').toString().trim())
-    const hasLevel = Boolean((profile.student_level || '').toString().trim())
-    const hasDepartment = Boolean((profile.department || '').toString().trim())
-    const hasPhone = Boolean((profile.phone || '').toString().trim())
-    const hasGender = Boolean((profile.gender || '').toString().trim())
-
-    if (!hasMatric) fields.push("Matric Number")
-    if (!hasLevel) fields.push("Level")
-    if (!hasDepartment) fields.push("Department")
-    // Faculty optional
-    if (!hasPhone) fields.push("Phone Number")
-    if (!hasGender) fields.push("Gender")
-    return fields
+    return hasMatric ? [] : ["Matric Number"]
   }, [profile])
 
   const isIncomplete = missingFields.length > 0

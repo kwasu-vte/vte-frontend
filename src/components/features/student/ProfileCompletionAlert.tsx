@@ -25,20 +25,8 @@ function ProfileCompletionAlert({ profile, dismissible = true, onDismiss }: Prof
 
   // Determine missing fields
   const missingFields = React.useMemo(() => {
-    const fields = [] as string[]
     const hasMatric = Boolean((profile.matric_number || '').toString().trim())
-    const hasLevel = Boolean((profile.student_level || '').toString().trim())
-    const hasDepartment = Boolean((profile.department || '').toString().trim())
-    const hasPhone = Boolean((profile.phone || '').toString().trim())
-    const hasGender = Boolean((profile.gender || '').toString().trim())
-
-    if (!hasMatric) fields.push("Matric Number")
-    if (!hasLevel) fields.push("Level")
-    if (!hasDepartment) fields.push("Department")
-    // Faculty is treated as optional; remove if business requires it
-    if (!hasPhone) fields.push("Phone Number")
-    if (!hasGender) fields.push("Gender")
-    return fields
+    return hasMatric ? [] : ["Matric Number"]
   }, [profile])
 
   const handleDismiss = () => {
