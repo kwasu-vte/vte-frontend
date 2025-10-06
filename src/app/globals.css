@@ -52,11 +52,7 @@
 
 /* * Base Typography & Contrast */
 @layer base {
-  html, body {
-    /* * Force light theme and high-contrast defaults */
-    color-scheme: light;
-    @apply bg-background text-foreground;
-  }
+  /* * Avoid forcing global html/body styles to prevent conflicts with NextUI theme in production */
 
   h1 {
     @apply text-3xl font-bold leading-tight text-foreground; /* Page Title */
