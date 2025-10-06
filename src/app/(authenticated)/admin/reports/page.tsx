@@ -61,7 +61,7 @@ export default function AdminReportsPage() {
 
   const groups = useMemo(() => (groupsData || []).map((g: any) => ({ id: g.id, name: g.group_display_name || `Group ${g.group_number}` })), [groupsData])
 
-  const reportMutation = useMutation({
+  const reportMutation = useMutation<AttendanceReport | { statistics: GroupStatistics; groups: any[] } | null>({
     mutationFn: async () => {
       if (type === 'attendance' && groupId) {
         return (await qrCodesApi.getGroupAttendanceReport(Number(groupId))).data;
@@ -232,9 +232,9 @@ export default function AdminReportsPage() {
             )}
 
             {/* * Capacity report display */}
-            {type === 'capacity' && reportMutation.data && (
+            {type === 'capacity' && reportMutation.data && 'statistics' in reportMutation.data && (
               <CapacityOverviewReport 
-                statistics={reportMutation.data.statistics as GroupStatistics}
+                statistics={reportMutation.data.statistics}
                 groups={reportMutation.data.groups || []}
               />
             )}

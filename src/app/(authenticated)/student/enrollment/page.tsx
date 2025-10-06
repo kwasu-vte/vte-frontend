@@ -258,11 +258,19 @@ export default async function StudentEnrollment({ searchParams }: { searchParams
             {(() => {
               const status = (enrollment.status || '').toString().toLowerCase();
               const payStatus = (enrollment.payment_status || '').toString().toLowerCase();
-              const hasPendingKeyword = (s: string) => s.includes('pending');
-              const isPaymentPending = hasPendingKeyword(status)
-                || hasPendingKeyword(payStatus)
+              
+              // * If user is assigned, don't show payment section regardless of payment_status
+              if (status === 'assigned' || status === 'paid') {
+                return false;
+              }
+              
+              // * Show payment section only if status is pending_payment or payment_status is pending/failed
+              const isPaymentPending = status === 'pending_payment' 
+                || payStatus === 'pending' 
+                || payStatus === 'failed'
                 || status === 'unpaid'
                 || payStatus === 'unpaid';
+              
               return isPaymentPending;
             })() && (
               <Card shadow="sm" className="w-full">

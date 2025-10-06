@@ -23,34 +23,30 @@ interface ProfilePageData {
 
 async function getProfilePageData(userId: string): Promise<ProfilePageData> {
   try {
-    // Fetch profile and enrollment data in parallel
-    const [profileResponse, enrollmentsResponse] = await Promise.allSettled([
+    // Fetch profile and current enrollment data in parallel
+    const [profileResponse, enrollmentResponse] = await Promise.allSettled([
       studentsApi.getProfile(userId),
-      enrollmentsApi.getAll({ per_page: 50 }) // Get recent enrollments
+      enrollmentsApi.getUserEnrollment(userId) // Only get current enrollment (students can't access all enrollments)
     ]);
 
     const profile = profileResponse.status === 'fulfilled' ? profileResponse.value.data : null;
-    const allEnrollments = enrollmentsResponse.status === 'fulfilled' ? enrollmentsResponse.value.data.items : [];
+    const currentEnrollment = enrollmentResponse.status === 'fulfilled' ? enrollmentResponse.value.data : null;
     
-    // Filter enrollments for this user
-    const userEnrollments = allEnrollments.filter((enrollment: any) => enrollment.user_id === userId);
+    // Students can only see their current enrollment, not full history
+    const userEnrollments = currentEnrollment ? [currentEnrollment] : [];
 
     // Derive attendance summary from QR scan data if user has an active enrollment
     let attendanceSummary = null;
-    if (profile && userEnrollments.length > 0) {
-      const activeEnrollment = userEnrollments.find((enrollment: any) => 
-        enrollment.status === 'assigned' || enrollment.status === 'active'
-      );
-      
-      if (activeEnrollment && activeEnrollment.group_id) {
+    if (profile && currentEnrollment && (currentEnrollment.status === 'assigned' || currentEnrollment.status === 'active')) {
+      if (currentEnrollment.group?.id) {
         try {
           // Get attendance report for the group
-          const attendanceResponse = await qrCodesApi.getGroupAttendanceReport(Number(activeEnrollment.group_id));
+          const attendanceResponse = await qrCodesApi.getGroupAttendanceReport(Number(currentEnrollment.group.id));
           const attendanceData = attendanceResponse.data;
           
           if (attendanceData) {
             // Calculate attendance stats from the report
-            const totalEnrolled = parseInt(attendanceData.group_info?.total_enrolled || '0');
+            const totalEnrolled = parseInt(String(attendanceData.group_info?.total_enrolled || '0'));
             const attendedStudents = attendanceData.students?.length || 0;
             
             attendanceSummary = {
@@ -153,11 +149,11 @@ export default async function StudentProfile() {
         )}
       </StateRenderer>
 
-      {/* Enrollment History */}
+      {/* Current Enrollment */}
       <Card shadow="sm" className="w-full">
         <CardHeader className="flex items-center gap-2">
           <History className="h-5 w-5 text-primary" />
-          <p className="text-xl font-medium leading-normal">Enrollment History</p>
+          <p className="text-xl font-medium leading-normal">Current Enrollment</p>
         </CardHeader>
         <CardBody className="p-6">
           <StateRenderer
@@ -167,7 +163,10 @@ export default async function StudentProfile() {
             loadingComponent={<Skeleton className="h-20 w-full" />}
             emptyComponent={
               <div className="text-center py-8">
-                <p className="text-sm text-neutral-600">No enrollment history found.</p>
+                <p className="text-sm text-neutral-600">No current enrollment found.</p>
+                <p className="text-xs text-neutral-500 mt-2">
+                  You can enroll in a skill from the skills page.
+                </p>
               </div>
             }
           >
@@ -180,6 +179,11 @@ export default async function StudentProfile() {
                       <p className="text-sm text-neutral-600">
                         Enrolled: {new Date(enrollment.created_at).toLocaleDateString()}
                       </p>
+                      {enrollment.academic_session && (
+                        <p className="text-xs text-neutral-500">
+                          Session: {enrollment.academic_session.name}
+                        </p>
+                      )}
                     </div>
                     <div className="text-right">
                       <p className="text-sm font-medium text-neutral-900 capitalize">{enrollment.status}</p>

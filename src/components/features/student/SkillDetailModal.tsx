@@ -3,6 +3,12 @@ import React from "react"
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Chip } from "@nextui-org/react"
 import { BookOpen, AlertCircle, CheckCircle } from "lucide-react"
 
+/**
+ * * SkillDetailModal
+ * Modal showing skill details with enrollment status and action buttons.
+ * Handles enrolled state and disables enrollment for other skills when user is already enrolled.
+ */
+
 export type SkillDetailModalProps = {
   isOpen: boolean
   onClose: () => void
@@ -16,9 +22,10 @@ export type SkillDetailModalProps = {
     date_range_end?: string | null
   } | null
   studentLevel: string
+  enrollment: any
 }
 
-export default function SkillDetailModal({ isOpen, onClose, onEnroll, skill, studentLevel }: SkillDetailModalProps) {
+export default function SkillDetailModal({ isOpen, onClose, onEnroll, skill, studentLevel, enrollment }: SkillDetailModalProps) {
   if (!skill) return null
 
   const isLevelAllowed = !skill.allowed_levels || skill.allowed_levels.includes(studentLevel)
@@ -26,9 +33,24 @@ export default function SkillDetailModal({ isOpen, onClose, onEnroll, skill, stu
   const startDate = skill.date_range_start ? new Date(skill.date_range_start) : null
   const endDate = skill.date_range_end ? new Date(skill.date_range_end) : null
   const isEnrollmentActive = (!startDate || now >= startDate) && (!endDate || now <= endDate)
+  
+  // Check if user is enrolled in this skill
+  // The enrollment object has a nested skill object with id
+  const enrolledSkillId = enrollment?.skill?.id;
+  const isEnrolled = enrollment && enrolledSkillId === skill.id;
+  // Check if user has any enrollment (to disable other skills)
+  const hasEnrollment = !!enrollment;
 
-  const statusColor = isLevelAllowed && isEnrollmentActive ? "success" : (!isLevelAllowed ? "danger" : "warning")
-  const statusText = isLevelAllowed && isEnrollmentActive ? "Available" : (!isLevelAllowed ? `Not available for ${studentLevel}` : "Enrollment closed")
+  const statusColor = isEnrolled ? "success" : 
+                     isLevelAllowed && isEnrollmentActive && !hasEnrollment ? "success" : 
+                     !isLevelAllowed ? "danger" : 
+                     hasEnrollment ? "default" : "warning"
+                     
+  const statusText = isEnrolled ? "You are enrolled in this skill" :
+                    isLevelAllowed && isEnrollmentActive && !hasEnrollment ? "Available for enrollment" :
+                    !isLevelAllowed ? `Not available for ${studentLevel}` :
+                    hasEnrollment ? "You can only enroll in one skill at a time" :
+                    "Enrollment closed"
 
   const formatDate = (d?: string | null) => (d ? new Date(d).toLocaleDateString() : null)
 
@@ -65,8 +87,13 @@ export default function SkillDetailModal({ isOpen, onClose, onEnroll, skill, stu
         </ModalBody>
         <ModalFooter>
           <Button variant="ghost" onPress={onClose}>Close</Button>
-          <Button color="primary" isDisabled={!isLevelAllowed || !isEnrollmentActive} onPress={() => onEnroll(skill.id)}>
-            {(!isLevelAllowed || !isEnrollmentActive) ? 'Not Available' : 'Enroll'}
+          <Button 
+            color={isEnrolled ? "success" : "primary"} 
+            isDisabled={!isEnrolled && (!isLevelAllowed || !isEnrollmentActive || hasEnrollment)} 
+            onPress={() => onEnroll(skill.id)}
+          >
+            {isEnrolled ? 'View Enrollment' : 
+             (!isLevelAllowed || !isEnrollmentActive || hasEnrollment) ? 'Not Available' : 'Enroll'}
           </Button>
         </ModalFooter>
       </ModalContent>

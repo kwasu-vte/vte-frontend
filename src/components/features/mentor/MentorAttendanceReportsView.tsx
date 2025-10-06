@@ -99,10 +99,10 @@ export default function MentorAttendanceReportsView(props: { userId: string }) {
                 start: from || report.group_info.practical_date || new Date().toISOString(),
                 end: to || report.group_info.practical_date || new Date().toISOString(),
               }}
-              attendanceData={(report.students || []).map((studentName) => ({
-                student: studentName,
-                scans: 0,
-                points: 0,
+              attendanceData={(report.students || []).map((student) => ({
+                student: student.full_name,
+                scans: student.total_attendance,
+                points: student.total_points,
                 percentage: 0,
               }))}
             />

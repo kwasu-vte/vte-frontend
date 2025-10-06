@@ -145,6 +145,12 @@ const navigationItems: NavigationItem[] = [
     icon: Users,
     role: ['Student'],
   },
+  {
+    href: '/student/scan-qr',
+    label: 'Scan QR Code',
+    icon: QrCode,
+    role: ['Student'],
+  },
 ];
 
 export function Sidebar({ isOpen, user }: SidebarProps) {

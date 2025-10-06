@@ -1,6 +1,28 @@
 ## [Unreleased]
 
 ### Added
+- Student: Permanent profile completion modal on dashboard when profile is incomplete. Includes missing fields list and CTA to `/student/profile/create`. Also shows existing dismissible banner.
+- **Dynamic QR Code Printing System**: New comprehensive QR code printing solution with quantity selection
+  - QR Code Print Selector page (`/admin/qr-codes/print-selector`) with quantity selection (1 or multiples of 2, max 24)
+  - Dynamic QR Code Print page (`/admin/qr-codes/print-dynamic`) with optimal grid layout arrangement
+  - Automatic grid layout calculation based on quantity (1x1, 2x2, 3x3, 4x4 configurations)
+  - Responsive QR code sizing based on quantity (larger for fewer codes, smaller for more)
+  - Print-on-demand functionality (no auto-print on page mount)
+  - Layout preview showing grid arrangement before printing
+  - Robust fallback system: server QR images with automatic client-side generation on error
+  - **Smart Pagination**: Large quantities (22-24 QR codes) automatically split across multiple A4 pages
+  - **Page Break Management**: Proper page breaks and page numbering for multi-page prints
+  - **A4 Optimization**: Calculated layouts that fit perfectly within A4 page dimensions
+  - **PDF Generation**: html3pdf.js integration for downloadable PDF files with professional formatting
+  - **Simplified Interface**: Single "Generate PDF" button that creates downloadable PDF files
+
+### Changed
+- **PDF Generation Migration**: Replaced jsPDF with html3pdf.js for better PDF generation
+  - Updated PDF generator page (`/admin/qr-codes/pdf-generator`) to use html3pdf.js instead of jsPDF
+  - Improved PDF quality with better HTML-to-PDF conversion
+  - Enhanced page break handling and layout optimization
+  - Better support for complex layouts and responsive design
+  - Improved QR code rendering quality in generated PDFs
 - **Capacity Overview Report**: New comprehensive capacity reporting system with Excel export functionality
   - Viewable capacity overview with system statistics, utilization distribution, and group status summary
   - Detailed group breakdown with capacity indicators and status chips
@@ -691,3 +713,6 @@
 - Main content gets full width with no padding/margins during print
 - Print-specific styles only apply when @media print is active
 - Ensures clean print output without UI elements
+
+## 2025-10-06T08:50:09+01:00
+- chore: update pnpm-lock.yaml to reflect deps changes (add html3pdf, remove html2pdf.js; align react-qr-scanner range)
