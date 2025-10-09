@@ -241,8 +241,8 @@ export function MentorModal({
                   isRequired={!mentor}
                   variant="bordered"
                 />
-                {/* <Input */}
-                  label="Confirm Password"
+                <Input
+                  // label="Confirm Password"
                   placeholder="Confirm password"
                   type="password"
                   value={formData.password_confirmation}
