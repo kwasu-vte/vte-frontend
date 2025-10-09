@@ -21,7 +21,7 @@ export type ScanConfirmationModalProps = {
 export default function ScanConfirmationModal({ isOpen, scanResult, remainingScans, onClose }: ScanConfirmationModalProps) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} placement="center">
-      <ModalContent>
+      <ModalContent className="bg-white shadow-md">
         {() => (
           <>
             <ModalHeader className="flex flex-col gap-1">Attendance Recorded</ModalHeader>
