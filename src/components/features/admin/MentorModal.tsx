@@ -140,7 +140,7 @@ export function MentorModal({
           <ModalBody className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Input
-                label="First Name"
+                // label="First Name"
                 placeholder="Enter first name"
                 value={formData.first_name}
                 onChange={(e) => handleInputChange('first_name', e.target.value)}
@@ -148,7 +148,7 @@ export function MentorModal({
                 variant="bordered"
               />
               <Input
-                label="Last Name"
+                // label="Last Name"
                 placeholder="Enter last name"
                 value={formData.last_name}
                 onChange={(e) => handleInputChange('last_name', e.target.value)}
@@ -158,7 +158,7 @@ export function MentorModal({
             </div>
 
             <Input
-              label="Email"
+              // label="Email"
               placeholder="Enter email address"
               type="email"
               value={formData.email}
@@ -169,7 +169,7 @@ export function MentorModal({
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Select
-                label="Specialization"
+                // label="Specialization"
                 placeholder="Select specialization"
                 selectedKeys={formData.specialization ? [formData.specialization] : []}
                 onSelectionChange={(keys) => {
@@ -186,7 +186,7 @@ export function MentorModal({
                 ))}
               </Select>
               <Input
-                label="Phone Number"
+                // label="Phone Number"
                 placeholder="Enter phone number"
                 value={formData.phone}
                 onChange={(e) => handleInputChange('phone', e.target.value)}
@@ -222,7 +222,7 @@ export function MentorModal({
             </div>
 
             <Textarea
-              label="Meta Information"
+              // label="Meta Information"
               placeholder="Additional notes or metadata (optional)"
               value={formData.meta}
               onChange={(e) => handleInputChange('meta', e.target.value)}
@@ -233,7 +233,7 @@ export function MentorModal({
             {!mentor && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Input
-                  label="Password"
+                  // label="Password"
                   placeholder="Enter password"
                   type="password"
                   value={formData.password}
@@ -241,7 +241,7 @@ export function MentorModal({
                   isRequired={!mentor}
                   variant="bordered"
                 />
-                <Input
+                {/* <Input */}
                   label="Confirm Password"
                   placeholder="Confirm password"
                   type="password"

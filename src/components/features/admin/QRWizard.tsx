@@ -217,11 +217,11 @@ export function QRWizard({ currentStep, onStepChange, onComplete, initialData = 
     <Card>
       <CardHeader>
         <h2 className="text-xl font-semibold">Choose Your Training Program</h2>
-        <p className="text-neutral-600 mt-2">Select the vocational skill and specific training group you&apos;re managing.</p>
+        <p className="text-neutral-600 mt-2 px-1">Select the vocational skill and specific training group you&apos;re managing.</p>
       </CardHeader>
       <CardBody className="space-y-4">
         <Select
-          label="Which vocational skill are you managing?"
+          // label="Which vocational skill are you managing?"
           placeholder="Select a skill"
           selectedKeys={data.skillId ? new Set([String(data.skillId)]) : new Set([])}
           onSelectionChange={(keys) => {
@@ -289,7 +289,7 @@ export function QRWizard({ currentStep, onStepChange, onComplete, initialData = 
     <Card>
       <CardHeader>
         <h2 className="text-xl font-semibold">Set Up Your QR Codes</h2>
-        <p className="text-neutral-600 mt-2">Configure the details for your attendance tracking codes.</p>
+        <p className="text-neutral-600 mt-2 px-1">Configure the details for your attendance tracking codes.</p>
       </CardHeader>
       <CardBody className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -348,6 +348,7 @@ export function QRWizard({ currentStep, onStepChange, onComplete, initialData = 
             updateData({ mentorId: first || undefined });
           }}
           size="lg"
+          className="bg-white"
         >
           {mentors.map((mentor: MentorProfile) => (
             <SelectItem key={String(mentor.user_id || mentor.id)}>
