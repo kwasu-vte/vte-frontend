@@ -161,12 +161,31 @@ function StudentQRScanner({
         student_id: studentId 
       })
 
-      const { data } = response
-      const success = data.data.success
-      const points = data.data.points_awarded ? parseInt(data.data.points_awarded) : undefined
-      const timestamp = data.data.scanned_at
-      const studentName = data.data.skill_title
-      const message = data.data.message
+      console.log("API Response:", response) // Debug log
+
+      // Handle different possible response structures
+      let success = false
+      let points: number | undefined
+      let timestamp: string | undefined
+      let studentName: string | undefined
+      let message: string | undefined
+
+      // Try to extract data from various possible structures
+      if (response?.data?.data) {
+        success = response.data.data.success ?? false
+        points = response.data.data.points_awarded ? parseInt(response.data.data.points_awarded) : undefined
+        timestamp = response.data.data.scanned_at
+        studentName = response.data.data.skill_title
+        message = response.data.data.message
+      } else if (response?.data) {
+        success = response.data.success ?? false
+        points = response.data.points_awarded ? parseInt(response.data.points_awarded) : undefined
+        timestamp = response.data.scanned_at
+        studentName = response.data.skill_title
+        message = response.data.message
+      } else {
+        throw new Error("Invalid API response structure")
+      }
 
       setScanResult({ success, message, points, timestamp, studentName })
 
@@ -182,6 +201,7 @@ function StudentQRScanner({
       }
       setToken("")
     } catch (error) {
+      console.error("Scan error:", error) // Debug log
       const message = error instanceof Error ? error.message : "Network error"
       setScanResult({ success: false, message })
       setResultOpen(true)
