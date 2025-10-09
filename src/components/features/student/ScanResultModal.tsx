@@ -23,7 +23,7 @@ export default function ScanResultModal({ isOpen, scanResult, onClose, onRescan 
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} placement="center">
-      <ModalContent>
+      <ModalContent className="bg-white shadow-md">
         {() => (
           <>
             <ModalHeader className="flex flex-col gap-1">
