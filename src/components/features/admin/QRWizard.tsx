@@ -230,6 +230,18 @@ export function QRWizard({ currentStep, onStepChange, onComplete, initialData = 
           }}
           size="lg"
           isRequired
+          classNames={{
+    listbox: "bg-white",
+    item: "data-[selected=true]:bg-white",
+    base: "w-full",
+    trigger: "h-10",
+    innerWrapper: "pb-0",
+    selectorIcon: "right-3",
+    popoverContent: "shadow-lg",
+  }}
+  style={{
+    paddingRight: '2.5rem'
+  }}
         >
           {skills.map((skill: Skill) => (
             <SelectItem key={String(skill.id)}>
@@ -250,6 +262,18 @@ export function QRWizard({ currentStep, onStepChange, onComplete, initialData = 
             size="lg"
             isDisabled={!data.skillId || groups.length === 0}
             isRequired
+            classNames={{
+    listbox: "bg-white",
+    item: "data-[selected=true]:bg-white",
+    base: "w-full",
+    trigger: "h-10",
+    innerWrapper: "pb-0",
+    selectorIcon: "right-3",
+    popoverContent: "shadow-lg",
+  }}
+  style={{
+    paddingRight: '2.5rem'
+  }}
           >
             {groups.map((group: SkillGroup) => (
               <SelectItem key={String(group.id)}>
@@ -347,8 +371,19 @@ export function QRWizard({ currentStep, onStepChange, onComplete, initialData = 
             const first = Array.from(keys as Set<string>)[0] || '';
             updateData({ mentorId: first || undefined });
           }}
-          size="lg"
-          className="bg-white"
+          size="lg" 
+          classNames={{
+    listbox: "bg-white",
+    item: "data-[selected=true]:bg-white",
+    base: "w-full",
+    trigger: "h-10",
+    innerWrapper: "pb-0",
+    selectorIcon: "right-3",
+    popoverContent: "shadow-lg",
+  }}
+  style={{
+    paddingRight: '2.5rem'
+  }}
         >
           {mentors.map((mentor: MentorProfile) => (
             <SelectItem key={String(mentor.user_id || mentor.id)}>

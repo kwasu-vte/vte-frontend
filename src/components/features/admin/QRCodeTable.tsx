@@ -119,23 +119,34 @@ export function QRCodeTable({ skillId, groupId, onCreateClick }: QRCodeTableProp
           <p className="text-sm text-gray-500">Manage QR codes for the selected group</p>
         </div>
         <div className="flex items-center gap-2">
-          <Select
-            size="sm"
-            selectedKeys={[status]}
-            onChange={(e) => setStatus(e.target.value as "all" | "active" | "expired")}
-            className="w-32"
-          >
-            <SelectItem key="all">All</SelectItem>
-            <SelectItem key="active">Active</SelectItem>
-            <SelectItem key="expired">Expired</SelectItem>
-          </Select>
+         <Select
+  size="md"
+  selectedKeys={[status]}
+  onChange={(e) => setStatus(e.target.value as "all" | "active" | "expired")}
+  classNames={{
+    listbox: "bg-white",
+    item: "data-[selected=true]:bg-white",
+    base: "w-full",
+    trigger: "h-10",
+    innerWrapper: "pb-0",
+    selectorIcon: "right-3",
+    popoverContent: "shadow-lg",
+  }}
+  style={{
+    paddingRight: '2.5rem'
+  }}
+>
+  <SelectItem key="all">All</SelectItem>
+  <SelectItem key="active">Active</SelectItem>
+  <SelectItem key="expired">Expired</SelectItem>
+</Select>
           <Button
             color="primary"
             size="sm"
             startContent={<Plus className="h-4 w-4" />}
             onPress={onCreateClick}
           >
-            Create QR Codes
+           <p className="text-sm"> Create QR Codes</p>
           </Button>
         </div>
       </CardHeader>
