@@ -6,11 +6,8 @@ import { qrCodesApi } from "@/lib/api/qr-codes"
 import ScanResultModal from "./ScanResultModal"
 import ScanConfirmationModal from "./ScanConfirmationModal"
 import ScanProgressIndicator from "./ScanProgressIndicator"
-import dynamic from "next/dynamic"
-import type { ProcessQrScanPayload, QrScanResponse } from "@/lib/types" // Add this import
-
-// Dynamically import QR scanner to avoid SSR issues
-const QrScanner = dynamic(() => import("react-qr-scanner"), { ssr: false })
+import type { ProcessQrScanPayload, QrScanResponse } from "@/lib/types"
+import { Html5Qrcode } from "html5-qrcode"
 
 export type StudentQRScannerProps = {
   studentId: string
@@ -43,98 +40,161 @@ function StudentQRScanner({
   const [cameraError, setCameraError] = React.useState<string | null>(null)
   const [showScanner, setShowScanner] = React.useState(false)
   const [isRequestingPermission, setIsRequestingPermission] = React.useState(false)
+  
+  const html5QrCodeRef = React.useRef<Html5Qrcode | null>(null)
+  const scannerIdRef = React.useRef("qr-reader-" + Math.random().toString(36).substr(2, 9))
+  const lastScannedRef = React.useRef<string>("")
+  const scanCooldownRef = React.useRef<NodeJS.Timeout | null>(null)
 
-  const requestCameraPermission = async () => {
+  // Cleanup camera on unmount
+  React.useEffect(() => {
+    return () => {
+      stopScanner()
+    }
+  }, [])
+
+  const stopScanner = async () => {
+    if (html5QrCodeRef.current) {
+      try {
+        const state = html5QrCodeRef.current.getState()
+        if (state === 2) { // SCANNING state
+          await html5QrCodeRef.current.stop()
+        }
+      } catch (error) {
+        console.error("Error stopping scanner:", error)
+      }
+      html5QrCodeRef.current = null
+    }
+  }
+
+  const startScanner = async () => {
     try {
       setIsRequestingPermission(true)
       setCameraError(null)
-      
+
       // Check if mediaDevices is available
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
         throw new Error('Camera API not supported in this browser or context.')
       }
-      
-      // Request camera access
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: 'environment' } 
-      })
-      
-      // Permission granted - stop the stream and show the scanner
-      stream.getTracks().forEach(track => track.stop())
+
+      // Stop any existing scanner
+      await stopScanner()
+
+      // Show scanner first to render the DOM element
       setShowScanner(true)
+
+      // Wait for DOM element to be rendered
+      await new Promise(resolve => setTimeout(resolve, 100))
+
+      // Check if element exists
+      const element = document.getElementById(scannerIdRef.current)
+      if (!element) {
+        throw new Error('Scanner element not found in DOM')
+      }
+
+      // Create new scanner instance
+      html5QrCodeRef.current = new Html5Qrcode(scannerIdRef.current)
+
+      // Start scanning
+      await html5QrCodeRef.current.start(
+        { facingMode: "environment" },
+        {
+          fps: 10,
+          qrbox: { width: 250, height: 250 },
+          aspectRatio: 1.0
+        },
+        (decodedText, decodedResult) => {
+          handleScan(decodedText)
+        },
+        (errorMessage) => {
+          // Ignore common scanning errors (no QR code in frame)
+          // Only log actual errors
+          if (!errorMessage.includes("NotFoundException")) {
+            console.debug("QR scan error:", errorMessage)
+          }
+        }
+      )
       
     } catch (error: any) {
       console.error('Camera permission error:', error)
       
       // Handle different error types
       if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
-        setCameraError('Camera access denied. This may be due to browser permissions or security policy. Please check your browser settings and ensure you are accessing the site via HTTPS.')
+        setCameraError('Camera access denied. Please check your browser settings and ensure you are accessing the site via HTTPS.')
       } else if (error.name === 'NotFoundError' || error.name === 'DevicesNotFoundError') {
         setCameraError('No camera found on this device.')
       } else if (error.name === 'NotReadableError' || error.name === 'TrackStartError') {
         setCameraError('Camera is already in use by another application.')
       } else if (error.message?.includes('not supported') || error.message?.includes('policy')) {
-        setCameraError('Camera access is blocked by browser security policy. Please ensure the app is running on HTTPS and not in an embedded frame.')
+        setCameraError('Camera access is blocked by browser security policy. Please ensure the app is running on HTTPS.')
       } else {
         setCameraError(`Unable to access camera: ${error.message || 'Unknown error'}`)
       }
+      
+      setShowScanner(false)
     } finally {
       setIsRequestingPermission(false)
     }
   }
 
- const processToken = async (scannedToken: string) => {
-  if (!scannedToken.trim()) return
-  
-  setIsSubmitting(true)
-  try {
-    // Use proper typing for the API call
-    const response = await qrCodesApi.processScan({ 
-      token: scannedToken.trim(), 
-      student_id: studentId 
-    })
+  const processToken = async (scannedToken: string) => {
+    if (!scannedToken.trim()) return
+    
+    // Prevent duplicate scans (debouncing)
+    if (lastScannedRef.current === scannedToken.trim()) {
+      return
+    }
+    
+    // Set cooldown
+    lastScannedRef.current = scannedToken.trim()
+    if (scanCooldownRef.current) {
+      clearTimeout(scanCooldownRef.current)
+    }
+    scanCooldownRef.current = setTimeout(() => {
+      lastScannedRef.current = ""
+    }, 3000) // 3 second cooldown
+    
+    setIsSubmitting(true)
+    try {
+      const response = await qrCodesApi.processScan({ 
+        token: scannedToken.trim(), 
+        student_id: studentId 
+      })
 
-    // The response is now properly typed
-    const { data } = response
-    const success = data.data.success
-    const points = data.data.points_awarded ? parseInt(data.data.points_awarded) : undefined
-    const timestamp = data.data.scanned_at
-    const studentName = data.data.skill_title // Using skill_title as student identifier
-    const message = data.data.message
+      const { data } = response
+      const success = data.data.success
+      const points = data.data.points_awarded ? parseInt(data.data.points_awarded) : undefined
+      const timestamp = data.data.scanned_at
+      const studentName = data.data.skill_title
+      const message = data.data.message
 
-    setScanResult({ success, message, points, timestamp, studentName })
+      setScanResult({ success, message, points, timestamp, studentName })
 
-    if (success) {
-      setConfirmOpen(true)
-      setRemainingScans((r) => Math.max(0, r - 1))
-      if (points && timestamp) {
-        onScanSuccess({ token: scannedToken.trim(), points, timestamp })
+      if (success) {
+        setConfirmOpen(true)
+        setRemainingScans((r) => Math.max(0, r - 1))
+        if (points && timestamp) {
+          onScanSuccess({ token: scannedToken.trim(), points, timestamp })
+        }
+      } else {
+        setResultOpen(true)
+        onScanError(message || "Scan failed")
       }
-    } else {
+      setToken("")
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Network error"
+      setScanResult({ success: false, message })
       setResultOpen(true)
-      onScanError(message || "Scan failed")
-    }
-    setToken("")
-  } catch (error) {
-    const message = error instanceof Error ? error.message : "Network error"
-    setScanResult({ success: false, message })
-    setResultOpen(true)
-    onScanError(message)
-  } finally {
-    setIsSubmitting(false)
-  }
-}
-
-  const handleScan = (data: any) => {
-    if (data && !isSubmitting) {
-      processToken(data.text || data)
+      onScanError(message)
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
-  const handleError = (err: any) => {
-    console.error("Camera error:", err)
-    setCameraError("Camera error occurred. Please try manual entry instead.")
-    setShowScanner(false)
+  const handleScan = (decodedText: string) => {
+    if (decodedText && !isSubmitting) {
+      processToken(decodedText)
+    }
   }
 
   const handleManualSubmit = () => {
@@ -144,6 +204,11 @@ function StudentQRScanner({
       return
     }
     processToken(token)
+  }
+
+  const handleStopCamera = async () => {
+    await stopScanner()
+    setShowScanner(false)
   }
 
   const renderCameraTab = () => {
@@ -174,8 +239,7 @@ function StudentQRScanner({
               color="primary" 
               onPress={() => {
                 setCameraError(null)
-                setShowScanner(false)
-                requestCameraPermission()
+                startScanner()
               }}
               startContent={<Camera className="w-4 h-4" />}
             >
@@ -196,30 +260,20 @@ function StudentQRScanner({
     if (showScanner) {
       return (
         <div className="py-4">
-          <div className="relative w-full aspect-square max-w-sm mx-auto overflow-hidden rounded-lg bg-black">
-            <QrScanner
-              delay={300}
-              onError={handleError}
-              onScan={handleScan}
-              style={{ width: "100%" }}
-              constraints={{
-                video: { facingMode: "environment" }
-              }}
-            />
+          <div className="relative w-full max-w-sm mx-auto">
+            <div id={scannerIdRef.current} className="rounded-lg overflow-hidden" />
             {isSubmitting && (
-              <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+              <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-lg">
                 <Spinner size="lg" color="white" />
               </div>
             )}
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/70 text-white px-4 py-2 rounded-full text-sm">
-              Point camera at QR code
-            </div>
           </div>
-          <div className="mt-4 text-center">
+          <div className="mt-4 text-center space-y-2">
+            <p className="text-sm text-neutral-600">Point camera at QR code</p>
             <Button 
               size="sm"
               variant="flat"
-              onPress={() => setShowScanner(false)}
+              onPress={handleStopCamera}
             >
               Stop Camera
             </Button>
@@ -253,7 +307,7 @@ function StudentQRScanner({
         <Button 
           color="primary" 
           size="lg"
-          onPress={requestCameraPermission}
+          onPress={startScanner}
           isLoading={isRequestingPermission}
           startContent={!isRequestingPermission ? <Camera className="w-5 h-5" /> : undefined}
         >
@@ -292,7 +346,7 @@ function StudentQRScanner({
             setSelectedTab(key as string)
             // Stop scanner when switching away from camera tab
             if (key !== "camera" && showScanner) {
-              setShowScanner(false)
+              handleStopCamera()
             }
           }}
           aria-label="Scan options"
@@ -305,7 +359,6 @@ function StudentQRScanner({
             <div className="py-4 space-y-4">
               <div className="flex items-end gap-2">
                 <Input
-                  // label="QR Token"
                   placeholder="Enter token (e.g., ABC123)"
                   value={token}
                   onValueChange={setToken}
