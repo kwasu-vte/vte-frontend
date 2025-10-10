@@ -1,6 +1,6 @@
 "use client"
 import React from "react"
-import { Card, CardBody, CardHeader, Chip, Select, SelectItem } from "@nextui-org/react"
+import { Card, CardBody, CardHeader, Chip, Select, SelectItem } from "@heroui/react"
 
 /**
  * * PracticalCalendar
@@ -57,8 +57,8 @@ function PracticalCalendar({ practicalDates, viewMode = 'month' }: PracticalCale
           }}
           className="max-w-[140px]"
         >
-          <SelectItem key="month" value="month">Month</SelectItem>
-          <SelectItem key="week" value="week">Week</SelectItem>
+          <SelectItem key="month">Month</SelectItem>
+          <SelectItem key="week">Week</SelectItem>
         </Select>
       </CardHeader>
       <CardBody className="space-y-6">

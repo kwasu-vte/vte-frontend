@@ -1,6 +1,6 @@
 "use client"
 import React from "react"
-import { Tabs, Tab, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Button, Skeleton } from "@nextui-org/react"
+import { Tabs, Tab, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Button, Skeleton } from "@heroui/react"
 import { useQuery } from "@tanstack/react-query"
 import { qrCodesApi } from "@/lib/api"
 import type { AttendanceReport, QrScanHistory } from "@/lib/types"

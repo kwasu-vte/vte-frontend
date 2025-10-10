@@ -1,6 +1,6 @@
 "use client"
 import React from "react"
-import { Card, CardBody, CardHeader, Chip, Button, Skeleton, Tabs, Tab } from "@nextui-org/react"
+import { Card, CardBody, CardHeader, Chip, Button, Skeleton, Tabs, Tab } from "@heroui/react"
 import { useMentorDashboardData } from "@/lib/hooks/use-mentor-dashboard-data"
 import MentorGroupsList from "@/components/features/mentor/MentorGroupsList"
 import PracticalCalendar from "@/components/features/student/PracticalCalendar"
@@ -94,7 +94,7 @@ export default function MentorDashboard(props: MentorDashboardProps) {
                 {(data) => (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {data.map((g) => (
-                      <Card key={g.id} shadow="sm">
+                      <Card key={g.id} shadow="sm" className="transition-colors hover:bg-neutral-50">
                         <CardHeader className="flex items-center justify-between px-4 pt-4">
                           <div>
                             <p className="text-base font-medium text-neutral-900">{(g as any).group_display_name ?? `Group ${g.group_number ?? g.id}`}</p>

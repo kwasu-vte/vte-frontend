@@ -1,6 +1,6 @@
 "use client"
 import React from "react"
-import { Chip } from "@nextui-org/react"
+import { Chip } from "@heroui/react"
 import { CheckCircle, Clock, XCircle } from "lucide-react"
 
 /**

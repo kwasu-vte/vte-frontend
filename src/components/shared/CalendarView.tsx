@@ -5,7 +5,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Card, CardBody, Button } from '@nextui-org/react';
+import { Card, CardBody, Button } from '@heroui/react';
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon } from 'lucide-react';
 import { Activity } from '@/lib/types';
 

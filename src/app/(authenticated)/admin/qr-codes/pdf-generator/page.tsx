@@ -410,7 +410,13 @@ const handleGeneratePDF = async () => {
     `;
 
     // * Configure html3pdf options
-    const opt = {
+    const opt: {
+      margin: number;
+      filename: string;
+      image: { type: 'jpeg' | 'png'; quality: number };
+      html2canvas: Record<string, unknown>;
+      jsPDF: { unit: string; format: string; orientation: 'portrait' | 'landscape'; compress: boolean };
+    } = {
       margin: 0.5,
       filename: `qr-codes-group-${qrCodeData.skill_group_id}-${new Date().toISOString().split('T')[0]}.pdf`,
       image: { type: 'jpeg', quality: 0.98 },
@@ -442,7 +448,7 @@ const handleGeneratePDF = async () => {
 };
 
 // * Helper function to load image as data URL
-const loadImageAsDataUrl = (imagePath) => {
+const loadImageAsDataUrl = (imagePath: string): Promise<string> => {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.crossOrigin = 'anonymous';
@@ -453,7 +459,9 @@ const loadImageAsDataUrl = (imagePath) => {
       canvas.height = img.height;
       
       const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0);
+      if (ctx) {
+        ctx.drawImage(img, 0, 0);
+      }
       
       try {
         const dataUrl = canvas.toDataURL('image/png');
@@ -474,7 +482,7 @@ const loadImageAsDataUrl = (imagePath) => {
 };
 
 // * Helper function to generate QR code as data URL
-const generateQRCodeImage = async (token, logoDataUrl) => {
+const generateQRCodeImage = async (token: string, logoDataUrl: string): Promise<string> => {
   return new Promise((resolve, reject) => {
     // Create temporary container
     const tempDiv = document.createElement('div');
@@ -522,11 +530,11 @@ const generateQRCodeImage = async (token, logoDataUrl) => {
     setTimeout(async () => {
       try {
         const blob = await qrCode.getRawData('png');
-        if (blob) {
+        if (blob instanceof Blob) {
           const reader = new FileReader();
           reader.onloadend = () => {
             document.body.removeChild(tempDiv);
-            resolve(reader.result);
+            resolve(typeof reader.result === 'string' ? reader.result : '');
           };
           reader.onerror = () => {
             document.body.removeChild(tempDiv);

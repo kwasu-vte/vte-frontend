@@ -40,6 +40,20 @@ export const skillGroupsApi = {
     });
   },
 
+  // * Convenience helper: reassign a student from one group to another
+  // * Performs remove from current group, then assign to target group
+  async reassignStudent(currentGroupId: number, targetGroupId: number, enrollmentId: number): Promise<ApiResponse<{ from_group_id: number; to_group_id: number; enrollment_id: number }>> {
+    // Remove from current group
+    await apiRequest(`v1/skill-groups/${currentGroupId}/remove-student?enrollment_id=${enrollmentId}`, { method: 'DELETE' });
+    // Assign to target group
+    await apiRequest(`v1/skill-groups/${targetGroupId}/assign-student`, { method: 'POST', body: JSON.stringify({ enrollment_id: enrollmentId }) });
+    return {
+      success: true,
+      message: 'Reassigned successfully',
+      data: { from_group_id: currentGroupId, to_group_id: targetGroupId, enrollment_id: enrollmentId }
+    } as any;
+  },
+
   getStatistics(params?: { skill_id?: number; academic_session_id?: number; }): Promise<ApiResponse<GroupStatistics>> {
     const query = new URLSearchParams();
     if (params?.skill_id) query.append('skill_id', params.skill_id.toString());

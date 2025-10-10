@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, CardBody, CardHeader, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip, Button } from '@nextui-org/react';
+import { Card, CardBody, CardHeader, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip, Button } from '@heroui/react';
 import { FileSpreadsheet, Users, TrendingUp, AlertCircle, CheckCircle } from 'lucide-react';
 import { GroupStatistics, SkillGroup } from '@/lib/types';
 import { exportCapacityOverviewToExcel } from '@/lib/utils/excel-export';

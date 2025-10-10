@@ -7,7 +7,7 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
-import { Card, CardHeader, CardBody, Input, Button, Link, Spinner, Checkbox } from '@nextui-org/react';
+import { Card, CardHeader, CardBody, Input, Button, Link, Spinner, Checkbox } from '@heroui/react';
 import { Eye, EyeOff } from 'lucide-react';
 import logo from '@/assets/kwasulogo.png';
 import { NotificationContainer } from '@/components/shared/NotificationContainer';

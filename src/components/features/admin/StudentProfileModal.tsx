@@ -1,6 +1,7 @@
 "use client";
 
-import { Modal, ModalContent, ModalHeader, ModalBody } from "@nextui-org/react";
+import { AlertTriangle } from 'lucide-react';
+import { Modal, ModalContent, ModalHeader, ModalBody } from "@heroui/react";
 import { useQuery } from "@tanstack/react-query";
 import { studentsApi } from "@/lib/api";
 import type { StudentProfile } from "@/lib/types";
@@ -39,7 +40,9 @@ export function StudentProfileModal({ isOpen, onClose, userId }: StudentProfileM
           )}
           {error && (
             <div className="text-center p-8">
-              <div className="text-error text-5xl mb-2">⚠️</div>
+              <div className="text-red-500 mb-2">
+                <AlertTriangle className="w-12 h-12" />
+              </div>
               <div className="text-neutral-700">Failed to load profile</div>
             </div>
           )}

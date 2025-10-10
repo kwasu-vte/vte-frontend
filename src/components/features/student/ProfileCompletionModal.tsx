@@ -1,7 +1,7 @@
 "use client"
 import React from "react"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Button } from "@nextui-org/react"
+import { Button } from "@heroui/react"
 import Link from "next/link"
 
 export type ProfileCompletionModalProps = {

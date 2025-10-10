@@ -80,6 +80,19 @@ export interface StudentProfile {
   student_level_int: string;
   attendances_count: string;
   enrollments_count: string;
+  user_id: string;
+  // * Optional fields that may come from API
+  assigned_group?: {
+    id: string;
+    group_number: string;
+    group_display_name: string;
+    skill_title: string;
+  } | null;
+  current_enrollment?: {
+    skill_title: string;
+    status: string;
+    group_assigned: boolean;
+  } | null;
 }
 
 export interface Group {
@@ -211,20 +224,33 @@ export interface LoginPayload {
 // * Enrollment Management
 export interface Enrollment {
   id: number;
-  user_id: string;
-  skill_id: string;
-  academic_session_id: number;
+  user_id?: string; // * May not be present in API response
+  skill_id?: string; // * May not be present in API response
+  academic_session_id?: number; // * May not be present in API response
   status: 'pending_payment' | 'paid' | 'assigned' | 'cancelled';
-  payment_status: 'pending' | 'paid' | 'failed';
+  payment_status?: 'pending' | 'paid' | 'failed'; // * May not be present in API response
   created_at: string;
   updated_at: string;
+  reference?: string | null; // * Payment reference
+  meta?: any | null; // * Additional metadata
   group?: {
     id: string;
     group_number: string;
     group_display_name: string;
   };
   user?: User;
-  skill?: Skill;
+  skill?: {
+    id: string;
+    title: string;
+    date_range_start?: string | null;
+    date_range_end?: string | null;
+    exclude_weekends?: boolean;
+  };
+  student?: {
+    id: string;
+    first_name: string;
+    last_name: string;
+  };
   academic_session?: AcademicSession;
 }
 

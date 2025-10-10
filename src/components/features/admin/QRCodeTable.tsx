@@ -2,7 +2,7 @@
 
 import React from "react"
 import { useState } from "react"
-import { Button, Card, CardBody, CardHeader, Chip, Pagination, Select, SelectItem, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tooltip } from "@nextui-org/react"
+import { Button, Card, CardBody, CardHeader, Chip, Pagination, Select, SelectItem, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tooltip } from "@heroui/react"
 import { useQuery } from "@tanstack/react-query"
 import { qrCodesApi } from "@/lib/api"
 import { Printer, Plus } from "lucide-react"
@@ -125,7 +125,6 @@ export function QRCodeTable({ skillId, groupId, onCreateClick }: QRCodeTableProp
   onChange={(e) => setStatus(e.target.value as "all" | "active" | "expired")}
   classNames={{
     listbox: "bg-white",
-    item: "data-[selected=true]:bg-white",
     base: "w-full",
     trigger: "h-10",
     innerWrapper: "pb-0",

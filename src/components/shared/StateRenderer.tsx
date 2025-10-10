@@ -2,7 +2,11 @@
 // * This component handles all four states for data-displaying components
 // * Non-negotiable: Every data component MUST use this pattern
 
+'use client';
+
 import React from 'react';
+import { Loader2, AlertTriangle, FolderOpen } from 'lucide-react';
+import { ClientOnly } from './ClientOnly';
 
 interface StateRendererProps<T> {
   data: T | undefined;
@@ -26,7 +30,7 @@ export function StateRenderer<T>({
   emptyComponent,
   children,
 }: StateRendererProps<T>) {
-  console.log('🔍 [StateRenderer] Decision logic:', {
+  console.log('[StateRenderer] Decision logic:', {
     data,
     dataLength: Array.isArray(data) ? data.length : 'not-array',
     isLoading,
@@ -39,40 +43,58 @@ export function StateRenderer<T>({
     condition3: Array.isArray(data) && data.length === 0
   });
 
-  // * Show loading state only when explicitly loading
-  if (isLoading) {
-    console.log('🔍 [StateRenderer] Showing LOADING state');
-    return <>{loadingComponent ?? <DefaultLoadingComponent />}</>;
-  }
+  return (
+    <ClientOnly fallback={<DefaultLoadingComponent />}>
+      {/* * Show loading state only when explicitly loading */}
+      {isLoading && (
+        <>
+          {console.log('[StateRenderer] Showing LOADING state')}
+          {loadingComponent ?? <DefaultLoadingComponent />}
+        </>
+      )}
 
-  // * Show error state
-  if (error) {
-    console.log('🔍 [StateRenderer] Showing ERROR state');
-    return <>{errorComponent ?? <DefaultErrorComponent error={error} onRetry={onRetry} />}</>;
-  }
+      {/* * Show error state */}
+      {!isLoading && error && (
+        <>
+          {console.log('[StateRenderer] Showing ERROR state')}
+          {errorComponent ?? <DefaultErrorComponent error={error} onRetry={onRetry} />}
+        </>
+      )}
 
-  // * Show empty state for null/undefined or empty arrays when not loading and no error
-  if (data == null || (Array.isArray(data) && data.length === 0)) {
-    console.log('🔍 [StateRenderer] Showing EMPTY state');
-    return <>{emptyComponent ?? <DefaultEmptyComponent message="No items to display." />}</>;
-  }
+      {/* * Show empty state for null/undefined or empty arrays when not loading and no error */}
+      {!isLoading && !error && (data == null || (Array.isArray(data) && data.length === 0)) && (
+        <>
+          {console.log('[StateRenderer] Showing EMPTY state')}
+          {emptyComponent ?? <DefaultEmptyComponent message="No items to display." />}
+        </>
+      )}
 
-  // * Show data
-  console.log('🔍 [StateRenderer] Showing DATA state with:', data);
-  return children(data as NonNullable<T>);
+      {/* * Show data */}
+      {!isLoading && !error && data != null && !(Array.isArray(data) && data.length === 0) && (
+        <>
+          {console.log('[StateRenderer] Showing DATA state with:', data)}
+          {children(data as NonNullable<T>)}
+        </>
+      )}
+    </ClientOnly>
+  );
 }
 
 // * Default Components for Common States
 export const DefaultLoadingComponent = () => (
-  <div className="flex items-center justify-center p-8">
-    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-    <span className="ml-3 text-neutral-600">Loading...</span>
+  <div className="flex flex-col items-center justify-center p-8 text-center">
+    <div className="text-neutral-400 mb-4">
+      <Loader2 className="w-16 h-16 animate-spin" />
+    </div>
+    <span className="text-neutral-600">Loading...</span>
   </div>
 );
 
 export const DefaultErrorComponent = ({ error, onRetry }: { error: Error; onRetry?: () => void }) => (
   <div className="flex flex-col items-center justify-center p-8 text-center">
-    <div className="text-error text-6xl mb-4">⚠️</div>
+    <div className="text-red-500 mb-4">
+      <AlertTriangle className="w-16 h-16" />
+    </div>
     <h3 className="text-xl font-semibold text-neutral-900 mb-2">Something went wrong</h3>
     <p className="text-neutral-600 mb-4">{error.message}</p>
     {onRetry && (
@@ -88,7 +110,9 @@ export const DefaultErrorComponent = ({ error, onRetry }: { error: Error; onRetr
 
 export const DefaultEmptyComponent = ({ message, actionButton }: { message: string; actionButton?: React.ReactNode }) => (
   <div className="flex flex-col items-center justify-center p-8 text-center">
-    <div className="text-neutral-400 text-6xl mb-4">📭</div>
+    <div className="text-neutral-400 mb-4">
+      <FolderOpen className="w-16 h-16" />
+    </div>
     <h3 className="text-xl font-semibold text-neutral-900 mb-2">No data found</h3>
     <p className="text-neutral-600 mb-4">{message}</p>
     {actionButton}

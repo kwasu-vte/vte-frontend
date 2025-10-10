@@ -1,7 +1,7 @@
 "use client"
 import React from "react"
 import { useMemo, useState } from "react"
-import { Button, Card, CardBody, CardHeader, Select, SelectItem, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@nextui-org/react"
+import { Button, Card, CardBody, CardHeader, Select, SelectItem, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@heroui/react"
 
 /**
  * * MentorQRAssignment

@@ -24,8 +24,8 @@ export default function EnrollmentStatusBadge({ status, showTooltip = false }: E
   const label =
     lower === 'pending' ? 'Pending' : lower === 'paid' ? 'Paid' : lower === 'assigned' ? 'Assigned' : 'Completed'
 
-  const Chip = require('@nextui-org/react').Chip as React.ComponentType<any>
-  const Tooltip = require('@nextui-org/react').Tooltip as React.ComponentType<any>
+  const Chip = require('@heroui/react').Chip as React.ComponentType<any>
+  const Tooltip = require('@heroui/react').Tooltip as React.ComponentType<any>
 
   const chip = <Chip color={color} variant="flat" size="sm">{label}</Chip>
 

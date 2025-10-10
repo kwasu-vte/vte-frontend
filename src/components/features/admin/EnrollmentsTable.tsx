@@ -1,6 +1,6 @@
 "use client"
 import React from "react"
-import { Pagination } from "@nextui-org/react"
+import { Pagination, Tooltip } from "@heroui/react"
 import type { Enrollment } from "@/lib/types"
 import EnrollmentStatusBadge from "./EnrollmentStatusBadge"
 import { DataTable } from "@/components/shared/DataTable"
@@ -21,9 +21,11 @@ export type EnrollmentsTableProps = {
   enrollments: Enrollment[]
   perPage?: number
   onAssignGroup?: (enrollmentId: number) => void
+  onReassignGroup?: (enrollmentId: number, currentGroupId: string) => void
+  onViewStudent?: (userId: string, enrollment: Enrollment) => void
 }
 
-export default function EnrollmentsTable({ enrollments, perPage = 25, onAssignGroup }: EnrollmentsTableProps) {
+export default function EnrollmentsTable({ enrollments, perPage = 25, onAssignGroup, onReassignGroup, onViewStudent }: EnrollmentsTableProps) {
   const [page, setPage] = React.useState(1)
   const total = enrollments.length
   const totalPages = Math.max(1, Math.ceil(total / perPage))
@@ -36,7 +38,19 @@ export default function EnrollmentsTable({ enrollments, perPage = 25, onAssignGr
       const first = apiStudent?.first_name ?? user?.first_name
       const last = apiStudent?.last_name ?? user?.last_name
       const full = `${last ?? ''} ${first ?? ''}`.trim()
-      return full || e.user_id
+      const name = full || e.user_id
+      const userId = (apiStudent?.id ?? user?.id ?? e.user_id) as string
+      if (onViewStudent) {
+        return (
+          <button
+            className="text-primary underline-offset-2 hover:underline cursor-pointer"
+            onClick={() => onViewStudent(userId, e)}
+          >
+            {name}
+          </button>
+        )
+      }
+      return name
     }},
     { key: "skill", label: "Skill", render: (e: Enrollment) => e.skill?.title ?? e.skill_id },
     { key: "status", label: "Status", render: (e: Enrollment) => <EnrollmentStatusBadge status={e.status.toUpperCase() as any} /> },
@@ -58,24 +72,47 @@ export default function EnrollmentsTable({ enrollments, perPage = 25, onAssignGr
       )
     }},
     { key: "created_at", label: "Enrolled On", render: (e: Enrollment) => new Date(e.created_at).toLocaleString() },
-    ...(onAssignGroup ? [{ key: "actions", label: "Actions", render: (e: Enrollment) => {
+    ...((onAssignGroup || onReassignGroup) ? [{ key: "actions", label: "Actions", render: (e: Enrollment) => {
       const status = String(e.status || '').toLowerCase()
       const reference = (e as any)?.reference
       const isPaid = e.payment_status === 'paid' || (!!reference && (status === 'assigned' || status === 'paid'))
-      const alreadyAssigned = Boolean(e.group?.id) || status === 'assigned'
-      if (alreadyAssigned) {
-        return <span className="text-neutral-400 text-sm cursor-not-allowed">Assigned</span>
-      }
+      const hasGroupId = Boolean(e.group?.id)
+      const isAssignedStatus = status === 'assigned'
       if (!isPaid) {
         return <span className="text-neutral-400 text-sm cursor-not-allowed" title="Payment required before assignment">Unpaid</span>
       }
+      if (hasGroupId) {
+        return (
+          <Tooltip content="Move student to a different group" placement="top">
+            <button
+              className="text-primary hover:underline text-sm cursor-pointer"
+              onClick={() => {
+                const currentGroupId = e.group?.id as unknown as string
+                if (!currentGroupId) return
+                onReassignGroup?.(Number(e.id), currentGroupId)
+              }}
+            >
+              Reassign
+            </button>
+          </Tooltip>
+        )
+      }
+      if (isAssignedStatus && !hasGroupId) {
+        return (
+          <Tooltip content="Student is marked assigned but no group info provided" placement="top">
+            <span className="text-neutral-500 text-sm cursor-not-allowed">Assigned</span>
+          </Tooltip>
+        )
+      }
       return (
-        <button
-          className="text-primary hover:underline text-sm"
-          onClick={() => onAssignGroup?.(Number(e.id))}
-        >
-          Assign to Group
-        </button>
+        <Tooltip content="Assign student to a group" placement="top">
+          <button
+            className="text-primary hover:underline text-sm cursor-pointer"
+            onClick={() => onAssignGroup?.(Number(e.id))}
+          >
+            Assign to Group
+          </button>
+        </Tooltip>
       )
     } }] : [] as any),
   ]

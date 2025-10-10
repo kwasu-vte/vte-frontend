@@ -6,9 +6,11 @@
 
 import React from 'react';
 import { DataTable } from '@/components/shared/DataTable';
-import { Button, Chip, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@nextui-org/react';
-import { MoreVertical, Edit, Trash2, Eye, Users, Calendar, Plus } from 'lucide-react';
+import { Button, Chip, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@heroui/react';
+import { MoreVertical, Edit, Trash2, Eye, Users, Plus, UserCheck } from 'lucide-react';
 import { Skill } from '@/lib/types';
+import { useRouter } from 'next/navigation';
+import { ClientOnly } from '@/components/shared/ClientOnly';
 
 interface SkillsTableProps {
   skills: Skill[];
@@ -16,7 +18,7 @@ interface SkillsTableProps {
   onDelete?: (skill: Skill) => void;
   onView?: (skill: Skill) => void;
   onManageGroups?: (skill: Skill) => void;
-  onManageSchedule?: (skill: Skill) => void;
+  onManageEnrollments?: (skill: Skill) => void;
   onCreate?: () => void;
   isLoading?: boolean;
   error?: Error | null;
@@ -28,12 +30,13 @@ export function SkillsTable({
   onDelete,
   onView,
   onManageGroups,
-  onManageSchedule,
+  onManageEnrollments,
   onCreate,
   isLoading = false,
   error = null,
 }: SkillsTableProps) {
-  console.log('🔍 [SkillsTable] Received props:', {
+  const router = useRouter();
+  console.log('[SkillsTable] Received props:', {
     skills,
     skillsLength: skills?.length,
     isLoading,
@@ -72,13 +75,27 @@ export function SkillsTable({
   const columns = [
     {
       key: 'title',
-      label: 'Title',
+      label: 'Skill',
       render: (skill: Skill) => (
-        <div className="space-y-1">
-          <div className="font-medium text-neutral-900">{skill.title}</div>
+        <div className="space-y-2">
+          <div className="font-semibold text-neutral-900 text-base">{skill.title}</div>
           {skill.description && (
-            <div className="text-sm text-neutral-500 line-clamp-2">
+            <div className="text-sm text-neutral-600 line-clamp-2 max-w-xs">
               {skill.description}
+            </div>
+          )}
+          {skill.allowed_levels && skill.allowed_levels.length > 0 && (
+            <div className="flex flex-wrap gap-1">
+              {skill.allowed_levels.slice(0, 3).map((level: string) => (
+                <Chip key={level} size="sm" variant="flat" color="primary" className="text-xs">
+                  L{level}
+                </Chip>
+              ))}
+              {skill.allowed_levels.length > 3 && (
+                <Chip size="sm" variant="flat" color="default" className="text-xs">
+                  +{skill.allowed_levels.length - 3}
+                </Chip>
+              )}
             </div>
           )}
         </div>
@@ -86,13 +103,35 @@ export function SkillsTable({
     },
     {
       key: 'groups',
-      label: 'Max Groups',
+      label: 'Groups',
       render: (skill: Skill) => (
-        <div className="text-center">
-          <div className="font-medium text-neutral-900">
-            {skill.groups_count} / {skill.max_groups}
+        <div className="text-center space-y-1">
+          <div className="text-lg font-bold text-blue-600">
+            {skill.groups_count || 0}
           </div>
-          <div className="text-xs text-neutral-500">groups</div>
+          <div className="text-xs text-neutral-500">
+            of {skill.max_groups || 0} max
+          </div>
+          <div className="w-full bg-neutral-200 rounded-full h-1.5">
+            <div 
+              className="bg-blue-500 h-1.5 rounded-full transition-all duration-300" 
+              style={{ 
+                width: `${skill.max_groups ? Math.min(((skill.groups_count || 0) / skill.max_groups) * 100, 100) : 0}%` 
+              }}
+            ></div>
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: 'enrollments',
+      label: 'Enrollments',
+      render: (skill: Skill) => (
+        <div className="text-center space-y-1">
+          <div className="text-lg font-bold text-green-600">
+            {skill.enrollments_count || 0}
+          </div>
+          <div className="text-xs text-neutral-500">students</div>
         </div>
       ),
     },
@@ -102,45 +141,25 @@ export function SkillsTable({
       render: (skill: Skill) => {
         const status = getCapacityStatus(skill);
         return (
-          <div className="space-y-1">
+          <div className="space-y-2">
             <Chip
               color={status.color as any}
               size="sm"
               variant="flat"
+              className="font-medium"
             >
               {status.text}
             </Chip>
-            <div className="text-xs text-neutral-500">
-              {skill.enrollments_count} enrolled
+            <div className="text-xs text-neutral-600">
+              {skill.min_students_per_group}
+              {skill.max_students_per_group && skill.max_students_per_group !== skill.min_students_per_group
+                ? ` - ${skill.max_students_per_group}`
+                : ''
+              } per group
             </div>
           </div>
         );
       },
-    },
-    {
-      key: 'students_per_group',
-      label: 'Students/Group',
-      render: (skill: Skill) => (
-        <div className="text-center">
-          <div className="font-medium text-neutral-900">
-            {skill.min_students_per_group}
-            {skill.max_students_per_group && skill.max_students_per_group !== skill.min_students_per_group
-              ? ` - ${skill.max_students_per_group}`
-              : ''
-            }
-          </div>
-          <div className="text-xs text-neutral-500">students</div>
-        </div>
-      ),
-    },
-    {
-      key: 'allowed_levels',
-      label: 'Levels',
-      render: (skill: Skill) => (
-        <div className="text-sm text-neutral-600">
-          {formatAllowedLevels(skill.allowed_levels)}
-        </div>
-      ),
     },
     {
       key: 'actions',
@@ -184,14 +203,14 @@ export function SkillsTable({
           );
         }
         
-        if (onManageSchedule) {
+        if (onManageEnrollments) {
           menuItems.push(
             <DropdownItem
-              key="schedule"
-              startContent={<Calendar className="w-4 h-4" />}
-              onClick={() => onManageSchedule(skill)}
+              key="enrollments"
+              startContent={<UserCheck className="w-4 h-4" />}
+              onClick={() => onManageEnrollments(skill)}
             >
-              Manage Schedule
+              Manage Enrollments
             </DropdownItem>
           );
         }
@@ -211,21 +230,35 @@ export function SkillsTable({
         }
 
         return (
-          <Dropdown>
-            <DropdownTrigger>
-              <Button
-                isIconOnly
-                variant="light"
-                size="sm"
-                className="text-neutral-500 hover:text-neutral-700"
-              >
-                <MoreVertical className="w-4 h-4" />
-              </Button>
-            </DropdownTrigger>
-            <DropdownMenu aria-label="Skill actions">
-              {menuItems}
-            </DropdownMenu>
-          </Dropdown>
+          <ClientOnly fallback={
+            <Button
+              isIconOnly
+              variant="light"
+              size="sm"
+              className="text-neutral-500 hover:text-neutral-700"
+              aria-label="Skill actions"
+              isDisabled
+            >
+              <MoreVertical className="w-4 h-4" />
+            </Button>
+          }>
+            <Dropdown>
+              <DropdownTrigger>
+                <Button
+                  isIconOnly
+                  variant="light"
+                  size="sm"
+                  className="text-neutral-500 hover:text-neutral-700"
+                  aria-label="Skill actions"
+                >
+                  <MoreVertical className="w-4 h-4" />
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu aria-label="Skill actions">
+                {menuItems}
+              </DropdownMenu>
+            </Dropdown>
+          </ClientOnly>
         );
       },
     },
@@ -238,7 +271,10 @@ export function SkillsTable({
       error={error}
       columns={columns}
       emptyMessage="No skills found. Create your first skill to get started."
-      onRowClick={onView}
+      onRowClick={(skill: Skill) => {
+        // Navigate to skill groups per NEW.md pattern
+        router.push(`/admin/skills/${skill.id}/groups`)
+      }}
       emptyActionButton={
         onCreate ? (
           <Button

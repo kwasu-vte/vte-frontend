@@ -1,7 +1,7 @@
 "use client"
 import React from "react"
 import { useMemo, useState } from "react"
-import { Button, Card, CardBody, CardHeader, Chip, Pagination, Select, SelectItem, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tooltip } from "@nextui-org/react"
+import { Button, Card, CardBody, CardHeader, Chip, Pagination, Select, SelectItem, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tooltip } from "@heroui/react"
 import { useQuery } from "@tanstack/react-query"
 import { qrCodesApi } from "@/lib/api"
 import { Printer } from "lucide-react"

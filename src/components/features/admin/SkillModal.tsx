@@ -9,11 +9,11 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerBody,
+  DrawerFooter,
   Button,
   Input,
   Textarea,
@@ -23,7 +23,8 @@ import {
   Divider,
   Accordion,
   AccordionItem,
-} from '@nextui-org/react';
+  Tooltip,
+} from '@heroui/react';
 import { X, Plus, Trash2 } from 'lucide-react';
 import { Skill, CreateSkillPayload, UpdateSkillPayload } from '@/lib/types';
 
@@ -153,19 +154,9 @@ export const SkillModal = memo(function SkillModal({
   const currentMeta = watch('meta') || [];
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      size="2xl"
-      scrollBehavior="inside"
-      classNames={{
-        base: 'max-h-[95vh]',
-        body: 'py-6 max-h-[70vh] overflow-y-auto',
-        footer: 'mt-4',
-      }}
-    >
-      <ModalContent>
-        <ModalHeader className="flex flex-col gap-1">
+    <Drawer isOpen={isOpen} onClose={onClose} placement="right" size="lg">
+      <DrawerContent>
+        <DrawerHeader className="flex flex-col gap-1">
           <h2 className="text-xl font-semibold">
             {isEdit ? 'Edit Skill' : 'Create New Skill'}
           </h2>
@@ -175,10 +166,10 @@ export const SkillModal = memo(function SkillModal({
               : 'Fill in the details to create a new vocational skill.'
             }
           </p>
-        </ModalHeader>
+        </DrawerHeader>
 
         <form onSubmit={handleSubmit(onFormSubmit)}>
-          <ModalBody className="space-y-6">
+          <DrawerBody className="space-y-6">
             {/* * Basic Information */}
             <div className="space-y-4">
               <h3 className="text-lg font-medium text-neutral-900">Basic Information</h3>
@@ -321,27 +312,31 @@ export const SkillModal = memo(function SkillModal({
                 </div>
               </AccordionItem>
             </Accordion>
-          </ModalBody>
+          </DrawerBody>
 
-          <ModalFooter>
-            <Button
-              variant="light"
-              onClick={onClose}
-              isDisabled={isSubmitting || isLoading}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              color="primary"
-              isLoading={isSubmitting || isLoading}
-              isDisabled={isSubmitting || isLoading}
-            >
-              {isEdit ? 'Update Skill' : 'Create Skill'}
-            </Button>
-          </ModalFooter>
+          <DrawerFooter>
+            <Tooltip content="Close without saving" placement="top">
+              <Button
+                variant="light"
+                onClick={onClose}
+                isDisabled={isSubmitting || isLoading}
+              >
+                Cancel
+              </Button>
+            </Tooltip>
+            <Tooltip content={isEdit ? 'Save changes' : 'Create the new skill'} placement="top">
+              <Button
+                type="submit"
+                color="primary"
+                isLoading={isSubmitting || isLoading}
+                isDisabled={isSubmitting || isLoading}
+              >
+                {isEdit ? 'Update Skill' : 'Create Skill'}
+              </Button>
+            </Tooltip>
+          </DrawerFooter>
         </form>
-      </ModalContent>
-    </Modal>
+      </DrawerContent>
+    </Drawer>
   );
 });

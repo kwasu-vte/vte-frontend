@@ -1,3 +1,106 @@
+## feat(admin): enhanced navigation and UX improvements
+
+### Navigation & Query Parameters
+- Added query parameter support for all filters across admin pages
+- Implemented URL-based navigation for manage enrollments and groups
+- Added deep linking support for filtered views
+- Enhanced browser back/forward navigation with filter persistence
+- Improved shareable URLs with filter states
+
+### Skills Page Enhancements
+- Added "Manage Enrollments" option to skills table dropdown
+- Implemented navigation to enrollments page with skill filter
+- Added navigation to groups management with skill context
+- Enhanced skills table with better visual hierarchy
+
+### Mentor Skill Assignment Modal
+- Completely redesigned mentor skill assignment interface
+- Added comprehensive overview dashboard with key metrics
+- Implemented dual-panel layout (assigned vs available skills)
+- Enhanced visual feedback with color-coded sections
+- Added skill descriptions in dropdown selections
+- Improved empty states with helpful messaging
+- Added loading states and progress indicators
+- Enhanced accessibility with better labels and ARIA support
+
+### Filter System Improvements
+- All filters now sync with URL query parameters
+- Added filter persistence across page navigation
+- Implemented filter state restoration on page load
+- Enhanced filter clearing functionality
+- Improved filter count displays
+
+## feat(admin): comprehensive admin dashboard improvements
+
+### Skills Page Improvements
+- Enhanced skills table design with better visual hierarchy and progress bars
+- Added chip-based level display in skill name column
+- Improved groups column with progress visualization
+- Added dedicated enrollments column with better metrics
+- Removed manage schedule option from skills table
+- Fixed max groups display to show actual count instead of hardcoded /100
+- Updated skill details modal to fetch specific skill data for comprehensive information
+
+### Groups Page Improvements
+- Added client-side filter by unique skills with dropdown selection
+- Enhanced filter UI with skill count display
+- Improved visual feedback for filtered results
+
+### Enrollment Page Improvements
+- Fixed empty skill select by properly handling API response structure
+- Added "(current)" indicator to active academic session in session selects
+- Improved data parsing for both direct array and paginated responses
+
+### Students Page Improvements
+- Added comprehensive filtering system with multiple filter options:
+  - Skill filter (dropdown with all available skills)
+  - Department filter (predefined departments)
+  - Level filter (100-500 levels)
+  - Enrollment status filter (pending, approved, rejected, completed)
+- Enhanced filter UI with responsive grid layout
+- Added filter count display and clear functionality
+- Improved search functionality with better field coverage
+
+### Mentors Page Improvements
+- Added multiple skill filtering with multi-select dropdown
+- Enhanced filter UI with clear skills filter button
+- Improved filtering logic to handle both JSON string and array skill formats
+- Added filter count display
+
+### General Improvements
+- Added "(current)" indicator to all session selects across admin pages
+- Improved filter UI consistency across all admin pages
+- Enhanced visual feedback with filter counts and clear buttons
+- Better responsive design for filter layouts
+
+## feat(admin): enhanced group details modal design
+
+- Redesigned group details modal with modern card-based layout
+- Added gradient overview card with key metrics display
+- Improved capacity visualization with animated progress bar
+- Enhanced skill information section with better typography and chip displays
+- Added academic session details with proper date formatting
+- Implemented loading spinner with better UX
+- Increased modal size to 2xl for better content display
+- Added color-coded status indicators and visual hierarchy
+
+## fix(admin): groups page improvements
+
+- Fixed groups page to show correct member count from API data (current_student_count)
+- Removed mentor column from groups table as requested
+- Removed ID display from groups table for cleaner UI
+- Updated view details modal to fetch specific skill group data with comprehensive information
+- Added detailed skill information, capacity overview, and academic session details in modal
+- Improved data mapping to use actual API response structure
+
+## fix(admin): mentors page search now uses client-side filtering
+
+- Changed mentors page search from server-side to client-side filtering
+- Removed search parameter from React Query key to prevent unnecessary API calls
+- Increased per_page limit to 100 to support client-side filtering
+- Search now filters by mentor name, email, and specialization locally
+- Improves performance and provides instant search results
+
 ## feat(student): redesign student homepage UI/UX
 
 - Added gradient hero with quick refresh and tour entry
@@ -8,6 +111,22 @@
 - Better empty state for UpcomingPracticals with Schedule links
 
 ## [Unreleased]
+
+### Added / Changed
+- Admin Enrollments: Implemented HeroUI-based layout per docs/NEW.md
+  - Prominent Filters card with session/skill selectors
+  - Auto-assign button moved to Filters header; disabled until both filters selected
+  - Manual assignment modals now show only groups with capacity (and respect selected session/skill)
+- Admin Skills: Row click navigates to `/admin/skills/[skillId]/groups` per NEW.md
+- Admin Skill Groups: Switched to HeroUI Cards with row hover and status chips
+- Admin Students: Added Filters card and Results card with count; search moved into Filters
+- Admin Mentors: Added Filters card and Results card with count; search moved into Filters
+- Admin Enrollments: Group select options now show capacity (current/max) in assign/reassign
+- Mentor Dashboard: Added hover state on schedule cards for better affordance
+- Student Dashboard: Prominent empty state card for no active enrollment
+- Tables: Added tooltips to action triggers (Skills, Students, Mentors, Enrollments)
+- Modals → Drawers: Switched `SkillModal` and `MentorModal` to Drawer UX with action tooltips
+- Modals → Drawers: Switched `StudentModal` and `GroupModal` to Drawer UX with action tooltips
 
 ### Added
 - Onboarding: Integrated Onborda provider in root layout, added shared steps (`src/onborda/steps.tsx`) and custom card (`src/onborda/TourCard.tsx`), plus Start Tour buttons on Admin/Mentor/Student dashboards. Tailwind updated to scan Onborda dist for classes.
@@ -736,3 +855,16 @@
 - UI: Hide all "Start Tour" buttons by rendering `StartTourButton` as a no-op component.
 ### Fixed
 - PWA: Made student dashboard installation optional again. Removed hard `RequirePWA` gate and added non-blocking `FloatingInstallPrompt` for students.
+
+## 2025-10-10T13:17:03+01:00
+- Tailwind v4 directives updated; switched to @import 'tailwindcss'
+- HeroUI v2 integration: removed unsupported SelectItem value props
+- Removed NextUI dependency to avoid conflicts
+- Fixed strict TS types: QR scanner parsing, pdf generator types, Blob guards
+- Deleted legacy tailwind.config.ts and wired @config to JS file
+- Clean TS build (npx tsc --noEmit) and Next build
+
+## 2025-10-10
+- Added reassignStudent helper in src/lib/api/skill-groups.ts (remove + assign flow)
+- Updated admin enrollments UI to support Reassign action and modal
+- No breaking changes to existing APIs; purely additive UI capability

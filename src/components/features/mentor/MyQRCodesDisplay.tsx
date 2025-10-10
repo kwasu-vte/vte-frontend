@@ -1,6 +1,6 @@
 "use client"
 import React from "react"
-import { Card, CardBody, CardHeader, Button, Chip, Skeleton } from "@nextui-org/react"
+import { Card, CardBody, CardHeader, Button, Chip, Skeleton } from "@heroui/react"
 import { useQuery } from "@tanstack/react-query"
 import { qrCodesApi } from "@/lib/api"
 import type { PaginatedResponse, GroupQrCode } from "@/lib/types"

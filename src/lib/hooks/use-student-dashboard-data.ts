@@ -38,6 +38,7 @@ export function useStudentDashboardData(userId: string): StudentDashboardData {
         student_level_int: String(studentProfile.student_level_int ?? ''),
         attendances_count: String(studentProfile.attendances_count ?? '0'),
         enrollments_count: String(studentProfile.enrollments_count ?? '0'),
+        user_id: String(userId),
       };
       console.log('[useStudentDashboardData] normalized studentProfile', normalized);
       return normalized;

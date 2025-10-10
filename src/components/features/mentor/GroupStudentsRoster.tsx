@@ -1,8 +1,6 @@
 "use client"
 import React from "react"
-import { Input, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Skeleton, Chip, Avatar, Button } from "@nextui-org/react"
-import { useQuery } from "@tanstack/react-query"
-import { skillGroupsApi } from "@/lib/api"
+import { Input, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip, Avatar } from "@heroui/react"
 import type { SkillGroup, User } from "@/lib/types"
 
 /**
@@ -10,74 +8,47 @@ import type { SkillGroup, User } from "@/lib/types"
  * Detailed student list for a specific group with search/filter.
  *
  * Props:
- * - groupId: number (required when fetching)
+ * - group: SkillGroup (required group data)
  * - title?: string (optional title override)
  */
 export type GroupStudentsRosterProps = {
-  groupId: number
+  group: SkillGroup
   title?: string
 }
 
 export default function GroupStudentsRoster(props: GroupStudentsRosterProps) {
-  const { groupId, title } = props
+  const { group, title } = props
 
-  const { data, isLoading, isError, error, refetch } = useQuery({
-    queryKey: ["group-details", groupId],
-    queryFn: async () => {
-      const res = await skillGroupsApi.getById(groupId)
-      return res?.data as SkillGroup
-    },
-  })
+  // * Extract students from enrollments
+  const students = React.useMemo(() => {
+    return group.enrollments?.map(enrollment => enrollment.user).filter(Boolean) as User[] || []
+  }, [group.enrollments])
 
   const [search, setSearch] = React.useState("")
 
-  // * Loading state with table skeleton
-  if (isLoading) {
-    return (
-      <div className="space-y-4">
-        <Skeleton className="h-7 w-48 rounded-md" />
-        <Skeleton className="h-10 w-full rounded-md" />
-        <div className="border rounded-lg">
-          {Array.from({ length: 5 }).map((_, idx) => (
-            <div key={idx} className="p-4 border-b last:border-b-0">
-              <Skeleton className="h-5 w-3/4 rounded-md" />
-            </div>
-          ))}
-        </div>
-      </div>
-    )
-  }
-
-  // * Error state
-  if (isError) {
-    return (
-      <div className="flex flex-col items-center justify-center text-center p-8 border rounded-lg bg-neutral-50">
-        <p className="text-base font-medium text-neutral-900 mb-2">Failed to load roster</p>
-        <p className="text-sm text-neutral-500 mb-4">{(error as any)?.message ?? "Please try again."}</p>
-        <Button color="primary" onPress={() => refetch()}>Retry</Button>
-      </div>
-    )
-  }
-
-  const students: User[] = (data?.enrollments as any)?.map((e: any) => e.user) ?? []
-
-  const filtered = students.filter((s) => {
-    const full = `${s.first_name ?? ""} ${s.last_name ?? ""}`.trim().toLowerCase()
-    const matric = (s.matric_number ?? "").toLowerCase()
+  // * Filter students based on search
+  const filteredStudents = React.useMemo(() => {
+    if (!search.trim()) return students
     const q = search.trim().toLowerCase()
-    if (!q) return true
-    return full.includes(q) || matric.includes(q)
-  })
+    return students.filter(student => 
+      student.name?.toLowerCase().includes(q) ||
+      student.email?.toLowerCase().includes(q) ||
+      student.phone?.toLowerCase().includes(q)
+    )
+  }, [students, search])
+
+  // * No loading state needed since we have the data
+
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-xl font-medium text-neutral-900">{title ?? data?.group_display_name ?? `Group ${data?.group_number ?? groupId}`}</p>
-          <p className="text-sm text-neutral-500">{data?.skill?.title ?? ""}</p>
+          <p className="text-xl font-medium text-neutral-900">{title ?? group.group_display_name ?? `Group ${group.group_number ?? group.id}`}</p>
+          <p className="text-sm text-neutral-500">{group.skill?.title ?? ""}</p>
         </div>
-        <Chip variant="flat" color={data?.is_full ? "danger" : "success"}>
-          {filtered.length} / {Number(data?.max_student_capacity ?? 0)}
+        <Chip variant="flat" color={students.length >= Number(group.max_student_capacity ?? 0) ? "danger" : "success"}>
+          {filteredStudents.length} / {Number(group.max_student_capacity ?? 0)}
         </Chip>
       </div>
 
@@ -100,7 +71,7 @@ export default function GroupStudentsRoster(props: GroupStudentsRosterProps) {
             <div className="text-sm text-neutral-500 py-6">No students found.</div>
           }
         >
-          {filtered.map((s) => (
+          {filteredStudents.map((s) => (
             <TableRow key={s.id}>
               <TableCell>
                 <div className="flex items-center gap-3">

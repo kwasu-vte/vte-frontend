@@ -16,9 +16,11 @@ export function ClientOnly({ children, fallback = null }: ClientOnlyProps) {
   const [hasMounted, setHasMounted] = useState(false);
 
   useEffect(() => {
+    // * Ensure we're on the client and DOM is ready
     setHasMounted(true);
   }, []);
 
+  // * During SSR and initial hydration, show fallback
   if (!hasMounted) {
     return <>{fallback}</>;
   }

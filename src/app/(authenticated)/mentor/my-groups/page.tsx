@@ -1,9 +1,9 @@
 'use server'
 
 import { requireRole } from '@/lib/auth'
-import MentorGroupsPageView from '@/components/features/mentor/MentorGroupsPageView'
+import MentorSkillsAndGroupsView from '@/components/features/mentor/MentorSkillsAndGroupsView'
 
 export default async function MentorGroupsPage() {
   const user = await requireRole('Mentor')
-  return <MentorGroupsPageView userId={String(user.id)} />
+  return <MentorSkillsAndGroupsView userId={String(user.id)} />
 }

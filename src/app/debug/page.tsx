@@ -1,5 +1,7 @@
 'use client';
 
+import { Trash2, AlertTriangle } from 'lucide-react';
+
 // * Debug page to help diagnose button issues
 export default function DebugPage() {
   console.log('🔧 DebugPage component mounted');
@@ -106,12 +108,16 @@ export default function DebugPage() {
             fontSize: '14px'
           }}
         >
-          🗑️ Clear All Caches & Service Workers
+          <Trash2 className="w-4 h-4 inline mr-2" />
+          Clear All Caches & Service Workers
         </button>
       </div>
 
       <div style={{ marginTop: '30px', padding: '15px', backgroundColor: '#fff3cd', borderRadius: '5px', border: '1px solid #ffeaa7' }}>
-        <h4>⚠️ Troubleshooting Steps:</h4>
+        <h4>
+          <AlertTriangle className="w-4 h-4 inline mr-2" />
+          Troubleshooting Steps:
+        </h4>
         <ol>
           <li><strong>Clear browser cache manually</strong> (Ctrl+Shift+Delete)</li>
           <li><strong>Open DevTools</strong> (F12) and check Console tab for errors</li>

@@ -5,7 +5,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, Select, SelectItem } from '@nextui-org/react';
+import { Drawer, DrawerContent, DrawerHeader, DrawerBody, DrawerFooter, Button, Input, Select, SelectItem, Tooltip } from '@heroui/react';
 import { Group, CreateGroupPayload } from '@/lib/types';
 import { useQuery } from '@tanstack/react-query';
 import { skillsApi, mentorsApi } from '@/lib/api';
@@ -98,23 +98,18 @@ export function GroupModal({
   const isFormValid = formData.name && formData.skillId;
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      size="2xl"
-      scrollBehavior="inside"
-    >
-      <ModalContent>
-        <ModalHeader className="flex flex-col gap-1">
+    <Drawer isOpen={isOpen} onClose={onClose} placement="right" size="lg">
+      <DrawerContent>
+        <DrawerHeader className="flex flex-col gap-1">
           <h2 className="text-xl font-semibold">
             {group ? 'Edit Group' : 'Create New Group'}
           </h2>
           <p className="text-sm text-neutral-600">
             {group ? 'Update group information' : 'Fill in the details to create a new group'}
           </p>
-        </ModalHeader>
+        </DrawerHeader>
         <form onSubmit={handleSubmit}>
-          <ModalBody className="space-y-4">
+          <DrawerBody className="space-y-4">
             <Input
               label="Group Name"
               placeholder="Enter group name"
@@ -136,7 +131,7 @@ export function GroupModal({
               variant="bordered"
             >
               {skills?.map((skill) => (
-                <SelectItem key={skill.id} value={skill.id}>
+                <SelectItem key={skill.id}>
                   {skill.title}
                 </SelectItem>
               )) || []}
@@ -153,7 +148,7 @@ export function GroupModal({
               variant="bordered"
             >
               {mentors?.map((mentor) => (
-                <SelectItem key={mentor.id} value={mentor.id}>
+                <SelectItem key={mentor.id}>
                   {mentor.full_name || mentor.user?.first_name + ' ' + mentor.user?.last_name || String(mentor.id)}
                 </SelectItem>
               )) || []}
@@ -166,26 +161,30 @@ export function GroupModal({
               onChange={(e) => handleInputChange('description', e.target.value)}
               variant="bordered"
             />
-          </ModalBody>
-          <ModalFooter>
-            <Button
-              variant="light"
-              onClick={onClose}
-              isDisabled={isLoading}
-            >
-              Cancel
-            </Button>
-            <Button
-              color="primary"
-              type="submit"
-              isLoading={isLoading}
-              isDisabled={!isFormValid || isLoading}
-            >
-              {group ? 'Update Group' : 'Create Group'}
-            </Button>
-          </ModalFooter>
+          </DrawerBody>
+          <DrawerFooter>
+            <Tooltip content="Close without saving" placement="top">
+              <Button
+                variant="light"
+                onClick={onClose}
+                isDisabled={isLoading}
+              >
+                Cancel
+              </Button>
+            </Tooltip>
+            <Tooltip content={group ? 'Save changes' : 'Create group'} placement="top">
+              <Button
+                color="primary"
+                type="submit"
+                isLoading={isLoading}
+                isDisabled={!isFormValid || isLoading}
+              >
+                {group ? 'Update Group' : 'Create Group'}
+              </Button>
+            </Tooltip>
+          </DrawerFooter>
         </form>
-      </ModalContent>
-    </Modal>
+      </DrawerContent>
+    </Drawer>
   );
 }

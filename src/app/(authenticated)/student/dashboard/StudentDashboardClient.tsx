@@ -12,7 +12,7 @@ import { GroupAssignmentCard } from '@/components/features/student/GroupAssignme
 import { QuickActions } from '@/components/features/student/QuickActions';
 import { NotificationContainer } from '@/components/shared/NotificationContainer';
 import { StateRenderer } from '@/components/shared/StateRenderer';
-import { Card, CardBody, CardHeader, Skeleton, Button, Chip } from '@nextui-org/react';
+import { Card, CardBody, CardHeader, Skeleton, Button, Chip } from '@heroui/react';
 import { ListSkeleton, CardGridSkeleton } from '@/components/shared/Skeletons';
 import Link from 'next/link';
 import { BookOpen, CreditCard, Users } from 'lucide-react';
@@ -160,14 +160,20 @@ export function StudentDashboardClient({ userId }: StudentDashboardClientProps) 
                 onRetry={refetchAll}
                 loadingComponent={<div className="py-2"><ListSkeleton rows={2} /></div>}
                 emptyComponent={
-                  <div className="text-center">
-                    <BookOpen className="h-10 w-10 text-primary mb-2 inline-block" />
-                    <p className="text-xl font-medium leading-normal">No Active Enrollment</p>
-                    <p className="text-sm text-neutral-600 mt-1">You haven&apos;t enrolled in any skills yet. Browse available skills to get started.</p>
-                    <div className="mt-4">
-                      <Button as={Link} href="/student/skills" color="primary" variant="solid">Browse Skills</Button>
-                    </div>
-                  </div>
+                  <Card shadow="sm" className="w-full border-primary-200 bg-primary-50">
+                    <CardHeader className="flex items-center gap-3">
+                      <BookOpen className="h-6 w-6 text-primary" />
+                      <div>
+                        <p className="text-lg font-medium leading-normal">No Active Enrollment</p>
+                        <p className="text-sm text-neutral-700">You haven&apos;t enrolled in any skills yet. Browse available skills to get started.</p>
+                      </div>
+                    </CardHeader>
+                    <CardBody className="p-6">
+                      <div className="flex items-center justify-end">
+                        <Button as={Link} href="/student/skills" color="primary" variant="solid">Browse Skills</Button>
+                      </div>
+                    </CardBody>
+                  </Card>
                 }
               >
                 {(enrollment) => (

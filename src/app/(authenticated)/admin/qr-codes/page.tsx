@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from 'react';
-import { Card, CardBody, CardHeader, Select, SelectItem, Modal, ModalContent, ModalHeader, ModalBody, useDisclosure } from '@nextui-org/react';
+import { Card, CardBody, CardHeader, Select, SelectItem, Modal, ModalContent, ModalHeader, ModalBody, useDisclosure } from '@heroui/react';
 import { QRCodeTable } from '@/components/features/admin/QRCodeTable';
 import { QRWizard } from '@/components/features/admin/QRWizard';
 import { useQuery } from '@tanstack/react-query';

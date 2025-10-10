@@ -1,6 +1,6 @@
 "use client"
 import React from "react"
-import { Card, CardHeader, CardBody, Button, Chip } from "@nextui-org/react"
+import { Card, CardHeader, CardBody, Button, Chip } from "@heroui/react"
 
 export type PracticalQRCardProps = {
   practical: { id: string; date: string; group: string }

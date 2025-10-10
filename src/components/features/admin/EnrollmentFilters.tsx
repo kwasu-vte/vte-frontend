@@ -1,6 +1,6 @@
 "use client"
 import React from "react"
-import { Select, SelectItem, Button } from "@nextui-org/react"
+import { Select, SelectItem, Button } from "@heroui/react"
 import { academicSessionsApi, skillsApi } from "@/lib/api"
 import { useQuery } from "@tanstack/react-query"
 import type { AcademicSession, Skill } from "@/lib/types"
@@ -37,9 +37,21 @@ export function EnrollmentFilters({ value, onChange, defaultPerPage = 25 }: Enro
   const [filters, setFilters] = React.useState<{ academic_session_id?: number; skill_id?: string; per_page?: number }>(value || { per_page: defaultPerPage })
 
   const sessions = React.useMemo(() => (sessionsResp?.data as AcademicSession[]) || [], [sessionsResp?.data])
-  const skills = Array.isArray((skillsResp as any)?.data)
-    ? ((skillsResp?.data as unknown) as Skill[])
-    : ((((skillsResp as any)?.data?.items as unknown) as Skill[]) || [])
+  const skills = React.useMemo(() => {
+    if (!skillsResp?.data) return []
+    
+    // * Handle both direct array and paginated response
+    if (Array.isArray(skillsResp.data)) {
+      return skillsResp.data as Skill[]
+    }
+    
+    // * Handle paginated response with items
+    if ((skillsResp.data as any)?.items) {
+      return (skillsResp.data as any).items as Skill[]
+    }
+    
+    return []
+  }, [skillsResp?.data])
 
   // * Prefer the globally active session from the store when absent
   React.useEffect(() => {
@@ -83,12 +95,9 @@ export function EnrollmentFilters({ value, onChange, defaultPerPage = 25 }: Enro
           onChange={(e) => handleChange("academic_session_id", e.target.value ? Number(e.target.value) : undefined)}
           placeholder="Academic sessions"
           size="sm"
+          items={[{ key: 'all', name: 'All Sessions' }, ...sessions.map(session => ({ key: String(session.id), name: session.name, active: (session as any).active }))]}
         >
-          {sessions.map((s) => (
-            <SelectItem key={String(s.id)} value={s.id}>
-              {s.name}
-            </SelectItem>
-          ))}
+          {(session) => <SelectItem key={session.key}>{session.name}{(session as any).active ? ' (current)' : ''}</SelectItem>}
         </Select>
       </div>
 
@@ -100,12 +109,9 @@ export function EnrollmentFilters({ value, onChange, defaultPerPage = 25 }: Enro
           onChange={(e) => handleChange("skill_id", e.target.value || undefined)}
           placeholder="All skills"
           size="sm"
+          items={[{ key: 'all', title: 'All Skills' }, ...skills.map(skill => ({ key: skill.id, title: skill.title }))]}
         >
-          {skills.map((sk) => (
-            <SelectItem key={sk.id} value={sk.id}>
-              {sk.title}
-            </SelectItem>
-          ))}
+          {(skill) => <SelectItem key={skill.key}>{skill.title}</SelectItem>}
         </Select>
       </div>
 

@@ -5,7 +5,8 @@
 'use client';
 
 import React from 'react';
-import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@nextui-org/react';
+import { FolderOpen } from 'lucide-react';
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
 import { StateRenderer, DefaultLoadingComponent, DefaultErrorComponent, DefaultEmptyComponent } from './StateRenderer';
 
 interface DataTableProps<T> {
@@ -60,7 +61,9 @@ export function DataTable<T>({
         if (!items) {
           return (
             <div className="p-6 text-center">
-              <div className="text-neutral-400 text-6xl mb-4">📭</div>
+              <div className="text-neutral-400 mb-4">
+                <FolderOpen className="w-16 h-16" />
+              </div>
               <h3 className="text-xl font-semibold text-neutral-900 mb-2">No data found</h3>
               <p className="text-neutral-600 mb-4">{emptyMessage}</p>
               {emptyActionButton}
@@ -83,16 +86,17 @@ export function DataTable<T>({
           );
         }
         
+        const selectionMode = onRowClick ? 'single' : 'none' as const
         return (
           <Table
             aria-label="Data table"
-            selectionMode="single"
-            onRowAction={(key) => {
-              if (onRowClick) {
-                const item = safeItems.find((_, index) => index.toString() === key);
-                if (item) onRowClick(item);
+            selectionMode={selectionMode}
+            {...(onRowClick ? {
+              onRowAction: (key: React.Key) => {
+                const item = safeItems.find((it: any) => String(it?.id ?? '') === String(key))
+                if (item) onRowClick(item)
               }
-            }}
+            } : {})}
             classNames={{
               wrapper: "shadow-sm",
             }}
@@ -105,8 +109,8 @@ export function DataTable<T>({
               )}
             </TableHeader>
             <TableBody items={safeItems}>
-              {(item) => (
-                <TableRow key={(item as any).id || Math.random()}>
+              {(item: any) => (
+                <TableRow key={String(item?.id ?? Math.random())}>
                   {columns.map((column) => (
                     <TableCell key={column.key}>
                       {column.render ? column.render(item) : (item as any)[column.key]}
@@ -124,6 +128,9 @@ export function DataTable<T>({
 
 // * Skeleton Row Component for Loading States
 export function TableSkeleton({ columns, rows = 5 }: { columns: number; rows?: number }) {
+  // * Use deterministic widths to prevent hydration mismatch
+  const widths = ['w-20', 'w-32', 'w-24', 'w-28', 'w-16', 'w-36', 'w-22', 'w-30'];
+  
   return (
     <div className="space-y-3">
       {Array.from({ length: rows }).map((_, rowIndex) => (
@@ -131,8 +138,7 @@ export function TableSkeleton({ columns, rows = 5 }: { columns: number; rows?: n
           {Array.from({ length: columns }).map((_, colIndex) => (
             <div
               key={colIndex}
-              className="h-4 bg-neutral-200 rounded animate-pulse"
-              style={{ width: `${Math.random() * 100 + 100}px` }}
+              className={`h-4 bg-neutral-200 rounded animate-pulse ${widths[colIndex % widths.length]}`}
             />
           ))}
         </div>

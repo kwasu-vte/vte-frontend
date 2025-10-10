@@ -5,7 +5,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, Select, SelectItem, Textarea } from '@nextui-org/react';
+import { Drawer, DrawerContent, DrawerHeader, DrawerBody, DrawerFooter, Button, Input, Select, SelectItem, Textarea, Tooltip } from '@heroui/react';
 import { User, CreateMentorProfilePayload, UpdateUserPayload, MentorProfile } from '@/lib/types';
 import { getSpecializationOptions } from '@/lib/utils/specialization';
 
@@ -121,23 +121,18 @@ export function MentorModal({
   const specializationOptions = getSpecializationOptions();
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      size="2xl"
-      scrollBehavior="inside"
-    >
-      <ModalContent>
-        <ModalHeader className="flex flex-col gap-1">
+    <Drawer isOpen={isOpen} onClose={onClose} placement="right" size="lg">
+      <DrawerContent>
+        <DrawerHeader className="flex flex-col gap-1">
           <h2 className="text-xl font-semibold">
             {mentor ? 'Edit Mentor' : 'Add New Mentor'}
           </h2>
           <p className="text-sm text-neutral-600">
             {mentor ? 'Update mentor information' : 'Fill in the details to add a new mentor'}
           </p>
-        </ModalHeader>
+        </DrawerHeader>
         <form onSubmit={handleSubmit}>
-          <ModalBody className="space-y-4">
+          <DrawerBody className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Input
                 // label="First Name"
@@ -168,6 +163,7 @@ export function MentorModal({
             />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              
             <Select
   placeholder="Mentorship"
   selectedKeys={["mentorship"]} // Hardcode the default value
@@ -184,7 +180,8 @@ export function MentorModal({
     Mentorship
   </SelectItem>
 </Select>
-              <Input
+
+     <Input
                 // label="Phone Number"
                 placeholder="Enter phone number"
                 value={formData.phone}
@@ -253,26 +250,30 @@ export function MentorModal({
                 />
               </div>
             )}
-          </ModalBody>
-          <ModalFooter>
-            <Button
-              variant="light"
-              onClick={onClose}
-              isDisabled={isLoading}
-            >
-              Cancel
-            </Button>
-            <Button
-              color="primary"
-              type="submit"
-              isLoading={isLoading}
-              isDisabled={!isFormValid || !isPasswordMatch || isLoading}
-            >
-              {mentor ? 'Update Mentor' : 'Add Mentor'}
-            </Button>
-          </ModalFooter>
+          </DrawerBody>
+          <DrawerFooter>
+            <Tooltip content="Close without saving" placement="top">
+              <Button
+                variant="light"
+                onClick={onClose}
+                isDisabled={isLoading}
+              >
+                Cancel
+              </Button>
+            </Tooltip>
+            <Tooltip content={mentor ? 'Save changes' : 'Create mentor'} placement="top">
+              <Button
+                color="primary"
+                type="submit"
+                isLoading={isLoading}
+                isDisabled={!isFormValid || !isPasswordMatch || isLoading}
+              >
+                {mentor ? 'Update Mentor' : 'Add Mentor'}
+              </Button>
+            </Tooltip>
+          </DrawerFooter>
         </form>
-      </ModalContent>
-    </Modal>
+      </DrawerContent>
+    </Drawer>
   );
 }
