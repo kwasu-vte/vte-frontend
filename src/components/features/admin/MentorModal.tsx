@@ -168,23 +168,22 @@ export function MentorModal({
             />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Select
-                // label="Specialization"
-                placeholder="Select specialization"
-                selectedKeys={formData.specialization ? [formData.specialization] : []}
-                onSelectionChange={(keys) => {
-                  const selectedKey = Array.from(keys)[0] as string;
-                  handleInputChange('specialization', selectedKey);
-                }}
-                isRequired
-                variant="bordered"
-              >
-                {specializationOptions.map((option) => (
-                  <SelectItem key={option.key} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </Select>
+            <Select
+  placeholder="Mentorship"
+  selectedKeys={["mentorship"]} // Hardcode the default value
+  onSelectionChange={(keys) => {
+    const selectedKey = Array.from(keys)[0] as string;
+    handleInputChange('specialization', selectedKey);
+  }}
+  isRequired
+  variant="bordered"
+  isDisabled // Makes it read-only
+  disallowEmptySelection // Keeps the selection locked
+>
+  <SelectItem key="mentorship" value="mentorship">
+    Mentorship
+  </SelectItem>
+</Select>
               <Input
                 // label="Phone Number"
                 placeholder="Enter phone number"
