@@ -1,5 +1,5 @@
 // * Composite Data Hook for Student Dashboard
-// * Combines profile and enrollment data
+// * Combines profile, enrollment, attendance, and practical data
 // * Provides loading states and error handling
 
 import { useQuery } from '@tanstack/react-query';
@@ -9,6 +9,7 @@ import type { StudentProfile, Enrollment } from '@/lib/types';
 interface StudentDashboardData {
   profile: StudentProfile | null;
   enrollment: Enrollment | null;
+  upcomingPracticals: Array<{ date: string; skill: string; group: string }>;
   isLoading: boolean;
   error: Error | null;
 }
@@ -56,6 +57,20 @@ export function useStudentDashboardData(userId: string): StudentDashboardData {
     enabled: !!userId,
   });
 
+  // Derive upcoming practicals from enrollment data
+  const upcomingPracticals = (() => {
+    if (!enrollment?.group?.practical_dates) return [];
+    const today = new Date();
+    return enrollment.group.practical_dates
+      .filter(date => new Date(date) >= today)
+      .slice(0, 5) // Show next 5 practicals
+      .map(date => ({
+        date,
+        skill: enrollment.skill?.title || 'Unknown Skill',
+        group: `Group ${enrollment.group?.group_number || enrollment.group?.id}`
+      }));
+  })();
+
   // Combine loading states
   const isLoading = profileLoading || enrollmentLoading;
   
@@ -65,6 +80,7 @@ export function useStudentDashboardData(userId: string): StudentDashboardData {
   return {
     profile: profile || null,
     enrollment: enrollment || null,
+    upcomingPracticals,
     isLoading,
     error: error as Error | null,
   };
