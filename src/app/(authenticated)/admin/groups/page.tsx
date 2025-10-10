@@ -66,12 +66,12 @@ export default function AdminGroupsPage() {
       const res = await skillGroupsApi.list({ per_page: 100 });
       const results = res.data?.items ?? [];
       // * Map to Group[] shape for this table (best-effort)
-      const mapped = results.map((g: any) => ({
+      const mapped = results.map((g: SkillGroup) => ({
         id: String(g.id),
         name: g.group_display_name || `Group ${g.group_number}`,
         skill: { id: String(g.skill?.id ?? ''), title: g.skill?.title ?? 'Unknown' },
         mentor: null,
-        members: Array.from({ length: g.current_student_count || 0 }, (_, i) => ({ 
+        members: Array.from({ length: Number(g.current_student_count) || 0 }, (_, i) => ({ 
           id: `member-${i}`, 
           first_name: 'Student', 
           last_name: `${i + 1}` 
@@ -145,19 +145,16 @@ export default function AdminGroupsPage() {
               <Select
                 label="Filter by Skill"
                 placeholder="Select a skill"
-                selectedKeys={selectedSkillFilter ? [selectedSkillFilter] : []}
+                selectedKeys={selectedSkillFilter !== 'all' ? [selectedSkillFilter] : []}
                 onSelectionChange={(keys) => {
                   const selected = Array.from(keys)[0] as string
-                  updateFilter(selected || 'all')
+                  const value = selected || 'all';
+                  updateFilter(value)
                 }}
                 variant="bordered"
+                items={[{ key: 'all', title: 'All Skills' }, ...uniqueSkills.map(skill => ({ key: skill.id, title: skill.title }))]}
               >
-                <SelectItem key="all" value="all">All Skills</SelectItem>
-                {uniqueSkills.map((skill) => (
-                  <SelectItem key={skill.id} value={skill.id}>
-                    {skill.title}
-                  </SelectItem>
-                ))}
+                {(skill) => <SelectItem key={skill.key}>{skill.title}</SelectItem>}
               </Select>
             </div>
             <Chip variant="flat" color="primary">
@@ -367,7 +364,7 @@ export default function AdminGroupsPage() {
                           </p>
                           {detailedGroupData?.academic_session && (
                             <div className="text-xs text-neutral-600 mt-1">
-                              {new Date(detailedGroupData.academic_session.starts_at).toLocaleDateString()} - {new Date(detailedGroupData.academic_session.ends_at).toLocaleDateString()}
+                              {detailedGroupData.academic_session.starts_at ? new Date(detailedGroupData.academic_session.starts_at).toLocaleDateString() : 'N/A'} - {detailedGroupData.academic_session.ends_at ? new Date(detailedGroupData.academic_session.ends_at).toLocaleDateString() : 'N/A'}
                             </div>
                           )}
                         </div>

@@ -191,9 +191,10 @@ export default function MentorSkillAssignment(props: MentorSkillAssignmentProps)
                     placeholder="Choose a skill to assign"
                     variant="bordered"
                     size="lg"
+                    items={available.map(skill => ({ key: skill.id, title: skill.title, description: skill.description }))}
                   >
-                    {available.map((skill) => (
-                      <SelectItem key={skill.id} value={skill.id}>
+                    {(skill) => (
+                      <SelectItem key={skill.key}>
                         <div className="flex flex-col">
                           <span className="font-medium">{skill.title}</span>
                           {skill.description && (
@@ -201,7 +202,7 @@ export default function MentorSkillAssignment(props: MentorSkillAssignmentProps)
                           )}
                         </div>
                       </SelectItem>
-                    ))}
+                    )}
                   </Select>
                 </div>
                 

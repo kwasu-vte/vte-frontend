@@ -95,15 +95,9 @@ export function EnrollmentFilters({ value, onChange, defaultPerPage = 25 }: Enro
           onChange={(e) => handleChange("academic_session_id", e.target.value ? Number(e.target.value) : undefined)}
           placeholder="Academic sessions"
           size="sm"
+          items={[{ key: 'all', name: 'All Sessions' }, ...sessions.map(session => ({ key: String(session.id), name: session.name, active: (session as any).active }))]}
         >
-          <SelectItem key="all" value="">
-            All Sessions
-          </SelectItem>
-          {sessions.map((s) => (
-            <SelectItem key={String(s.id)} value={String(s.id)}>
-              {s.name}{(s as any).active ? ' (current)' : ''}
-            </SelectItem>
-          ))}
+          {(session) => <SelectItem key={session.key}>{session.name}{(session as any).active ? ' (current)' : ''}</SelectItem>}
         </Select>
       </div>
 
@@ -115,15 +109,9 @@ export function EnrollmentFilters({ value, onChange, defaultPerPage = 25 }: Enro
           onChange={(e) => handleChange("skill_id", e.target.value || undefined)}
           placeholder="All skills"
           size="sm"
+          items={[{ key: 'all', title: 'All Skills' }, ...skills.map(skill => ({ key: skill.id, title: skill.title }))]}
         >
-          <SelectItem key="all" value="">
-            All Skills
-          </SelectItem>
-          {skills.map((sk) => (
-            <SelectItem key={sk.id} value={sk.id}>
-              {sk.title}
-            </SelectItem>
-          ))}
+          {(skill) => <SelectItem key={skill.key}>{skill.title}</SelectItem>}
         </Select>
       </div>
 

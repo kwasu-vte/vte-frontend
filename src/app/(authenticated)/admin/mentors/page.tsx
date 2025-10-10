@@ -311,12 +311,9 @@ export default function AdminMentorsPage() {
                 variant="bordered"
                 selectionMode="multiple"
                 className="w-full"
+                items={(skillsData || []).map(skill => ({ key: skill.id, title: skill.title }))}
               >
-                {skillsData?.map((skill) => (
-                  <SelectItem key={skill.id} value={skill.id}>
-                    {skill.title}
-                  </SelectItem>
-                ))}
+                {(skill) => <SelectItem key={skill.key}>{skill.title}</SelectItem>}
               </Select>
             </div>
           </div>

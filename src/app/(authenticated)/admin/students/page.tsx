@@ -264,7 +264,7 @@ export default function AdminStudentsPage() {
     // * Apply level filter
     if (levelFilter !== 'all') {
       filteredStudents = filteredStudents.filter(student => 
-        student.level === levelFilter
+        student.student_level === levelFilter
       );
     }
     
@@ -414,13 +414,9 @@ export default function AdminStudentsPage() {
                 }}
                 variant="bordered"
                 size="sm"
+                items={[{ key: 'all', title: 'All Skills' }, ...(skillsData || []).map(skill => ({ key: skill.id, title: skill.title }))]}
               >
-                <SelectItem key="all" value="all">All Skills</SelectItem>
-                {skillsData?.map((skill) => (
-                  <SelectItem key={skill.id} value={skill.id}>
-                    {skill.title}
-                  </SelectItem>
-                ))}
+                {(skill) => <SelectItem key={skill.key}>{skill.title}</SelectItem>}
               </Select>
             </div>
             
@@ -437,12 +433,15 @@ export default function AdminStudentsPage() {
                 }}
                 variant="bordered"
                 size="sm"
+                items={[
+                  { key: 'all', title: 'All Departments' },
+                  { key: 'computer-science', title: 'Computer Science' },
+                  { key: 'electrical-engineering', title: 'Electrical Engineering' },
+                  { key: 'mechanical-engineering', title: 'Mechanical Engineering' },
+                  { key: 'civil-engineering', title: 'Civil Engineering' }
+                ]}
               >
-                <SelectItem key="all" value="all">All Departments</SelectItem>
-                <SelectItem key="computer-science" value="computer-science">Computer Science</SelectItem>
-                <SelectItem key="electrical-engineering" value="electrical-engineering">Electrical Engineering</SelectItem>
-                <SelectItem key="mechanical-engineering" value="mechanical-engineering">Mechanical Engineering</SelectItem>
-                <SelectItem key="civil-engineering" value="civil-engineering">Civil Engineering</SelectItem>
+                {(department) => <SelectItem key={department.key}>{department.title}</SelectItem>}
               </Select>
             </div>
             
@@ -459,13 +458,16 @@ export default function AdminStudentsPage() {
                 }}
                 variant="bordered"
                 size="sm"
+                items={[
+                  { key: 'all', title: 'All Levels' },
+                  { key: '100', title: '100 Level' },
+                  { key: '200', title: '200 Level' },
+                  { key: '300', title: '300 Level' },
+                  { key: '400', title: '400 Level' },
+                  { key: '500', title: '500 Level' }
+                ]}
               >
-                <SelectItem key="all" value="all">All Levels</SelectItem>
-                <SelectItem key="100" value="100">100 Level</SelectItem>
-                <SelectItem key="200" value="200">200 Level</SelectItem>
-                <SelectItem key="300" value="300">300 Level</SelectItem>
-                <SelectItem key="400" value="400">400 Level</SelectItem>
-                <SelectItem key="500" value="500">500 Level</SelectItem>
+                {(level) => <SelectItem key={level.key}>{level.title}</SelectItem>}
               </Select>
             </div>
           </div>
@@ -485,12 +487,15 @@ export default function AdminStudentsPage() {
                 variant="bordered"
                 size="sm"
                 className="w-48"
+                items={[
+                  { key: 'all', title: 'All Statuses' },
+                  { key: 'pending', title: 'Pending' },
+                  { key: 'approved', title: 'Approved' },
+                  { key: 'rejected', title: 'Rejected' },
+                  { key: 'completed', title: 'Completed' }
+                ]}
               >
-                <SelectItem key="all" value="all">All Statuses</SelectItem>
-                <SelectItem key="pending" value="pending">Pending</SelectItem>
-                <SelectItem key="approved" value="approved">Approved</SelectItem>
-                <SelectItem key="rejected" value="rejected">Rejected</SelectItem>
-                <SelectItem key="completed" value="completed">Completed</SelectItem>
+                {(status) => <SelectItem key={status.key}>{status.title}</SelectItem>}
               </Select>
             </div>
             
