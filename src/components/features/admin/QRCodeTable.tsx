@@ -145,6 +145,7 @@ export function QRCodeTable({ skillId, groupId, onCreateClick }: QRCodeTableProp
             size="sm"
             startContent={<Plus className="h-4 w-4" />}
             onPress={onCreateClick}
+            className="p-2"
           >
           <p className="text-sm"> Create QR Codes</p>
           </Button>}

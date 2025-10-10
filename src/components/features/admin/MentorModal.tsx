@@ -163,7 +163,6 @@ export function MentorModal({
             />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              
             <Select
   placeholder="Mentorship"
   selectedKeys={["mentorship"]} // Hardcode the default value
