@@ -1,3 +1,11 @@
+## fix(admin): mentors page search now uses client-side filtering
+
+- Changed mentors page search from server-side to client-side filtering
+- Removed search parameter from React Query key to prevent unnecessary API calls
+- Increased per_page limit to 100 to support client-side filtering
+- Search now filters by mentor name, email, and specialization locally
+- Improves performance and provides instant search results
+
 ## feat(student): redesign student homepage UI/UX
 
 - Added gradient hero with quick refresh and tour entry
@@ -8,6 +16,22 @@
 - Better empty state for UpcomingPracticals with Schedule links
 
 ## [Unreleased]
+
+### Added / Changed
+- Admin Enrollments: Implemented HeroUI-based layout per docs/NEW.md
+  - Prominent Filters card with session/skill selectors
+  - Auto-assign button moved to Filters header; disabled until both filters selected
+  - Manual assignment modals now show only groups with capacity (and respect selected session/skill)
+- Admin Skills: Row click navigates to `/admin/skills/[skillId]/groups` per NEW.md
+- Admin Skill Groups: Switched to HeroUI Cards with row hover and status chips
+- Admin Students: Added Filters card and Results card with count; search moved into Filters
+- Admin Mentors: Added Filters card and Results card with count; search moved into Filters
+- Admin Enrollments: Group select options now show capacity (current/max) in assign/reassign
+- Mentor Dashboard: Added hover state on schedule cards for better affordance
+- Student Dashboard: Prominent empty state card for no active enrollment
+- Tables: Added tooltips to action triggers (Skills, Students, Mentors, Enrollments)
+- Modals → Drawers: Switched `SkillModal` and `MentorModal` to Drawer UX with action tooltips
+- Modals → Drawers: Switched `StudentModal` and `GroupModal` to Drawer UX with action tooltips
 
 ### Added
 - Onboarding: Integrated Onborda provider in root layout, added shared steps (`src/onborda/steps.tsx`) and custom card (`src/onborda/TourCard.tsx`), plus Start Tour buttons on Admin/Mentor/Student dashboards. Tailwind updated to scan Onborda dist for classes.
@@ -744,3 +768,8 @@
 - Fixed strict TS types: QR scanner parsing, pdf generator types, Blob guards
 - Deleted legacy tailwind.config.ts and wired @config to JS file
 - Clean TS build (npx tsc --noEmit) and Next build
+
+## 2025-10-10
+- Added reassignStudent helper in src/lib/api/skill-groups.ts (remove + assign flow)
+- Updated admin enrollments UI to support Reassign action and modal
+- No breaking changes to existing APIs; purely additive UI capability

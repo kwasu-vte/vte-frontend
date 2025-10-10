@@ -38,14 +38,32 @@ export default function AdminMentorsPage() {
   }, [search])
 
   const { data, isLoading, error, refetch } = useClientQuery({
-    queryKey: ['mentors', { search: debouncedSearch }],
+    queryKey: ['mentors'],
     queryFn: async () => {
-      const res = await mentorsApi.list({ search: debouncedSearch || undefined, per_page: '25' })
+      const res = await mentorsApi.list({ per_page: '100' })
       return res.data
     },
   })
 
-  const mentors = useMemo(() => data ?? [], [data])
+  // * Client-side filtering
+  const mentors = useMemo(() => {
+    if (!data) return []
+    
+    if (!debouncedSearch.trim()) return data
+    
+    const searchTerm = debouncedSearch.toLowerCase()
+    return data.filter(mentor => {
+      const fullName = mentor.full_name || `${mentor.user.first_name} ${mentor.user.last_name}`
+      const email = mentor.user.email
+      const specialization = mentor.specialization
+      
+      return (
+        fullName.toLowerCase().includes(searchTerm) ||
+        email.toLowerCase().includes(searchTerm) ||
+        specialization.toLowerCase().includes(searchTerm)
+      )
+    })
+  }, [data, debouncedSearch])
 
   const createMentorMutation = useMutation({
     mutationFn: async (payload: CreateMentorProfilePayload) => {
@@ -174,29 +192,36 @@ export default function AdminMentorsPage() {
   return (
     <div className="space-y-6">
       {/* * Page Header */}
-      <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+      <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-neutral-900">Mentors</h1>
           <p className="text-neutral-600 mt-1">Manage mentors and assigned skills</p>
         </div>
         <div className="flex gap-3 items-center w-full md:w-auto">
-          <Input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            startContent={<Search className="w-4 h-4 text-neutral-400" />}
-            placeholder="Search mentors"
-            variant="bordered"
-            className="w-full md:w-80"
-          />
           <Button color="primary" startContent={<Plus className="w-4 h-4" />} onClick={openCreateModal}>Add Mentor</Button>
         </div>
       </div>
 
-      {/* Info: How to use */}
-      <div className="bg-blue-50 border border-blue-200 text-blue-800 rounded-md p-3 text-sm">
-        Search mentors by name or email. Use Add Mentor to create profiles, Assign Skills to link mentors to skills, and View to inspect details.
-      </div>
+      {/* Filters Card */}
+      <Card shadow="sm">
+        <CardHeader className="px-4 pt-4">
+          <p className="text-base font-medium text-neutral-900">Filters</p>
+        </CardHeader>
+        <CardBody className="px-4 pb-4">
+          <div className="w-full md:w-80">
+            <Input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              startContent={<Search className="w-4 h-4 text-neutral-400" />}
+              placeholder="Search mentors"
+              variant="bordered"
+              className="w-full"
+            />
+          </div>
+        </CardBody>
+      </Card>
 
+      {/* Results Card */}
       <Card shadow="sm">
         <CardHeader className="flex items-center justify-between px-4 pt-4">
           <div className="flex items-center gap-3">

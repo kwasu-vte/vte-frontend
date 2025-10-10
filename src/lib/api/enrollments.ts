@@ -20,11 +20,12 @@ export const enrollmentsApi = {
     });
   },
 
-  getAll(params?: { academic_session_id?: number; skill_id?: string; per_page?: number; }): Promise<ApiResponse<PaginatedResponse<Enrollment>>> {
+  getAll(params?: { academic_session_id?: number; skill_id?: string; per_page?: number; page?: number; }): Promise<ApiResponse<PaginatedResponse<Enrollment>>> {
     const query = new URLSearchParams();
     if (params?.academic_session_id) query.append('academic_session_id', params.academic_session_id.toString());
     if (params?.skill_id) query.append('skill_id', params.skill_id);
     if (params?.per_page) query.append('per_page', params.per_page.toString());
+    if (params?.page) query.append('page', params.page.toString());
     const q = query.toString();
     return apiRequest(`v1/enrollments${q ? `?${q}` : ''}`);
   },

@@ -10,6 +10,7 @@ import { Button, Chip, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } f
 import { MoreVertical, Eye, User as UserIcon, Users, Plus } from 'lucide-react';
 import { MentorProfile } from '@/lib/types';
 import { getSpecializationLabel } from '@/lib/utils/specialization';
+import { ClientOnly } from '@/components/shared/ClientOnly';
 
 interface MentorsTableProps {
   mentors: MentorProfile[];
@@ -175,21 +176,35 @@ export function MentorsTable({
         }
 
         return (
-          <Dropdown>
-            <DropdownTrigger>
-              <Button
-                isIconOnly
-                variant="light"
-                size="sm"
-                className="text-neutral-500 hover:text-neutral-700"
-              >
-                <MoreVertical className="w-4 h-4" />
-              </Button>
-            </DropdownTrigger>
-            <DropdownMenu aria-label="Mentor actions">
-              {menuItems}
-            </DropdownMenu>
-          </Dropdown>
+          <ClientOnly fallback={
+            <Button
+              isIconOnly
+              variant="light"
+              size="sm"
+              className="text-neutral-500 hover:text-neutral-700"
+              aria-label="Mentor actions"
+              isDisabled
+            >
+              <MoreVertical className="w-4 h-4" />
+            </Button>
+          }>
+            <Dropdown>
+              <DropdownTrigger>
+                <Button
+                  isIconOnly
+                  variant="light"
+                  size="sm"
+                  className="text-neutral-500 hover:text-neutral-700"
+                  aria-label="Mentor actions"
+                >
+                  <MoreVertical className="w-4 h-4" />
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu aria-label="Mentor actions">
+                {menuItems}
+              </DropdownMenu>
+            </Dropdown>
+          </ClientOnly>
         );
       },
     },

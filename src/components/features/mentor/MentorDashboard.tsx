@@ -94,7 +94,7 @@ export default function MentorDashboard(props: MentorDashboardProps) {
                 {(data) => (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {data.map((g) => (
-                      <Card key={g.id} shadow="sm">
+                      <Card key={g.id} shadow="sm" className="transition-colors hover:bg-neutral-50">
                         <CardHeader className="flex items-center justify-between px-4 pt-4">
                           <div>
                             <p className="text-base font-medium text-neutral-900">{(g as any).group_display_name ?? `Group ${g.group_number ?? g.id}`}</p>

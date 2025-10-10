@@ -8,6 +8,7 @@ import { Button, Chip, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } f
 import { StudentProfile } from '@/lib/types';
 import { MoreVertical, Eye, User as UserIcon, BookOpen, Plus, Edit, Trash2 } from 'lucide-react';
 import { DataTable } from '@/components/shared/DataTable';
+import { ClientOnly } from '@/components/shared/ClientOnly';
 
 interface StudentsTableProps {
   students: StudentProfile[] | undefined;
@@ -76,46 +77,107 @@ export function StudentsTable({
       key: 'enrollment_status',
       label: 'Enrollment Status',
       render: (student: StudentProfile) => {
-        const enrolled = Number(student.enrollments_count || 0) > 0;
-        const chipColor: 'success' | 'warning' = enrolled ? 'success' : 'warning';
+        // * Convert to number and check if > 0
+        const count = Number(student.enrollments_count || 0);
+        const enrolled = count > 0;
+        
+        // * Determine status based on enrollment data
+        let statusText = 'Not Enrolled';
+        let chipColor: 'success' | 'warning' | 'danger' = 'warning';
+        
+        if (enrolled) {
+          if (student.current_enrollment?.group_assigned) {
+            statusText = `Assigned (${count})`;
+            chipColor = 'success';
+          } else if (student.current_enrollment?.status === 'paid') {
+            statusText = `Paid - Pending Assignment (${count})`;
+            chipColor = 'warning';
+          } else {
+            statusText = `Enrolled (${count})`;
+            chipColor = 'success'; // * Green for enrolled students
+          }
+        }
+        
         return (
           <Chip color={chipColor} variant="flat" size="sm">
-            {enrolled ? 'Enrolled' : 'Not Enrolled'}
+            {statusText}
           </Chip>
         );
+      },
+    },
+    {
+      key: 'assigned_skill',
+      label: 'Assigned Skill',
+      render: (student: StudentProfile) => {
+        if (student.assigned_group?.skill_title) {
+          return (
+            <span className="font-medium text-neutral-900">{student.assigned_group.skill_title}</span>
+          );
+        }
+        if (student.current_enrollment?.skill_title) {
+          return (
+            <span className="font-medium text-neutral-900">{student.current_enrollment.skill_title}</span>
+          );
+        }
+        return <span className="text-neutral-400 italic">No assignment</span>;
       },
     },
     {
       key: 'actions',
       label: 'Actions',
       render: (student: StudentProfile) => {
-        const actionItems: React.ReactElement[] = [
-          (
-            <DropdownItem key="view" startContent={<Eye className="w-4 h-4" />} onClick={() => onView(student)}>
-              View Details
+        const menuItems = [];
+        
+        if (onView) {
+          menuItems.push(
+            <DropdownItem
+              key="view"
+              startContent={<Eye className="w-4 h-4" />}
+              onClick={() => onView(student)}
+            >
+              View Profile
             </DropdownItem>
-          ),
-          (
-            <DropdownItem key="profile" startContent={<UserIcon className="w-4 h-4" />} onClick={() => onManageProfile(student)}>
+          );
+        }
+        
+        if (onManageProfile) {
+          menuItems.push(
+            <DropdownItem
+              key="profile"
+              startContent={<UserIcon className="w-4 h-4" />}
+              onClick={() => onManageProfile(student)}
+            >
               Manage Profile
             </DropdownItem>
-          ),
-          (
-            <DropdownItem key="enrollments" startContent={<BookOpen className="w-4 h-4" />} onClick={() => onManageEnrollments(student)}>
+          );
+        }
+        
+        if (onManageEnrollments) {
+          menuItems.push(
+            <DropdownItem
+              key="enrollments"
+              startContent={<BookOpen className="w-4 h-4" />}
+              onClick={() => onManageEnrollments(student)}
+            >
               Manage Enrollments
             </DropdownItem>
-          ),
-        ];
-
+          );
+        }
+        
         if (onEdit) {
-          actionItems.splice(1, 0,
-            <DropdownItem key="edit" startContent={<Edit className="w-4 h-4" />} onClick={() => onEdit(student)}>
+          menuItems.push(
+            <DropdownItem
+              key="edit"
+              startContent={<Edit className="w-4 h-4" />}
+              onClick={() => onEdit(student)}
+            >
               Edit Student
             </DropdownItem>
           );
         }
+        
         if (onDelete) {
-          actionItems.push(
+          menuItems.push(
             <DropdownItem
               key="delete"
               className="text-danger"
@@ -129,24 +191,63 @@ export function StudentsTable({
         }
 
         return (
-          <Dropdown>
-            <DropdownTrigger>
-              <Button isIconOnly size="sm" variant="light">
-                <MoreVertical className="w-4 h-4" />
-              </Button>
-            </DropdownTrigger>
-            <DropdownMenu aria-label="Student actions">{actionItems}</DropdownMenu>
-          </Dropdown>
+          <ClientOnly fallback={
+            <Button
+              isIconOnly
+              variant="light"
+              size="sm"
+              className="text-neutral-500 hover:text-neutral-700"
+              aria-label="Student actions"
+              isDisabled
+            >
+              <MoreVertical className="w-4 h-4" />
+            </Button>
+          }>
+            <Dropdown>
+              <DropdownTrigger>
+                <Button
+                  isIconOnly
+                  variant="light"
+                  size="sm"
+                  className="text-neutral-500 hover:text-neutral-700"
+                  aria-label="Student actions"
+                >
+                  <MoreVertical className="w-4 h-4" />
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu aria-label="Student actions">
+                {menuItems}
+              </DropdownMenu>
+            </Dropdown>
+          </ClientOnly>
         );
       },
     },
   ];
 
   const getEnrollmentStatus = (student: StudentProfile) => {
-    const enrolled = Number(student.enrollments_count || 0) > 0;
+    const count = Number(student.enrollments_count || 0);
+    const enrolled = count > 0;
+    
+    let statusText = 'Not Enrolled';
+    let color: 'success' | 'warning' | 'danger' = 'warning';
+    
+    if (enrolled) {
+      if (student.current_enrollment?.group_assigned) {
+        statusText = `Assigned (${count})`;
+        color = 'success';
+      } else if (student.current_enrollment?.status === 'paid') {
+        statusText = `Paid - Pending Assignment (${count})`;
+        color = 'warning';
+      } else {
+        statusText = `Enrolled (${count})`;
+        color = 'success'; // * Green for enrolled students
+      }
+    }
+    
     return {
-      text: enrolled ? 'Enrolled' : 'Not Enrolled',
-      color: enrolled ? 'success' : 'warning',
+      text: statusText,
+      color,
     } as const;
   };
 

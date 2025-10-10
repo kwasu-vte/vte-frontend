@@ -37,16 +37,16 @@ export default function AdminSkillsPage() {
   } = useClientQuery({
     queryKey: ['skills'],
     queryFn: async () => {
-      console.log('🔍 [Skills] Starting API call...');
+      console.log('[Skills] Starting API call...');
       const response = await skillsApi.getAll();
-      console.log('🔍 [Skills] Raw API response:', response);
-      console.log('🔍 [Skills] Response.data:', response.data);
-      console.log('🔍 [Skills] Response.data.items:', response.data?.items);
-      console.log('🔍 [Skills] Items length:', response.data?.items?.length);
+      console.log('[Skills] Raw API response:', response);
+      console.log('[Skills] Response.data:', response.data);
+      console.log('[Skills] Response.data.items:', response.data?.items);
+      console.log('[Skills] Items length:', response.data?.items?.length);
       
       const extractedItems = response.data.items || [];
-      console.log('🔍 [Skills] Extracted items:', extractedItems);
-      console.log('🔍 [Skills] Extracted items length:', extractedItems.length);
+      console.log('[Skills] Extracted items:', extractedItems);
+      console.log('[Skills] Extracted items length:', extractedItems.length);
       
       return extractedItems;
     },

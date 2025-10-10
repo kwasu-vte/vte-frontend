@@ -9,6 +9,8 @@ import { DataTable } from '@/components/shared/DataTable';
 import { Button, Chip, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@heroui/react';
 import { MoreVertical, Edit, Trash2, Eye, Users, Calendar, Plus } from 'lucide-react';
 import { Skill } from '@/lib/types';
+import { useRouter } from 'next/navigation';
+import { ClientOnly } from '@/components/shared/ClientOnly';
 
 interface SkillsTableProps {
   skills: Skill[];
@@ -33,7 +35,8 @@ export function SkillsTable({
   isLoading = false,
   error = null,
 }: SkillsTableProps) {
-  console.log('🔍 [SkillsTable] Received props:', {
+  const router = useRouter();
+  console.log('[SkillsTable] Received props:', {
     skills,
     skillsLength: skills?.length,
     isLoading,
@@ -211,21 +214,35 @@ export function SkillsTable({
         }
 
         return (
-          <Dropdown>
-            <DropdownTrigger>
-              <Button
-                isIconOnly
-                variant="light"
-                size="sm"
-                className="text-neutral-500 hover:text-neutral-700"
-              >
-                <MoreVertical className="w-4 h-4" />
-              </Button>
-            </DropdownTrigger>
-            <DropdownMenu aria-label="Skill actions">
-              {menuItems}
-            </DropdownMenu>
-          </Dropdown>
+          <ClientOnly fallback={
+            <Button
+              isIconOnly
+              variant="light"
+              size="sm"
+              className="text-neutral-500 hover:text-neutral-700"
+              aria-label="Skill actions"
+              isDisabled
+            >
+              <MoreVertical className="w-4 h-4" />
+            </Button>
+          }>
+            <Dropdown>
+              <DropdownTrigger>
+                <Button
+                  isIconOnly
+                  variant="light"
+                  size="sm"
+                  className="text-neutral-500 hover:text-neutral-700"
+                  aria-label="Skill actions"
+                >
+                  <MoreVertical className="w-4 h-4" />
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu aria-label="Skill actions">
+                {menuItems}
+              </DropdownMenu>
+            </Dropdown>
+          </ClientOnly>
         );
       },
     },
@@ -238,7 +255,10 @@ export function SkillsTable({
       error={error}
       columns={columns}
       emptyMessage="No skills found. Create your first skill to get started."
-      onRowClick={onView}
+      onRowClick={(skill: Skill) => {
+        // Navigate to skill groups per NEW.md pattern
+        router.push(`/admin/skills/${skill.id}/groups`)
+      }}
       emptyActionButton={
         onCreate ? (
           <Button

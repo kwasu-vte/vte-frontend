@@ -5,7 +5,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, Select, SelectItem } from '@heroui/react';
+import { Drawer, DrawerContent, DrawerHeader, DrawerBody, DrawerFooter, Button, Input, Select, SelectItem, Tooltip } from '@heroui/react';
 import { CreateUserPayload, UpdateUserPayload, StudentProfile } from '@/lib/types';
 
 interface StudentModalProps {
@@ -119,23 +119,18 @@ export function StudentModal({
   ];
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      size="2xl"
-      scrollBehavior="inside"
-    >
-      <ModalContent>
-        <ModalHeader className="flex flex-col gap-1">
+    <Drawer isOpen={isOpen} onClose={onClose} placement="right" size="lg">
+      <DrawerContent>
+        <DrawerHeader className="flex flex-col gap-1">
           <h2 className="text-xl font-semibold">
             {student ? 'Edit Student' : 'Add New Student'}
           </h2>
           <p className="text-sm text-neutral-600">
             {student ? 'Update student information' : 'Fill in the details to add a new student'}
           </p>
-        </ModalHeader>
+        </DrawerHeader>
         <form onSubmit={handleSubmit}>
-          <ModalBody className="space-y-4">
+          <DrawerBody className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Input
                 label="First Name"
@@ -215,26 +210,30 @@ export function StudentModal({
                 />
               </div>
             )}
-          </ModalBody>
-          <ModalFooter>
-            <Button
-              variant="light"
-              onClick={onClose}
-              isDisabled={isLoading}
-            >
-              Cancel
-            </Button>
-            <Button
-              color="primary"
-              type="submit"
-              isLoading={isLoading}
-              isDisabled={!isFormValid || !isPasswordMatch || isLoading}
-            >
-              {student ? 'Update Student' : 'Add Student'}
-            </Button>
-          </ModalFooter>
+          </DrawerBody>
+          <DrawerFooter>
+            <Tooltip content="Close without saving" placement="top">
+              <Button
+                variant="light"
+                onClick={onClose}
+                isDisabled={isLoading}
+              >
+                Cancel
+              </Button>
+            </Tooltip>
+            <Tooltip content={student ? 'Save changes' : 'Create student'} placement="top">
+              <Button
+                color="primary"
+                type="submit"
+                isLoading={isLoading}
+                isDisabled={!isFormValid || !isPasswordMatch || isLoading}
+              >
+                {student ? 'Update Student' : 'Add Student'}
+              </Button>
+            </Tooltip>
+          </DrawerFooter>
         </form>
-      </ModalContent>
-    </Modal>
+      </DrawerContent>
+    </Drawer>
   );
 }

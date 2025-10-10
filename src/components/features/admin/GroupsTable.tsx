@@ -7,6 +7,7 @@
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Button, Chip, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@heroui/react';
 import { Group } from '@/lib/types';
 import { MoreVertical, Edit, Trash2, Eye, Users, Calendar } from 'lucide-react';
+import { ClientOnly } from '@/components/shared/ClientOnly';
 
 interface GroupsTableProps {
   groups: Group[];
@@ -99,61 +100,72 @@ export function GroupsTable({
               </Chip>
             </TableCell>
             <TableCell>
-              <Dropdown>
-                <DropdownTrigger>
-                  <Button
-                    isIconOnly
-                    size="sm"
-                    variant="light"
-                  >
-                    <MoreVertical className="w-4 h-4" />
-                  </Button>
-                </DropdownTrigger>
-                <DropdownMenu aria-label="Group actions">
-                  <DropdownItem
-                    key="view"
-                    startContent={<Eye className="w-4 h-4" />}
-                    onClick={() => onView?.(group)}
-                    isDisabled={!onView}
-                  >
-                    View Details
-                  </DropdownItem>
-                  <DropdownItem
-                    key="edit"
-                    startContent={<Edit className="w-4 h-4" />}
-                    onClick={() => onEdit?.(group)}
-                    isDisabled={!onEdit}
-                  >
-                    Edit Group
-                  </DropdownItem>
-                  <DropdownItem
-                    key="members"
-                    startContent={<Users className="w-4 h-4" />}
-                    onClick={() => onManageMembers?.(group)}
-                    isDisabled={!onManageMembers}
-                  >
-                    Manage Members
-                  </DropdownItem>
-                  <DropdownItem
-                    key="attendance"
-                    startContent={<Calendar className="w-4 h-4" />}
-                    onClick={() => onManageAttendance?.(group)}
-                    isDisabled={!onManageAttendance}
-                  >
-                    Manage Attendance
-                  </DropdownItem>
-                  <DropdownItem
-                    key="delete"
-                    className="text-danger"
-                    color="danger"
-                    startContent={<Trash2 className="w-4 h-4" />}
-                    onClick={() => onDelete?.(group)}
-                    isDisabled={!onDelete}
-                  >
-                    Delete Group
-                  </DropdownItem>
-                </DropdownMenu>
-              </Dropdown>
+              <ClientOnly fallback={
+                <Button
+                  isIconOnly
+                  size="sm"
+                  variant="light"
+                  isDisabled
+                >
+                  <MoreVertical className="w-4 h-4" />
+                </Button>
+              }>
+                <Dropdown>
+                  <DropdownTrigger>
+                    <Button
+                      isIconOnly
+                      size="sm"
+                      variant="light"
+                    >
+                      <MoreVertical className="w-4 h-4" />
+                    </Button>
+                  </DropdownTrigger>
+                  <DropdownMenu aria-label="Group actions">
+                    <DropdownItem
+                      key="view"
+                      startContent={<Eye className="w-4 h-4" />}
+                      onClick={() => onView?.(group)}
+                      isDisabled={!onView}
+                    >
+                      View Details
+                    </DropdownItem>
+                    <DropdownItem
+                      key="edit"
+                      startContent={<Edit className="w-4 h-4" />}
+                      onClick={() => onEdit?.(group)}
+                      isDisabled={!onEdit}
+                    >
+                      Edit Group
+                    </DropdownItem>
+                    <DropdownItem
+                      key="members"
+                      startContent={<Users className="w-4 h-4" />}
+                      onClick={() => onManageMembers?.(group)}
+                      isDisabled={!onManageMembers}
+                    >
+                      Manage Members
+                    </DropdownItem>
+                    <DropdownItem
+                      key="attendance"
+                      startContent={<Calendar className="w-4 h-4" />}
+                      onClick={() => onManageAttendance?.(group)}
+                      isDisabled={!onManageAttendance}
+                    >
+                      Manage Attendance
+                    </DropdownItem>
+                    <DropdownItem
+                      key="delete"
+                      className="text-danger"
+                      color="danger"
+                      startContent={<Trash2 className="w-4 h-4" />}
+                      onClick={() => onDelete?.(group)}
+                      isDisabled={!onDelete}
+                    >
+                      Delete Group
+                    </DropdownItem>
+                  </DropdownMenu>
+                </Dropdown>
+              </ClientOnly>
             </TableCell>
           </TableRow>
         )}
