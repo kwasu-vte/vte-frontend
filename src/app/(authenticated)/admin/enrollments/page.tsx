@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useClientQuery } from '@/lib/hooks/useClientQuery';
 import { enrollmentsApi, skillGroupsApi, skillsApi } from '@/lib/api';
 import type { Enrollment, PaginatedResponse } from '@/lib/types';
@@ -9,6 +9,7 @@ import EnrollmentFilters from '@/components/features/admin/EnrollmentFilters';
 import EnrollmentsTable from '@/components/features/admin/EnrollmentsTable';
 import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Select, SelectItem, Card, CardHeader, CardBody, Chip } from '@heroui/react';
 import { RefreshCw } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
 
 export default function AdminEnrollmentsPage() {
   const [filters, setFilters] = useState<{ academic_session_id?: number; skill_id?: string; per_page?: number }>({ per_page: 25 });
@@ -18,6 +19,22 @@ export default function AdminEnrollmentsPage() {
   const [reassignEnrollmentId, setReassignEnrollmentId] = useState<number | null>(null);
   const [reassignFromGroupId, setReassignFromGroupId] = useState<string | null>(null);
   const [selectedGroupId, setSelectedGroupId] = useState<string>("");
+  
+  const searchParams = useSearchParams();
+
+  // * Initialize filters from query params
+  useEffect(() => {
+    const skillId = searchParams.get('skill_id');
+    const academicSessionId = searchParams.get('academic_session_id');
+    
+    if (skillId || academicSessionId) {
+      setFilters(prev => ({
+        ...prev,
+        ...(skillId && { skill_id: skillId }),
+        ...(academicSessionId && { academic_session_id: Number(academicSessionId) })
+      }));
+    }
+  }, [searchParams]);
 
   const { data, isLoading, error, refetch } = useClientQuery({
     queryKey: ['admin-enrollments', filters],

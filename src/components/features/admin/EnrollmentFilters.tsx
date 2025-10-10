@@ -37,9 +37,21 @@ export function EnrollmentFilters({ value, onChange, defaultPerPage = 25 }: Enro
   const [filters, setFilters] = React.useState<{ academic_session_id?: number; skill_id?: string; per_page?: number }>(value || { per_page: defaultPerPage })
 
   const sessions = React.useMemo(() => (sessionsResp?.data as AcademicSession[]) || [], [sessionsResp?.data])
-  const skills = Array.isArray((skillsResp as any)?.data)
-    ? ((skillsResp?.data as unknown) as Skill[])
-    : ((((skillsResp as any)?.data?.items as unknown) as Skill[]) || [])
+  const skills = React.useMemo(() => {
+    if (!skillsResp?.data) return []
+    
+    // * Handle both direct array and paginated response
+    if (Array.isArray(skillsResp.data)) {
+      return skillsResp.data as Skill[]
+    }
+    
+    // * Handle paginated response with items
+    if ((skillsResp.data as any)?.items) {
+      return (skillsResp.data as any).items as Skill[]
+    }
+    
+    return []
+  }, [skillsResp?.data])
 
   // * Prefer the globally active session from the store when absent
   React.useEffect(() => {
@@ -84,9 +96,12 @@ export function EnrollmentFilters({ value, onChange, defaultPerPage = 25 }: Enro
           placeholder="Academic sessions"
           size="sm"
         >
+          <SelectItem key="all" value="">
+            All Sessions
+          </SelectItem>
           {sessions.map((s) => (
-            <SelectItem key={String(s.id)}>
-              {s.name}
+            <SelectItem key={String(s.id)} value={String(s.id)}>
+              {s.name}{(s as any).active ? ' (current)' : ''}
             </SelectItem>
           ))}
         </Select>
@@ -101,8 +116,11 @@ export function EnrollmentFilters({ value, onChange, defaultPerPage = 25 }: Enro
           placeholder="All skills"
           size="sm"
         >
+          <SelectItem key="all" value="">
+            All Skills
+          </SelectItem>
           {skills.map((sk) => (
-            <SelectItem key={sk.id}>
+            <SelectItem key={sk.id} value={sk.id}>
               {sk.title}
             </SelectItem>
           ))}

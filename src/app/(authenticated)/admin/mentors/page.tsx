@@ -10,12 +10,13 @@ import { useClientQuery } from '@/lib/hooks/useClientQuery';
 import { MentorsTable } from '@/components/features/admin/MentorsTable';
 import { MentorModal } from '@/components/features/admin/MentorModal';
 import MentorSkillAssignment from '@/components/features/mentor/MentorSkillAssignment';
-import { mentorsApi } from '@/lib/api';
-import { MentorProfile, CreateMentorProfilePayload } from '@/lib/types';
-import { Button, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Card, CardHeader, CardBody, Chip } from '@heroui/react';
-import { Plus, Search, Eye, AlertTriangle } from 'lucide-react';
+import { mentorsApi, skillsApi } from '@/lib/api';
+import { MentorProfile, CreateMentorProfilePayload, Skill } from '@/lib/types';
+import { Button, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Card, CardHeader, CardBody, Chip, Select, SelectItem } from '@heroui/react';
+import { Plus, Search, Eye, AlertTriangle, Filter } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { getErrorMessage, getErrorTitle, getSuccessTitle, getSuccessMessage } from '@/lib/error-handling';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function AdminMentorsPage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -27,9 +28,50 @@ export default function AdminMentorsPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
 
   const queryClient = useQueryClient();
   const { addNotification } = useApp();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // * Initialize filters from query params
+  useEffect(() => {
+    const skillsParam = searchParams.get('skills');
+    const searchQuery = searchParams.get('search');
+
+    if (skillsParam) {
+      const skills = skillsParam.split(',').filter(Boolean);
+      setSelectedSkills(skills);
+    }
+    if (searchQuery) {
+      setSearch(searchQuery);
+    }
+  }, [searchParams]);
+
+  // * Update URL when filters change
+  const updateFilters = (updates: Record<string, string>) => {
+    const params = new URLSearchParams(searchParams.toString());
+    
+    Object.entries(updates).forEach(([key, value]) => {
+      if (value === '' || value === 'all') {
+        params.delete(key);
+      } else {
+        params.set(key, value);
+      }
+    });
+    
+    router.push(`/admin/mentors?${params.toString()}`, { scroll: false });
+  };
+
+  // * Fetch skills for filtering
+  const { data: skillsData } = useClientQuery({
+    queryKey: ['skills'],
+    queryFn: async () => {
+      const response = await skillsApi.getAll();
+      return Array.isArray(response.data) ? response.data : response.data?.items || [];
+    },
+  });
 
   // * React Query for data fetching - only run on client
   useEffect(() => {
@@ -49,21 +91,50 @@ export default function AdminMentorsPage() {
   const mentors = useMemo(() => {
     if (!data) return []
     
-    if (!debouncedSearch.trim()) return data
+    let filteredMentors = data
     
-    const searchTerm = debouncedSearch.toLowerCase()
-    return data.filter(mentor => {
-      const fullName = mentor.full_name || `${mentor.user.first_name} ${mentor.user.last_name}`
-      const email = mentor.user.email
-      const specialization = mentor.specialization
-      
-      return (
-        fullName.toLowerCase().includes(searchTerm) ||
-        email.toLowerCase().includes(searchTerm) ||
-        specialization.toLowerCase().includes(searchTerm)
-      )
-    })
-  }, [data, debouncedSearch])
+    // * Apply search filter
+    if (debouncedSearch.trim()) {
+      const searchTerm = debouncedSearch.toLowerCase()
+      filteredMentors = filteredMentors.filter(mentor => {
+        const fullName = mentor.full_name || `${mentor.user.first_name} ${mentor.user.last_name}`
+        const email = mentor.user.email
+        const specialization = mentor.specialization
+        
+        return (
+          fullName.toLowerCase().includes(searchTerm) ||
+          email.toLowerCase().includes(searchTerm) ||
+          specialization.toLowerCase().includes(searchTerm)
+        )
+      })
+    }
+    
+    // * Apply skills filter
+    if (selectedSkills.length > 0) {
+      filteredMentors = filteredMentors.filter(mentor => {
+        if (!mentor.assigned_skills) return false
+        
+        let mentorSkills: any[] = []
+        if (typeof mentor.assigned_skills === 'string') {
+          try {
+            mentorSkills = JSON.parse(mentor.assigned_skills)
+          } catch {
+            mentorSkills = []
+          }
+        } else if (Array.isArray(mentor.assigned_skills)) {
+          mentorSkills = mentor.assigned_skills
+        }
+        
+        return selectedSkills.some(skillId => 
+          mentorSkills.some(skill => 
+            skill.id === skillId || skill.title === skillsData?.find(s => s.id === skillId)?.title
+          )
+        )
+      })
+    }
+    
+    return filteredMentors
+  }, [data, debouncedSearch, selectedSkills, skillsData])
 
   const createMentorMutation = useMutation({
     mutationFn: async (payload: CreateMentorProfilePayload) => {
@@ -205,18 +276,70 @@ export default function AdminMentorsPage() {
       {/* Filters Card */}
       <Card shadow="sm">
         <CardHeader className="px-4 pt-4">
-          <p className="text-base font-medium text-neutral-900">Filters</p>
+          <div className="flex items-center gap-2">
+            <Filter className="w-4 h-4 text-neutral-600" />
+            <p className="text-base font-medium text-neutral-900">Filters</p>
+          </div>
         </CardHeader>
         <CardBody className="px-4 pb-4">
-          <div className="w-full md:w-80">
-            <Input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              startContent={<Search className="w-4 h-4 text-neutral-400" />}
-              placeholder="Search mentors"
-              variant="bordered"
-              className="w-full"
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Input
+                value={search}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  updateFilters({ search: e.target.value });
+                }}
+                startContent={<Search className="w-4 h-4 text-neutral-400" />}
+                placeholder="Search mentors"
+                variant="bordered"
+                label="Search"
+                className="w-full"
+              />
+            </div>
+            
+            <div>
+              <Select
+                label="Filter by Skills"
+                placeholder="Select skills"
+                selectedKeys={selectedSkills}
+                onSelectionChange={(keys) => {
+                  const skills = Array.from(keys) as string[];
+                  setSelectedSkills(skills);
+                  updateFilters({ skills: skills.join(',') });
+                }}
+                variant="bordered"
+                selectionMode="multiple"
+                className="w-full"
+              >
+                {skillsData?.map((skill) => (
+                  <SelectItem key={skill.id} value={skill.id}>
+                    {skill.title}
+                  </SelectItem>
+                ))}
+              </Select>
+            </div>
+          </div>
+          
+          <div className="flex items-center justify-between mt-4">
+            <div className="flex gap-2">
+              {selectedSkills.length > 0 && (
+                <Button
+                  size="sm"
+                  variant="light"
+                  onClick={() => {
+                  setSelectedSkills([]);
+                  updateFilters({ skills: '' });
+                }}
+                >
+                  Clear Skills Filter
+                </Button>
+              )}
+            </div>
+            
+            <Chip variant="flat" color="primary">
+              {mentors?.length || 0} mentors
+            </Chip>
           </div>
         </CardBody>
       </Card>

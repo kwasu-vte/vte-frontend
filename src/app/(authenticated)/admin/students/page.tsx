@@ -11,13 +11,14 @@ import { StudentsTable } from '@/components/features/admin/StudentsTable';
 // import { StudentModal } from '@/components/features/admin/StudentModal';
 import { StudentProfileModal } from '@/components/features/admin/StudentProfileModal';
 import { StudentEnrollmentsModal } from '@/components/features/admin/StudentEnrollmentsModal';
-import { studentsApi, enrollmentsApi } from '@/lib/api';
-import { StudentProfile, Enrollment } from '@/lib/types';
+import { studentsApi, enrollmentsApi, skillsApi, academicSessionsApi } from '@/lib/api';
+import { StudentProfile, Enrollment, Skill, AcademicSession } from '@/lib/types';
 import type { CreateUserPayload, UpdateUserPayload } from '@/lib/types'
-import { Button, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@heroui/react';
-import { AlertTriangle, Search } from 'lucide-react';
+import { Button, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Card, CardHeader, CardBody, Chip, Select, SelectItem } from '@heroui/react';
+import { AlertTriangle, Search, Filter } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { getErrorMessage, getErrorTitle, getSuccessTitle, getSuccessMessage } from '@/lib/error-handling';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function AdminStudentsPage() {
   // const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -28,9 +29,62 @@ export default function AdminStudentsPage() {
   // const [isSubmitting, setIsSubmitting] = useState(false);
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [skillFilter, setSkillFilter] = useState<string>('all');
+  const [departmentFilter, setDepartmentFilter] = useState<string>('all');
+  const [levelFilter, setLevelFilter] = useState<string>('all');
+  const [enrollmentStatusFilter, setEnrollmentStatusFilter] = useState<string>('all');
 
   const queryClient = useQueryClient();
   const { addNotification } = useApp();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // * Initialize filters from query params
+  useEffect(() => {
+    const skillId = searchParams.get('skill_id');
+    const department = searchParams.get('department');
+    const level = searchParams.get('level');
+    const enrollmentStatus = searchParams.get('enrollment_status');
+    const searchQuery = searchParams.get('search');
+
+    if (skillId) setSkillFilter(skillId);
+    if (department) setDepartmentFilter(department);
+    if (level) setLevelFilter(level);
+    if (enrollmentStatus) setEnrollmentStatusFilter(enrollmentStatus);
+    if (searchQuery) setSearch(searchQuery);
+  }, [searchParams]);
+
+  // * Update URL when filters change
+  const updateFilters = (updates: Record<string, string>) => {
+    const params = new URLSearchParams(searchParams.toString());
+    
+    Object.entries(updates).forEach(([key, value]) => {
+      if (value === 'all' || value === '') {
+        params.delete(key);
+      } else {
+        params.set(key, value);
+      }
+    });
+    
+    router.push(`/admin/students?${params.toString()}`, { scroll: false });
+  };
+
+  // * Fetch filter data
+  const { data: skillsData } = useClientQuery({
+    queryKey: ['skills'],
+    queryFn: async () => {
+      const response = await skillsApi.getAll();
+      return Array.isArray(response.data) ? response.data : response.data?.items || [];
+    },
+  });
+
+  const { data: sessionsData } = useClientQuery({
+    queryKey: ['academic-sessions'],
+    queryFn: async () => {
+      const response = await academicSessionsApi.getAll();
+      return response.data || [];
+    },
+  });
 
   // * React Query for data fetching - only run on client
   useEffect(() => {
@@ -178,18 +232,51 @@ export default function AdminStudentsPage() {
     });
 
     // * Apply client-side filtering
-    if (!debouncedSearch) return mergedStudents;
+    let filteredStudents = mergedStudents;
     
-    const searchLower = debouncedSearch.toLowerCase();
-    return mergedStudents.filter(student => 
-      student.full_name.toLowerCase().includes(searchLower) ||
-      student.matric_number.toLowerCase().includes(searchLower) ||
-      student.department.toLowerCase().includes(searchLower) ||
-      (student.faculty && student.faculty.toLowerCase().includes(searchLower)) ||
-      (student.assigned_group?.skill_title && student.assigned_group.skill_title.toLowerCase().includes(searchLower)) ||
-      (student.current_enrollment?.skill_title && student.current_enrollment.skill_title.toLowerCase().includes(searchLower))
-    );
-  }, [studentsResponse, enrollmentsResponse, debouncedSearch]);
+    // * Apply search filter
+    if (debouncedSearch) {
+      const searchLower = debouncedSearch.toLowerCase();
+      filteredStudents = filteredStudents.filter(student => 
+        student.full_name.toLowerCase().includes(searchLower) ||
+        student.matric_number.toLowerCase().includes(searchLower) ||
+        student.department.toLowerCase().includes(searchLower) ||
+        (student.faculty && student.faculty.toLowerCase().includes(searchLower)) ||
+        (student.assigned_group?.skill_title && student.assigned_group.skill_title.toLowerCase().includes(searchLower)) ||
+        (student.current_enrollment?.skill_title && student.current_enrollment.skill_title.toLowerCase().includes(searchLower))
+      );
+    }
+    
+    // * Apply skill filter
+    if (skillFilter !== 'all') {
+      filteredStudents = filteredStudents.filter(student => 
+        student.current_enrollment?.skill_title === skillsData?.find(s => s.id === skillFilter)?.title
+      );
+    }
+    
+    // * Apply department filter
+    if (departmentFilter !== 'all') {
+      filteredStudents = filteredStudents.filter(student => 
+        student.department.toLowerCase() === departmentFilter.toLowerCase()
+      );
+    }
+    
+    // * Apply level filter
+    if (levelFilter !== 'all') {
+      filteredStudents = filteredStudents.filter(student => 
+        student.level === levelFilter
+      );
+    }
+    
+    // * Apply enrollment status filter
+    if (enrollmentStatusFilter !== 'all') {
+      filteredStudents = filteredStudents.filter(student => 
+        student.current_enrollment?.status === enrollmentStatusFilter
+      );
+    }
+    
+    return filteredStudents;
+  }, [studentsResponse, enrollmentsResponse, debouncedSearch, skillFilter, departmentFilter, levelFilter, enrollmentStatusFilter, skillsData]);
 
   // * Combined loading and error states
   const isLoading = studentsLoading || enrollmentsLoading;
@@ -291,22 +378,128 @@ export default function AdminStudentsPage() {
       </div>
 
       {/* Filters Card */}
-      <div className="bg-white rounded-lg shadow-sm border border-neutral-200">
-        <div className="px-4 pt-4">
-          <p className="text-base font-medium text-neutral-900">Filters</p>
-        </div>
-        <div className="px-4 pb-4">
-          <div className="w-full md:w-80">
-            <Input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              startContent={<Search className="w-4 h-4 text-neutral-400" />}
-              placeholder="Search by name or matric number"
-              variant="bordered"
-            />
+      <Card shadow="sm">
+        <CardHeader className="px-4 pt-4">
+          <div className="flex items-center gap-2">
+            <Filter className="w-4 h-4 text-neutral-600" />
+            <p className="text-base font-medium text-neutral-900">Filters</p>
           </div>
-        </div>
-      </div>
+        </CardHeader>
+        <CardBody className="px-4 pb-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+            <div className="lg:col-span-2">
+              <Input
+                value={search}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  updateFilters({ search: e.target.value });
+                }}
+                startContent={<Search className="w-4 h-4 text-neutral-400" />}
+                placeholder="Search by name or matric number"
+                variant="bordered"
+                label="Search"
+              />
+            </div>
+            
+            <div>
+              <Select
+                label="Skill"
+                placeholder="All skills"
+                selectedKeys={skillFilter !== 'all' ? [skillFilter] : []}
+                onSelectionChange={(keys) => {
+                  const selected = Array.from(keys)[0] as string
+                  const value = selected || 'all';
+                  setSkillFilter(value);
+                  updateFilters({ skill_id: value });
+                }}
+                variant="bordered"
+                size="sm"
+              >
+                <SelectItem key="all" value="all">All Skills</SelectItem>
+                {skillsData?.map((skill) => (
+                  <SelectItem key={skill.id} value={skill.id}>
+                    {skill.title}
+                  </SelectItem>
+                ))}
+              </Select>
+            </div>
+            
+            <div>
+              <Select
+                label="Department"
+                placeholder="All departments"
+                selectedKeys={departmentFilter !== 'all' ? [departmentFilter] : []}
+                onSelectionChange={(keys) => {
+                  const selected = Array.from(keys)[0] as string
+                  const value = selected || 'all';
+                  setDepartmentFilter(value);
+                  updateFilters({ department: value });
+                }}
+                variant="bordered"
+                size="sm"
+              >
+                <SelectItem key="all" value="all">All Departments</SelectItem>
+                <SelectItem key="computer-science" value="computer-science">Computer Science</SelectItem>
+                <SelectItem key="electrical-engineering" value="electrical-engineering">Electrical Engineering</SelectItem>
+                <SelectItem key="mechanical-engineering" value="mechanical-engineering">Mechanical Engineering</SelectItem>
+                <SelectItem key="civil-engineering" value="civil-engineering">Civil Engineering</SelectItem>
+              </Select>
+            </div>
+            
+            <div>
+              <Select
+                label="Level"
+                placeholder="All levels"
+                selectedKeys={levelFilter !== 'all' ? [levelFilter] : []}
+                onSelectionChange={(keys) => {
+                  const selected = Array.from(keys)[0] as string
+                  const value = selected || 'all';
+                  setLevelFilter(value);
+                  updateFilters({ level: value });
+                }}
+                variant="bordered"
+                size="sm"
+              >
+                <SelectItem key="all" value="all">All Levels</SelectItem>
+                <SelectItem key="100" value="100">100 Level</SelectItem>
+                <SelectItem key="200" value="200">200 Level</SelectItem>
+                <SelectItem key="300" value="300">300 Level</SelectItem>
+                <SelectItem key="400" value="400">400 Level</SelectItem>
+                <SelectItem key="500" value="500">500 Level</SelectItem>
+              </Select>
+            </div>
+          </div>
+          
+          <div className="flex items-center justify-between mt-4">
+            <div className="flex gap-2">
+              <Select
+                label="Enrollment Status"
+                placeholder="All statuses"
+                selectedKeys={enrollmentStatusFilter !== 'all' ? [enrollmentStatusFilter] : []}
+                onSelectionChange={(keys) => {
+                  const selected = Array.from(keys)[0] as string
+                  const value = selected || 'all';
+                  setEnrollmentStatusFilter(value);
+                  updateFilters({ enrollment_status: value });
+                }}
+                variant="bordered"
+                size="sm"
+                className="w-48"
+              >
+                <SelectItem key="all" value="all">All Statuses</SelectItem>
+                <SelectItem key="pending" value="pending">Pending</SelectItem>
+                <SelectItem key="approved" value="approved">Approved</SelectItem>
+                <SelectItem key="rejected" value="rejected">Rejected</SelectItem>
+                <SelectItem key="completed" value="completed">Completed</SelectItem>
+              </Select>
+            </div>
+            
+            <Chip variant="flat" color="primary">
+              {students?.length || 0} students
+            </Chip>
+          </div>
+        </CardBody>
+      </Card>
 
       {/* Students Results Card */}
       <div className="bg-white rounded-lg shadow-sm border border-neutral-200">

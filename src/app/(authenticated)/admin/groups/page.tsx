@@ -4,18 +4,43 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useClientQuery } from '@/lib/hooks/useClientQuery';
 import { StateRenderer, DefaultLoadingComponent, DefaultErrorComponent, DefaultEmptyComponent } from '@/components/shared/StateRenderer';
 import { GroupsTable } from '@/components/features/admin/GroupsTable';
 import { skillGroupsApi } from '@/lib/api';
-import { Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Card, CardHeader, CardBody, Chip } from '@heroui/react';
-import { Eye } from 'lucide-react';
+import { Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Card, CardHeader, CardBody, Chip, Select, SelectItem } from '@heroui/react';
+import { Eye, Filter } from 'lucide-react';
 import type { Group, SkillGroup } from '@/lib/types';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function AdminGroupsPage() {
   const [viewGroup, setViewGroup] = useState<Group | null>(null);
   const [isViewOpen, setIsViewOpen] = useState(false);
+  const [selectedSkillFilter, setSelectedSkillFilter] = useState<string>('all');
+  
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // * Initialize filter from query params
+  useEffect(() => {
+    const skillId = searchParams.get('skill_id');
+    if (skillId) {
+      setSelectedSkillFilter(skillId);
+    }
+  }, [searchParams]);
+
+  // * Update URL when filter changes
+  const updateFilter = (skillId: string) => {
+    setSelectedSkillFilter(skillId);
+    const params = new URLSearchParams(searchParams.toString());
+    if (skillId === 'all') {
+      params.delete('skill_id');
+    } else {
+      params.set('skill_id', skillId);
+    }
+    router.push(`/admin/groups?${params.toString()}`, { scroll: false });
+  };
 
   // * Fetch detailed skill group data for view modal
   const { data: detailedGroupData, isLoading: isDetailedLoading } = useClientQuery({
@@ -60,6 +85,25 @@ export default function AdminGroupsPage() {
     },
   });
 
+  // * Get unique skills for filter
+  const uniqueSkills = useMemo(() => {
+    if (!groups) return []
+    const skills = groups.map(group => group.skill)
+    const unique = skills.filter((skill, index, self) => 
+      index === self.findIndex(s => s.id === skill.id)
+    )
+    return unique
+  }, [groups])
+
+  // * Filter groups by selected skill
+  const filteredGroups = useMemo(() => {
+    if (!groups) return []
+    
+    if (selectedSkillFilter === 'all') return groups
+    
+    return groups.filter(group => group.skill.id === selectedSkillFilter)
+  }, [groups, selectedSkillFilter])
+
   // * Read-only view: open details modal
   const handleView = (group: Group) => {
     setViewGroup(group);
@@ -87,17 +131,53 @@ export default function AdminGroupsPage() {
         View groups and their capacity. Use the eye icon to view group details. Creation and editing are disabled here.
       </div>
 
+      {/* Filters Card */}
+      <Card shadow="sm">
+        <CardHeader className="px-4 pt-4">
+          <div className="flex items-center gap-2">
+            <Filter className="w-4 h-4 text-neutral-600" />
+            <p className="text-base font-medium text-neutral-900">Filters</p>
+          </div>
+        </CardHeader>
+        <CardBody className="px-4 pb-4">
+          <div className="flex gap-4 items-center">
+            <div className="w-full md:w-80">
+              <Select
+                label="Filter by Skill"
+                placeholder="Select a skill"
+                selectedKeys={selectedSkillFilter ? [selectedSkillFilter] : []}
+                onSelectionChange={(keys) => {
+                  const selected = Array.from(keys)[0] as string
+                  updateFilter(selected || 'all')
+                }}
+                variant="bordered"
+              >
+                <SelectItem key="all" value="all">All Skills</SelectItem>
+                {uniqueSkills.map((skill) => (
+                  <SelectItem key={skill.id} value={skill.id}>
+                    {skill.title}
+                  </SelectItem>
+                ))}
+              </Select>
+            </div>
+            <Chip variant="flat" color="primary">
+              {filteredGroups?.length || 0} groups
+            </Chip>
+          </div>
+        </CardBody>
+      </Card>
+
       {/* * Groups Table with StateRenderer */}
       <Card shadow="sm">
         <CardHeader className="flex items-center justify-between px-4 pt-4">
           <div className="flex items-center gap-3">
             <p className="text-base font-medium text-neutral-900">Groups</p>
-            <Chip variant="flat">{groups?.length || 0}</Chip>
+            <Chip variant="flat">{filteredGroups?.length || 0}</Chip>
           </div>
         </CardHeader>
         <CardBody className="px-4 pb-4">
           <StateRenderer
-            data={groups}
+            data={filteredGroups}
             isLoading={isLoading}
             error={error}
             loadingComponent={<div className="py-2"><DefaultLoadingComponent /></div>}
