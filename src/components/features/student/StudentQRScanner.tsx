@@ -245,10 +245,10 @@ function StudentQRScanner({
           <div className="bg-blue-50 p-4 rounded-lg text-left">
             <p className="text-sm font-medium text-blue-900 mb-2">How to enable camera:</p>
             <ol className="text-sm text-blue-800 space-y-1 list-decimal list-inside">
-              <li>Click the lock/info icon in your browser's address bar</li>
-              <li>Find "Camera" in the permissions list</li>
-              <li>Change the setting to "Allow"</li>
-              <li>Click "Try Again" below</li>
+              <li>Click the lock/info icon in your browser&apos;s address bar</li>
+              <li>Find &quot;Camera&quot; in the permissions list</li>
+              <li>Change the setting to &quot;Allow&quot;</li>
+              <li>Click &quot;Try Again&quot; below</li>
             </ol>
           </div>
           <div className="flex gap-2 justify-center">
@@ -316,7 +316,7 @@ function StudentQRScanner({
           <p className="text-xs font-medium text-neutral-700">What happens next:</p>
           <ul className="text-xs text-neutral-600 space-y-1">
             <li>• Your browser will show a permission prompt</li>
-            <li>• Click "Allow" to enable camera access</li>
+            <li>• Click &quot;Allow&quot; to enable camera access</li>
             <li>• The camera will activate for QR scanning</li>
             <li>• You can always use manual entry instead</li>
           </ul>
@@ -330,8 +330,8 @@ function StudentQRScanner({
         >
           {isRequestingPermission ? 'Requesting Access...' : 'Enable Camera'}
         </Button>
-        <p className="text-xs text-neutral-500">
-          or use the <button 
+          <p className="text-xs text-neutral-500">
+            or use the <button 
             onClick={() => setSelectedTab("manual")}
             className="text-primary underline"
           >
