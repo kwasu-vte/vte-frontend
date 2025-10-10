@@ -14,13 +14,13 @@ import GroupCapacityIndicator from "@/components/features/admin/GroupCapacityInd
  * - userId?: string (when provided, component fetches mentor groups)
  * - groups?: SkillGroup[] (optional pre-fetched groups; bypasses fetching)
  * - viewMode?: 'grid' | 'list'
- * - onSelectGroup?: (groupId: number) => void
+ * - onSelectGroup?: (groupId: string) => void
  */
 export type MentorGroupsListProps = {
   userId?: string
   groups?: SkillGroup[]
   viewMode?: "grid" | "list"
-  onSelectGroup?: (groupId: number) => void
+  onSelectGroup?: (groupId: string) => void
 }
 
 export default function MentorGroupsList(props: MentorGroupsListProps) {
@@ -96,45 +96,81 @@ export default function MentorGroupsList(props: MentorGroupsListProps) {
         <Card
           key={group.id}
           shadow="sm"
-          className={isGrid ? "" : ""}
+          className={`${isGrid ? "" : "w-full"} hover:shadow-md transition-shadow`}
           isPressable={!!onSelectGroup}
           onPress={() => onSelectGroup?.(Number(group.id))}
         >
-          <CardHeader className="flex items-center justify-between">
-            <div>
-              <p className="text-xl font-medium text-neutral-900">{group.group_display_name ?? `Group ${group.group_number ?? group.id}`}</p>
-              <p className="text-sm text-neutral-500">{group.skill?.title ?? "Unknown Skill"}</p>
-            </div>
-            <Chip color="primary" variant="flat" size="sm">
-              {group.group_number ? `#${group.group_number}` : `ID: ${group.id}`}
-            </Chip>
-          </CardHeader>
-          <CardBody className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="text-sm text-neutral-600">
-                Capacity
+          <CardBody className="p-4">
+            {/* Header Section */}
+            <div className="flex items-start justify-between mb-3">
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-neutral-900 mb-1">
+                  {group.group_display_name ?? `Group ${group.group_number ?? group.id}`}
+                </h3>
+                <p className="text-sm text-neutral-600">{group.skill?.title ?? "Unknown Skill"}</p>
               </div>
-              <div className="text-sm font-medium text-neutral-900">
-                {Number(group.current_student_count ?? 0)}/{Number(group.max_student_capacity ?? 0)}
+              <Chip color="primary" variant="flat" size="sm">
+                {group.group_number ? `#${group.group_number}` : `ID: ${group.id}`}
+              </Chip>
+            </div>
+
+            {/* Stats Grid */}
+            <div className="grid grid-cols-2 gap-4 mb-4">
+              <div className="bg-blue-50 rounded-lg p-3">
+                <div className="text-xs text-blue-600 font-medium mb-1">Students</div>
+                <div className="text-lg font-bold text-blue-900">
+                  {group.enrollments?.length ?? Number(group.current_student_count ?? 0)}
+                </div>
+                <div className="text-xs text-blue-600">
+                  of {Number(group.max_student_capacity ?? 0)}
+                </div>
+              </div>
+              <div className="bg-green-50 rounded-lg p-3">
+                <div className="text-xs text-green-600 font-medium mb-1">Capacity</div>
+                <div className="text-lg font-bold text-green-900">
+                  {Math.round(((group.enrollments?.length ?? Number(group.current_student_count ?? 0)) / Number(group.max_student_capacity ?? 1)) * 100)}%
+                </div>
+                <div className="text-xs text-green-600">filled</div>
               </div>
             </div>
-            <GroupCapacityIndicator
-              current={Number(group.current_student_count ?? 0)}
-              max={Number(group.max_student_capacity ?? 0)}
-              size="md"
-            />
+
+            {/* Progress Bar */}
+            <div className="mb-4">
+              <GroupCapacityIndicator
+                current={group.enrollments?.length ?? Number(group.current_student_count ?? 0)}
+                max={Number(group.max_student_capacity ?? 0)}
+                size="sm"
+              />
+            </div>
+
+            {/* Next Practical */}
             {(group as any)?.next_practical_at && (
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-neutral-600">Next practical</span>
-                <span className="text-sm font-medium text-neutral-900">
-                  {new Date((group as any).next_practical_at as string).toLocaleString()}
-                </span>
+              <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 mb-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                  <div className="flex-1">
+                    <div className="text-xs text-orange-600 font-medium">Next Practical</div>
+                    <div className="text-sm font-medium text-orange-900">
+                      {new Date((group as any).next_practical_at as string).toLocaleDateString()}
+                    </div>
+                    <div className="text-xs text-orange-600">
+                      {new Date((group as any).next_practical_at as string).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
+
+            {/* Action Button */}
             {onSelectGroup && (
               <div className="flex justify-end">
-                <Button color="primary" variant="bordered" onPress={() => onSelectGroup(Number(group.id))}>
-                  View Roster
+                <Button 
+                  color="primary" 
+                  variant="bordered" 
+                  size="sm"
+                  onPress={() => onSelectGroup(group.id)}
+                >
+                  View Details
                 </Button>
               </div>
             )}

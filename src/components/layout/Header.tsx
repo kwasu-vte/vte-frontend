@@ -51,7 +51,7 @@ function generateBreadcrumbs(pathname: string) {
     else if (segment === 'settings') label = 'Settings';
     else if (segment === 'profile') label = 'Profile';
     else if (segment === 'my-group') label = 'My Group';
-    else if (segment === 'my-groups') label = 'My Groups';
+    else if (segment === 'my-groups') label = 'Skills & Groups';
     else if (segment === 'calendar') label = 'Calendar';
     
     // * Capitalize first letter

@@ -97,14 +97,8 @@ const navigationItems: NavigationItem[] = [
   },
   {
     href: '/mentor/my-skills',
-    label: 'My Skills',
+    label: 'Skills & Groups',
     icon: BookOpen,
-    role: ['Mentor'],
-  },
-  {
-    href: '/mentor/my-groups',
-    label: 'My Groups',
-    icon: Users,
     role: ['Mentor'],
   },
   {
