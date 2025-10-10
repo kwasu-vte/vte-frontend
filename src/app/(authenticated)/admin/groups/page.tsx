@@ -11,11 +11,22 @@ import { GroupsTable } from '@/components/features/admin/GroupsTable';
 import { skillGroupsApi } from '@/lib/api';
 import { Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Card, CardHeader, CardBody, Chip } from '@heroui/react';
 import { Eye } from 'lucide-react';
-import type { Group } from '@/lib/types';
+import type { Group, SkillGroup } from '@/lib/types';
 
 export default function AdminGroupsPage() {
   const [viewGroup, setViewGroup] = useState<Group | null>(null);
   const [isViewOpen, setIsViewOpen] = useState(false);
+
+  // * Fetch detailed skill group data for view modal
+  const { data: detailedGroupData, isLoading: isDetailedLoading } = useClientQuery({
+    queryKey: ['skill-group-details', viewGroup?.id],
+    queryFn: async () => {
+      if (!viewGroup?.id) return null;
+      const res = await skillGroupsApi.getById(Number(viewGroup.id));
+      return res.data;
+    },
+    enabled: !!viewGroup?.id && isViewOpen,
+  });
 
   // * React Query for data fetching - only run on client
   const {
@@ -35,10 +46,16 @@ export default function AdminGroupsPage() {
         name: g.group_display_name || `Group ${g.group_number}`,
         skill: { id: String(g.skill?.id ?? ''), title: g.skill?.title ?? 'Unknown' },
         mentor: null,
-        members: [],
+        members: Array.from({ length: g.current_student_count || 0 }, (_, i) => ({ 
+          id: `member-${i}`, 
+          first_name: 'Student', 
+          last_name: `${i + 1}` 
+        })), // * Create placeholder members based on count
         creation_date: g.created_at ?? '',
-        end_date: g.updated_at ?? ''
-      })) as unknown as Group[];
+        end_date: g.updated_at ?? '',
+        // * Store original skill group data for detailed view
+        skillGroupData: g
+      })) as unknown as (Group & { skillGroupData: any })[];
       return mapped;
     },
   });
@@ -123,49 +140,111 @@ export default function AdminGroupsPage() {
           <ModalBody>
             {viewGroup && (
               <div className="space-y-4">
-                <div className="bg-neutral-50 p-4 rounded-lg">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                    <div>
-                      <span className="text-neutral-600">Name:</span>
-                      <span className="ml-2 font-medium">{viewGroup.name}</span>
-                    </div>
-                    <div>
-                      <span className="text-neutral-600">ID:</span>
-                      <span className="ml-2 font-medium">{viewGroup.id}</span>
-                    </div>
-                    <div>
-                      <span className="text-neutral-600">Skill:</span>
-                      <span className="ml-2 font-medium">{viewGroup.skill.title}</span>
-                    </div>
-                    <div>
-                      <span className="text-neutral-600">Mentor:</span>
-                      <span className="ml-2 font-medium">{viewGroup.mentor ? `${viewGroup.mentor.first_name} ${viewGroup.mentor.last_name}` : '—'}</span>
-                    </div>
-                    <div>
-                      <span className="text-neutral-600">Created:</span>
-                      <span className="ml-2 font-medium">{viewGroup.creation_date}</span>
-                    </div>
-                    <div>
-                      <span className="text-neutral-600">Ends:</span>
-                      <span className="ml-2 font-medium">{viewGroup.end_date}</span>
-                    </div>
+                {isDetailedLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="text-neutral-500">Loading group details...</div>
                   </div>
-                </div>
-
-                <div>
-                  <h3 className="font-medium text-neutral-900 mb-2">Members ({viewGroup.members?.length || 0})</h3>
-                  <div className="space-y-2">
-                    {(viewGroup.members || []).map((m) => (
-                      <div key={m.id} className="flex items-center justify-between text-sm bg-white border border-neutral-200 rounded p-2">
-                        <span className="font-medium text-neutral-900">{m.first_name} {m.last_name}</span>
-                        <span className="text-neutral-500">{m.id}</span>
+                ) : (
+                  <>
+                    <div className="bg-neutral-50 p-4 rounded-lg">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                        <div>
+                          <span className="text-neutral-600">Group Name:</span>
+                          <span className="ml-2 font-medium">{detailedGroupData?.group_display_name || viewGroup.name}</span>
+                        </div>
+                        <div>
+                          <span className="text-neutral-600">Skill:</span>
+                          <span className="ml-2 font-medium">{detailedGroupData?.skill?.title || viewGroup.skill.title}</span>
+                        </div>
+                        <div>
+                          <span className="text-neutral-600">Current Students:</span>
+                          <span className="ml-2 font-medium">{detailedGroupData?.current_student_count || 0}</span>
+                        </div>
+                        <div>
+                          <span className="text-neutral-600">Max Capacity:</span>
+                          <span className="ml-2 font-medium">{detailedGroupData?.max_student_capacity || 0}</span>
+                        </div>
+                        <div>
+                          <span className="text-neutral-600">Capacity:</span>
+                          <span className="ml-2 font-medium">{detailedGroupData?.capacity_percentage || 0}%</span>
+                        </div>
+                        <div>
+                          <span className="text-neutral-600">Status:</span>
+                          <span className="ml-2 font-medium">
+                            {detailedGroupData?.is_full ? 'Full' : detailedGroupData?.has_capacity ? 'Available' : 'Limited'}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-neutral-600">Academic Session:</span>
+                          <span className="ml-2 font-medium">{detailedGroupData?.academic_session?.name || '—'}</span>
+                        </div>
+                        <div>
+                          <span className="text-neutral-600">Created:</span>
+                          <span className="ml-2 font-medium">
+                            {detailedGroupData?.created_at ? new Date(detailedGroupData.created_at).toLocaleDateString() : '—'}
+                          </span>
+                        </div>
                       </div>
-                    ))}
-                    {(!viewGroup.members || viewGroup.members.length === 0) && (
-                      <div className="text-sm text-neutral-500 italic">No members yet.</div>
+                    </div>
+
+                    {detailedGroupData?.skill && (
+                      <div>
+                        <h3 className="font-medium text-neutral-900 mb-2">Skill Details</h3>
+                        <div className="bg-blue-50 p-4 rounded-lg">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                            <div>
+                              <span className="text-neutral-600">Description:</span>
+                              <span className="ml-2 font-medium">{detailedGroupData.skill.description || '—'}</span>
+                            </div>
+                            <div>
+                              <span className="text-neutral-600">Max Groups:</span>
+                              <span className="ml-2 font-medium">{detailedGroupData.skill.max_groups || '—'}</span>
+                            </div>
+                            <div>
+                              <span className="text-neutral-600">Min Students:</span>
+                              <span className="ml-2 font-medium">{detailedGroupData.skill.min_students_per_group || '—'}</span>
+                            </div>
+                            <div>
+                              <span className="text-neutral-600">Max Students:</span>
+                              <span className="ml-2 font-medium">{detailedGroupData.skill.max_students_per_group || '—'}</span>
+                            </div>
+                            <div>
+                              <span className="text-neutral-600">Allowed Levels:</span>
+                              <span className="ml-2 font-medium">
+                                {detailedGroupData.skill.allowed_levels?.join(', ') || '—'}
+                              </span>
+                            </div>
+                            <div>
+                              <span className="text-neutral-600">Exclude Weekends:</span>
+                              <span className="ml-2 font-medium">{detailedGroupData.skill.exclude_weekends ? 'Yes' : 'No'}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     )}
-                  </div>
-                </div>
+
+                    <div>
+                      <h3 className="font-medium text-neutral-900 mb-2">Capacity Overview</h3>
+                      <div className="bg-green-50 p-4 rounded-lg">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-sm text-neutral-600">Current Usage</span>
+                          <span className="text-sm font-medium">{detailedGroupData?.current_student_count || 0} / {detailedGroupData?.max_student_capacity || 0}</span>
+                        </div>
+                        <div className="w-full bg-neutral-200 rounded-full h-2">
+                          <div 
+                            className="bg-blue-500 h-2 rounded-full transition-all duration-300" 
+                            style={{ width: `${detailedGroupData?.capacity_percentage || 0}%` }}
+                          ></div>
+                        </div>
+                        <div className="flex justify-between text-xs text-neutral-500 mt-1">
+                          <span>0%</span>
+                          <span>{detailedGroupData?.capacity_percentage || 0}%</span>
+                          <span>100%</span>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
             )}
           </ModalBody>

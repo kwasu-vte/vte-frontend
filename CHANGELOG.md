@@ -1,3 +1,12 @@
+## fix(admin): groups page improvements
+
+- Fixed groups page to show correct member count from API data (current_student_count)
+- Removed mentor column from groups table as requested
+- Removed ID display from groups table for cleaner UI
+- Updated view details modal to fetch specific skill group data with comprehensive information
+- Added detailed skill information, capacity overview, and academic session details in modal
+- Improved data mapping to use actual API response structure
+
 ## fix(admin): mentors page search now uses client-side filtering
 
 - Changed mentors page search from server-side to client-side filtering

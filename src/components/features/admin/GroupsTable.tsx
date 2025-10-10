@@ -29,7 +29,6 @@ export function GroupsTable({
   const columns = [
     { key: 'name', label: 'Group Name' },
     { key: 'skill', label: 'Skill' },
-    { key: 'mentor', label: 'Mentor' },
     { key: 'members', label: 'Members' },
     { key: 'status', label: 'Status' },
     { key: 'actions', label: 'Actions' }
@@ -62,26 +61,12 @@ export function GroupsTable({
             <TableCell>
               <div className="flex flex-col">
                 <span className="font-semibold text-neutral-900">{group.name}</span>
-                <span className="text-sm text-neutral-500">ID: {group.id}</span>
               </div>
             </TableCell>
             <TableCell>
               <div className="flex flex-col">
                 <span className="font-medium text-neutral-900">{group.skill.title}</span>
-                <span className="text-sm text-neutral-500">{group.skill.id}</span>
               </div>
-            </TableCell>
-            <TableCell>
-              {group.mentor ? (
-                <div className="flex flex-col">
-                  <span className="font-medium text-neutral-900">
-                    {group.mentor.first_name} {group.mentor.last_name}
-                  </span>
-                  <span className="text-sm text-neutral-500">{group.mentor.id}</span>
-                </div>
-              ) : (
-                <span className="text-neutral-400 italic">No mentor assigned</span>
-              )}
             </TableCell>
             <TableCell>
               <div className="flex items-center gap-2">
