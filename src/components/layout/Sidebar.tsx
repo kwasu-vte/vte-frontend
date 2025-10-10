@@ -107,12 +107,6 @@ const navigationItems: NavigationItem[] = [
     icon: Calendar,
     role: ['Mentor'],
   },
-  {
-    href: '/mentor/calendar',
-    label: 'Calendar',
-    icon: Calendar,
-    role: ['Mentor'],
-  },
 
   // * Student Navigation
   {

@@ -52,7 +52,7 @@ function generateBreadcrumbs(pathname: string) {
     else if (segment === 'profile') label = 'Profile';
     else if (segment === 'my-group') label = 'My Group';
     else if (segment === 'my-groups') label = 'Skills & Groups';
-    else if (segment === 'calendar') label = 'Calendar';
+    else if (segment === 'schedule') label = 'Schedule';
     
     // * Capitalize first letter
     label = label.charAt(0).toUpperCase() + label.slice(1);
