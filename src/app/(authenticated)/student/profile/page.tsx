@@ -9,7 +9,7 @@ import { ProfileView } from '@/components/features/student/ProfileView';
 import { AttendanceReport } from '@/components/features/student/AttendanceReport';
 import { NotificationContainer } from '@/components/shared/NotificationContainer';
 import { StateRenderer } from '@/components/shared/StateRenderer';
-import { Card, CardBody, CardHeader, Skeleton, Button } from '@nextui-org/react';
+import { Card, CardBody, CardHeader, Skeleton, Button } from '@heroui/react';
 import { ArrowLeft, History, BarChart3 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -37,7 +37,7 @@ async function getProfilePageData(userId: string): Promise<ProfilePageData> {
 
     // Derive attendance summary from QR scan data if user has an active enrollment
     let attendanceSummary = null;
-    if (profile && currentEnrollment && (currentEnrollment.status === 'assigned' || currentEnrollment.status === 'active')) {
+    if (profile && currentEnrollment && currentEnrollment.status === 'assigned') {
       if (currentEnrollment.group?.id) {
         try {
           // Get attendance report for the group

@@ -13,7 +13,7 @@ import { StudentProfileModal } from '@/components/features/admin/StudentProfileM
 import { studentsApi } from '@/lib/api';
 import { StudentProfile } from '@/lib/types';
 import type { CreateUserPayload, UpdateUserPayload } from '@/lib/types'
-import { Button, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@nextui-org/react';
+import { Button, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@heroui/react';
 import { AlertTriangle, Search } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { getErrorMessage, getErrorTitle, getSuccessTitle, getSuccessMessage } from '@/lib/error-handling';

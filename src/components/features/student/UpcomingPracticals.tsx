@@ -1,6 +1,6 @@
 "use client"
 import React from "react"
-import { Card, CardBody, CardHeader, Chip, Divider, Button } from "@nextui-org/react"
+import { Card, CardBody, CardHeader, Chip, Divider, Button } from "@heroui/react"
 import Link from "next/link"
 import { Calendar, MapPin, User, Clock } from "lucide-react"
 

@@ -5,7 +5,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Card, CardBody, CardHeader, Input, Switch, Button, Divider } from '@nextui-org/react';
+import { Card, CardBody, CardHeader, Input, Switch, Button, Divider } from '@heroui/react';
 // Deprecated per plan: no SystemConfig API; keep local prop types to avoid leaking types
 type SystemConfig = {
   system_name?: string;

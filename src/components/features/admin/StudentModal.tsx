@@ -5,7 +5,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, Select, SelectItem } from '@nextui-org/react';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, Select, SelectItem } from '@heroui/react';
 import { CreateUserPayload, UpdateUserPayload, StudentProfile } from '@/lib/types';
 
 interface StudentModalProps {
@@ -184,7 +184,7 @@ export function StudentModal({
                 variant="bordered"
               >
                 {levelOptions.map((option) => (
-                  <SelectItem key={option.key} value={option.value}>
+                  <SelectItem key={option.key}>
                     {option.label}
                   </SelectItem>
                 ))}

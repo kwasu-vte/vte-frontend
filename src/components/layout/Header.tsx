@@ -229,7 +229,7 @@ export function Header({ user, onMenuClick }: HeaderProps) {
                   <SelectValue placeholder={isLoading ? 'Loading sessions...' : sessions.length ? 'Select session' : 'No sessions'} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="__create__">
+                  <SelectItem key="__create__" value="__create__">
                     <span className="flex items-center">
                       <Plus className="w-4 h-4 mr-2" /> Add new session…
                     </span>
@@ -308,7 +308,7 @@ export function Header({ user, onMenuClick }: HeaderProps) {
                             <SelectValue placeholder="Choose a session" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="__create__">
+                            <SelectItem key="__create__" value="__create__">
                               <span className="flex items-center"><Plus className="w-4 h-4 mr-2" /> Create new session…</span>
                             </SelectItem>
                             {sessions.map((s) => (

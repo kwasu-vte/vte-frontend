@@ -1,6 +1,6 @@
 "use client";
 
-import { Modal, ModalContent, ModalHeader, ModalBody } from "@nextui-org/react";
+import { Modal, ModalContent, ModalHeader, ModalBody } from "@heroui/react";
 import { useQuery } from "@tanstack/react-query";
 import { studentsApi } from "@/lib/api";
 import type { StudentProfile } from "@/lib/types";

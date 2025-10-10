@@ -4,7 +4,7 @@
 
 'use client';
 
-import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Button, Chip, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@nextui-org/react';
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Button, Chip, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@heroui/react';
 import { Group } from '@/lib/types';
 import { MoreVertical, Edit, Trash2, Eye, Users, Calendar } from 'lucide-react';
 

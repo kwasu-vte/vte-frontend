@@ -12,7 +12,7 @@ import { MentorModal } from '@/components/features/admin/MentorModal';
 import MentorSkillAssignment from '@/components/features/mentor/MentorSkillAssignment';
 import { mentorsApi } from '@/lib/api';
 import { MentorProfile, CreateMentorProfilePayload } from '@/lib/types';
-import { Button, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Card, CardHeader, CardBody, Chip } from '@nextui-org/react';
+import { Button, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Card, CardHeader, CardBody, Chip } from '@heroui/react';
 import { Plus, Search, Eye, AlertTriangle } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { getErrorMessage, getErrorTitle, getSuccessTitle, getSuccessMessage } from '@/lib/error-handling';

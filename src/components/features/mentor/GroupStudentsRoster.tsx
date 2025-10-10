@@ -1,6 +1,6 @@
 "use client"
 import React from "react"
-import { Input, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Skeleton, Chip, Avatar, Button } from "@nextui-org/react"
+import { Input, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Skeleton, Chip, Avatar, Button } from "@heroui/react"
 import { useQuery } from "@tanstack/react-query"
 import { skillGroupsApi } from "@/lib/api"
 import type { SkillGroup, User } from "@/lib/types"

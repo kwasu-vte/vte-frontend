@@ -1,6 +1,6 @@
 "use client"
 import React from "react"
-import { Chip, Progress, Tooltip } from "@nextui-org/react"
+import { Chip, Progress, Tooltip } from "@heroui/react"
 
 /**
  * * GroupCapacityIndicator

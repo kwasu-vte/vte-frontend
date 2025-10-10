@@ -4,7 +4,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Button, Input, Textarea } from '@nextui-org/react';
+import { Button, Input, Textarea } from '@heroui/react';
 
 // * Test validation schema
 const testSchema = z.object({

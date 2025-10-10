@@ -13,7 +13,7 @@ import {
   Divider,
   Spinner,
   Tooltip
-} from '@nextui-org/react';
+} from '@heroui/react';
 import { useQuery } from '@tanstack/react-query';
 import { skillsApi, skillGroupsApi, mentorsApi, qrCodesApi } from '@/lib/api';
 import { z } from 'zod';
@@ -230,9 +230,8 @@ export function QRWizard({ currentStep, onStepChange, onComplete, initialData = 
           }}
           size="lg"
           isRequired
-          classNames={{
+  classNames={{
     listbox: "bg-white",
-    item: "data-[selected=true]:bg-white",
     base: "w-full",
     trigger: "h-10",
     innerWrapper: "pb-0",
@@ -262,9 +261,8 @@ export function QRWizard({ currentStep, onStepChange, onComplete, initialData = 
             size="lg"
             isDisabled={!data.skillId || groups.length === 0}
             isRequired
-            classNames={{
+  classNames={{
     listbox: "bg-white",
-    item: "data-[selected=true]:bg-white",
     base: "w-full",
     trigger: "h-10",
     innerWrapper: "pb-0",
@@ -372,9 +370,8 @@ export function QRWizard({ currentStep, onStepChange, onComplete, initialData = 
             updateData({ mentorId: first || undefined });
           }}
           size="lg" 
-          classNames={{
+  classNames={{
     listbox: "bg-white",
-    item: "data-[selected=true]:bg-white",
     base: "w-full",
     trigger: "h-10",
     innerWrapper: "pb-0",

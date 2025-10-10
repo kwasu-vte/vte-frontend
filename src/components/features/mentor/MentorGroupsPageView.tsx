@@ -1,6 +1,6 @@
 "use client"
 import React from "react"
-import { Card, CardHeader, CardBody, Input, Select, SelectItem, Button, Tabs, Tab, Chip, Skeleton } from "@nextui-org/react"
+import { Card, CardHeader, CardBody, Input, Select, SelectItem, Button, Tabs, Tab, Chip, Skeleton } from "@heroui/react"
 import { useQuery } from "@tanstack/react-query"
 import { mentorsApi, qrCodesApi } from "@/lib/api"
 import type { Skill, SkillGroup, AttendanceReport } from "@/lib/types"
@@ -84,7 +84,7 @@ export default function MentorGroupsPageView(props: { userId: string }) {
               placeholder="All skills"
             >
               {(skills ?? []).map((s) => (
-                <SelectItem key={String(s.id)} value={String(s.id)}>{s.title}</SelectItem>
+                <SelectItem key={String(s.id)}>{s.title}</SelectItem>
               ))}
             </Select>
           )}

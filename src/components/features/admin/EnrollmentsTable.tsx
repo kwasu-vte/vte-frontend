@@ -1,6 +1,6 @@
 "use client"
 import React from "react"
-import { Pagination } from "@nextui-org/react"
+import { Pagination } from "@heroui/react"
 import type { Enrollment } from "@/lib/types"
 import EnrollmentStatusBadge from "./EnrollmentStatusBadge"
 import { DataTable } from "@/components/shared/DataTable"

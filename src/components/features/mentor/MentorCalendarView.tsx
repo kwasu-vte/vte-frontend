@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useMemo } from "react"
-import { Card, CardBody, CardHeader, Chip, Button, Skeleton, Tabs, Tab } from "@nextui-org/react"
+import { Card, CardBody, CardHeader, Chip, Button, Skeleton, Tabs, Tab } from "@heroui/react"
 import { useMentorDashboardData } from "@/lib/hooks/use-mentor-dashboard-data"
 import GroupScheduleCard from "@/components/features/mentor/GroupScheduleCard"
 import PracticalCalendar from "@/components/features/student/PracticalCalendar"

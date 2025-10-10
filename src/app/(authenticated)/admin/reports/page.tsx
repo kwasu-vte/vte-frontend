@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 import { skillGroupsApi, qrCodesApi } from '@/lib/api';
 import { useMutation } from '@tanstack/react-query';
 import { useClientQuery } from '@/lib/hooks/useClientQuery';
-import { Button, Select, SelectItem, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Card, CardBody, CardHeader, Chip } from '@nextui-org/react';
+import { Button, Select, SelectItem, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Card, CardBody, CardHeader, Chip } from '@heroui/react';
 import { FileSpreadsheet, Calendar, Users } from 'lucide-react';
 import { exportAttendanceReportToExcel } from '@/lib/utils/excel-export';
 import { AttendanceReport, GroupStatistics } from '@/lib/types';
@@ -88,8 +88,8 @@ export default function AdminReportsPage() {
             selectedKeys={[type]}
             onChange={(e) => setType(e.target.value as 'attendance' | 'capacity')}
           >
-            <SelectItem key="attendance" value="attendance">Attendance</SelectItem>
-            <SelectItem key="capacity" value="capacity">Capacity Overview</SelectItem>
+            <SelectItem key="attendance">Attendance</SelectItem>
+            <SelectItem key="capacity">Capacity Overview</SelectItem>
           </Select>
           <Select
             // label="Group (for attendance)"

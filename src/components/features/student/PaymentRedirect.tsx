@@ -1,6 +1,6 @@
 "use client"
 import React from "react"
-import { Card, CardBody, CardHeader, Button, Image } from "@nextui-org/react"
+import { Card, CardBody, CardHeader, Button, Image } from "@heroui/react"
 
 /**
  * * PaymentRedirect

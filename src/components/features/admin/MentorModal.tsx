@@ -5,7 +5,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, Select, SelectItem, Textarea } from '@nextui-org/react';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, Select, SelectItem, Textarea } from '@heroui/react';
 import { User, CreateMentorProfilePayload, UpdateUserPayload, MentorProfile } from '@/lib/types';
 import { getSpecializationOptions } from '@/lib/utils/specialization';
 
@@ -180,7 +180,7 @@ export function MentorModal({
                 variant="bordered"
               >
                 {specializationOptions.map((option) => (
-                  <SelectItem key={option.key} value={option.value}>
+                  <SelectItem key={option.key}>
                     {option.label}
                   </SelectItem>
                 ))}

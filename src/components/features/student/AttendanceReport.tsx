@@ -1,6 +1,6 @@
 "use client"
 import React from "react"
-import { Button, Chip, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Card, CardBody, CardHeader, Divider } from "@nextui-org/react"
+import { Button, Chip, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Card, CardBody, CardHeader, Divider } from "@heroui/react"
 import { Download, Calendar, FileSpreadsheet } from "lucide-react"
 import * as XLSX from 'xlsx'
 

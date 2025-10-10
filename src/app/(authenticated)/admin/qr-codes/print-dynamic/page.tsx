@@ -386,7 +386,7 @@ export default function DynamicQRCodePrintPage() {
                         />
                       ) : (
                         <div 
-                          ref={(el) => qrRefs.current[qrIndex] = el}
+                          ref={(el) => { qrRefs.current[qrIndex] = el as HTMLDivElement | null; }}
                           className={`${pageLayout.qrClass} print:${pageLayout.qrClass} flex items-center justify-center`}
                         />
                       )}

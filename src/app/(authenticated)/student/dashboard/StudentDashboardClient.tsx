@@ -12,7 +12,7 @@ import { GroupAssignmentCard } from '@/components/features/student/GroupAssignme
 import { QuickActions } from '@/components/features/student/QuickActions';
 import { NotificationContainer } from '@/components/shared/NotificationContainer';
 import { StateRenderer } from '@/components/shared/StateRenderer';
-import { Card, CardBody, CardHeader, Skeleton, Button, Chip } from '@nextui-org/react';
+import { Card, CardBody, CardHeader, Skeleton, Button, Chip } from '@heroui/react';
 import { ListSkeleton, CardGridSkeleton } from '@/components/shared/Skeletons';
 import Link from 'next/link';
 import { BookOpen, CreditCard, Users } from 'lucide-react';

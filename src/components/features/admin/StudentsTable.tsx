@@ -4,7 +4,7 @@
 
 'use client';
 
-import { Button, Chip, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@nextui-org/react';
+import { Button, Chip, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@heroui/react';
 import { StudentProfile } from '@/lib/types';
 import { MoreVertical, Eye, User as UserIcon, BookOpen, Plus, Edit, Trash2 } from 'lucide-react';
 import { DataTable } from '@/components/shared/DataTable';

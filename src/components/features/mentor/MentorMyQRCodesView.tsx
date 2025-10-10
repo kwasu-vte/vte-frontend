@@ -1,6 +1,6 @@
 "use client"
 import React from "react"
-import { Card, CardHeader, CardBody, Tabs, Tab, Select, SelectItem, Skeleton } from "@nextui-org/react"
+import { Card, CardHeader, CardBody, Tabs, Tab, Select, SelectItem, Skeleton } from "@heroui/react"
 import { useQuery } from "@tanstack/react-query"
 import { mentorsApi, qrCodesApi } from "@/lib/api"
 import type { SkillGroup, PaginatedResponse, GroupQrCode } from "@/lib/types"
@@ -82,7 +82,7 @@ export default function MentorMyQRCodesView(props: { userId: string }) {
                 className="max-w-md"
               >
                 {groups.map((g) => (
-                  <SelectItem key={String(g.id)} value={String(g.id)}>
+                  <SelectItem key={String(g.id)}>
                     {(g as any).group_display_name ?? `Group ${g.group_number ?? g.id}`} — {g.skill?.title}
                   </SelectItem>
                 ))}

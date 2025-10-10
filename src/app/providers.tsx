@@ -1,20 +1,22 @@
 'use client';
 
 import { ThemeProvider } from 'next-themes';
-import { NextUIProvider } from '@nextui-org/react';
+import { HeroUIProvider } from '@heroui/system';
+import { useRouter } from 'next/navigation';
 
 export function Providers({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
   return (
-    <ThemeProvider
-      attribute="class"
-      defaultTheme="light"
-      themes={['light']}
-      enableSystem={false}
-      disableTransitionOnChange
-    >
-      <NextUIProvider>
+    <HeroUIProvider navigate={router.push}>
+      <ThemeProvider
+        attribute="class"
+        defaultTheme="light"
+        themes={['light']}
+        enableSystem={false}
+        disableTransitionOnChange
+      >
         {children}
-      </NextUIProvider>
-    </ThemeProvider>
+      </ThemeProvider>
+    </HeroUIProvider>
   );
 }

@@ -1,6 +1,6 @@
 "use client"
 import React from "react"
-import { Card, CardHeader, CardBody, Button, Chip, Select, SelectItem, Skeleton } from "@nextui-org/react"
+import { Card, CardHeader, CardBody, Button, Chip, Select, SelectItem, Skeleton } from "@heroui/react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { mentorsApi, skillsApi } from "@/lib/api"
 import type { Skill } from "@/lib/types"
@@ -122,7 +122,7 @@ export default function MentorSkillAssignment(props: MentorSkillAssignmentProps)
                 selectionMode="single"
               >
                 {available.map((s) => (
-                  <SelectItem key={s.id} value={s.id}>
+                  <SelectItem key={s.id}>
                     {s.title}
                   </SelectItem>
                 ))}

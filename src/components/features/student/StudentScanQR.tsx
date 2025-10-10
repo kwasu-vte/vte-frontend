@@ -9,7 +9,7 @@ import { enrollmentsApi } from '@/lib/api';
 import { StudentQRScanner } from '@/components/features/student/StudentQRScanner';
 import { NotificationContainer } from '@/components/shared/NotificationContainer';
 import { StateRenderer } from '@/components/shared/StateRenderer';
-import { Card, CardBody, CardHeader, Skeleton, Button } from '@nextui-org/react';
+import { Card, CardBody, CardHeader, Skeleton, Button } from '@heroui/react';
 import { ArrowLeft, QrCode, Users, Calendar, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';

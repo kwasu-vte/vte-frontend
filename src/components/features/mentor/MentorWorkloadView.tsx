@@ -1,6 +1,6 @@
 "use client"
 import React from "react"
-import { Card, CardBody } from "@nextui-org/react"
+import { Card, CardBody } from "@heroui/react"
 import { useQuery } from "@tanstack/react-query"
 import { skillGroupsApi } from "@/lib/api"
 import type { GroupStatistics } from "@/lib/types"

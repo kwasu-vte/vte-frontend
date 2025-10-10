@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Card, CardBody, CardHeader, Button, Select, SelectItem } from '@nextui-org/react';
+import { Card, CardBody, CardHeader, Button, Select, SelectItem } from '@heroui/react';
 import { ArrowLeft, Printer } from 'lucide-react';
 import QRCodeStyling, {
   DrawType,
@@ -270,7 +270,7 @@ export default function QRCodePrintSelectorPage() {
                 className="max-w-xs"
               >
                 {quantityOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
+                  <SelectItem key={option.value}>
                     {option.label}
                   </SelectItem>
                 ))}

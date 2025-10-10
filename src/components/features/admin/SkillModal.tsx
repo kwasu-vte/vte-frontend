@@ -23,7 +23,7 @@ import {
   Divider,
   Accordion,
   AccordionItem,
-} from '@nextui-org/react';
+} from '@heroui/react';
 import { X, Plus, Trash2 } from 'lucide-react';
 import { Skill, CreateSkillPayload, UpdateSkillPayload } from '@/lib/types';
 

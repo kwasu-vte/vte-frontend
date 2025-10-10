@@ -10,7 +10,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { Card, CardBody, CardHeader, Chip, Divider } from "@nextui-org/react"
+import { Card, CardBody, CardHeader, Chip, Divider } from "@heroui/react"
 import { Calendar, Clock, Users, MapPin, User } from "lucide-react"
 
 export interface SessionDetailsData {

@@ -1,6 +1,6 @@
 "use client"
 import React, { useMemo } from "react"
-import { Checkbox, CheckboxGroup } from "@nextui-org/react"
+import { Checkbox, CheckboxGroup } from "@heroui/react"
 
 /**
  * * SkillLevelSelector

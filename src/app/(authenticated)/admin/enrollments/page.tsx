@@ -7,7 +7,7 @@ import type { Enrollment, PaginatedResponse } from '@/lib/types';
 import { StateRenderer, DefaultLoadingComponent, DefaultErrorComponent } from '@/components/shared/StateRenderer';
 import EnrollmentFilters from '@/components/features/admin/EnrollmentFilters';
 import EnrollmentsTable from '@/components/features/admin/EnrollmentsTable';
-import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Select, SelectItem, Card, CardHeader, CardBody, Chip } from '@nextui-org/react';
+import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Select, SelectItem, Card, CardHeader, CardBody, Chip } from '@heroui/react';
 import { RefreshCw } from 'lucide-react';
 
 export default function AdminEnrollmentsPage() {

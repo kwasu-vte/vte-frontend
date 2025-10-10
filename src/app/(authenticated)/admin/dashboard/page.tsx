@@ -10,7 +10,7 @@ import { StatCard, StatCardGrid } from '@/components/shared/StatCard';
 import { useAdminDashboardData } from '@/lib/hooks/use-admin-dashboard-data';
 import Link from 'next/link';
 import { ListSkeleton } from '@/components/shared/Skeletons';
-import { Button } from '@nextui-org/react';
+import { Button } from '@heroui/react';
 
 export default function AdminDashboard() {
   const { sessions, activeSession, statistics, recentEnrollments, isLoading, error } = useAdminDashboardData();
@@ -42,7 +42,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* * Stats */}
-      <StatCardGrid id="admin-stats">
+      <StatCardGrid>
         <StatCard title="Total Groups" value={totalGroups} color="primary" />
         <StatCard title="Total Students" value={totalStudents} color="success" />
         <StatCard title="Full Groups" value={fullGroups} color="warning" />

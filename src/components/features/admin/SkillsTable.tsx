@@ -6,7 +6,7 @@
 
 import React from 'react';
 import { DataTable } from '@/components/shared/DataTable';
-import { Button, Chip, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@nextui-org/react';
+import { Button, Chip, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@heroui/react';
 import { MoreVertical, Edit, Trash2, Eye, Users, Calendar, Plus } from 'lucide-react';
 import { Skill } from '@/lib/types';
 

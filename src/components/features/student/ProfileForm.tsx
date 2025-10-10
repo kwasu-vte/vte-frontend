@@ -1,6 +1,6 @@
 "use client"
 import React from "react"
-import { Card, CardBody, CardHeader, Input, Select, SelectItem, Button, Divider } from "@nextui-org/react"
+import { Card, CardBody, CardHeader, Input, Select, SelectItem, Button, Divider } from "@heroui/react"
 import { AlertTriangle, User, GraduationCap, Building, Phone, Users } from "lucide-react"
 import { CreateStudentProfilePayload } from "@/lib/types"
 import { faculties, type Faculty } from "@/lib/data/faculties"
@@ -207,7 +207,7 @@ function ProfileForm({ onSubmit, initialData, isLoading = false }: ProfileFormPr
                 isRequired
               >
                 {levelOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
+                  <SelectItem key={option.value}>
                     {option.label}
                   </SelectItem>
                 ))}
@@ -228,7 +228,7 @@ function ProfileForm({ onSubmit, initialData, isLoading = false }: ProfileFormPr
                 isRequired
               >
                 {genderOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
+                  <SelectItem key={option.value}>
                     {option.label}
                   </SelectItem>
                 ))}
@@ -271,7 +271,7 @@ function ProfileForm({ onSubmit, initialData, isLoading = false }: ProfileFormPr
                 isRequired
               >
                 {faculties.map((f) => (
-                  <SelectItem key={f.id} value={f.id}>
+                  <SelectItem key={f.id}>
                     {f.name}
                   </SelectItem>
                 ))}
@@ -294,7 +294,7 @@ function ProfileForm({ onSubmit, initialData, isLoading = false }: ProfileFormPr
                 isRequired
               >
                 {(faculties.find(f => f.id === selectedFacultyId)?.departments || []).map((d) => (
-                  <SelectItem key={d.id} value={d.id}>
+                  <SelectItem key={d.id}>
                     {d.name}
                   </SelectItem>
                 ))}

@@ -1,7 +1,7 @@
 "use client"
 import React from "react"
 import { useMemo, useState } from "react"
-import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tooltip } from "@nextui-org/react"
+import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tooltip } from "@heroui/react"
 import { useClientQuery } from "@/lib/hooks/useClientQuery"
 import { enrollmentsApi } from "@/lib/api"
 

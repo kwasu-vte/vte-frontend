@@ -1,6 +1,6 @@
 "use client"
 import React from "react"
-import { Card, CardBody, CardHeader, Chip, Button, Skeleton } from "@nextui-org/react"
+import { Card, CardBody, CardHeader, Chip, Button, Skeleton } from "@heroui/react"
 import { useQuery } from "@tanstack/react-query"
 import { mentorsApi } from "@/lib/api"
 import type { SkillGroup } from "@/lib/types"

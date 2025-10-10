@@ -2,7 +2,7 @@
 import React from "react"
 import { useEffect, useMemo, useState } from "react"
 import { useQuery } from "@tanstack/react-query"
-import { Button, Card, CardBody, CardHeader, Input, Select, SelectItem, Spinner } from "@nextui-org/react"
+import { Button, Card, CardBody, CardHeader, Input, Select, SelectItem, Spinner } from "@heroui/react"
 import { z } from "zod"
 import { skillGroupsApi, mentorsApi, qrCodesApi } from "@/lib/api"
 

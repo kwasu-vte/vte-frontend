@@ -10,7 +10,7 @@ import { getCurrentUser } from '@/lib/auth';
 import { studentsApi } from '@/lib/api';
 import { ProfileForm } from '@/components/features/student/ProfileForm';
 import { NotificationContainer } from '@/components/shared/NotificationContainer';
-import { Card, CardBody, CardHeader, Progress, Button } from '@nextui-org/react';
+import { Card, CardBody, CardHeader, Progress, Button } from '@heroui/react';
 import { ArrowLeft, CheckCircle } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { CreateStudentProfilePayload } from '@/lib/types';

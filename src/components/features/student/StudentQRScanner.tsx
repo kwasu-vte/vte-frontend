@@ -1,6 +1,6 @@
 "use client"
 import React from "react"
-import { Card, CardBody, CardHeader, Button, Input, Spinner, Tabs, Tab } from "@nextui-org/react"
+import { Card, CardBody, CardHeader, Button, Input, Spinner, Tabs, Tab } from "@heroui/react"
 import { Camera, AlertCircle } from "lucide-react"
 import { qrCodesApi } from "@/lib/api/qr-codes"
 import ScanResultModal from "./ScanResultModal"
@@ -163,29 +163,26 @@ function StudentQRScanner({
 
       console.log("API Response:", response) // Debug log
 
-      // Handle different possible response structures
-      let success = false
-      let points: number | undefined
-      let timestamp: string | undefined
-      let studentName: string | undefined
-      let message: string | undefined
-
-      // Try to extract data from various possible structures
-      if (response?.data?.data) {
-        success = response.data.data.success ?? false
-        points = response.data.data.points_awarded ? parseInt(response.data.data.points_awarded) : undefined
-        timestamp = response.data.data.scanned_at
-        studentName = response.data.data.skill_title
-        message = response.data.data.message
-      } else if (response?.data) {
-        success = response.data.success ?? false
-        points = response.data.points_awarded ? parseInt(response.data.points_awarded) : undefined
-        timestamp = response.data.scanned_at
-        studentName = response.data.skill_title
-        message = response.data.message
-      } else {
-        throw new Error("Invalid API response structure")
+      // Handle different possible response structures by normalizing payload
+      type ScanPayload = {
+        success?: boolean
+        message?: string
+        points_awarded?: string
+        scanned_at?: string
+        skill_title?: string
       }
+      const rawPayload = (response && typeof response === 'object')
+        ? ((response as { data?: unknown })?.data as unknown)
+        : undefined
+      const payload: ScanPayload = (rawPayload && typeof rawPayload === 'object' && (rawPayload as { data?: unknown })?.data)
+        ? ((rawPayload as { data: unknown }).data as ScanPayload)
+        : ((rawPayload as ScanPayload) || {})
+
+      const success = payload.success ?? false
+      const points = payload.points_awarded ? parseInt(payload.points_awarded) : undefined
+      const timestamp = payload.scanned_at
+      const studentName = payload.skill_title
+      const message = payload.message
 
       setScanResult({ success, message, points, timestamp, studentName })
 

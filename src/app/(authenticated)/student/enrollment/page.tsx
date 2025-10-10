@@ -11,7 +11,7 @@ import { PaymentRedirect } from '@/components/features/student/PaymentRedirect';
 import { GroupAssignmentCard } from '@/components/features/student/GroupAssignmentCard';
 import { NotificationContainer } from '@/components/shared/NotificationContainer';
 import { StateRenderer } from '@/components/shared/StateRenderer';
-import { Card, CardBody, CardHeader, Skeleton, Button } from '@nextui-org/react';
+import { Card, CardBody, CardHeader, Skeleton, Button } from '@heroui/react';
 import { ArrowLeft, BookOpen, CreditCard, Users } from 'lucide-react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
@@ -297,7 +297,7 @@ export default async function StudentEnrollment({ searchParams }: { searchParams
                 group={{
                   number: parseInt(String(enrollment.group_id || 0)),
                   mentorName: 'Loading...', // This would come from group details API
-                  schedule: 'Loading...'
+                  // schedule removed: not part of GroupAssignmentCardProps
                 }}
               />
             )}

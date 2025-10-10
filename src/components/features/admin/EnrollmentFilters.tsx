@@ -1,6 +1,6 @@
 "use client"
 import React from "react"
-import { Select, SelectItem, Button } from "@nextui-org/react"
+import { Select, SelectItem, Button } from "@heroui/react"
 import { academicSessionsApi, skillsApi } from "@/lib/api"
 import { useQuery } from "@tanstack/react-query"
 import type { AcademicSession, Skill } from "@/lib/types"
@@ -85,7 +85,7 @@ export function EnrollmentFilters({ value, onChange, defaultPerPage = 25 }: Enro
           size="sm"
         >
           {sessions.map((s) => (
-            <SelectItem key={String(s.id)} value={s.id}>
+            <SelectItem key={String(s.id)}>
               {s.name}
             </SelectItem>
           ))}
@@ -102,7 +102,7 @@ export function EnrollmentFilters({ value, onChange, defaultPerPage = 25 }: Enro
           size="sm"
         >
           {skills.map((sk) => (
-            <SelectItem key={sk.id} value={sk.id}>
+            <SelectItem key={sk.id}>
               {sk.title}
             </SelectItem>
           ))}

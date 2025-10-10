@@ -736,3 +736,11 @@
 - UI: Hide all "Start Tour" buttons by rendering `StartTourButton` as a no-op component.
 ### Fixed
 - PWA: Made student dashboard installation optional again. Removed hard `RequirePWA` gate and added non-blocking `FloatingInstallPrompt` for students.
+
+## 2025-10-10T13:17:03+01:00
+- Tailwind v4 directives updated; switched to @import 'tailwindcss'
+- HeroUI v2 integration: removed unsupported SelectItem value props
+- Removed NextUI dependency to avoid conflicts
+- Fixed strict TS types: QR scanner parsing, pdf generator types, Blob guards
+- Deleted legacy tailwind.config.ts and wired @config to JS file
+- Clean TS build (npx tsc --noEmit) and Next build

@@ -8,7 +8,7 @@ import { enrollmentsApi, skillGroupsApi } from '@/lib/api';
 import { GroupAssignmentCard } from '@/components/features/student/GroupAssignmentCard';
 import { NotificationContainer } from '@/components/shared/NotificationContainer';
 import { StateRenderer } from '@/components/shared/StateRenderer';
-import { Card, CardBody, CardHeader, Skeleton, Button, Avatar, Chip, Divider } from '@nextui-org/react';
+import { Card, CardBody, CardHeader, Skeleton, Button, Avatar, Chip, Divider } from '@heroui/react';
 import { ArrowLeft, Users, User, Calendar, Mail, Phone, Clock, MapPin } from 'lucide-react';
 import Link from 'next/link';
 import { getSpecializationLabel } from '@/lib/utils/specialization';
@@ -44,7 +44,7 @@ async function getMyGroupPageData(userId: string): Promise<MyGroupPageData> {
               end: group.skill?.date_range_end || group.updated_at,
               excludeWeekends: group.skill?.exclude_weekends || false,
               practicalDates: group.practical_dates || [],
-              assignedPracticalDate: group.assigned_practical_date
+              // assignedPracticalDate removed: property not present on SkillGroup
             },
             capacity: 0, // Students cannot access capacity data
             currentSize: 0 // Students cannot access member count
@@ -63,7 +63,7 @@ async function getMyGroupPageData(userId: string): Promise<MyGroupPageData> {
             end: enrollment.skill?.date_range_end || enrollment.updated_at,
             excludeWeekends: enrollment.skill?.exclude_weekends || false,
             practicalDates: [],
-            assignedPracticalDate: enrollment.group.assigned_practical_date
+            // assignedPracticalDate removed: property not present on group
           },
           capacity: 0, // Students cannot access capacity data
           currentSize: 0 // Students cannot access member count
@@ -191,9 +191,7 @@ export default async function StudentMyGroup() {
                 group={{
                   number: parseInt(data.groupDetails.id),
                   mentorName: 'TBD',
-                  schedule: data.groupDetails.skill?.date_range_start && data.groupDetails.skill?.date_range_end 
-                    ? `${new Date(data.groupDetails.skill.date_range_start).toLocaleDateString()} - ${new Date(data.groupDetails.skill.date_range_end).toLocaleDateString()}`
-                    : 'Schedule will be announced by mentor'
+                  // schedule removed; not part of GroupAssignmentCardProps
                 }}
               />
 

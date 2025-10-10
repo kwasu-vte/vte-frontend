@@ -1,6 +1,6 @@
 "use client"
 import React from "react"
-import { Card, CardBody, CardHeader, Chip, Divider } from "@nextui-org/react"
+import { Card, CardBody, CardHeader, Chip, Divider } from "@heroui/react"
 
 /**
  * * GroupAssignmentCard

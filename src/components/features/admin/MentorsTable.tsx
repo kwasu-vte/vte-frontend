@@ -6,7 +6,7 @@
 
 import React from 'react';
 import { DataTable } from '@/components/shared/DataTable';
-import { Button, Chip, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@nextui-org/react';
+import { Button, Chip, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@heroui/react';
 import { MoreVertical, Eye, User as UserIcon, Users, Plus } from 'lucide-react';
 import { MentorProfile } from '@/lib/types';
 import { getSpecializationLabel } from '@/lib/utils/specialization';

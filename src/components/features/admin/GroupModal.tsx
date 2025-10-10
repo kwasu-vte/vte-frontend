@@ -5,7 +5,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, Select, SelectItem } from '@nextui-org/react';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, Select, SelectItem } from '@heroui/react';
 import { Group, CreateGroupPayload } from '@/lib/types';
 import { useQuery } from '@tanstack/react-query';
 import { skillsApi, mentorsApi } from '@/lib/api';
@@ -136,7 +136,7 @@ export function GroupModal({
               variant="bordered"
             >
               {skills?.map((skill) => (
-                <SelectItem key={skill.id} value={skill.id}>
+                <SelectItem key={skill.id}>
                   {skill.title}
                 </SelectItem>
               )) || []}
@@ -153,7 +153,7 @@ export function GroupModal({
               variant="bordered"
             >
               {mentors?.map((mentor) => (
-                <SelectItem key={mentor.id} value={mentor.id}>
+                <SelectItem key={mentor.id}>
                   {mentor.full_name || mentor.user?.first_name + ' ' + mentor.user?.last_name || String(mentor.id)}
                 </SelectItem>
               )) || []}

@@ -5,7 +5,7 @@
 'use client';
 
 import React from 'react';
-import { Button, Card, CardBody } from '@nextui-org/react';
+import { Button, Card, CardBody } from '@heroui/react';
 import { AlertCircle, RefreshCw, Wifi, Server, AlertTriangle } from 'lucide-react';
 
 interface ErrorStateProps {

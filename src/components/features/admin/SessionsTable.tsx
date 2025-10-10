@@ -1,6 +1,6 @@
 "use client"
 import React, { useMemo } from "react"
-import { Button, Chip } from "@nextui-org/react"
+import { Button, Chip } from "@heroui/react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { academicSessionsApi } from "@/lib/api"
 import type { AcademicSession } from "@/lib/types"

@@ -7,7 +7,7 @@ import { getCurrentUser } from '@/lib/auth';
 import { enrollmentsApi } from '@/lib/api';
 import { NotificationContainer } from '@/components/shared/NotificationContainer';
 import { StateRenderer } from '@/components/shared/StateRenderer';
-import { Card, CardBody, CardHeader, Skeleton, Button, Chip, Divider } from '@nextui-org/react';
+import { Card, CardBody, CardHeader, Skeleton, Button, Chip, Divider } from '@heroui/react';
 import { ArrowLeft, Calendar, Clock, MapPin, User } from 'lucide-react';
 import Link from 'next/link';
 
