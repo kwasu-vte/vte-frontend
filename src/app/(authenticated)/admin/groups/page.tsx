@@ -129,117 +129,177 @@ export default function AdminGroupsPage() {
       )}
 
       {/* * View Group Modal (read-only) */}
-      <Modal isOpen={isViewOpen} onClose={closeView} size="lg" scrollBehavior="inside">
+      <Modal isOpen={isViewOpen} onClose={closeView} size="2xl" scrollBehavior="inside">
         <ModalContent>
-          <ModalHeader className="flex flex-col gap-1">
-            <div className="flex items-center gap-2">
-              <Eye className="w-5 h-5 text-blue-500" />
-              <h2 className="text-lg font-semibold">Group Details</h2>
+          <ModalHeader className="flex flex-col gap-1 pb-2">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <Eye className="w-5 h-5 text-blue-600" />
+              </div>
+              <div>
+                <h2 className="text-xl font-semibold text-neutral-900">Group Details</h2>
+                <p className="text-sm text-neutral-500">Comprehensive information about this skill group</p>
+              </div>
             </div>
           </ModalHeader>
-          <ModalBody>
+          <ModalBody className="px-6 py-4">
             {viewGroup && (
-              <div className="space-y-4">
+              <div className="space-y-6">
                 {isDetailedLoading ? (
-                  <div className="flex items-center justify-center py-8">
-                    <div className="text-neutral-500">Loading group details...</div>
+                  <div className="flex items-center justify-center py-12">
+                    <div className="text-center">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-3"></div>
+                      <div className="text-neutral-500">Loading group details...</div>
+                    </div>
                   </div>
                 ) : (
                   <>
-                    <div className="bg-neutral-50 p-4 rounded-lg">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                    {/* * Group Overview Card */}
+                    <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-6">
+                      <div className="flex items-start justify-between mb-4">
                         <div>
-                          <span className="text-neutral-600">Group Name:</span>
-                          <span className="ml-2 font-medium">{detailedGroupData?.group_display_name || viewGroup.name}</span>
+                          <h3 className="text-lg font-semibold text-neutral-900 mb-1">
+                            {detailedGroupData?.group_display_name || viewGroup.name}
+                          </h3>
+                          <p className="text-sm text-neutral-600">
+                            {detailedGroupData?.skill?.title || viewGroup.skill.title}
+                          </p>
                         </div>
-                        <div>
-                          <span className="text-neutral-600">Skill:</span>
-                          <span className="ml-2 font-medium">{detailedGroupData?.skill?.title || viewGroup.skill.title}</span>
+                        <Chip 
+                          color={detailedGroupData?.is_full ? 'danger' : detailedGroupData?.has_capacity ? 'success' : 'warning'}
+                          variant="flat"
+                          size="sm"
+                        >
+                          {detailedGroupData?.is_full ? 'Full' : detailedGroupData?.has_capacity ? 'Available' : 'Limited'}
+                        </Chip>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-blue-600">{detailedGroupData?.current_student_count || 0}</div>
+                          <div className="text-xs text-neutral-600">Current Students</div>
                         </div>
-                        <div>
-                          <span className="text-neutral-600">Current Students:</span>
-                          <span className="ml-2 font-medium">{detailedGroupData?.current_student_count || 0}</span>
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-neutral-700">{detailedGroupData?.max_student_capacity || 0}</div>
+                          <div className="text-xs text-neutral-600">Max Capacity</div>
                         </div>
-                        <div>
-                          <span className="text-neutral-600">Max Capacity:</span>
-                          <span className="ml-2 font-medium">{detailedGroupData?.max_student_capacity || 0}</span>
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-green-600">{detailedGroupData?.capacity_percentage || 0}%</div>
+                          <div className="text-xs text-neutral-600">Utilization</div>
                         </div>
-                        <div>
-                          <span className="text-neutral-600">Capacity:</span>
-                          <span className="ml-2 font-medium">{detailedGroupData?.capacity_percentage || 0}%</span>
-                        </div>
-                        <div>
-                          <span className="text-neutral-600">Status:</span>
-                          <span className="ml-2 font-medium">
-                            {detailedGroupData?.is_full ? 'Full' : detailedGroupData?.has_capacity ? 'Available' : 'Limited'}
-                          </span>
-                        </div>
-                        <div>
-                          <span className="text-neutral-600">Academic Session:</span>
-                          <span className="ml-2 font-medium">{detailedGroupData?.academic_session?.name || '—'}</span>
-                        </div>
-                        <div>
-                          <span className="text-neutral-600">Created:</span>
-                          <span className="ml-2 font-medium">
-                            {detailedGroupData?.created_at ? new Date(detailedGroupData.created_at).toLocaleDateString() : '—'}
-                          </span>
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-purple-600">{detailedGroupData?.capacity_remaining || 0}</div>
+                          <div className="text-xs text-neutral-600">Spots Left</div>
                         </div>
                       </div>
                     </div>
 
+                    {/* * Capacity Progress */}
+                    <div className="bg-white border border-neutral-200 rounded-xl p-6">
+                      <h4 className="font-semibold text-neutral-900 mb-4 flex items-center gap-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        Capacity Overview
+                      </h4>
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-medium text-neutral-700">Current Usage</span>
+                          <span className="text-sm font-semibold text-neutral-900">
+                            {detailedGroupData?.current_student_count || 0} / {detailedGroupData?.max_student_capacity || 0} students
+                          </span>
+                        </div>
+                        <div className="relative">
+                          <div className="w-full bg-neutral-200 rounded-full h-3">
+                            <div 
+                              className="bg-gradient-to-r from-blue-500 to-green-500 h-3 rounded-full transition-all duration-500 ease-out" 
+                              style={{ width: `${Math.min(detailedGroupData?.capacity_percentage || 0, 100)}%` }}
+                            ></div>
+                          </div>
+                          <div className="flex justify-between text-xs text-neutral-500 mt-2">
+                            <span>0%</span>
+                            <span className="font-medium">{detailedGroupData?.capacity_percentage || 0}%</span>
+                            <span>100%</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* * Skill Information */}
                     {detailedGroupData?.skill && (
-                      <div>
-                        <h3 className="font-medium text-neutral-900 mb-2">Skill Details</h3>
-                        <div className="bg-blue-50 p-4 rounded-lg">
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                      <div className="bg-white border border-neutral-200 rounded-xl p-6">
+                        <h4 className="font-semibold text-neutral-900 mb-4 flex items-center gap-2">
+                          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                          Skill Information
+                        </h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-3">
                             <div>
-                              <span className="text-neutral-600">Description:</span>
-                              <span className="ml-2 font-medium">{detailedGroupData.skill.description || '—'}</span>
+                              <label className="text-xs font-medium text-neutral-500 uppercase tracking-wide">Description</label>
+                              <p className="text-sm text-neutral-700 mt-1">{detailedGroupData.skill.description || 'No description provided'}</p>
                             </div>
                             <div>
-                              <span className="text-neutral-600">Max Groups:</span>
-                              <span className="ml-2 font-medium">{detailedGroupData.skill.max_groups || '—'}</span>
+                              <label className="text-xs font-medium text-neutral-500 uppercase tracking-wide">Allowed Levels</label>
+                              <div className="flex flex-wrap gap-1 mt-1">
+                                {detailedGroupData.skill.allowed_levels?.map((level: string) => (
+                                  <Chip key={level} size="sm" variant="flat" color="primary">{level}</Chip>
+                                )) || <span className="text-sm text-neutral-500">No restrictions</span>}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="space-y-3">
+                            <div className="grid grid-cols-2 gap-3">
+                              <div>
+                                <label className="text-xs font-medium text-neutral-500 uppercase tracking-wide">Min Students</label>
+                                <p className="text-sm font-semibold text-neutral-900 mt-1">{detailedGroupData.skill.min_students_per_group || '—'}</p>
+                              </div>
+                              <div>
+                                <label className="text-xs font-medium text-neutral-500 uppercase tracking-wide">Max Students</label>
+                                <p className="text-sm font-semibold text-neutral-900 mt-1">{detailedGroupData.skill.max_students_per_group || '—'}</p>
+                              </div>
                             </div>
                             <div>
-                              <span className="text-neutral-600">Min Students:</span>
-                              <span className="ml-2 font-medium">{detailedGroupData.skill.min_students_per_group || '—'}</span>
-                            </div>
-                            <div>
-                              <span className="text-neutral-600">Max Students:</span>
-                              <span className="ml-2 font-medium">{detailedGroupData.skill.max_students_per_group || '—'}</span>
-                            </div>
-                            <div>
-                              <span className="text-neutral-600">Allowed Levels:</span>
-                              <span className="ml-2 font-medium">
-                                {detailedGroupData.skill.allowed_levels?.join(', ') || '—'}
-                              </span>
-                            </div>
-                            <div>
-                              <span className="text-neutral-600">Exclude Weekends:</span>
-                              <span className="ml-2 font-medium">{detailedGroupData.skill.exclude_weekends ? 'Yes' : 'No'}</span>
+                              <label className="text-xs font-medium text-neutral-500 uppercase tracking-wide">Weekend Exclusion</label>
+                              <div className="mt-1">
+                                <Chip 
+                                  size="sm" 
+                                  variant="flat" 
+                                  color={detailedGroupData.skill.exclude_weekends ? 'warning' : 'success'}
+                                >
+                                  {detailedGroupData.skill.exclude_weekends ? 'Excluded' : 'Included'}
+                                </Chip>
+                              </div>
                             </div>
                           </div>
                         </div>
                       </div>
                     )}
 
-                    <div>
-                      <h3 className="font-medium text-neutral-900 mb-2">Capacity Overview</h3>
-                      <div className="bg-green-50 p-4 rounded-lg">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-sm text-neutral-600">Current Usage</span>
-                          <span className="text-sm font-medium">{detailedGroupData?.current_student_count || 0} / {detailedGroupData?.max_student_capacity || 0}</span>
+                    {/* * Academic Session & Metadata */}
+                    <div className="bg-white border border-neutral-200 rounded-xl p-6">
+                      <h4 className="font-semibold text-neutral-900 mb-4 flex items-center gap-2">
+                        <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                        Session & Metadata
+                      </h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-xs font-medium text-neutral-500 uppercase tracking-wide">Academic Session</label>
+                          <p className="text-sm font-semibold text-neutral-900 mt-1">
+                            {detailedGroupData?.academic_session?.name || 'No session assigned'}
+                          </p>
+                          {detailedGroupData?.academic_session && (
+                            <div className="text-xs text-neutral-600 mt-1">
+                              {new Date(detailedGroupData.academic_session.starts_at).toLocaleDateString()} - {new Date(detailedGroupData.academic_session.ends_at).toLocaleDateString()}
+                            </div>
+                          )}
                         </div>
-                        <div className="w-full bg-neutral-200 rounded-full h-2">
-                          <div 
-                            className="bg-blue-500 h-2 rounded-full transition-all duration-300" 
-                            style={{ width: `${detailedGroupData?.capacity_percentage || 0}%` }}
-                          ></div>
-                        </div>
-                        <div className="flex justify-between text-xs text-neutral-500 mt-1">
-                          <span>0%</span>
-                          <span>{detailedGroupData?.capacity_percentage || 0}%</span>
-                          <span>100%</span>
+                        <div>
+                          <label className="text-xs font-medium text-neutral-500 uppercase tracking-wide">Created Date</label>
+                          <p className="text-sm font-semibold text-neutral-900 mt-1">
+                            {detailedGroupData?.created_at ? new Date(detailedGroupData.created_at).toLocaleDateString('en-US', {
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric'
+                            }) : '—'}
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -248,8 +308,15 @@ export default function AdminGroupsPage() {
               </div>
             )}
           </ModalBody>
-          <ModalFooter>
-            <Button variant="light" onClick={closeView}>Close</Button>
+          <ModalFooter className="px-6 py-4">
+            <Button 
+              color="primary" 
+              variant="light" 
+              onClick={closeView}
+              className="font-medium"
+            >
+              Close
+            </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>

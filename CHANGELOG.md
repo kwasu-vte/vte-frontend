@@ -1,3 +1,14 @@
+## feat(admin): enhanced group details modal design
+
+- Redesigned group details modal with modern card-based layout
+- Added gradient overview card with key metrics display
+- Improved capacity visualization with animated progress bar
+- Enhanced skill information section with better typography and chip displays
+- Added academic session details with proper date formatting
+- Implemented loading spinner with better UX
+- Increased modal size to 2xl for better content display
+- Added color-coded status indicators and visual hierarchy
+
 ## fix(admin): groups page improvements
 
 - Fixed groups page to show correct member count from API data (current_student_count)
