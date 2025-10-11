@@ -53,6 +53,9 @@ function StudentQRScanner({
   const [scanResult, setScanResult] = useState<any>(null);
   const [cameraError, setCameraError] = useState<string | null>(null);
   const [cameraActive, setCameraActive] = useState(false);
+  const [permissionStatus, setPermissionStatus] = useState<'unknown' | 'granted' | 'denied' | 'prompt'>('unknown');
+  const [retryCount, setRetryCount] = useState(0);
+  const [isInitializing, setIsInitializing] = useState(false);
   
   const lastScanned = useRef('');
   const html5QrCodeRef = useRef<Html5Qrcode | null>(null);
@@ -63,12 +66,28 @@ function StudentQRScanner({
   const progress = (completedScans / requiredScans) * 100;
   const remainingScans = Math.max(0, requiredScans - completedScans);
 
+  // Debug enrollment data
+  console.log('Enrollment data:', enrollment);
+
   // Cleanup camera on unmount
   useEffect(() => {
     return () => {
       stopScanner();
     };
   }, []);
+
+
+  // Check camera permissions when switching to camera mode
+  useEffect(() => {
+    if (scanMode === 'camera' && navigator.permissions) {
+      navigator.permissions.query({ name: 'camera' as PermissionName }).then((result) => {
+        setPermissionStatus(result.state);
+      }).catch(() => {
+        setPermissionStatus('unknown');
+      });
+    }
+  }, [scanMode]);
+
 
   const stopScanner = async () => {
     if (html5QrCodeRef.current) {
@@ -88,6 +107,7 @@ function StudentQRScanner({
   const startScanner = async () => {
     try {
       setCameraError(null);
+      setIsInitializing(true);
 
       // Check if mediaDevices is available
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
@@ -97,13 +117,33 @@ function StudentQRScanner({
       // Stop any existing scanner
       await stopScanner();
 
-      // Wait for DOM element to be rendered
-      await new Promise(resolve => setTimeout(resolve, 100));
+      // Wait for DOM element to be rendered with multiple attempts
+      let element = null;
+      let attempts = 0;
+      const maxAttempts = 10;
+      
+      while (!element && attempts < maxAttempts) {
+        element = document.getElementById(scannerIdRef.current);
+        if (!element) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+          attempts++;
+        }
+      }
 
-      // Check if element exists
-      const element = document.getElementById(scannerIdRef.current);
       if (!element) {
-        throw new Error('Scanner element not found in DOM');
+        throw new Error('Scanner element not found in DOM after multiple attempts. Please refresh the page and try again.');
+      }
+
+      // Additional check to ensure element is visible and has dimensions
+      const rect = element.getBoundingClientRect();
+      const computedStyle = window.getComputedStyle(element);
+      
+      if (rect.width === 0 || rect.height === 0) {
+        throw new Error('Scanner element is not properly rendered. Please try again.');
+      }
+      
+      if (computedStyle.display === 'none' || computedStyle.visibility === 'hidden') {
+        throw new Error('Scanner element is hidden. Please ensure the camera interface is visible.');
       }
 
       // Create new scanner instance
@@ -129,21 +169,27 @@ function StudentQRScanner({
       );
       
       setCameraActive(true);
+      setRetryCount(0); // Reset retry count on success
     } catch (error: any) {
       console.error('Camera permission error:', error);
       
       // Handle different error types
       if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
         setCameraError('Camera access denied. Please check your browser settings and ensure you are accessing the site via HTTPS.');
+        setPermissionStatus('denied');
       } else if (error.name === 'NotFoundError' || error.name === 'DevicesNotFoundError') {
         setCameraError('No camera found on this device.');
       } else if (error.name === 'NotReadableError' || error.name === 'TrackStartError') {
         setCameraError('Camera is already in use by another application.');
       } else if (error.message?.includes('not supported') || error.message?.includes('policy')) {
         setCameraError('Camera access is blocked by browser security policy. Please ensure the app is running on HTTPS.');
+      } else if (error.message?.includes('Scanner element not found') || error.message?.includes('not properly rendered') || error.message?.includes('Scanner element is hidden')) {
+        setCameraError('Camera interface not ready. Please try again.');
       } else {
         setCameraError(`Unable to access camera: ${error.message || 'Unknown error'}`);
       }
+    } finally {
+      setIsInitializing(false);
     }
   };
 
@@ -217,6 +263,13 @@ function StudentQRScanner({
 
   const handleStartCamera = () => {
     setCameraError(null);
+    setRetryCount(prev => prev + 1);
+    startScanner();
+  };
+
+  const handleRetryCamera = () => {
+    setCameraError(null);
+    setRetryCount(prev => prev + 1);
     startScanner();
   };
 
@@ -228,7 +281,7 @@ function StudentQRScanner({
   const ResultDisplay = () => {
     if (!showResult || !scanResult) return null;
 
-    return (
+      return (
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
         <Card className="w-full max-w-md">
           <CardBody className="p-6 text-center space-y-4">
@@ -261,8 +314,8 @@ function StudentQRScanner({
               <>
                 <div className="w-16 h-16 bg-danger/10 rounded-full flex items-center justify-center mx-auto">
                   <XCircle className="w-10 h-10 text-danger" />
-                </div>
-                <div>
+          </div>
+          <div>
                   <h3 className="text-xl font-semibold text-neutral-900 mb-2">
                     Scan Failed
                   </h3>
@@ -340,7 +393,7 @@ function StudentQRScanner({
                 <Button
                   onPress={() => {
                     setScanMode('camera');
-                    if (!cameraActive) handleStartCamera();
+                    // Don't auto-start camera, let user click "Enable Camera" button
                   }}
                   variant={scanMode === 'camera' ? 'solid' : 'flat'}
                   color={scanMode === 'camera' ? 'primary' : 'default'}
@@ -382,112 +435,186 @@ function StudentQRScanner({
                         <p className="text-sm text-neutral-600 mb-4 max-w-sm mx-auto">
                           {cameraError}
                         </p>
+                        {retryCount > 0 && (
+                          <p className="text-xs text-neutral-500 mb-2">
+                            Attempt {retryCount} of 3
+                          </p>
+                        )}
                       </div>
                       <div className="flex gap-2 justify-center">
                         <Button
                           color="primary"
-                          onPress={() => {
-                            setCameraError(null);
-                            handleStartCamera();
-                          }}
+                          onPress={handleRetryCamera}
                           startContent={<Camera className="w-4 h-4" />}
+                          isDisabled={isInitializing}
+                          isLoading={isInitializing}
                         >
-                          Try Again
+                          {isInitializing ? 'Initializing...' : 'Try Again'}
                         </Button>
                         <Button
                           variant="flat"
                           onPress={() => setScanMode('manual')}
+                          isDisabled={isInitializing}
                         >
                           Use Manual Entry
                         </Button>
                       </div>
-                    </div>
-                  ) : !cameraActive ? (
-                    <div className="text-center py-8 space-y-4">
-                      <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
-                        <Camera className="w-10 h-10 text-primary" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-neutral-900 mb-2">
-                          Camera Access Needed
-                        </h3>
-                        <p className="text-sm text-neutral-600 mb-4 max-w-sm mx-auto">
-                          Allow camera access to scan QR codes. Your browser will prompt for permission.
-                        </p>
-                      </div>
-                      <Button
-                        color="primary"
-                        size="lg"
-                        onPress={handleStartCamera}
-                        startContent={<Camera className="w-5 h-5" />}
-                      >
-                        Enable Camera
-                      </Button>
-                      <p className="text-xs text-neutral-500">
-                        You can also use manual entry if camera is unavailable
-                      </p>
+                      {retryCount >= 3 && (
+                        <div className="bg-blue-50 p-4 rounded-lg text-left">
+                          <p className="text-sm font-medium text-blue-900 mb-2">Still having issues?</p>
+                          <ul className="text-sm text-blue-800 space-y-1">
+                            <li>• Refresh the page and try again</li>
+                            <li>• Check if another app is using the camera</li>
+                            <li>• Ensure you're on HTTPS (required for camera access)</li>
+                            <li>• Try using manual entry instead</li>
+                          </ul>
+                        </div>
+                      )}
                     </div>
                   ) : (
-                    <div className="space-y-4">
+                    <>
+                      {/* Always render scanner element when in camera mode */}
                       <div className="relative bg-neutral-900 rounded-lg overflow-hidden aspect-square max-w-sm mx-auto">
                         <div id={scannerIdRef.current} className="w-full h-full" />
-                        {isSubmitting && (
+                        
+                        {/* Overlay for loading/inactive states */}
+                        {(!cameraActive || isInitializing) && (
+                          <div className="absolute inset-0 bg-neutral-900 flex flex-col items-center justify-center gap-4 p-6">
+                            {isInitializing ? (
+                              <>
+                                <Spinner size="lg" color="white" />
+                                <p className="text-white text-sm">Initializing camera...</p>
+                              </>
+                            ) : (
+                              <>
+                                <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center">
+                                  <Camera className="w-10 h-10 text-primary" />
+                                </div>
+                                <div className="text-center">
+                                  <h3 className="font-semibold text-white mb-2">
+                                    Camera Access Needed
+                                  </h3>
+                                  <p className="text-sm text-neutral-400 mb-4 max-w-sm">
+                                    {permissionStatus === 'denied' 
+                                      ? 'Camera access was denied. Please enable camera permissions in your browser settings.'
+                                      : permissionStatus === 'granted'
+                                      ? 'Camera permissions are granted. Click below to start scanning.'
+                                      : 'Allow camera access to scan QR codes. Your browser will prompt for permission.'
+                                    }
+                                  </p>
+                                </div>
+                                
+                                {permissionStatus === 'denied' ? (
+                                  <div className="space-y-3 w-full max-w-sm">
+                                    <div className="bg-blue-50 p-4 rounded-lg text-left">
+                                      <p className="text-sm font-medium text-blue-900 mb-2">How to enable camera:</p>
+                                      <ol className="text-sm text-blue-800 space-y-1 list-decimal list-inside">
+                                        <li>Click the lock/info icon in your browser's address bar</li>
+                                        <li>Find "Camera" in the permissions list</li>
+                                        <li>Change the setting to "Allow"</li>
+                                        <li>Refresh this page</li>
+                                      </ol>
+                                    </div>
+                                    <div className="flex gap-2 justify-center">
+                                      <Button
+                                        color="primary"
+                                        onPress={() => window.location.reload()}
+                                        startContent={<Camera className="w-4 h-4" />}
+                                      >
+                                        Refresh Page
+                                      </Button>
+                                      <Button
+                                        variant="flat"
+                                        onPress={() => setScanMode('manual')}
+                                      >
+                                        Use Manual Entry
+                                      </Button>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <div className="space-y-3">
+                                    <Button
+                                      color="primary"
+                                      size="lg"
+                                      onPress={handleStartCamera}
+                                      startContent={<Camera className="w-5 h-5" />}
+                                      isDisabled={isInitializing}
+                                      isLoading={isInitializing}
+                                    >
+                                      Enable Camera
+                                    </Button>
+                                    <p className="text-xs text-neutral-400">
+                                      You can also use manual entry if camera is unavailable
+                                    </p>
+                                  </div>
+                                )}
+                              </>
+                            )}
+                          </div>
+                        )}
+                        
+                        {/* Scanning overlay */}
+                        {isSubmitting && cameraActive && (
                           <div className="absolute inset-0 bg-black/70 flex items-center justify-center">
                             <Spinner size="lg" color="white" />
                           </div>
                         )}
                       </div>
-                      <div className="text-center space-y-2">
-                        <p className="text-sm text-neutral-600">
-                          Position the QR code within the frame
-                        </p>
-                        <Button
-                          size="sm"
-                          variant="flat"
-                          onPress={handleStopCamera}
-                        >
-                          Stop Camera
-                        </Button>
-                      </div>
-                    </div>
+                      
+                      {/* Camera controls - only show when active */}
+                      {cameraActive && !isInitializing && (
+                        <div className="text-center space-y-2">
+                          <p className="text-sm text-neutral-600">
+                            Position the QR code within the frame
+                          </p>
+                          <Button 
+                            size="sm"
+                            variant="flat"
+                            onPress={handleStopCamera}
+                          >
+                            Stop Camera
+                          </Button>
+                        </div>
+                      )}
+                    </>
                   )}
                 </div>
               ) : (
                 <div className="space-y-4 max-w-md mx-auto">
-                  <div>
+        <div>
                     <label className="text-sm font-medium text-neutral-700 mb-2 block">
                       Enter Token Code
                     </label>
                     <div className="flex gap-2">
-                      <Input
+                <Input
                         placeholder="e.g., ABC123XYZ"
-                        value={token}
-                        onValueChange={setToken}
-                        isDisabled={isSubmitting}
+                  value={token}
+                  onValueChange={setToken}
+                  isDisabled={isSubmitting}
                         size="lg"
                         classNames={{
                           input: "text-center uppercase tracking-wider text-lg font-mono"
                         }}
-                        onKeyPress={(e) => {
-                          if (e.key === 'Enter' && token.trim() && !isSubmitting) {
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter' && token.trim() && !isSubmitting) {
                             handleManualSubmit();
-                          }
-                        }}
-                      />
-                      <Button
-                        color="primary"
+                    }
+                  }}
+                />
+                <Button 
+                  color="primary" 
                         size="lg"
-                        onPress={handleManualSubmit}
-                        isDisabled={!token.trim() || isSubmitting}
+                  onPress={handleManualSubmit} 
+                  isDisabled={!token.trim() || isSubmitting}
                         isLoading={isSubmitting}
                         className="min-w-24"
-                      >
+                >
                         Submit
-                      </Button>
-                    </div>
+                </Button>
+              </div>
                     <p className="text-xs text-neutral-500 mt-2">
                       Enter the code shown below your mentor's QR code
-                    </p>
+              </p>
                   </div>
                 </div>
               )}
@@ -508,7 +635,13 @@ function StudentQRScanner({
                 </div>
                 <div>
                   <p className="text-xs text-neutral-500 mb-1">Group ID</p>
-                  <p className="font-medium text-neutral-900">#{enrollment?.group_id || 'Not assigned'}</p>
+                  <p className="font-medium text-neutral-900">
+                    {enrollment?.group_id 
+                      ? `#${enrollment.group_id}` 
+                      : enrollment?.group?.group_number 
+                        ? `#${enrollment.group.group_number}` 
+                        : 'Not assigned'}
+                  </p>
                 </div>
                 <div>
                   <p className="text-xs text-neutral-500 mb-1">Status</p>
@@ -541,8 +674,8 @@ function StudentQRScanner({
                   <span>Contact your mentor if issues occur</span>
                 </li>
               </ul>
-            </CardBody>
-          </Card>
+      </CardBody>
+    </Card>
         </div>
       </div>
 
