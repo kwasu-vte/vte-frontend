@@ -22,6 +22,28 @@ interface EnrollmentPageData {
   selectedSkill: any | null;
 }
 
+// * Utility function to determine enrollment status from API response
+function getEnrollmentStatusInfo(enrollment: any) {
+  if (!enrollment) return { status: 'no_enrollment', needsPayment: false, isAssigned: false };
+  
+  const status = enrollment.status?.toLowerCase() || '';
+  const hasReference = !!enrollment.reference;
+  const hasGroup = !!enrollment.group;
+  
+  return {
+    status,
+    hasReference,
+    hasGroup,
+    needsPayment: status === 'pending_payment' && !hasReference,
+    paymentInProgress: status === 'pending_payment' && hasReference,
+    isAssigned: status === 'assigned' && hasGroup,
+    isCancelled: status === 'cancelled',
+    groupNumber: enrollment.group?.group_number || null,
+    skillTitle: enrollment.skill?.title || null,
+    reference: enrollment.reference || null
+  };
+}
+
 //
 
 async function getEnrollmentPageData(userId: string, skillId: string | null): Promise<EnrollmentPageData> {
@@ -39,13 +61,29 @@ async function getEnrollmentPageData(userId: string, skillId: string | null): Pr
     // * Log enrollment API response
     console.log('[EnrollmentPage:getEnrollmentPageData] API Response - getUserEnrollment:', {
       success: enrollmentResponse.success,
+      message: enrollmentResponse.message || null,
       hasData: !!enrollmentResponse.data,
-      error: enrollmentResponse.error || null,
+      data: enrollmentResponse.data,
+      // * Key enrollment status indicators
+      enrollmentStatus: enrollmentResponse.data?.status || null,
+      paymentReference: enrollmentResponse.data?.reference || null,
+      hasGroupAssignment: !!enrollmentResponse.data?.group,
+      groupNumber: enrollmentResponse.data?.group?.group_number || null,
+      skillTitle: enrollmentResponse.data?.skill?.title || null,
       timestamp: new Date().toISOString()
     });
     
     const enrollment = enrollmentResponse.success ? enrollmentResponse.data : null;
     console.info('[EnrollmentPage:getEnrollmentPageData] enrollmentExists=', !!enrollment);
+    
+    // * Log enrollment status analysis
+    if (enrollment) {
+      const statusInfo = getEnrollmentStatusInfo(enrollment);
+      console.log('[EnrollmentPage:getEnrollmentPageData] Enrollment Status Analysis:', {
+        ...statusInfo,
+        timestamp: new Date().toISOString()
+      });
+    }
   let selectedSkill: any | null = null;
     if (skillId) {
       try {
@@ -154,8 +192,9 @@ export default async function StudentEnrollment({ searchParams }: { searchParams
     // * Log enrollment creation API response
     console.log('[EnrollmentPage] API Response - createForUser:', {
       success: created.success,
+      message: created.message || null,
       hasData: !!created.data,
-      error: created.error || null,
+      data: created.data,
       enrollmentId: created.data?.id || null,
       timestamp: new Date().toISOString()
     });
@@ -175,8 +214,9 @@ export default async function StudentEnrollment({ searchParams }: { searchParams
       // * Log payment API response
       console.log('[EnrollmentPage] API Response - payForUser:', {
         success: pay.success,
+        message: pay.message || null,
         hasData: !!pay.data,
-        error: pay.error || null,
+        data: pay.data,
         hasPaymentUrl: !!pay.data?.payment_url,
         paymentUrl: pay.data?.payment_url || null,
         timestamp: new Date().toISOString()
@@ -217,15 +257,40 @@ export default async function StudentEnrollment({ searchParams }: { searchParams
       {data.enrollment ? (
         <div className="space-y-6">
           {/* Status Timeline */}
-          <StatusTimeline
-            enrollment={{
+          {(() => {
+            const timelineData = {
               status: data.enrollment.status,
-              payment_status: data.enrollment.payment_status,
+              payment_status: data.enrollment.payment_status || (() => {
+                // * Fallback logic: determine payment status from enrollment status and reference
+                if (data.enrollment.status === 'assigned' || data.enrollment.status === 'active') {
+                  return 'paid'; // If assigned/active, payment must be complete
+                }
+                if (data.enrollment.reference) {
+                  return 'pending'; // Has reference but not assigned yet = payment in progress
+                }
+                return 'pending'; // No reference = payment not started
+              })(),
               created_at: data.enrollment.created_at,
               updated_at: data.enrollment.updated_at
-            }}
-            skill={data.enrollment.skill ? { title: data.enrollment.skill.title } : undefined}
-          />
+            };
+            
+            // * Log what's being passed to StatusTimeline
+            console.log('[EnrollmentPage] StatusTimeline Props:', {
+              enrollment: timelineData,
+              hasPaymentStatus: 'payment_status' in data.enrollment,
+              originalPaymentStatus: data.enrollment.payment_status,
+              fallbackPaymentStatus: timelineData.payment_status,
+              usedFallback: !data.enrollment.payment_status,
+              timestamp: new Date().toISOString()
+            });
+            
+            return (
+              <StatusTimeline
+                enrollment={timelineData}
+                skill={data.enrollment.skill ? { title: data.enrollment.skill.title } : undefined}
+              />
+            );
+          })()}
 
           {/* Enrollment Status Card */}
           <EnrollmentStatus
