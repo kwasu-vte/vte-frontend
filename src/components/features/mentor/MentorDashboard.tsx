@@ -74,7 +74,7 @@ export default function MentorDashboard(props: MentorDashboardProps) {
           <Card shadow="sm" id="mentor-today-schedule">
             <CardHeader className="flex items-center justify-between px-4 pt-4">
               <div>
-                <p className="text-base font-medium text-neutral-900">Today&apos;s Schedule</p>
+                <p className="text-base font-medium text-neutral-900">Today's Schedule</p>
                 <p className="text-sm text-neutral-500">Derived from your assigned groups</p>
               </div>
               <div className="flex items-center gap-2">

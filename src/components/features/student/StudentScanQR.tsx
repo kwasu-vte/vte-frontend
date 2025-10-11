@@ -69,7 +69,7 @@ export default function StudentScanQR({ userId }: StudentScanQRProps) {
             Scan QR Code
           </h1>
           <p className="text-neutral-600">
-            Scan your mentor&apos;s QR code to mark attendance.
+            Scan your mentor's QR code to mark attendance.
           </p>
         </div>
       </div>

@@ -78,7 +78,7 @@ export function PWAManager({ children }: PWAManagerProps) {
       {/* * Online/Offline Status Indicator */}
       {!isOnline && (
         <div className="fixed top-0 left-0 right-0 bg-red-500 text-white text-center py-2 z-50">
-          <span className="text-sm">You&apos;re offline. Some features may be limited.</span>
+          <span className="text-sm">You're offline. Some features may be limited.</span>
         </div>
       )}
       

@@ -133,7 +133,7 @@ export default async function StudentProfile() {
               </CardHeader>
               <CardBody>
                 <p className="text-sm text-neutral-600 mb-4">
-                  You haven&apos;t created your profile yet.
+                  You haven't created your profile yet.
                 </p>
                 <Button
                   as={Link}
@@ -222,7 +222,7 @@ export default async function StudentProfile() {
                     No Active Enrollment
                   </p>
                   <p className="text-sm text-neutral-600 mb-4">
-                    You&apos;re not currently enrolled in any skill. Browse available skills to get started.
+                    You're not currently enrolled in any skill. Browse available skills to get started.
                   </p>
                   <Button 
                     as={Link}

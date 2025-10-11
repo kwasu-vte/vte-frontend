@@ -395,14 +395,14 @@ export default async function StudentEnrollment({ searchParams }: { searchParams
             <BookOpen className="h-12 w-12 text-neutral-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-neutral-900 mb-2">No Active Enrollment</h3>
             <p className="text-neutral-600 mb-6">
-              You haven&apos;t enrolled in any skills yet. Browse available skills to get started.
+              You haven't enrolled in any skills yet. Browse available skills to get started.
             </p>
             {/* Guidance when skill is pre-selected */}
             {(data.selectedSkill || skillParam) && (
               <Card className="mb-6 border-neutral-200 bg-neutral-50">
                 <CardBody className="p-4">
                   <p className="text-sm text-neutral-700">
-                    You selected <span className="font-medium">{data.selectedSkill?.title || skillParam}</span>. Click &quot;Enroll and Pay&quot; to create your enrollment and proceed to payment.
+                    You selected <span className="font-medium">{data.selectedSkill?.title || skillParam}</span>. Click "Enroll and Pay" to create your enrollment and proceed to payment.
                   </p>
                 </CardBody>
               </Card>

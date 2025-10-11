@@ -199,7 +199,7 @@ export default function AdminGroupsPage() {
             <p><strong>Loading:</strong> {isLoading ? 'Yes' : 'No'}</p>
             <p><strong>Error:</strong> {error ? (error as Error).message : 'None'}</p>
             <p><strong>Data Count:</strong> {groups?.length || 0}</p>
-            <p><strong>Query Key:</strong> [&apos;groups&apos;]</p>
+            <p><strong>Query Key:</strong> ['groups']</p>
             <p><strong>Mode:</strong> Read-only</p>
           </div>
         </div>
