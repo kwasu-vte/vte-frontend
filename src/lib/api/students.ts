@@ -27,5 +27,3 @@ export const studentsApi = {
     return apiRequest(`v1/users/${userId}/student/available-skills`);
   },
 };
-
-

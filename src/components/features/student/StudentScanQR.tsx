@@ -44,7 +44,6 @@ export default function StudentScanQR({ userId }: StudentScanQRProps) {
   const handleScanSuccess = (result: any) => {
     console.log('Scan successful:', result);
     // Show success notification or update UI
-    router.refresh(); // Refresh to update attendance data
   };
 
   const handleScanError = (error: any) => {
@@ -116,7 +115,7 @@ export default function StudentScanQR({ userId }: StudentScanQRProps) {
       >
         {(enrollment) => {
           // Check if student is in a group (assigned or active)
-          const isInGroup = enrollment.status === 'assigned' || enrollment.status === 'active';
+          const isInGroup = enrollment.status === 'assigned' || enrollment.status === 'paid';
           
           if (!isInGroup) {
             return (
@@ -145,8 +144,6 @@ export default function StudentScanQR({ userId }: StudentScanQRProps) {
               studentId={userId}
               onScanSuccess={handleScanSuccess}
               onScanError={handleScanError}
-              requiredScansToday={3} // This would come from enrollment/group data
-              completedScansToday={0} // This would come from attendance data
               enrollment={enrollment}
             />
           );

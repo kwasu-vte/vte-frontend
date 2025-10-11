@@ -37,7 +37,7 @@ function StatusTimeline({ enrollment, skill }: StatusTimelineProps) {
       title: 'Group Assignment',
       description: 'You will be assigned to a group after payment',
       icon: Users,
-      status: enrollment.status === 'assigned' || enrollment.status === 'active' ? 'completed' :
+      status: enrollment.status === 'assigned' || enrollment.status === 'paid' ? 'completed' :
               enrollment.status === 'paid' ? 'current' : 'pending'
     },
     {
@@ -45,7 +45,7 @@ function StatusTimeline({ enrollment, skill }: StatusTimelineProps) {
       title: 'Active Enrollment',
       description: 'Start attending practical sessions',
       icon: CheckCircle2,
-      status: enrollment.status === 'active' ? 'completed' : 'pending'
+      status: enrollment.status === 'assigned' ? 'completed' : 'pending'
     }
   ]
 

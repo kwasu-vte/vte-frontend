@@ -19,7 +19,7 @@ interface SchedulePageData {
 async function getSchedulePageData(userId: string): Promise<SchedulePageData> {
   try {
     const enrollmentResponse = await enrollmentsApi.getUserEnrollment(userId);
-    const enrollment = enrollmentResponse.status === 'fulfilled' ? enrollmentResponse.value.data : null;
+    const enrollment = enrollmentResponse.data;
 
     return {
       enrollment
@@ -66,7 +66,7 @@ export default async function StudentSchedule() {
       {/* Main Content */}
       {data.enrollment ? (() => {
         // Check if student is in a group
-        const isInGroup = data.enrollment.status === 'assigned' || data.enrollment.status === 'active';
+        const isInGroup = data.enrollment.status === 'assigned' || data.enrollment.status === 'paid';
         
         if (!isInGroup) {
           return (
@@ -123,7 +123,7 @@ export default async function StudentSchedule() {
                       <span className="text-sm text-neutral-600">Status</span>
                     </div>
                     <Chip 
-                      color={data.enrollment.status === 'active' ? 'success' : 'warning'} 
+                      color={data.enrollment.status === 'assigned' ? 'success' : 'warning'} 
                       variant="flat"
                       className="capitalize"
                     >
@@ -210,21 +210,15 @@ export default async function StudentSchedule() {
                       <p className="font-medium text-neutral-900">Group {data.enrollment.group.group_number}</p>
                     </div>
                     <div className="space-y-2">
-                      <p className="text-sm text-neutral-600">Mentor</p>
+                      <p className="text-sm text-neutral-600">Group Display Name</p>
                       <p className="font-medium text-neutral-900">
-                        {data.enrollment.group.mentor?.name || 'TBD'}
+                        {data.enrollment.group.group_display_name || 'TBD'}
                       </p>
                     </div>
                     <div className="space-y-2">
-                      <p className="text-sm text-neutral-600">Location</p>
+                      <p className="text-sm text-neutral-600">Group ID</p>
                       <p className="font-medium text-neutral-900">
-                        {data.enrollment.group.location || 'TBD'}
-                      </p>
-                    </div>
-                    <div className="space-y-2">
-                      <p className="text-sm text-neutral-600">Schedule</p>
-                      <p className="font-medium text-neutral-900">
-                        {data.enrollment.group.schedule || 'TBD'}
+                        {data.enrollment.group.id || 'TBD'}
                       </p>
                     </div>
                   </div>

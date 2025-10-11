@@ -32,11 +32,23 @@ interface SidebarProps {
 
 // * Navigation items for each role
 const navigationItems: NavigationItem[] = [
-  // * Admin Navigation
+  // * Admin Navigation - Ordered by priority and frequency of use
   {
     href: '/admin/dashboard',
     label: 'Dashboard',
     icon: Home,
+    role: ['Admin'],
+  },
+  {
+    href: '/admin/students',
+    label: 'Students',
+    icon: GraduationCap,
+    role: ['Admin'],
+  },
+  {
+    href: '/admin/mentors',
+    label: 'Mentors',
+    icon: UserCheck,
     role: ['Admin'],
   },
   {
@@ -55,18 +67,6 @@ const navigationItems: NavigationItem[] = [
     href: '/admin/enrollments',
     label: 'Enrollments',
     icon: ClipboardList,
-    role: ['Admin'],
-  },
-  {
-    href: '/admin/students',
-    label: 'Students',
-    icon: GraduationCap,
-    role: ['Admin'],
-  },
-  {
-    href: '/admin/mentors',
-    label: 'Mentors',
-    icon: UserCheck,
     role: ['Admin'],
   },
   {
@@ -113,6 +113,12 @@ const navigationItems: NavigationItem[] = [
     href: '/student/dashboard',
     label: 'Dashboard',
     icon: Home,
+    role: ['Student'],
+  },
+  {
+    href: '/student/schedule',
+    label: 'Schedule',
+    icon: Calendar,
     role: ['Student'],
   },
   {

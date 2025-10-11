@@ -130,7 +130,7 @@ export function StudentDashboardClient({ userId }: StudentDashboardClientProps) 
                     </p>
                   </div>
                   <Chip 
-                    color={enrollment.status === 'active' ? 'success' : 'primary'}
+                    color={enrollment.status === 'assigned' ? 'success' : 'primary'}
                     variant="flat"
                     size="sm"
                   >
@@ -266,7 +266,7 @@ function NextStepContent({ profile, enrollment }: any) {
       color: 'warning',
       icon: Clock,
     };
-  } else if (['paid', 'assigned', 'active'].includes(status)) {
+  } else if (['paid', 'assigned'].includes(status)) {
     const awaitingGroup = status === 'paid' && !enrollment.group?.id;
     config = {
       title: awaitingGroup ? 'Awaiting Group Assignment' : 'Group Assigned',

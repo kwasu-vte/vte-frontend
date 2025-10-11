@@ -262,7 +262,7 @@ export default async function StudentEnrollment({ searchParams }: { searchParams
               status: data.enrollment.status,
               payment_status: data.enrollment.payment_status || (() => {
                 // * Fallback logic: determine payment status from enrollment status and reference
-                if (data.enrollment.status === 'assigned' || data.enrollment.status === 'active') {
+                if (data.enrollment.status === 'assigned' || data.enrollment.status === 'paid') {
                   return 'paid'; // If assigned/active, payment must be complete
                 }
                 if (data.enrollment.reference) {

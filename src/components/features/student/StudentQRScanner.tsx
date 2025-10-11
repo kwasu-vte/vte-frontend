@@ -6,9 +6,8 @@ import {
   Button, 
   Input, 
   Spinner, 
-  Progress,
-  Chip,
-  Divider
+  Divider,
+  Chip
 } from '@heroui/react';
 import { 
   Camera, 
@@ -16,9 +15,7 @@ import {
   CheckCircle2, 
   XCircle, 
   AlertCircle,
-  Trophy,
-  Clock,
-  Target
+  Trophy
 } from 'lucide-react';
 import { qrCodesApi } from "@/lib/api/qr-codes"
 import type { ProcessQrScanPayload, QrScanResponse } from "@/lib/types"
@@ -28,8 +25,6 @@ export type StudentQRScannerProps = {
   studentId: string
   onScanSuccess: (result: { token: string; points: number; timestamp: string }) => void
   onScanError: (error: string) => void
-  requiredScansToday?: number
-  completedScansToday?: number
   enrollment?: {
     status: string
     skill: { title: string }
@@ -42,8 +37,6 @@ function StudentQRScanner({
   studentId, 
   onScanSuccess, 
   onScanError, 
-  requiredScansToday = 3, 
-  completedScansToday = 0,
   enrollment
 }: StudentQRScannerProps) {
   const [scanMode, setScanMode] = useState<'camera' | 'manual'>('manual');
@@ -60,11 +53,6 @@ function StudentQRScanner({
   const lastScanned = useRef('');
   const html5QrCodeRef = useRef<Html5Qrcode | null>(null);
   const scannerIdRef = useRef("qr-reader-" + Math.random().toString(36).substr(2, 9));
-  
-  const completedScans = completedScansToday;
-  const requiredScans = requiredScansToday;
-  const progress = (completedScans / requiredScans) * 100;
-  const remainingScans = Math.max(0, requiredScans - completedScans);
 
   // Debug enrollment data
   console.log('Enrollment data:', enrollment);
@@ -305,9 +293,7 @@ function StudentQRScanner({
                   </div>
                 </div>
                 <div className="text-sm text-neutral-500">
-                  {remainingScans > 0 
-                    ? `${remainingScans} more scan${remainingScans !== 1 ? 's' : ''} needed today`
-                    : "All scans completed for today! ✓"}
+                  Attendance recorded successfully
                 </div>
               </>
             ) : (
@@ -354,35 +340,6 @@ function StudentQRScanner({
           </p>
         </div>
 
-        {/* Progress Card */}
-        <Card shadow="sm">
-          <CardBody className="p-6">
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <p className="text-sm text-neutral-600 mb-1">Today's Progress</p>
-                <p className="text-2xl font-bold text-neutral-900">
-                  {completedScans} / {requiredScans}
-                </p>
-              </div>
-              <Chip 
-                color={remainingScans === 0 ? "success" : "warning"}
-                variant="flat"
-                startContent={remainingScans === 0 ? <CheckCircle2 className="w-4 h-4" /> : <Target className="w-4 h-4" />}
-              >
-                {remainingScans === 0 ? 'Complete' : `${remainingScans} remaining`}
-              </Chip>
-            </div>
-            <Progress 
-              value={progress} 
-              color={remainingScans === 0 ? "success" : "primary"}
-              size="sm"
-              className="mb-2"
-            />
-            <p className="text-xs text-neutral-500">
-              Scan {remainingScans} more time{remainingScans !== 1 ? 's' : ''} to complete today's attendance
-            </p>
-          </CardBody>
-        </Card>
 
         {/* Main Scanner Card */}
         <Card shadow="sm">
