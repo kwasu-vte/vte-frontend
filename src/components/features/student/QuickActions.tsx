@@ -11,20 +11,26 @@ export type QuickActionsProps = {
 
 function QuickActions({ enrollment, hasProfile = false }: QuickActionsProps) {
   const actions = React.useMemo(() => {
-    const baseActions = [
+    const baseActions: Array<{
+      label: string;
+      href: string;
+      icon: React.ComponentType<any>;
+      color: 'primary' | 'default' | 'success';
+      variant: 'flat';
+    }> = [
       {
         label: "Browse Skills",
         href: "/student/skills",
         icon: BookOpen,
-        color: "primary" as const,
-        variant: "flat" as const,
+        color: "primary",
+        variant: "flat",
       },
       {
         label: "My Profile",
         href: "/student/profile",
         icon: User,
-        color: "default" as const,
-        variant: "flat" as const,
+        color: "default",
+        variant: "flat",
       }
     ]
 
@@ -34,22 +40,22 @@ function QuickActions({ enrollment, hasProfile = false }: QuickActionsProps) {
           label: "My Group",
           href: "/student/my-group",
           icon: Users,
-          color: "primary" as const,
-          variant: "flat" as const,
+          color: "primary",
+          variant: "flat",
         },
         {
           label: "Mark Attendance",
           href: "/student/scan-qr",
           icon: QrCode,
-          color: "success" as const,
-          variant: "flat" as const,
+          color: "success",
+          variant: "flat",
         },
         {
           label: "View Schedule",
           href: "/student/schedule",
           icon: Calendar,
-          color: "default" as const,
-          variant: "flat" as const,
+          color: "default",
+          variant: "flat",
         }
       )
     }

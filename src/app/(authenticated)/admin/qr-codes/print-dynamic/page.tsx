@@ -355,7 +355,7 @@ export default function DynamicQRCodePrintPage() {
               </h1>
               <div className="w-24 h-1 bg-blue-600 mx-auto print:bg-black"></div>
               <p className="text-sm print:text-xs text-gray-600 print:text-black">
-                {quantity} QR Code{quantity > 1 ? 's' : ''} for {qrCodeData.skill} Group {qrCodeData.skill_group_id}
+                {quantity} QR Code{quantity > 1 ? 's' : ''} for Group {qrCodeData.skill_group_id}
                 {pageLayout.totalPages > 1 && (
                   <span> • Page {page.pageNumber} of {pageLayout.totalPages}</span>
                 )}

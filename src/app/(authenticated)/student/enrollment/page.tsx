@@ -361,8 +361,6 @@ export default async function StudentEnrollment({ searchParams }: { searchParams
                 group={{
                   number: groupNumber,
                   mentorName: 'Loading...', // This would come from group details API
-                  schedule: 'TBD', // This would come from group details API
-                  location: 'TBD' // This would come from group details API
                 }}
               />
             );

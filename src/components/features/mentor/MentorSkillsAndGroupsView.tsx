@@ -49,7 +49,7 @@ export default function MentorSkillsAndGroupsView(props: MentorSkillsAndGroupsVi
     if (!groups) return []
     const skills = groups.map(group => group.skill).filter(Boolean)
     const unique = skills.filter((skill, index, self) => 
-      index === self.findIndex(s => s.id === skill.id)
+      skill && index === self.findIndex(s => s && skill && s.id === skill.id)
     )
     return unique
   }, [groups])
@@ -223,7 +223,7 @@ export default function MentorSkillsAndGroupsView(props: MentorSkillsAndGroupsVi
                   setSelectedSkillId(selected || 'all')
                 }}
                 variant="bordered"
-                items={[{ key: 'all', title: 'All Skills' }, ...uniqueSkills.map(skill => ({ key: String(skill.id), title: skill.title }))]}
+                items={[{ key: 'all', title: 'All Skills' }, ...uniqueSkills.filter(skill => skill).map(skill => ({ key: String(skill!.id), title: skill!.title }))]}
               >
                 {(skill) => <SelectItem key={skill.key}>{skill.title}</SelectItem>}
               </Select>
@@ -356,11 +356,11 @@ export default function MentorSkillsAndGroupsView(props: MentorSkillsAndGroupsVi
                       </p>
                     </div>
                     <Chip 
-                      color={selectedGroup.enrollments?.length >= Number(selectedGroup.max_student_capacity ?? 0) ? 'danger' : 'success'}
+                      color={(selectedGroup.enrollments?.length ?? 0) >= Number(selectedGroup.max_student_capacity ?? 0) ? 'danger' : 'success'}
                       variant="flat"
                       size="sm"
                     >
-                      {selectedGroup.enrollments?.length >= Number(selectedGroup.max_student_capacity ?? 0) ? 'Full' : 'Available'}
+                      {(selectedGroup.enrollments?.length ?? 0) >= Number(selectedGroup.max_student_capacity ?? 0) ? 'Full' : 'Available'}
                     </Chip>
                   </div>
                   

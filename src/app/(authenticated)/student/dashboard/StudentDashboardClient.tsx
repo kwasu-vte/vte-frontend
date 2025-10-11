@@ -53,7 +53,7 @@ export function StudentDashboardClient({ userId }: StudentDashboardClientProps) 
   const enrollmentStatus = enrollment?.status || 'Not Enrolled';
   const upcomingCount = upcomingPracticals.length;
   const groupNumber = enrollment?.group?.group_number || '—';
-  const groupSize = enrollment?.group?.current_student_count || '0';
+  const groupSize = '—'; // Group size not available in enrollment data
 
   return (
     <div className="min-h-screen bg-default-50 p-4 md:p-6 space-y-6">
@@ -190,7 +190,12 @@ export function StudentDashboardClient({ userId }: StudentDashboardClientProps) 
   );
 }
 
-function StatCard({ title, value, icon: Icon, color }: any) {
+function StatCard({ title, value, icon: Icon, color }: {
+  title: string;
+  value: string | number;
+  icon: React.ComponentType<any>;
+  color: 'success' | 'primary' | 'warning' | 'default';
+}) {
   const colorClasses = {
     success: 'bg-success-50 border-success-200 text-success-600',
     primary: 'bg-primary-50 border-primary-200 text-primary-600',
@@ -217,16 +222,26 @@ function StatCard({ title, value, icon: Icon, color }: any) {
   );
 }
 
-function NextStepContent({ profile, enrollment }: any) {
+function NextStepContent({ profile, enrollment }: {
+  profile: any;
+  enrollment: any;
+}) {
   const status = (enrollment?.status || '').toString().toLowerCase();
   const payStatus = (enrollment?.payment_status || '').toString().toLowerCase();
   
-  let config = {
+  let config: {
+    title: string;
+    description: string;
+    ctaLabel: string;
+    ctaHref: string;
+    color: 'success' | 'primary' | 'warning' | 'danger';
+    icon: React.ComponentType<any>;
+  } = {
     title: 'All Set!',
     description: 'Check your upcoming sessions and group details.',
     ctaLabel: '',
     ctaHref: '',
-    color: 'success' as const,
+    color: 'success',
     icon: CheckCircle2,
   };
 
@@ -323,19 +338,24 @@ function NextStepContent({ profile, enrollment }: any) {
   );
 }
 
-function QuickActionButtons({ enrollment }: any) {
-  const actions = [
+function QuickActionButtons({ enrollment }: { enrollment: any }) {
+  const actions: Array<{
+    label: string;
+    href: string;
+    icon: React.ComponentType<any>;
+    color: 'primary' | 'default' | 'success';
+  }> = [
     {
       label: 'Browse Skills',
       href: '/student/skills',
       icon: BookOpen,
-      color: 'primary' as const,
+      color: 'primary',
     },
     {
       label: 'My Profile',
       href: '/student/profile',
       icon: User,
-      color: 'default' as const,
+      color: 'default',
     },
   ];
 
@@ -345,19 +365,19 @@ function QuickActionButtons({ enrollment }: any) {
         label: 'My Group',
         href: '/student/my-group',
         icon: Users,
-        color: 'primary' as const,
+        color: 'primary',
       },
       {
         label: 'Mark Attendance',
         href: '/student/scan-qr',
         icon: QrCode,
-        color: 'success' as const,
+        color: 'success',
       },
       {
         label: 'View Schedule',
         href: '/student/schedule',
         icon: Calendar,
-        color: 'default' as const,
+        color: 'default',
       }
     );
   }

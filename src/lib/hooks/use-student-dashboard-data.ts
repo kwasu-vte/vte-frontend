@@ -59,16 +59,9 @@ export function useStudentDashboardData(userId: string): StudentDashboardData {
 
   // Derive upcoming practicals from enrollment data
   const upcomingPracticals = (() => {
-    if (!enrollment?.group?.practical_dates) return [];
-    const today = new Date();
-    return enrollment.group.practical_dates
-      .filter(date => new Date(date) >= today)
-      .slice(0, 5) // Show next 5 practicals
-      .map(date => ({
-        date,
-        skill: enrollment.skill?.title || 'Unknown Skill',
-        group: `Group ${enrollment.group?.group_number || enrollment.group?.id}`
-      }));
+    // practical_dates not available in enrollment group data
+    // This would need to be fetched from a separate API endpoint
+    return [];
   })();
 
   // Combine loading states

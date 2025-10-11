@@ -31,9 +31,9 @@ export default function GroupStudentsRoster(props: GroupStudentsRosterProps) {
     if (!search.trim()) return students
     const q = search.trim().toLowerCase()
     return students.filter(student => 
-      student.name?.toLowerCase().includes(q) ||
+      `${student.first_name} ${student.last_name}`.toLowerCase().includes(q) ||
       student.email?.toLowerCase().includes(q) ||
-      student.phone?.toLowerCase().includes(q)
+      student.matric_number?.toLowerCase().includes(q)
     )
   }, [students, search])
 

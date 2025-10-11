@@ -595,9 +595,7 @@ function StudentQRScanner({
                   <p className="font-medium text-neutral-900">
                     {enrollment?.group_id 
                       ? `#${enrollment.group_id}` 
-                      : enrollment?.group?.group_number 
-                        ? `#${enrollment.group.group_number}` 
-                        : 'Not assigned'}
+                      : 'Not assigned'}
                   </p>
                 </div>
                 <div>

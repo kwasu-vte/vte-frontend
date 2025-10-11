@@ -5,8 +5,19 @@ import { Card, CardBody, Button } from '@heroui/react';
 import { X, CheckCircle, AlertCircle, AlertTriangle, Info } from 'lucide-react';
 
 // Mock context for demo
+interface Notification {
+  id: string;
+  type: 'success' | 'error' | 'warning' | 'info';
+  title: string;
+  message: string;
+  action?: {
+    label: string;
+    onClick: () => void;
+  };
+}
+
 const useApp = () => ({
-  notifications: [],
+  notifications: [] as Notification[],
   removeNotification: (id: string) => console.log('Remove:', id),
 });
 

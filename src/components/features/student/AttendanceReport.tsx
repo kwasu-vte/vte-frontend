@@ -1,7 +1,7 @@
 "use client"
 import React from "react"
 import { Button, Chip, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Card, CardBody, CardHeader, Divider } from "@heroui/react"
-import { Download, Calendar, FileSpreadsheet, FileText, FilePdf } from "lucide-react"
+import { Download, Calendar, FileSpreadsheet, FileText, File } from "lucide-react"
 import * as XLSX from 'xlsx'
 
 /**
@@ -71,7 +71,7 @@ function AttendanceReport({ groupId, dateRange, attendanceData }: AttendanceRepo
     const headers = Object.keys(csvData[0])
     const csvContent = [
       headers.join(','),
-      ...csvData.map(row => headers.map(header => `"${row[header]}"`).join(','))
+      ...csvData.map(row => headers.map(header => `"${(row as Record<string, any>)[header]}"`).join(','))
     ].join('\n')
 
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
@@ -151,7 +151,7 @@ function AttendanceReport({ groupId, dateRange, attendanceData }: AttendanceRepo
             variant="flat" 
             size="sm"
             color="default"
-            startContent={<FilePdf className="h-4 w-4" />}
+            startContent={<File className="h-4 w-4" />}
             isDisabled
           >
             PDF

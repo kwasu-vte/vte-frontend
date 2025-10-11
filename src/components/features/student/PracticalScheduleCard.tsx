@@ -8,12 +8,12 @@ import { Calendar, Clock, AlertCircle, Info } from 'lucide-react';
 
 interface GroupDetails {
   skill?: {
-    date_range_start?: string;
-    date_range_end?: string;
+    date_range_start?: string | null;
+    date_range_end?: string | null;
   };
   schedule: {
     excludeWeekends: boolean;
-    assignedPracticalDate?: string;
+    assignedPracticalDate?: string | null;
   };
 }
 
@@ -76,14 +76,18 @@ export function PracticalScheduleCard({ groupDetails }: PracticalScheduleCardPro
                     <div>
                       <p className="text-sm font-medium text-neutral-700">Period</p>
                       <p className="text-base font-semibold text-neutral-900 mt-1">
-                        {new Date(groupDetails.skill!.date_range_start!).toLocaleDateString('en-US', {
-                          month: 'short',
-                          day: 'numeric'
-                        })} - {new Date(groupDetails.skill!.date_range_end!).toLocaleDateString('en-US', {
-                          month: 'short',
-                          day: 'numeric',
-                          year: 'numeric'
-                        })}
+                        {groupDetails.skill?.date_range_start && groupDetails.skill?.date_range_end ? (
+                          <>
+                            {new Date(groupDetails.skill.date_range_start).toLocaleDateString('en-US', {
+                              month: 'short',
+                              day: 'numeric'
+                            })} - {new Date(groupDetails.skill.date_range_end).toLocaleDateString('en-US', {
+                              month: 'short',
+                              day: 'numeric',
+                              year: 'numeric'
+                            })}
+                          </>
+                        ) : 'TBD'}
                       </p>
                     </div>
                   </div>
