@@ -338,20 +338,35 @@ export default async function StudentEnrollment({ searchParams }: { searchParams
           )}
 
           {/* Group Assignment */}
-          {(['assigned','active'].includes((data.enrollment.status || '').toString().toLowerCase()) || data.enrollment.group_id) && (
-            <GroupAssignmentCard
-              enrollment={{
-                id: data.enrollment.id.toString(),
-                status: data.enrollment.status
-              }}
-              group={{
-                number: parseInt(String(data.enrollment.group_id || 0)),
-                mentorName: 'Loading...', // This would come from group details API
-                schedule: 'TBD', // This would come from group details API
-                location: 'TBD' // This would come from group details API
-              }}
-            />
-          )}
+          {(() => {
+            const shouldShowGroup = ['assigned','active'].includes((data.enrollment.status || '').toString().toLowerCase()) || data.enrollment.group;
+            const groupNumber = data.enrollment.group?.group_number || 0;
+            
+            // * Log group assignment data
+            console.log('[EnrollmentPage] Group Assignment Data:', {
+              shouldShowGroup,
+              enrollmentStatus: data.enrollment.status,
+              hasGroup: !!data.enrollment.group,
+              groupNumber,
+              groupData: data.enrollment.group,
+              timestamp: new Date().toISOString()
+            });
+            
+            return shouldShowGroup && (
+              <GroupAssignmentCard
+                enrollment={{
+                  id: data.enrollment.id.toString(),
+                  status: data.enrollment.status
+                }}
+                group={{
+                  number: groupNumber,
+                  mentorName: 'Loading...', // This would come from group details API
+                  schedule: 'TBD', // This would come from group details API
+                  location: 'TBD' // This would come from group details API
+                }}
+              />
+            );
+          })()}
 
           {/* Cancellation Notice */}
           {data.enrollment.status === 'cancelled' && (
@@ -421,51 +436,6 @@ export default async function StudentEnrollment({ searchParams }: { searchParams
           </CardBody>
         </Card>
       )}
-          <Card shadow="sm" className="w-full">
-            <CardBody className="p-8 text-center">
-              <BookOpen className="h-12 w-12 text-neutral-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-neutral-900 mb-2">No Active Enrollment</h3>
-              <p className="text-neutral-600 mb-6">
-                You haven&apos;t enrolled in any skills yet. Browse available skills to get started.
-              </p>
-              {/* Guidance when skill is pre-selected */}
-              {(data.selectedSkill || skillParam) && (
-                <Card className="mb-6 border-neutral-200 bg-neutral-50">
-                  <CardBody className="p-4">
-                    <p className="text-sm text-neutral-700">
-                      You selected <span className="font-medium">{data.selectedSkill?.title || skillParam}</span>. Click &quot;Enroll and Pay&quot; to create your enrollment and proceed to payment.
-                    </p>
-                  </CardBody>
-                </Card>
-              )}
-              {(data.selectedSkill || skillParam) ? (
-                <div className="space-y-4">
-                  <div className="text-left inline-block">
-                    <p className="text-sm font-medium text-neutral-900">Selected Skill</p>
-                    <p className="text-sm text-neutral-700">
-                      {data.selectedSkill?.title || skillParam}
-                    </p>
-                  </div>
-                  <Button
-                    as={Link}
-                    href={`/student/enrollment?skill=${data.selectedSkill?.id || skillParam}&confirm=1`}
-                    color="primary"
-                  >
-                    Enroll and Pay
-                  </Button>
-                </div>
-              ) : (
-                <Button
-                  as={Link}
-                  href="/student/skills"
-                  color="primary"
-                  startContent={<BookOpen className="h-4 w-4" />}
-                >
-                  Browse Skills
-                </Button>
-              )}
-            </CardBody>
-          </Card>
       {/* Notifications */}
       <NotificationContainer />
     </div>
