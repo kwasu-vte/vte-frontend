@@ -1,15 +1,13 @@
 // * Student Skills Page
-// * Browse/enroll in skills with SkillSelectionGrid and SkillDetailModal
-// * Follows design guide principles with NextUI components
+// * Browse/enroll in skills with improved UI/UX and clear information hierarchy
 
 import React from 'react';
 import { getCurrentUser } from '@/lib/auth';
 import { studentsApi, enrollmentsApi } from '@/lib/api';
 import StudentSkillsClient from './StudentSkillsClient';
 import { NotificationContainer } from '@/components/shared/NotificationContainer';
-import { StateRenderer } from '@/components/shared/StateRenderer';
-import { Card, CardBody, CardHeader, Skeleton, Button } from '@heroui/react';
-import { ArrowLeft, BookOpen } from 'lucide-react';
+import { Card, CardBody, Button, Chip } from '@heroui/react';
+import { ArrowLeft, BookOpen, AlertCircle, Info } from 'lucide-react';
 import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
@@ -22,7 +20,6 @@ interface SkillsPageData {
 
 async function getSkillsPageData(userId: string): Promise<SkillsPageData> {
   try {
-    // Fetch profile, available skills, and enrollment in parallel
     const [profileResponse, skillsResponse, enrollmentResponse] = await Promise.allSettled([
       studentsApi.getProfile(userId),
       studentsApi.getAvailableSkills(userId),
@@ -59,129 +56,163 @@ export default async function StudentSkills() {
   // Check if user has a profile
   if (!data.profile) {
     return (
-      <div className="space-y-6">
-        {/* Page Header */}
+      <div className="max-w-4xl mx-auto">
+        <div className="space-y-6">
+          {/* Header */}
+          <div className="flex items-center gap-4">
+            <Button
+              as={Link}
+              href="/student/dashboard"
+              isIconOnly
+              variant="light"
+              className="text-neutral-600"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <div>
+              <h1 className="text-2xl font-bold text-neutral-900">
+                Skill Enrollment
+              </h1>
+              <p className="text-sm text-neutral-600 mt-1">
+                Choose and enroll in skills to enhance your learning
+              </p>
+            </div>
+          </div>
+
+          {/* Profile Required Card */}
+          <Card className="border-2 border-warning-300 bg-warning-50">
+            <CardBody className="p-6">
+              <div className="flex items-start gap-4">
+                <div className="p-3 bg-warning-100 rounded-lg flex-shrink-0">
+                  <AlertCircle className="h-6 w-6 text-warning-600" />
+                </div>
+                <div className="flex-1">
+                  <h2 className="text-lg font-semibold text-warning-900 mb-2">
+                    Profile Setup Required
+                  </h2>
+                  <p className="text-sm text-warning-800 mb-4 leading-relaxed">
+                    Before you can enroll in skills, you need to complete your student profile. 
+                    This helps us recommend the right skills for your level and track your progress.
+                  </p>
+                  <Button
+                    as={Link}
+                    href="/student/profile/create"
+                    color="warning"
+                    variant="solid"
+                    startContent={<BookOpen className="h-4 w-4" />}
+                  >
+                    Create Your Profile
+                  </Button>
+                </div>
+              </div>
+            </CardBody>
+          </Card>
+
+          <NotificationContainer />
+        </div>
+      </div>
+    );
+  }
+
+  // Check if there are any skills available
+  const hasSkills = data.availableSkills && data.availableSkills.length > 0;
+  const hasEnrollment = !!data.enrollment;
+
+  return (
+    <div className="space-y-6">
+      {/* Page Header */}
+      <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-4">
           <Button
             as={Link}
             href="/student/dashboard"
             isIconOnly
-            variant="ghost"
+            variant="light"
             className="text-neutral-600"
           >
-            <ArrowLeft className="h-4 w-4" />
+            <ArrowLeft className="h-5 w-5" />
           </Button>
           <div>
-            <h1 className="text-3xl font-bold text-neutral-900 mb-2">
-              Available Skills
-            </h1>
-            <p className="text-neutral-600">
-              Browse and enroll in skills available for your level.
+            <div className="flex items-center gap-3">
+              <h1 className="text-2xl font-bold text-neutral-900">
+                Skill Enrollment
+              </h1>
+              {hasEnrollment && (
+                <Chip 
+                  color="success" 
+                  variant="flat" 
+                  size="sm"
+                  startContent={<BookOpen className="h-3 w-3" />}
+                >
+                  Currently Enrolled
+                </Chip>
+              )}
+            </div>
+            <p className="text-sm text-neutral-600 mt-1">
+              {data.profile.student_level} • {hasSkills ? `${data.availableSkills.length} skills available` : 'No skills available'}
             </p>
           </div>
         </div>
 
-        {/* Profile Required Alert */}
-        <Card className="border-warning bg-warning-50">
-          <CardBody className="p-6">
-            <div className="flex items-center gap-3">
-              <BookOpen className="h-5 w-5 text-warning" />
-              <div>
-                <h3 className="text-lg font-medium text-warning-800">
-                  Profile Required
-                </h3>
-                <p className="text-sm text-warning-700 mb-4">
-                  You need to create your profile before you can enroll in skills.
+        {hasEnrollment && (
+          <Button
+            as={Link}
+            href="/student/enrollment"
+            color="primary"
+            variant="flat"
+            size="sm"
+          >
+            View Enrollment
+          </Button>
+        )}
+      </div>
+
+      {/* Info Banner */}
+      {hasSkills && (
+        <Card className="border border-primary-200 bg-primary-50">
+          <CardBody className="p-4">
+            <div className="flex items-start gap-3">
+              <Info className="h-5 w-5 text-primary-600 flex-shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <p className="text-sm text-primary-900">
+                  <span className="font-medium">How it works:</span> Browse available skills and click on any skill to view details. 
+                  {hasEnrollment 
+                    ? ' You can only enroll in one skill at a time. Complete your current enrollment to select a new skill.'
+                    : ' When you find one you like, click "Enroll Now" to get started.'
+                  }
                 </p>
-                <Button
-                  as={Link}
-                  href="/student/profile/create"
-                  color="warning"
-                  variant="solid"
-                >
-                  Create Profile
-                </Button>
               </div>
             </div>
           </CardBody>
         </Card>
+      )}
 
-        {/* Notifications */}
-        <NotificationContainer />
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-6">
-      {/* Page Header */}
-      <div className="flex items-center gap-4">
-        <Button
-          as={Link}
-          href="/student/dashboard"
-          isIconOnly
-          variant="ghost"
-          className="text-neutral-600"
-        >
-          <ArrowLeft className="h-4 w-4" />
-        </Button>
-        <div>
-          <h1 className="text-3xl font-bold text-neutral-900 mb-2">
-            Available Skills
-          </h1>
-          <p className="text-neutral-600">
-            Browse and enroll in skills available for your level.
-          </p>
-        </div>
-      </div>
-
-      {/* Instructional Banner */}
-      <Card shadow="sm" className="w-full border-neutral-200 bg-neutral-50">
-        <CardBody className="p-4">
-          <p className="text-sm text-neutral-700">
-            Select a skill to see details, then click Enroll on the skill panel. You can confirm on the Enrollment page.
-          </p>
-        </CardBody>
-      </Card>
-
-      {/* Skills Grid */}
-      <StateRenderer
-        isLoading={false}
-        error={null}
-        data={data.availableSkills}
-        loadingComponent={
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {Array.from({ length: 6 }).map((_, index) => (
-              <Card key={index} shadow="sm" className="w-full">
-                <CardBody className="p-6">
-                  <Skeleton className="h-40 w-full" />
-                </CardBody>
-              </Card>
-            ))}
-          </div>
-        }
-        emptyComponent={
-          <Card shadow="sm" className="w-full">
-            <CardBody className="p-8 text-center">
-              <BookOpen className="h-12 w-12 text-neutral-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-neutral-900 mb-2">No Skills Available</h3>
-              <p className="text-neutral-600">
-                There are no skills available for your level at this time. Check back later or contact your administrator.
+      {/* Skills Content */}
+      {hasSkills ? (
+        <StudentSkillsClient
+          availableSkills={data.availableSkills}
+          studentLevel={data.profile.student_level}
+          enrollment={data.enrollment}
+        />
+      ) : (
+        <Card className="border border-neutral-200">
+          <CardBody className="p-12 text-center">
+            <div className="max-w-md mx-auto">
+              <div className="p-4 bg-neutral-100 rounded-full w-fit mx-auto mb-4">
+                <BookOpen className="h-8 w-8 text-neutral-400" />
+              </div>
+              <h3 className="text-lg font-semibold text-neutral-900 mb-2">
+                No Skills Available Yet
+              </h3>
+              <p className="text-sm text-neutral-600 leading-relaxed">
+                There are currently no skills available for {data.profile.student_level} level. 
+                New skills are added regularly, so check back soon or contact your administrator for more information.
               </p>
-            </CardBody>
-          </Card>
-        }
-      >
-        {(skills) => (
-          <StudentSkillsClient
-            availableSkills={skills}
-            studentLevel={data.profile.student_level}
-            enrollment={data.enrollment}
-          />
-        )}
-      </StateRenderer>
+            </div>
+          </CardBody>
+        </Card>
+      )}
 
-      {/* Notifications */}
       <NotificationContainer />
     </div>
   );

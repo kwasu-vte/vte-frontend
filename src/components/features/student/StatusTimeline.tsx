@@ -1,17 +1,8 @@
 "use client"
 import React from "react"
 import { Card, CardBody, CardHeader, Chip, Divider } from "@heroui/react"
-import { CheckCircle, Clock, AlertCircle, CreditCard, Users, Calendar } from "lucide-react"
+import { CheckCircle2, Clock, Circle, CreditCard, Users, Calendar } from "lucide-react"
 
-/**
- * * StatusTimeline
- * Visual timeline showing enrollment progress through different stages.
- * Follows design guide with NextUI components and proper styling.
- *
- * Props:
- * - enrollment: { status: string; payment_status: string; created_at: string; updated_at: string }
- * - skill?: { title: string }
- */
 export type StatusTimelineProps = {
   enrollment: {
     status: string
@@ -30,7 +21,7 @@ function StatusTimeline({ enrollment, skill }: StatusTimelineProps) {
       id: 'selected',
       title: 'Skill Selected',
       description: 'You have selected a skill for enrollment',
-      icon: CheckCircle,
+      icon: Calendar,
       status: 'completed'
     },
     {
@@ -53,116 +44,108 @@ function StatusTimeline({ enrollment, skill }: StatusTimelineProps) {
       id: 'active',
       title: 'Active Enrollment',
       description: 'Start attending practical sessions',
-      icon: Calendar,
+      icon: CheckCircle2,
       status: enrollment.status === 'active' ? 'completed' : 'pending'
     }
   ]
 
-  const getStepColor = (status: string) => {
-    switch (status) {
-      case 'completed': return 'success'
-      case 'current': return 'primary'
-      case 'pending': return 'default'
-      default: return 'default'
-    }
-  }
-
-  const getStepIcon = (step: typeof steps[0]) => {
-    const IconComponent = step.icon
-    const color = getStepColor(step.status)
-    
-    if (step.status === 'completed') {
-      return <CheckCircle className="h-5 w-5 text-success" />
-    } else if (step.status === 'current') {
-      return <Clock className="h-5 w-5 text-primary animate-pulse" />
-    } else {
-      return <IconComponent className="h-5 w-5 text-neutral-400" />
-    }
-  }
-
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
       month: 'short',
       day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+      year: 'numeric'
     })
   }
 
   return (
-    <Card shadow="sm" className="w-full">
-      <CardHeader className="flex flex-col items-start gap-2">
-        <div className="flex items-center gap-2">
-          <Calendar className="h-5 w-5 text-primary" />
-          <p className="text-xl font-medium leading-normal">Enrollment Timeline</p>
+    <Card shadow="sm" className="w-full border border-neutral-100">
+      <CardHeader className="pb-3">
+        <div className="flex flex-col gap-1 w-full">
+          <h2 className="text-lg font-semibold text-neutral-900">Enrollment Progress</h2>
+          {skill && (
+            <p className="text-sm text-neutral-500">{skill.title}</p>
+          )}
         </div>
-        {skill && (
-          <p className="text-sm text-neutral-600">For: {skill.title}</p>
-        )}
       </CardHeader>
       
       <Divider />
       
-      <CardBody className="p-6">
-        <div className="space-y-6">
-          {steps.map((step, index) => (
-            <div key={step.id} className="flex items-start gap-4">
-              {/* Timeline Icon */}
-              <div className="flex-shrink-0 mt-1">
-                {getStepIcon(step)}
-              </div>
+      <CardBody className="pt-6 pb-6">
+        <div className="relative">
+          {/* Vertical line */}
+          <div className="absolute left-[15px] top-8 bottom-8 w-[2px] bg-neutral-200" />
+          
+          <div className="space-y-8">
+            {steps.map((step, index) => {
+              const IconComponent = step.icon
+              const isCompleted = step.status === 'completed'
+              const isCurrent = step.status === 'current'
+              const isPending = step.status === 'pending'
               
-              {/* Timeline Content */}
-              <div className="flex-1 space-y-2">
-                <div className="flex items-center gap-2">
-                  <h3 className="text-base font-medium text-neutral-900">
-                    {step.title}
-                  </h3>
-                  <Chip
-                    color={getStepColor(step.status)}
-                    variant="flat"
-                    size="sm"
-                  >
-                    {step.status === 'completed' ? 'Completed' :
-                     step.status === 'current' ? 'Current' : 'Pending'}
-                  </Chip>
+              return (
+                <div key={step.id} className="relative flex gap-4">
+                  {/* Icon container */}
+                  <div className="flex-shrink-0 relative z-10">
+                    <div className={`
+                      w-8 h-8 rounded-full flex items-center justify-center
+                      ${isCompleted ? 'bg-success-100 text-success-600' : 
+                        isCurrent ? 'bg-primary-100 text-primary-600' : 
+                        'bg-neutral-100 text-neutral-400'}
+                    `}>
+                      {isCompleted ? (
+                        <CheckCircle2 className="h-4 w-4" strokeWidth={2.5} />
+                      ) : isCurrent ? (
+                        <Clock className="h-4 w-4" strokeWidth={2.5} />
+                      ) : (
+                        <Circle className="h-4 w-4" strokeWidth={2.5} />
+                      )}
+                    </div>
+                  </div>
+                  
+                  {/* Content */}
+                  <div className="flex-1 pt-0.5">
+                    <div className="flex items-start justify-between gap-3 mb-1">
+                      <h3 className={`text-sm font-semibold ${
+                        isCompleted || isCurrent ? 'text-neutral-900' : 'text-neutral-500'
+                      }`}>
+                        {step.title}
+                      </h3>
+                      {(isCompleted || isCurrent) && (
+                        <Chip
+                          size="sm"
+                          variant="flat"
+                          color={isCompleted ? 'success' : 'primary'}
+                          classNames={{
+                            base: 'h-6',
+                            content: 'text-xs font-medium px-1'
+                          }}
+                        >
+                          {isCompleted ? 'Done' : 'In Progress'}
+                        </Chip>
+                      )}
+                    </div>
+                    
+                    <p className="text-sm text-neutral-600 leading-relaxed">
+                      {step.description}
+                    </p>
+                  </div>
                 </div>
-                
-                <p className="text-sm text-neutral-600">
-                  {step.description}
-                </p>
-                
-                {/* Show completion date for completed steps */}
-                {step.status === 'completed' && (
-                  <p className="text-xs text-neutral-500">
-                    Completed on {formatDate(enrollment.updated_at)}
-                  </p>
-                )}
-              </div>
-              
-              {/* Timeline Connector */}
-              {index < steps.length - 1 && (
-                <div className="absolute left-6 top-12 w-0.5 h-8 bg-neutral-200" />
-              )}
-            </div>
-          ))}
+              )
+            })}
+          </div>
         </div>
         
-        {/* Overall Status Summary */}
+        {/* Footer summary */}
         <Divider className="my-6" />
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between text-sm">
           <div>
-            <p className="text-sm text-neutral-600">Current Status</p>
-            <p className="text-lg font-medium text-neutral-900 capitalize">
-              {enrollment.status} • {enrollment.payment_status}
-            </p>
+            <span className="text-neutral-500">Status: </span>
+            <span className="font-medium text-neutral-900 capitalize">
+              {enrollment.status.replace(/_/g, ' ')}
+            </span>
           </div>
-          <div className="text-right">
-            <p className="text-sm text-neutral-600">Enrolled</p>
-            <p className="text-sm text-neutral-900">
-              {formatDate(enrollment.created_at)}
-            </p>
+          <div className="text-neutral-500">
+            Started {formatDate(enrollment.created_at)}
           </div>
         </div>
       </CardBody>

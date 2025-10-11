@@ -8,8 +8,7 @@ import { studentsApi, enrollmentsApi, qrCodesApi } from '@/lib/api';
 import { ProfileView } from '@/components/features/student/ProfileView';
 import { AttendanceReport } from '@/components/features/student/AttendanceReport';
 import { NotificationContainer } from '@/components/shared/NotificationContainer';
-import { StateRenderer } from '@/components/shared/StateRenderer';
-import { Card, CardBody, CardHeader, Skeleton, Button } from '@heroui/react';
+import { Card, CardBody, CardHeader, Button } from '@heroui/react';
 import { ArrowLeft, History, BarChart3 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -110,44 +109,30 @@ export default async function StudentProfile() {
       </div>
 
       {/* Profile View */}
-      <StateRenderer
-        isLoading={false}
-        error={null}
-        data={data.profile}
-        loadingComponent={
-          <Card shadow="sm" className="w-full">
-            <CardBody className="p-6">
-              <Skeleton className="h-40 w-full" />
-            </CardBody>
-          </Card>
-        }
-        emptyComponent={
-          <Card shadow="sm" className="w-full">
-            <CardHeader>
-              <p className="text-xl font-medium leading-normal">No Profile Found</p>
-            </CardHeader>
-            <CardBody>
-              <p className="text-sm text-neutral-600 mb-4">
-                You haven&apos;t created your profile yet.
-              </p>
-              <Button
-                as={Link}
-                href="/student/profile/create"
-                color="primary"
-              >
-                Create Profile
-              </Button>
-            </CardBody>
-          </Card>
-        }
-      >
-        {(profile) => (
-          <ProfileView 
-            profile={profile}
-            showCompletionBadge={true}
-          />
-        )}
-      </StateRenderer>
+      {data.profile ? (
+        <ProfileView 
+          profile={data.profile}
+          showCompletionBadge={true}
+        />
+      ) : (
+        <Card shadow="sm" className="w-full">
+          <CardHeader>
+            <p className="text-xl font-medium leading-normal">No Profile Found</p>
+          </CardHeader>
+          <CardBody>
+            <p className="text-sm text-neutral-600 mb-4">
+              You haven&apos;t created your profile yet.
+            </p>
+            <Button
+              as={Link}
+              href="/student/profile/create"
+              color="primary"
+            >
+              Create Profile
+            </Button>
+          </CardBody>
+        </Card>
+      )}
 
       {/* Current Enrollment */}
       <Card shadow="sm" className="w-full">
@@ -156,91 +141,69 @@ export default async function StudentProfile() {
           <p className="text-xl font-medium leading-normal">Current Enrollment</p>
         </CardHeader>
         <CardBody className="p-6">
-          <StateRenderer
-        isLoading={false}
-        error={null}
-            data={data.enrollments}
-            loadingComponent={<Skeleton className="h-20 w-full" />}
-            emptyComponent={
-              <div className="text-center py-8">
-                <p className="text-sm text-neutral-600">No current enrollment found.</p>
-                <p className="text-xs text-neutral-500 mt-2">
-                  You can enroll in a skill from the skills page.
-                </p>
-              </div>
-            }
-          >
-            {(enrollments) => (
-              <div className="space-y-3">
-                {enrollments.map((enrollment: any) => (
-                  <div key={enrollment.id} className="flex items-center justify-between p-4 border border-neutral-200 rounded-lg">
-                    <div>
-                      <p className="font-medium text-neutral-900">{enrollment.skill?.title || 'Unknown Skill'}</p>
-                      <p className="text-sm text-neutral-600">
-                        Enrolled: {new Date(enrollment.created_at).toLocaleDateString()}
+          {data.enrollments && data.enrollments.length > 0 ? (
+            <div className="space-y-3">
+              {data.enrollments.map((enrollment: any) => (
+                <div key={enrollment.id} className="flex items-center justify-between p-4 border border-neutral-200 rounded-lg">
+                  <div>
+                    <p className="font-medium text-neutral-900">{enrollment.skill?.title || 'Unknown Skill'}</p>
+                    <p className="text-sm text-neutral-600">
+                      Enrolled: {new Date(enrollment.created_at).toLocaleDateString()}
+                    </p>
+                    {enrollment.academic_session && (
+                      <p className="text-xs text-neutral-500">
+                        Session: {enrollment.academic_session.name}
                       </p>
-                      {enrollment.academic_session && (
-                        <p className="text-xs text-neutral-500">
-                          Session: {enrollment.academic_session.name}
-                        </p>
-                      )}
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm font-medium text-neutral-900 capitalize">{enrollment.status}</p>
-                      <p className="text-xs text-neutral-600 capitalize">{enrollment.payment_status}</p>
-                    </div>
+                    )}
                   </div>
-                ))}
-              </div>
-            )}
-          </StateRenderer>
+                  <div className="text-right">
+                    <p className="text-sm font-medium text-neutral-900 capitalize">{enrollment.status}</p>
+                    <p className="text-xs text-neutral-600 capitalize">{enrollment.payment_status}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <p className="text-sm text-neutral-600">No current enrollment found.</p>
+              <p className="text-xs text-neutral-500 mt-2">
+                You can enroll in a skill from the skills page.
+              </p>
+            </div>
+          )}
         </CardBody>
       </Card>
 
       {/* Attendance Summary */}
-      <StateRenderer
-        isLoading={false}
-        error={null}
-        data={data.attendanceSummary}
-        loadingComponent={
-          <Card shadow="sm" className="w-full">
-            <CardBody className="p-6">
-              <Skeleton className="h-32 w-full" />
-            </CardBody>
-          </Card>
-        }
-        emptyComponent={null}
-      >
-        {(summary) => (
-          <Card shadow="sm" className="w-full">
-            <CardHeader className="flex items-center gap-2">
-              <BarChart3 className="h-5 w-5 text-primary" />
-              <p className="text-xl font-medium leading-normal">Attendance Summary</p>
-            </CardHeader>
-            <CardBody className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="text-center p-4 bg-primary-50 rounded-lg">
-                  <p className="text-2xl font-bold text-primary">{summary.totalSessions}</p>
-                  <p className="text-sm text-primary-700">Total Sessions</p>
-                </div>
-                <div className="text-center p-4 bg-success-50 rounded-lg">
-                  <p className="text-2xl font-bold text-success">{summary.attendedSessions}</p>
-                  <p className="text-sm text-success-700">Attended Sessions</p>
-                </div>
-                <div className="text-center p-4 bg-warning-50 rounded-lg">
-                  <p className="text-2xl font-bold text-warning">{summary.attendanceRate}%</p>
-                  <p className="text-sm text-warning-700">Attendance Rate</p>
-                </div>
+      {data.attendanceSummary ? (
+        <Card shadow="sm" className="w-full">
+          <CardHeader className="flex items-center gap-2">
+            <BarChart3 className="h-5 w-5 text-primary" />
+            <p className="text-xl font-medium leading-normal">Attendance Summary</p>
+          </CardHeader>
+          <CardBody className="p-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="text-center p-4 bg-primary-50 rounded-lg">
+                <p className="text-2xl font-bold text-primary">{data.attendanceSummary.totalSessions}</p>
+                <p className="text-sm text-primary-700">Total Sessions</p>
               </div>
-              <div className="mt-4 text-center">
-                <p className="text-sm text-neutral-600">
-                  Last attendance: {new Date(summary.lastAttendance).toLocaleDateString()}
-                </p>
+              <div className="text-center p-4 bg-success-50 rounded-lg">
+                <p className="text-2xl font-bold text-success">{data.attendanceSummary.attendedSessions}</p>
+                <p className="text-sm text-success-700">Attended Sessions</p>
               </div>
-            </CardBody>
-          </Card>
-        )}
-      </StateRenderer>
+              <div className="text-center p-4 bg-warning-50 rounded-lg">
+                <p className="text-2xl font-bold text-warning">{data.attendanceSummary.attendanceRate}%</p>
+                <p className="text-sm text-warning-700">Attendance Rate</p>
+              </div>
+            </div>
+            <div className="mt-4 text-center">
+              <p className="text-sm text-neutral-600">
+                Last attendance: {new Date(data.attendanceSummary.lastAttendance).toLocaleDateString()}
+              </p>
+            </div>
+          </CardBody>
+        </Card>
+      ) : null}
 
       {/* Notifications */}
       <NotificationContainer />
