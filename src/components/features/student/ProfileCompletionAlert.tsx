@@ -1,21 +1,18 @@
 "use client"
 import React from "react"
 import { Card, CardBody, Button } from "@heroui/react"
-import { AlertTriangle, X } from "lucide-react"
+import { AlertCircle, X } from "lucide-react"
 import Link from "next/link"
 
-/**
- * * ProfileCompletionAlert
- * Alert banner for incomplete profiles with link to complete profile.
- * Shows missing fields and provides quick access to profile completion.
- *
- * Props:
- * - profile: Partial<{ matric_number: string; level: number; department: string; faculty: string; phone: string; gender: string }>
- * - dismissible?: boolean
- * - onDismiss?: () => void
- */
 export type ProfileCompletionAlertProps = {
-  profile: Partial<{ matric_number: string; student_level: string; department: string; faculty: string | null; phone: string | null; gender: string | null }>
+  profile: Partial<{ 
+    matric_number: string
+    student_level: string
+    department: string
+    faculty: string | null
+    phone: string | null
+    gender: string | null 
+  }>
   dismissible?: boolean
   onDismiss?: () => void
 }
@@ -23,7 +20,6 @@ export type ProfileCompletionAlertProps = {
 function ProfileCompletionAlert({ profile, dismissible = true, onDismiss }: ProfileCompletionAlertProps) {
   const [isDismissed, setIsDismissed] = React.useState(false)
 
-  // Determine missing fields
   const missingFields = React.useMemo(() => {
     const fields = [] as string[]
     const hasMatric = Boolean((profile.matric_number || '').toString().trim())
@@ -35,21 +31,9 @@ function ProfileCompletionAlert({ profile, dismissible = true, onDismiss }: Prof
     if (!hasMatric) fields.push("Matric Number")
     if (!hasLevel) fields.push("Level")
     if (!hasDepartment) fields.push("Department")
-    // Faculty is treated as optional; remove if business requires it
     if (!hasPhone) fields.push("Phone Number")
     if (!hasGender) fields.push("Gender")
-    console.log('[ProfileCompletionAlert] completeness-check', {
-      values: {
-        matric_number: profile.matric_number,
-        student_level: profile.student_level,
-        department: profile.department,
-        faculty: profile.faculty,
-        phone: profile.phone,
-        gender: profile.gender,
-      },
-      flags: { hasMatric, hasLevel, hasDepartment, hasPhone, hasGender },
-      missingFields: [...fields],
-    })
+    
     return fields
   }, [profile])
 
@@ -58,47 +42,53 @@ function ProfileCompletionAlert({ profile, dismissible = true, onDismiss }: Prof
     onDismiss?.()
   }
 
-  // Don't render if dismissed or no missing fields
   if (isDismissed || missingFields.length === 0) {
     return null
   }
 
   return (
-    <Card className="border-warning bg-warning-50" id="student-profile">
-      <CardBody className="flex flex-row items-center justify-between p-4">
-        <div className="flex items-center gap-3">
-          <AlertTriangle className="h-5 w-5 text-warning" />
-          <div>
-            <p className="text-sm font-medium text-warning-800">
+    <Card 
+      shadow="none"
+      className="border-2 border-warning-300 bg-warning-50"
+    >
+      <CardBody className="p-4">
+        <div className="flex items-start gap-4">
+          <div className="flex-shrink-0 mt-0.5">
+            <AlertCircle className="h-5 w-5 text-warning-600" />
+          </div>
+          
+          <div className="flex-1 min-w-0">
+            <h3 className="text-sm font-semibold text-warning-900 mb-1">
               Complete Your Profile
-            </p>
-            <p className="text-xs text-warning-700">
-              Missing: {missingFields.join(", ")}
+            </h3>
+            <p className="text-sm text-warning-800">
+              Please add the following information: <span className="font-medium">{missingFields.join(", ")}</span>
             </p>
           </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button
-            as={Link}
-            href="/student/profile"
-            color="warning"
-            variant="solid"
-            size="sm"
-            className="text-xs"
-          >
-            Complete Profile
-          </Button>
-          {dismissible && (
+
+          <div className="flex items-center gap-2 flex-shrink-0">
             <Button
-              isIconOnly
-              variant="ghost"
+              as={Link}
+              href="/student/profile"
+              color="warning"
               size="sm"
-              onClick={handleDismiss}
-              className="text-warning-600 hover:text-warning-800"
+              className="font-medium"
             >
-              <X className="h-4 w-4" />
+              Complete Now
             </Button>
-          )}
+            {dismissible && (
+              <Button
+                isIconOnly
+                variant="light"
+                size="sm"
+                onClick={handleDismiss}
+                className="text-warning-700 hover:bg-warning-100"
+                aria-label="Dismiss alert"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
         </div>
       </CardBody>
     </Card>

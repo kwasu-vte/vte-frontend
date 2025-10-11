@@ -1,6 +1,6 @@
 "use client"
 import React from "react"
-import { Input, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip, Avatar } from "@heroui/react"
+import { Input, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip, Avatar, Button } from "@heroui/react"
 import type { SkillGroup, User } from "@/lib/types"
 
 /**

@@ -1,24 +1,14 @@
-// * StatCard Component
-// * Displays key metrics and statistics in a card format
-// * Used for dashboard summaries and key performance indicators
-
 'use client';
 
 import React from 'react';
 import { Card, CardBody } from '@heroui/react';
-import { LucideIcon } from 'lucide-react';
 
 interface StatCardProps {
   title: string;
   value: string | number;
   subtitle?: string;
-  icon?: LucideIcon;
-  trend?: {
-    value: number;
-    isPositive: boolean;
-  };
+  icon?: React.ComponentType<{ className?: string; strokeWidth?: number }>;
   color?: 'primary' | 'success' | 'warning' | 'danger' | 'neutral';
-  size?: 'sm' | 'md' | 'lg';
   className?: string;
 }
 
@@ -27,114 +17,48 @@ export function StatCard({
   value,
   subtitle,
   icon: Icon,
-  trend,
   color = 'neutral',
-  size = 'md',
   className = '',
 }: StatCardProps) {
-  // * Color variants
-  const colorVariants = {
-    primary: {
-      bg: 'bg-primary-50',
-      text: 'text-primary-600',
-      icon: 'text-primary-500',
-      border: 'border-primary-200',
-    },
-    success: {
-      bg: 'bg-green-50',
-      text: 'text-green-600',
-      icon: 'text-green-500',
-      border: 'border-green-200',
-    },
-    warning: {
-      bg: 'bg-yellow-50',
-      text: 'text-yellow-600',
-      icon: 'text-yellow-500',
-      border: 'border-yellow-200',
-    },
-    danger: {
-      bg: 'bg-red-50',
-      text: 'text-red-600',
-      icon: 'text-red-500',
-      border: 'border-red-200',
-    },
-    neutral: {
-      bg: 'bg-neutral-50',
-      text: 'text-neutral-600',
-      icon: 'text-neutral-500',
-      border: 'border-neutral-200',
-    },
+  const colorClasses = {
+    primary: 'bg-primary-50 border-primary-200',
+    success: 'bg-success-50 border-success-200',
+    warning: 'bg-warning-50 border-warning-200',
+    danger: 'bg-danger-50 border-danger-200',
+    neutral: 'bg-default-50 border-default-200',
   };
 
-  // * Size variants
-  const sizeVariants = {
-    sm: {
-      padding: 'p-4',
-      iconSize: 'w-5 h-5',
-      titleSize: 'text-sm',
-      valueSize: 'text-lg',
-      subtitleSize: 'text-xs',
-    },
-    md: {
-      padding: 'p-6',
-      iconSize: 'w-6 h-6',
-      titleSize: 'text-base',
-      valueSize: 'text-2xl',
-      subtitleSize: 'text-sm',
-    },
-    lg: {
-      padding: 'p-8',
-      iconSize: 'w-8 h-8',
-      titleSize: 'text-lg',
-      valueSize: 'text-3xl',
-      subtitleSize: 'text-base',
-    },
+  const iconColorClasses = {
+    primary: 'text-primary-600',
+    success: 'text-success-600',
+    warning: 'text-warning-600',
+    danger: 'text-danger-600',
+    neutral: 'text-default-600',
   };
-
-  const colors = colorVariants[color];
-  const sizes = sizeVariants[size];
 
   return (
     <Card
-      className={`
-        ${colors.bg} ${colors.border} border
-        hover:shadow-md transition-shadow duration-200
-        ${className}
-      `}
+      shadow="none"
+      className={`border ${colorClasses[color]} ${className}`}
     >
-      <CardBody className={`${sizes.padding}`}>
-        <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <p className={`${sizes.titleSize} font-medium ${colors.text} mb-1`}>
+      <CardBody className="p-4">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-medium text-default-600 uppercase tracking-wide mb-1">
               {title}
             </p>
-            <p className={`${sizes.valueSize} font-bold text-neutral-900 mb-1`}>
+            <p className="text-2xl font-bold text-default-900 mb-0.5">
               {value}
             </p>
             {subtitle && (
-              <p className={`${sizes.subtitleSize} text-neutral-500`}>
+              <p className="text-xs text-default-500">
                 {subtitle}
               </p>
             )}
-            {trend && (
-              <div className="flex items-center mt-2">
-                <span
-                  className={`
-                    ${sizes.subtitleSize} font-medium
-                    ${trend.isPositive ? 'text-green-600' : 'text-red-600'}
-                  `}
-                >
-                  {trend.isPositive ? '+' : ''}{trend.value}%
-                </span>
-                <span className={`${sizes.subtitleSize} text-neutral-500 ml-1`}>
-                  vs last period
-                </span>
-              </div>
-            )}
           </div>
           {Icon && (
-            <div className={`${colors.icon} ${sizes.iconSize} flex-shrink-0 ml-4`}>
-              <Icon className="w-full h-full" />
+            <div className={`flex-shrink-0 ${iconColorClasses[color]}`}>
+              <Icon className="h-6 w-6" strokeWidth={2} />
             </div>
           )}
         </div>
@@ -143,40 +67,26 @@ export function StatCard({
   );
 }
 
-// * StatCard Grid Layout Component
 interface StatCardGridProps {
   children: React.ReactNode;
   columns?: 1 | 2 | 3 | 4;
-  gap?: 'sm' | 'md' | 'lg';
   className?: string;
 }
 
 export function StatCardGrid({
   children,
   columns = 4,
-  gap = 'md',
   className = '',
 }: StatCardGridProps) {
-  const gridCols = {
+  const gridColsClasses = {
     1: 'grid-cols-1',
-    2: 'grid-cols-1 md:grid-cols-2',
-    3: 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3',
-    4: 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4',
-  };
-
-  const gapSizes = {
-    sm: 'gap-4',
-    md: 'gap-6',
-    lg: 'gap-8',
+    2: 'grid-cols-1 sm:grid-cols-2',
+    3: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3',
+    4: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4',
   };
 
   return (
-    <div
-      className={`
-        grid ${gridCols[columns]} ${gapSizes[gap]}
-        ${className}
-      `}
-    >
+    <div className={`grid ${gridColsClasses[columns]} gap-4 ${className}`}>
       {children}
     </div>
   );

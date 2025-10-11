@@ -1,184 +1,139 @@
-// * Student Dashboard Client Component
-// * Modern dashboard following admin/mentor design patterns
-// * Uses composite data hook for optimized data fetching
-
 'use client';
 
 import React from 'react';
+import { Card, CardBody, Button, Chip, Spinner } from '@heroui/react';
+import { 
+  BookOpen, Users, QrCode, Calendar, User, 
+  RefreshCw, AlertCircle, CheckCircle2, Clock 
+} from 'lucide-react';
 import { useStudentDashboardData } from '@/lib/hooks/use-student-dashboard-data';
-import { ProfileCompletionAlert } from '@/components/features/student/ProfileCompletionAlert';
-import { ProfileCompletionModal } from '@/components/features/student/ProfileCompletionModal';
-import { QuickActions } from '@/components/features/student/QuickActions';
-import { NotificationContainer } from '@/components/shared/NotificationContainer';
-import { StatCard, StatCardGrid } from '@/components/shared/StatCard';
-import { Card, CardBody, Button, Chip } from '@heroui/react';
-import Link from 'next/link';
-import { useQueryClient } from '@tanstack/react-query';
 
 interface StudentDashboardClientProps {
   userId: string;
 }
 
 export function StudentDashboardClient({ userId }: StudentDashboardClientProps) {
-  const { profile, enrollment, upcomingPracticals, isLoading, error } = useStudentDashboardData(userId);
-  const queryClient = useQueryClient();
-  const refetchAll = async () => {
-    await Promise.all([
-      queryClient.invalidateQueries({ queryKey: ['student-profile', 'me'] }),
-      queryClient.invalidateQueries({ queryKey: ['student-enrollment', userId] }),
-    ]);
+  const { profile, enrollment, upcomingPracticals, error, isLoading } = useStudentDashboardData(userId);
+  const [isRefreshing, setIsRefreshing] = React.useState(false);
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    setIsRefreshing(false);
   };
 
-  // * Calculate key metrics for StatCards
-  const enrollmentStatus = enrollment?.status || 'Not Enrolled';
-  const upcomingCount = upcomingPracticals.length;
-  const groupNumber = enrollment?.group?.group_number || enrollment?.group?.id || '—';
-  const groupSize = enrollment?.group?.current_student_count || '0';
+  // * Show loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-default-50 p-4 md:p-6 flex items-center justify-center">
+        <div className="text-center">
+          <Spinner size="lg" />
+          <p className="text-default-600 mt-4">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
-  return (
-    <div className="space-y-4">
-      {/* * Header */}
-      <div className="bg-white p-4 rounded-lg shadow-sm border border-neutral-200">
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold text-neutral-900">Student Dashboard</h1>
-            <p className="text-sm text-neutral-600">
-              {enrollment ? `${enrollment.skill?.title || 'Unknown Skill'} - ${enrollmentStatus}` : 'Not Enrolled'}
-            </p>
-          </div>
-          <Button
-            color="primary"
-            variant="bordered"
-            size="sm"
-            isDisabled={isLoading}
-            onPress={refetchAll}
-          >
-            {isLoading ? 'Refreshing…' : 'Refresh'}
+  // * Show error state
+  if (error) {
+    return (
+      <div className="min-h-screen bg-default-50 p-4 md:p-6 flex items-center justify-center">
+        <div className="text-center">
+          <AlertCircle className="h-12 w-12 text-danger mx-auto mb-4" />
+          <h3 className="text-lg font-semibold text-default-900 mb-2">Error Loading Dashboard</h3>
+          <p className="text-default-600 mb-4">{error.message}</p>
+          <Button color="primary" onPress={handleRefresh}>
+            Try Again
           </Button>
         </div>
       </div>
+    );
+  }
 
-      {/* * Stats */}
-      <StatCardGrid columns={4}>
+  const enrollmentStatus = enrollment?.status || 'Not Enrolled';
+  const upcomingCount = upcomingPracticals.length;
+  const groupNumber = enrollment?.group?.group_number || '—';
+  const groupSize = enrollment?.group?.current_student_count || '0';
+
+  return (
+    <div className="min-h-screen bg-default-50 p-4 md:p-6 space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-default-900">Dashboard</h1>
+          <p className="text-sm text-default-600 mt-1">
+            {enrollment ? `${enrollment.skill?.title} - ${enrollmentStatus}` : 'Welcome back'}
+          </p>
+        </div>
+        <Button
+          color="default"
+          variant="flat"
+          size="sm"
+          isLoading={isRefreshing}
+          startContent={!isRefreshing && <RefreshCw className="h-4 w-4" />}
+          onPress={handleRefresh}
+        >
+          Refresh
+        </Button>
+      </div>
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard 
           title="Status" 
-          value={enrollmentStatus} 
-          color={enrollment ? "success" : "neutral"}
-          size="sm"
+          value={enrollmentStatus}
+          icon={enrollment ? CheckCircle2 : AlertCircle}
+          color={enrollment ? "success" : "default"}
         />
         <StatCard 
           title="Group" 
-          value={groupNumber} 
-          color={enrollment?.group ? "primary" : "neutral"}
-          size="sm"
+          value={groupNumber}
+          icon={Users}
+          color={enrollment?.group ? "primary" : "default"}
         />
         <StatCard 
-          title="Practicals" 
-          value={upcomingCount.toString()} 
-          color={upcomingCount > 0 ? "warning" : "neutral"}
-          size="sm"
+          title="Upcoming" 
+          value={upcomingCount}
+          icon={Clock}
+          color={upcomingCount > 0 ? "warning" : "default"}
         />
         <StatCard 
           title="Group Size" 
-          value={groupSize} 
-          color="neutral"
-          size="sm"
+          value={groupSize}
+          icon={Users}
+          color="default"
         />
-      </StatCardGrid>
+      </div>
 
-      {/* Profile Completion - Temporarily disabled to debug StateRenderer error */}
-      {/* {profile && (
-        <>
-          <ProfileCompletionModal profile={profile as any} />
-          <ProfileCompletionAlert 
-            profile={profile as any}
-            dismissible={true}
-          />
-        </>
-      )} */}
-
-      {/* * Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* * Left Column */}
+      {/* Main Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left Column - Main Content */}
         <div className="lg:col-span-2 space-y-4">
-          {/* * Next Step */}
+          {/* Next Step Card */}
           <Card shadow="sm">
-            <CardBody className="p-4">
-              {(() => {
-                const status = (enrollment?.status || '').toString().toLowerCase()
-                const payStatus = (enrollment?.payment_status || '').toString().toLowerCase()
-                let title = 'All set!'
-                let desc = 'Check your upcoming practicals and group details.'
-                let ctaHref: string | null = null
-                let ctaLabel = ''
-                let color: 'primary' | 'success' | 'warning' | 'danger' = 'success'
-
-                if (!profile) {
-                  title = 'Complete Profile'
-                  desc = 'Add your details to enable enrollment.'
-                  ctaHref = '/student/profile'
-                  ctaLabel = 'Complete'
-                  color = 'primary'
-                } else if (!enrollment) {
-                  title = 'Enroll in Skill'
-                  desc = 'Choose a practical training program.'
-                  ctaHref = '/student/skills'
-                  ctaLabel = 'Browse'
-                  color = 'primary'
-                } else if (payStatus === 'failed') {
-                  title = 'Payment Failed'
-                  desc = 'Retry your payment to continue.'
-                  ctaHref = '/student/enrollment'
-                  ctaLabel = 'Retry'
-                  color = 'danger'
-                } else if (payStatus.includes('pending') || payStatus === 'unpaid' || status === 'unpaid' || status.includes('pending')) {
-                  title = 'Payment Pending'
-                  desc = 'Complete payment to secure your spot.'
-                  ctaHref = '/student/enrollment'
-                  ctaLabel = 'Pay'
-                  color = 'warning'
-                } else if (['paid','assigned','active'].includes(status)) {
-                  const awaitingGroup = status === 'paid' && !enrollment.group?.id
-                  title = awaitingGroup ? 'Awaiting Group' : 'Group Assigned'
-                  desc = awaitingGroup ? 'You will be assigned soon.' : 'Check your group details.'
-                  ctaHref = awaitingGroup ? '/student/enrollment' : '/student/my-group'
-                  ctaLabel = awaitingGroup ? 'View' : 'View Group'
-                  color = 'success'
-                } else if (status === 'cancelled') {
-                  title = 'Enrollment Cancelled'
-                  desc = 'Choose another skill to enroll.'
-                  ctaHref = '/student/skills'
-                  ctaLabel = 'Browse'
-                  color = 'warning'
-                }
-
-                return (
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium text-neutral-900">{title}</p>
-                      <p className="text-sm text-neutral-600">{desc}</p>
-                    </div>
-                    {ctaHref && (
-                      <Button as={Link} href={ctaHref} color={color} size="sm">
-                        {ctaLabel}
-                      </Button>
-                    )}
-                  </div>
-                )
-              })()}
+            <CardBody className="p-5">
+              <NextStepContent profile={profile} enrollment={enrollment} />
             </CardBody>
           </Card>
 
-          {/* * Enrollment Status */}
+          {/* Enrollment Details */}
           {enrollment && (
             <Card shadow="sm">
-              <CardBody className="p-4">
+              <CardBody className="p-5">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="font-medium text-neutral-900">{enrollment.skill?.title || 'Unknown Skill'}</p>
-                    <p className="text-sm text-neutral-600">Status: {enrollment.status}</p>
+                    <h3 className="font-semibold text-default-900 mb-1">
+                      {enrollment.skill?.title}
+                    </h3>
+                    <p className="text-sm text-default-600">
+                      Group {groupNumber} • {groupSize} students
+                    </p>
                   </div>
-                  <Chip color={enrollment.status === 'active' ? 'success' : 'primary'} size="sm">
+                  <Chip 
+                    color={enrollment.status === 'active' ? 'success' : 'primary'}
+                    variant="flat"
+                    size="sm"
+                  >
                     {enrollment.status}
                   </Chip>
                 </div>
@@ -186,54 +141,242 @@ export function StudentDashboardClient({ userId }: StudentDashboardClientProps) 
             </Card>
           )}
 
-          {/* * Upcoming Practicals */}
+          {/* Upcoming Practicals */}
           {enrollment && upcomingPracticals.length > 0 && (
             <Card shadow="sm">
-              <CardBody className="p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <p className="font-medium text-neutral-900">Upcoming Practicals</p>
-                  <Chip size="sm" variant="flat">{upcomingPracticals.length}</Chip>
+              <CardBody className="p-5">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-semibold text-default-900">
+                    Upcoming Sessions
+                  </h3>
+                  <Chip size="sm" variant="flat">
+                    {upcomingPracticals.length}
+                  </Chip>
                 </div>
-                <div className="space-y-2">
-                  {upcomingPracticals.slice(0, 3).map((practical, index) => (
-                    <div key={index} className="flex items-center justify-between text-sm">
-                      <span className="text-neutral-900">{practical.skill}</span>
-                      <span className="text-neutral-600">
-                        {new Date(practical.date).toLocaleDateString()}
+                <div className="space-y-3">
+                  {upcomingPracticals.map((practical, idx) => (
+                    <div 
+                      key={idx}
+                      className="flex items-center justify-between p-3 rounded-lg bg-default-100"
+                    >
+                      <span className="font-medium text-sm text-default-900">
+                        {practical.skill}
+                      </span>
+                      <span className="text-sm text-default-600">
+                        {new Date(practical.date).toLocaleDateString('en-US', {
+                          month: 'short',
+                          day: 'numeric'
+                        })}
                       </span>
                     </div>
                   ))}
-                  {upcomingPracticals.length > 3 && (
-                    <p className="text-xs text-neutral-500 text-center">
-                      +{upcomingPracticals.length - 3} more
-                    </p>
-                  )}
                 </div>
               </CardBody>
             </Card>
           )}
         </div>
 
-        {/* * Right Column */}
-        <div className="lg:col-span-1 space-y-4">
-          {/* * Quick Actions */}
+        {/* Right Column - Quick Actions */}
+        <div className="lg:col-span-1">
           <Card shadow="sm">
-            <CardBody className="p-4">
-              <p className="font-medium text-neutral-900 mb-3">Quick Actions</p>
-              <QuickActions 
-                enrollment={enrollment ? {
-                  status: enrollment.status,
-                  group: enrollment.group?.id ? { id: enrollment.group.id.toString() } : undefined
-                } : undefined}
-                hasProfile={!!profile}
-              />
+            <CardBody className="p-5">
+              <h3 className="font-semibold text-default-900 mb-4">Quick Actions</h3>
+              <QuickActionButtons enrollment={enrollment} />
             </CardBody>
           </Card>
         </div>
       </div>
+    </div>
+  );
+}
 
-      {/* * Notifications - Temporarily disabled to debug StateRenderer error */}
-      {/* <NotificationContainer /> */}
+function StatCard({ title, value, icon: Icon, color }: any) {
+  const colorClasses = {
+    success: 'bg-success-50 border-success-200 text-success-600',
+    primary: 'bg-primary-50 border-primary-200 text-primary-600',
+    warning: 'bg-warning-50 border-warning-200 text-warning-600',
+    default: 'bg-default-100 border-default-200 text-default-600',
+  };
+
+  return (
+    <Card shadow="none" className={`border ${colorClasses[color]?.split(' ')[1] || 'border-default-200'}`}>
+      <CardBody className="p-4">
+        <div className="flex items-start justify-between">
+          <div className="flex-1">
+            <p className="text-xs font-medium text-default-600 uppercase mb-1">
+              {title}
+            </p>
+            <p className="text-xl font-bold text-default-900">{value}</p>
+          </div>
+          {Icon && (
+            <Icon className={`h-5 w-5 ${colorClasses[color]?.split(' ')[2] || 'text-default-600'}`} />
+          )}
+        </div>
+      </CardBody>
+    </Card>
+  );
+}
+
+function NextStepContent({ profile, enrollment }: any) {
+  const status = (enrollment?.status || '').toString().toLowerCase();
+  const payStatus = (enrollment?.payment_status || '').toString().toLowerCase();
+  
+  let config = {
+    title: 'All Set!',
+    description: 'Check your upcoming sessions and group details.',
+    ctaLabel: '',
+    ctaHref: '',
+    color: 'success' as const,
+    icon: CheckCircle2,
+  };
+
+  if (!profile) {
+    config = {
+      title: 'Complete Your Profile',
+      description: 'Add your details to enable enrollment in skills.',
+      ctaLabel: 'Complete Profile',
+      ctaHref: '/student/profile',
+      color: 'primary',
+      icon: User,
+    };
+  } else if (!enrollment) {
+    config = {
+      title: 'Enroll in a Skill',
+      description: 'Choose a practical training program to get started.',
+      ctaLabel: 'Browse Skills',
+      ctaHref: '/student/skills',
+      color: 'primary',
+      icon: BookOpen,
+    };
+  } else if (payStatus === 'failed') {
+    config = {
+      title: 'Payment Failed',
+      description: 'Please retry your payment to continue with enrollment.',
+      ctaLabel: 'Retry Payment',
+      ctaHref: '/student/enrollment',
+      color: 'danger',
+      icon: AlertCircle,
+    };
+  } else if (payStatus.includes('pending') || payStatus === 'unpaid' || status === 'unpaid' || status.includes('pending')) {
+    config = {
+      title: 'Payment Pending',
+      description: 'Complete your payment to secure your spot.',
+      ctaLabel: 'Complete Payment',
+      ctaHref: '/student/enrollment',
+      color: 'warning',
+      icon: Clock,
+    };
+  } else if (['paid', 'assigned', 'active'].includes(status)) {
+    const awaitingGroup = status === 'paid' && !enrollment.group?.id;
+    config = {
+      title: awaitingGroup ? 'Awaiting Group Assignment' : 'Group Assigned',
+      description: awaitingGroup ? 'You will be assigned to a group soon.' : 'View your group details and schedule.',
+      ctaLabel: awaitingGroup ? 'View Status' : 'View Group',
+      ctaHref: awaitingGroup ? '/student/enrollment' : '/student/my-group',
+      color: 'success',
+      icon: awaitingGroup ? Clock : Users,
+    };
+  } else if (status === 'cancelled') {
+    config = {
+      title: 'Enrollment Cancelled',
+      description: 'Browse and enroll in another skill.',
+      ctaLabel: 'Browse Skills',
+      ctaHref: '/student/skills',
+      color: 'warning',
+      icon: AlertCircle,
+    };
+  }
+
+  const Icon = config.icon;
+
+  return (
+    <div className="flex items-start gap-4">
+      <div className={`flex-shrink-0 p-2 rounded-lg ${
+        config.color === 'success' ? 'bg-success-100' :
+        config.color === 'primary' ? 'bg-primary-100' :
+        config.color === 'warning' ? 'bg-warning-100' :
+        config.color === 'danger' ? 'bg-danger-100' : 'bg-default-100'
+      }`}>
+        <Icon className={`h-5 w-5 ${
+          config.color === 'success' ? 'text-success-600' :
+          config.color === 'primary' ? 'text-primary-600' :
+          config.color === 'warning' ? 'text-warning-600' :
+          config.color === 'danger' ? 'text-danger-600' : 'text-default-600'
+        }`} />
+      </div>
+      <div className="flex-1">
+        <h3 className="font-semibold text-default-900 mb-1">{config.title}</h3>
+        <p className="text-sm text-default-600 mb-3">{config.description}</p>
+        {config.ctaHref && (
+          <Button
+            as="a"
+            href={config.ctaHref}
+            color={config.color}
+            size="sm"
+            variant="flat"
+          >
+            {config.ctaLabel}
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function QuickActionButtons({ enrollment }: any) {
+  const actions = [
+    {
+      label: 'Browse Skills',
+      href: '/student/skills',
+      icon: BookOpen,
+      color: 'primary' as const,
+    },
+    {
+      label: 'My Profile',
+      href: '/student/profile',
+      icon: User,
+      color: 'default' as const,
+    },
+  ];
+
+  if (enrollment?.group) {
+    actions.push(
+      {
+        label: 'My Group',
+        href: '/student/my-group',
+        icon: Users,
+        color: 'primary' as const,
+      },
+      {
+        label: 'Mark Attendance',
+        href: '/student/scan-qr',
+        icon: QrCode,
+        color: 'success' as const,
+      },
+      {
+        label: 'View Schedule',
+        href: '/student/schedule',
+        icon: Calendar,
+        color: 'default' as const,
+      }
+    );
+  }
+
+  return (
+    <div className="space-y-2">
+      {actions.map((action) => (
+        <Button
+          key={action.label}
+          as="a"
+          href={action.href}
+          color={action.color}
+          variant="flat"
+          className="w-full justify-start"
+          startContent={<action.icon className="h-4 w-4" />}
+        >
+          {action.label}
+        </Button>
+      ))}
     </div>
   );
 }
