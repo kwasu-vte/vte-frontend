@@ -15,10 +15,29 @@ export const authApi = {
     });
   },
 
-  refresh: (): Promise<ApiResponse<{ access_token: string }>> => {
-    return apiRequest('v1/users/auth/refresh', {
-      method: 'POST',
-    });
+  refresh: async (): Promise<ApiResponse<{ access_token: string }>> => {
+    // * Get current access token from cookie for refresh calls
+    if (typeof window === 'undefined') {
+      const { cookies } = await import('next/headers');
+      const cookieStore = await cookies();
+      const accessToken = cookieStore.get('session_token');
+      
+      if (!accessToken) {
+        throw new Error('No access token available for refresh');
+      }
+      
+      return apiRequest('v1/users/auth/refresh', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${accessToken.value}`,
+        },
+      });
+    } else {
+      // * Client-side: let the proxy handle access token from cookie
+      return apiRequest('v1/users/auth/refresh', {
+        method: 'POST',
+      });
+    }
   },
 
   getCurrentUser: async (): Promise<ApiResponse<User>> => {

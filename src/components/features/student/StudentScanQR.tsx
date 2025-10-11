@@ -9,8 +9,8 @@ import { enrollmentsApi } from '@/lib/api';
 import { StudentQRScanner } from '@/components/features/student/StudentQRScanner';
 import { NotificationContainer } from '@/components/shared/NotificationContainer';
 import { StateRenderer } from '@/components/shared/StateRenderer';
-import { Card, CardBody, CardHeader, Skeleton, Button } from '@heroui/react';
-import { ArrowLeft, QrCode, Users, Calendar, AlertCircle } from 'lucide-react';
+import { Card, CardBody, Skeleton, Button } from '@heroui/react';
+import { ArrowLeft, QrCode, Users, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -141,112 +141,14 @@ export default function StudentScanQR({ userId }: StudentScanQRProps) {
           }
 
           return (
-            <div className="space-y-6">
-              {/* QR Scanner */}
-              <div className="flex justify-center">
-                <StudentQRScanner
-                  studentId={userId}
-                  onScanSuccess={handleScanSuccess}
-                  onScanError={handleScanError}
-                  requiredScansToday={3} // This would come from enrollment/group data
-                  completedScansToday={0} // This would come from attendance data
-                />
-              </div>
-
-              {/* Instructions */}
-              <Card shadow="sm" className="w-full">
-                <CardHeader className="flex items-center gap-2">
-                  <AlertCircle className="h-5 w-5 text-primary" />
-                  <p className="text-xl font-medium leading-normal">How to Scan</p>
-                </CardHeader>
-                <CardBody className="p-6">
-                  <div className="space-y-4">
-                    <div className="space-y-3">
-                      <div className="flex items-start gap-3">
-                        <div className="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-sm font-medium">
-                          1
-                        </div>
-                        <div>
-                          <p className="font-medium text-neutral-900">Get the QR Code</p>
-                          <p className="text-sm text-neutral-600">
-                            Ask your mentor for the QR code displayed on their device or printed material.
-                          </p>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-start gap-3">
-                        <div className="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-sm font-medium">
-                          2
-                        </div>
-                        <div>
-                          <p className="font-medium text-neutral-900">Enter the Token</p>
-                          <p className="text-sm text-neutral-600">
-                            If camera scanning is unavailable, enter the token printed under the QR code.
-                          </p>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-start gap-3">
-                        <div className="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-sm font-medium">
-                          3
-                        </div>
-                        <div>
-                          <p className="font-medium text-neutral-900">Submit</p>
-                          <p className="text-sm text-neutral-600">
-                            Click submit to record your attendance and earn points.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="bg-blue-50 p-4 rounded-lg">
-                      <div className="flex items-start gap-2">
-                        <AlertCircle className="h-4 w-4 text-blue-600 mt-1" />
-                        <div className="text-sm text-blue-800">
-                          <p className="font-medium">Important Notes:</p>
-                          <ul className="mt-1 space-y-1">
-                            <li>• Each QR code can only be scanned once per student</li>
-                            <li>• QR codes expire after a certain time period</li>
-                            <li>• Make sure you&apos;re scanning the correct QR code for your group</li>
-                            <li>• Contact your mentor if you encounter any issues</li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </CardBody>
-              </Card>
-
-              {/* Group Information */}
-              <Card shadow="sm" className="w-full">
-                <CardHeader className="flex items-center gap-2">
-                  <Users className="h-5 w-5 text-primary" />
-                  <p className="text-xl font-medium leading-normal">Your Group</p>
-                </CardHeader>
-                <CardBody className="p-6">
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-neutral-600">Skill</span>
-                      <span className="font-medium text-neutral-900">
-                        {enrollment.skill?.title || 'Unknown Skill'}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-neutral-600">Group ID</span>
-                      <span className="font-medium text-neutral-900">
-                        {enrollment.group_id ? `Group ${enrollment.group_id}` : 'Not assigned'}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-neutral-600">Status</span>
-                      <span className="capitalize text-success-600 font-medium">
-                        {enrollment.status}
-                      </span>
-                    </div>
-                  </div>
-                </CardBody>
-              </Card>
-            </div>
+            <StudentQRScanner
+              studentId={userId}
+              onScanSuccess={handleScanSuccess}
+              onScanError={handleScanError}
+              requiredScansToday={3} // This would come from enrollment/group data
+              completedScansToday={0} // This would come from attendance data
+              enrollment={enrollment}
+            />
           );
         }}
       </StateRenderer>

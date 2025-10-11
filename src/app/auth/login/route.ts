@@ -30,17 +30,17 @@ export async function POST(request: NextRequest) {
     });
 
     const loginJson = await loginRes.json().catch(() => ({}));
-    const token = loginJson?.data?.access_token || loginJson?.access_token || null;
+    const accessToken = loginJson?.data?.access_token || loginJson?.access_token || null;
     const expiresIn = Number(loginJson?.data?.expires_in ?? loginJson?.expires_in ?? (remember ? 60 * 60 * 24 * 30 : 60 * 60 * 24 * 7));
 
-    if (!loginRes.ok || !token) {
+    if (!loginRes.ok || !accessToken) {
       const message = loginJson?.message || 'Authentication failed';
       return NextResponse.json({ success: false, message }, { status: loginRes.status || 401 });
     }
 
     // * Immediately check user to compute redirect target
     const meRes = await fetch(`${request.nextUrl.origin}/api/v1/users/auth/me`, {
-      headers: { 'Accept': 'application/json', 'Authorization': `Bearer ${token}` },
+      headers: { 'Accept': 'application/json', 'Authorization': `Bearer ${accessToken}` },
     });
     const meJson = await meRes.json().catch(() => ({}));
     const role = String(meJson?.data?.role || '').toLowerCase();
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
     // * Build redirect response and set cookie on the browser response
     const redirectUrl = new URL(request.nextUrl.searchParams.get('redirect') || redirectTarget, request.nextUrl.origin);
     const resp = NextResponse.redirect(redirectUrl);
-    resp.cookies.set('session_token', token, cookieOptions(isNaN(expiresIn) ? (remember ? 60 * 60 * 24 * 30 : 60 * 60 * 24 * 7) : expiresIn));
+    resp.cookies.set('session_token', accessToken, cookieOptions(isNaN(expiresIn) ? (remember ? 60 * 60 * 24 * 30 : 60 * 60 * 24 * 7) : expiresIn));
     return resp;
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Login failed';
