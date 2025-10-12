@@ -3,7 +3,7 @@
 import React from 'react'
 import { SkillSelectionGrid } from '@/components/features/student/SkillSelectionGrid'
 import { useRouter } from 'next/navigation'
-import SkillDetailModal from '@/components/features/student/SkillDetailModal'
+import { SkillDetailModal } from '@/components/features/student/SkillSelectionGrid'
 
 interface StudentSkillsClientProps {
   availableSkills: any[]

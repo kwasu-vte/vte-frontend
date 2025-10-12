@@ -1,360 +1,402 @@
-// * Student Dashboard Client Component
-// * Uses composite data hook for optimized data fetching
-
 'use client';
 
 import React from 'react';
+import { Card, CardBody, Button, Chip, Spinner } from '@heroui/react';
+import { 
+  BookOpen, Users, QrCode, Calendar, User, 
+  RefreshCw, AlertCircle, CheckCircle2, Clock 
+} from 'lucide-react';
 import { useStudentDashboardData } from '@/lib/hooks/use-student-dashboard-data';
-import { ProfileCompletionAlert } from '@/components/features/student/ProfileCompletionAlert';
-import { ProfileCompletionModal } from '@/components/features/student/ProfileCompletionModal';
-import { EnrollmentStatus } from '@/components/features/student/EnrollmentStatus';
-import { GroupAssignmentCard } from '@/components/features/student/GroupAssignmentCard';
-import { QuickActions } from '@/components/features/student/QuickActions';
-import { NotificationContainer } from '@/components/shared/NotificationContainer';
-import { StateRenderer } from '@/components/shared/StateRenderer';
-import { Card, CardBody, CardHeader, Skeleton, Button, Chip } from '@heroui/react';
-import { ListSkeleton, CardGridSkeleton } from '@/components/shared/Skeletons';
-import Link from 'next/link';
-import { BookOpen, CreditCard, Users } from 'lucide-react';
-import { useQueryClient } from '@tanstack/react-query';
 
 interface StudentDashboardClientProps {
   userId: string;
 }
 
 export function StudentDashboardClient({ userId }: StudentDashboardClientProps) {
-  const { profile, enrollment, isLoading, error } = useStudentDashboardData(userId);
-  const queryClient = useQueryClient();
-  const refetchAll = async () => {
-    await Promise.all([
-      queryClient.invalidateQueries({ queryKey: ['student-profile', 'me'] }),
-      queryClient.invalidateQueries({ queryKey: ['student-enrollment', userId] }),
-    ]);
+  const { profile, enrollment, upcomingPracticals, error, isLoading } = useStudentDashboardData(userId);
+  const [isRefreshing, setIsRefreshing] = React.useState(false);
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    setIsRefreshing(false);
   };
 
-  return (
-    <div className="space-y-6">
-      {/* Page Hero */}
-      <div id="student-welcome" className="rounded-xl bg-gradient-to-r from-primary-50 to-neutral-50 border border-neutral-200 p-5">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-neutral-900">Welcome back</h1>
-            <p className="text-neutral-600 mt-1">Track your enrollment, group, and upcoming practicals at a glance.</p>
-            <div className="mt-3" />
-          </div>
-          <div className="shrink-0">
-            <Button
-              variant="bordered"
-              color="primary"
-              size="sm"
-              aria-label="Refresh dashboard data"
-              isDisabled={isLoading}
-              onPress={refetchAll}
-            >
-              {isLoading ? 'Refreshing…' : 'Refresh'}
-            </Button>
-          </div>
+  // * Show loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-default-50 p-4 md:p-6 flex items-center justify-center">
+        <div className="text-center">
+          <Spinner size="lg" />
+          <p className="text-default-600 mt-4">Loading dashboard...</p>
         </div>
       </div>
+    );
+  }
 
-      {/* Guidance */}
-      <div className="bg-blue-50 border border-blue-200 text-blue-800 rounded-md p-3 text-sm">
-        Tip: The card below shows your next step. Complete your profile, finish payment, or review your group to keep moving.
+  // * Show error state
+  if (error) {
+    return (
+      <div className="min-h-screen bg-default-50 p-4 md:p-6 flex items-center justify-center">
+        <div className="text-center">
+          <AlertCircle className="h-12 w-12 text-danger mx-auto mb-4" />
+          <h3 className="text-lg font-semibold text-default-900 mb-2">Error Loading Dashboard</h3>
+          <p className="text-default-600 mb-4">{error.message}</p>
+          <Button color="primary" onPress={handleRefresh}>
+            Try Again
+          </Button>
+        </div>
       </div>
+    );
+  }
 
-      {/* Profile Completion - Permanent Modal + Dismissible Banner */}
-      {profile && (
-        <>
-          <ProfileCompletionModal profile={profile as any} />
-          <ProfileCompletionAlert 
-            profile={profile as any}
-            dismissible={true}
-          />
-        </>
-      )}
+  const enrollmentStatus = enrollment?.status || 'Not Enrolled';
+  const upcomingCount = upcomingPracticals.length;
+  const groupNumber = enrollment?.group?.group_number || '—';
+  const groupSize = '—'; // Group size not available in enrollment data
 
-      {/* Guided Next Step Callout */}
-      <div>
-        <StateRenderer
-          data={{ profile, enrollment }}
-          isLoading={isLoading}
-          error={error}
-          onRetry={() => window.location.reload()}
-          loadingComponent={null}
-          emptyComponent={null}
+  return (
+    <div className="min-h-screen bg-default-50 p-4 md:p-6 space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-default-900">Dashboard</h1>
+          <p className="text-sm text-default-600 mt-1">
+            {enrollment ? `${enrollment.skill?.title} - ${enrollmentStatus}` : 'Welcome back'}
+          </p>
+        </div>
+        <Button
+          color="default"
+          variant="flat"
+          size="sm"
+          isLoading={isRefreshing}
+          startContent={!isRefreshing && <RefreshCw className="h-4 w-4" />}
+          onPress={handleRefresh}
         >
-          {() => {
-            const status = (enrollment?.status || '').toString().toLowerCase()
-            const payStatus = (enrollment?.payment_status || '').toString().toLowerCase()
-            let title = 'You are all set'
-            let desc = 'Explore your dashboard to see upcoming practicals and quick actions.'
-            let ctaHref: string | null = null
-            let ctaLabel = ''
-
-            if (!profile) {
-              title = 'Complete your profile'
-              desc = 'Add your details to get personalized guidance and enable enrollment.'
-              ctaHref = '/student/profile'
-              ctaLabel = 'Complete Profile'
-            } else if (!enrollment) {
-              title = 'Enroll in a skill'
-              desc = 'Choose a practical training program to get started.'
-              ctaHref = '/student/skills'
-              ctaLabel = 'Browse Skills'
-            } else if (payStatus === 'failed') {
-              title = 'Payment failed'
-              desc = 'Retry your payment to continue with your enrollment.'
-              ctaHref = '/student/enrollment'
-              ctaLabel = 'Retry Payment'
-            } else if (payStatus.includes('pending') || payStatus === 'unpaid' || status === 'unpaid' || status.includes('pending')) {
-              title = 'Payment pending'
-              desc = 'Complete your payment to secure your spot.'
-              ctaHref = '/student/enrollment'
-              ctaLabel = 'Go to Payment'
-            } else if (['paid','assigned','active'].includes(status)) {
-              const awaitingGroup = status === 'paid' && !enrollment.group?.id
-              title = awaitingGroup ? 'Awaiting group assignment' : 'Group assigned'
-              desc = awaitingGroup ? 'You will be assigned to a group soon.' : 'Review your group and schedule.'
-              ctaHref = awaitingGroup ? '/student/enrollment' : '/student/my-group'
-              ctaLabel = awaitingGroup ? 'View Enrollment' : 'View Group'
-            } else if (status === 'cancelled') {
-              title = 'Enrollment cancelled'
-              desc = 'You can choose another skill and enroll again.'
-              ctaHref = '/student/skills'
-              ctaLabel = 'Browse Skills'
-            }
-
-            return (
-              <Card shadow="sm" className="w-full border-primary-200 bg-primary-50">
-                <CardHeader className="flex items-center justify-between px-4 pt-4">
-                  <div>
-                    <p className="text-lg font-medium leading-normal">{title}</p>
-                    <p className="text-sm text-neutral-700 mt-1">{desc}</p>
-                  </div>
-                  {ctaHref && (
-                    <Button as={Link} href={ctaHref} color="primary" size="sm">
-                      {ctaLabel}
-                    </Button>
-                  )}
-                </CardHeader>
-              </Card>
-            )
-          }}
-        </StateRenderer>
+          Refresh
+        </Button>
       </div>
 
-      {/* Main Dashboard Grid */}
+      {/* Stats Grid */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard 
+          title="Status" 
+          value={enrollmentStatus}
+          icon={enrollment ? CheckCircle2 : AlertCircle}
+          color={enrollment ? "success" : "default"}
+        />
+        <StatCard 
+          title="Group" 
+          value={groupNumber}
+          icon={Users}
+          color={enrollment?.group ? "primary" : "default"}
+        />
+        <StatCard 
+          title="Upcoming" 
+          value={upcomingCount}
+          icon={Clock}
+          color={upcomingCount > 0 ? "warning" : "default"}
+        />
+        <StatCard 
+          title="Group Size" 
+          value={groupSize}
+          icon={Users}
+          color="default"
+        />
+      </div>
+
+      {/* Main Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column - Status Cards */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Enrollment Status */}
-          <Card shadow="sm" className="w-full" id="student-enrollment-status">
-            <CardHeader className="px-4 pt-4">
-              <p className="text-base font-medium text-neutral-900">Enrollment Overview</p>
-            </CardHeader>
-            <CardBody className="p-4">
-              <StateRenderer
-                data={enrollment}
-                isLoading={isLoading}
-                error={error}
-                onRetry={refetchAll}
-                loadingComponent={<div className="py-2"><ListSkeleton rows={2} /></div>}
-                emptyComponent={
-                  <Card shadow="sm" className="w-full border-primary-200 bg-primary-50">
-                    <CardHeader className="flex items-center gap-3">
-                      <BookOpen className="h-6 w-6 text-primary" />
-                      <div>
-                        <p className="text-lg font-medium leading-normal">No Active Enrollment</p>
-                        <p className="text-sm text-neutral-700">You haven&apos;t enrolled in any skills yet. Browse available skills to get started.</p>
-                      </div>
-                    </CardHeader>
-                    <CardBody className="p-6">
-                      <div className="flex items-center justify-end">
-                        <Button as={Link} href="/student/skills" color="primary" variant="solid">Browse Skills</Button>
-                      </div>
-                    </CardBody>
-                  </Card>
-                }
-              >
-                {(enrollment) => (
-                  <div className="space-y-4">
-                    <EnrollmentStatus 
-                      enrollment={{
-                        id: enrollment.id.toString(),
-                        skillName: enrollment.skill?.title || 'Unknown Skill',
-                        status: enrollment.status.toUpperCase() as any,
-                        paymentStatus: enrollment.payment_status,
-                        group: enrollment.group?.id?.toString()
-                      }}
-                      showTimeline={true}
-                    />
-
-                    {/* Contextual Guidance */}
-                    {(() => {
-                      const status = (enrollment.status || '').toString().toLowerCase();
-                      const payStatus = (enrollment.payment_status || '').toString().toLowerCase();
-                      const cta = (href: string, label: string) => (
-                        <Button as={Link} href={href} color="primary" size="sm">{label}</Button>
-                      );
-
-                      if (payStatus === 'failed') {
-                        return (
-                          <Card shadow="sm" className="w-full border-danger-200 bg-danger-50">
-                            <CardHeader className="flex items-center gap-2">
-                              <CreditCard className="h-5 w-5 text-danger" />
-                              <p className="text-lg font-medium leading-normal">Payment Failed</p>
-                            </CardHeader>
-                            <CardBody className="p-6">
-                              <div className="flex items-center justify-between gap-4">
-                                <p className="text-sm text-neutral-700">Your last payment attempt failed. Please try again.</p>
-                                {cta('/student/enrollment', 'Retry Payment')}
-                              </div>
-                            </CardBody>
-                          </Card>
-                        );
-                      }
-
-                      if (status.includes('pending') || payStatus.includes('pending') || payStatus === 'unpaid' || status === 'unpaid') {
-                        return (
-                          <Card shadow="sm" className="w-full border-primary-200 bg-primary-50">
-                            <CardHeader className="flex items-center gap-2">
-                              <CreditCard className="h-5 w-5 text-primary" />
-                              <p className="text-lg font-medium leading-normal">Payment Pending</p>
-                            </CardHeader>
-                            <CardBody className="p-6">
-                              <div className="flex items-center justify-between gap-4">
-                                <p className="text-sm text-neutral-700">Complete your payment to secure your spot and continue.</p>
-                                {cta('/student/enrollment', 'Go to Payment')}
-                              </div>
-                            </CardBody>
-                          </Card>
-                        );
-                      }
-
-                      if (['paid','assigned','active'].includes(status)) {
-                        return (
-                          <Card shadow="sm" className="w-full border-success-200 bg-success-50">
-                            <CardHeader className="flex items-center gap-2">
-                              <Users className="h-5 w-5 text-success" />
-                              <p className="text-lg font-medium leading-normal">{status === 'paid' && !enrollment.group?.id ? 'Awaiting Group Assignment' : 'Group Assigned'}</p>
-                            </CardHeader>
-                            <CardBody className="p-6">
-                              <div className="flex items-center justify-between gap-4">
-                                <p className="text-sm text-neutral-700">
-                                  {status === 'paid' && !enrollment.group?.id
-                                    ? 'You will be assigned to a group soon. You can review your schedule once assigned.'
-                                    : 'Check your group roster and practical schedule.'}
-                                </p>
-                                <Button as={Link} href={status === 'paid' && !enrollment.group?.id ? '/student/enrollment' : '/student/my-group'} color="success" size="sm">
-                                  {status === 'paid' && !enrollment.group?.id ? 'View Enrollment' : 'View Group'}
-                                </Button>
-                              </div>
-                            </CardBody>
-                          </Card>
-                        );
-                      }
-
-                      if (status === 'assigned') {
-                        return (
-                          <Card shadow="sm" className="w-full border-success-200 bg-success-50">
-                            <CardHeader className="flex items-center gap-2">
-                              <Users className="h-5 w-5 text-success" />
-                              <p className="text-lg font-medium leading-normal">Group Assigned</p>
-                            </CardHeader>
-                            <CardBody className="p-6">
-                              <div className="flex items-center justify-between gap-4">
-                                <p className="text-base md:text-sm text-neutral-700">Check your group roster and practical schedule.</p>
-                                {cta('/student/my-group', 'View Group')}
-                              </div>
-                            </CardBody>
-                          </Card>
-                        );
-                      }
-
-                      if (status === 'cancelled') {
-                        return (
-                          <Card shadow="sm" className="w-full border-warning-200 bg-warning-50">
-                            <CardHeader className="flex items-center gap-2">
-                              <BookOpen className="h-5 w-5 text-warning" />
-                              <p className="text-lg font-medium leading-normal">Enrollment Cancelled</p>
-                            </CardHeader>
-                            <CardBody className="p-6">
-                              <div className="flex items-center justify-between gap-4">
-                                <p className="text-sm text-neutral-700">You can choose another skill and enroll again.</p>
-                                {cta('/student/skills', 'Browse Skills')}
-                              </div>
-                            </CardBody>
-                          </Card>
-                        );
-                      }
-                      return null;
-                    })()}
-                  </div>
-                )}
-              </StateRenderer>
+        {/* Left Column - Main Content */}
+        <div className="lg:col-span-2 space-y-4">
+          {/* Next Step Card */}
+          <Card shadow="sm">
+            <CardBody className="p-5">
+              <NextStepContent profile={profile} enrollment={enrollment} />
             </CardBody>
           </Card>
 
-          {/* Group Assignment */}
+          {/* Enrollment Details */}
           {enrollment && (
-            <Card shadow="sm" className="w-full">
-              <CardHeader className="px-4 pt-4">
-                <p className="text-base font-medium text-neutral-900">Group</p>
-              </CardHeader>
-              <CardBody className="p-4">
-                <StateRenderer
-                  data={enrollment.group?.id}
-                  isLoading={isLoading}
-                  error={error}
-                  onRetry={refetchAll}
-                  loadingComponent={<div className="py-2"><ListSkeleton rows={2} /></div>}
-                  emptyComponent={null}
-                >
-                  {(groupId) => (
-                    <GroupAssignmentCard
-                      enrollment={{
-                        id: enrollment.id.toString(),
-                        status: enrollment.status
-                      }}
-                      group={{
-                        number: parseInt(String(groupId))
-                      }}
-                    />
-                  )}
-                </StateRenderer>
+            <Card shadow="sm">
+              <CardBody className="p-5">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-semibold text-default-900 mb-1">
+                      {enrollment.skill?.title}
+                    </h3>
+                    <p className="text-sm text-default-600">
+                      Group {groupNumber} • {groupSize} students
+                    </p>
+                  </div>
+                  <Chip 
+                    color={enrollment.status === 'assigned' ? 'success' : 'primary'}
+                    variant="flat"
+                    size="sm"
+                  >
+                    {enrollment.status}
+                  </Chip>
+                </div>
               </CardBody>
             </Card>
           )}
 
-          {null}
-
-        </div>
-
-        {/* Right Column - Quick Actions + Widgets */}
-        <div className="lg:col-span-1">
-          <div id="student-quick-actions" className="space-y-6 lg:sticky lg:top-24">
+          {/* Upcoming Practicals */}
+          {enrollment && upcomingPracticals.length > 0 && (
             <Card shadow="sm">
-              <CardHeader className="px-4 pt-4">
-                <p className="text-base font-medium text-neutral-900">Quick Actions</p>
-              </CardHeader>
-              <CardBody className="p-4">
-                <QuickActions 
-                  enrollment={enrollment ? {
-                    status: enrollment.status,
-                    group: enrollment.group?.id ? { id: enrollment.group.id.toString() } : undefined
-                  } : undefined}
-                  hasProfile={!!profile}
-                />
+              <CardBody className="p-5">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-semibold text-default-900">
+                    Upcoming Sessions
+                  </h3>
+                  <Chip size="sm" variant="flat">
+                    {upcomingPracticals.length}
+                  </Chip>
+                </div>
+                <div className="space-y-3">
+                  {upcomingPracticals.map((practical, idx) => (
+                    <div 
+                      key={idx}
+                      className="flex items-center justify-between p-3 rounded-lg bg-default-100"
+                    >
+                      <span className="font-medium text-sm text-default-900">
+                        {practical.skill}
+                      </span>
+                      <span className="text-sm text-default-600">
+                        {new Date(practical.date).toLocaleDateString('en-US', {
+                          month: 'short',
+                          day: 'numeric'
+                        })}
+                      </span>
+                    </div>
+                  ))}
+                </div>
               </CardBody>
             </Card>
+          )}
+        </div>
 
-            {/* Keep sidebar minimal for focus */}
-          </div>
+        {/* Right Column - Quick Actions */}
+        <div className="lg:col-span-1">
+          <Card shadow="sm">
+            <CardBody className="p-5">
+              <h3 className="font-semibold text-default-900 mb-4">Quick Actions</h3>
+              <QuickActionButtons enrollment={enrollment} />
+            </CardBody>
+          </Card>
         </div>
       </div>
+    </div>
+  );
+}
 
-      {/* Notifications */}
-      <NotificationContainer />
+function StatCard({ title, value, icon: Icon, color }: {
+  title: string;
+  value: string | number;
+  icon: React.ComponentType<any>;
+  color: 'success' | 'primary' | 'warning' | 'default';
+}) {
+  const colorClasses = {
+    success: 'bg-success-50 border-success-200 text-success-600',
+    primary: 'bg-primary-50 border-primary-200 text-primary-600',
+    warning: 'bg-warning-50 border-warning-200 text-warning-600',
+    default: 'bg-default-100 border-default-200 text-default-600',
+  };
+
+  return (
+    <Card shadow="none" className={`border ${colorClasses[color]?.split(' ')[1] || 'border-default-200'}`}>
+      <CardBody className="p-4">
+        <div className="flex items-start justify-between">
+          <div className="flex-1">
+            <p className="text-xs font-medium text-default-600 uppercase mb-1">
+              {title}
+            </p>
+            <p className="text-xl font-bold text-default-900">{value}</p>
+          </div>
+          {Icon && (
+            <Icon className={`h-5 w-5 ${colorClasses[color]?.split(' ')[2] || 'text-default-600'}`} />
+          )}
+        </div>
+      </CardBody>
+    </Card>
+  );
+}
+
+function NextStepContent({ profile, enrollment }: {
+  profile: any;
+  enrollment: any;
+}) {
+  const status = (enrollment?.status || '').toString().toLowerCase();
+  const payStatus = (enrollment?.payment_status || '').toString().toLowerCase();
+  
+  let config: {
+    title: string;
+    description: string;
+    ctaLabel: string;
+    ctaHref: string;
+    color: 'success' | 'primary' | 'warning' | 'danger';
+    icon: React.ComponentType<any>;
+  } = {
+    title: 'All Set!',
+    description: 'Check your upcoming sessions and group details.',
+    ctaLabel: '',
+    ctaHref: '',
+    color: 'success',
+    icon: CheckCircle2,
+  };
+
+  if (!profile) {
+    config = {
+      title: 'Complete Your Profile',
+      description: 'Add your details to enable enrollment in skills.',
+      ctaLabel: 'Complete Profile',
+      ctaHref: '/student/profile',
+      color: 'primary',
+      icon: User,
+    };
+  } else if (!enrollment) {
+    config = {
+      title: 'Enroll in a Skill',
+      description: 'Choose a practical training program to get started.',
+      ctaLabel: 'Browse Skills',
+      ctaHref: '/student/skills',
+      color: 'primary',
+      icon: BookOpen,
+    };
+  } else if (payStatus === 'failed') {
+    config = {
+      title: 'Payment Failed',
+      description: 'Please retry your payment to continue with enrollment.',
+      ctaLabel: 'Retry Payment',
+      ctaHref: '/student/enrollment',
+      color: 'danger',
+      icon: AlertCircle,
+    };
+  } else if (payStatus.includes('pending') || payStatus === 'unpaid' || status === 'unpaid' || status.includes('pending')) {
+    config = {
+      title: 'Payment Pending',
+      description: 'Complete your payment to secure your spot.',
+      ctaLabel: 'Complete Payment',
+      ctaHref: '/student/enrollment',
+      color: 'warning',
+      icon: Clock,
+    };
+  } else if (['paid', 'assigned'].includes(status)) {
+    const awaitingGroup = status === 'paid' && !enrollment.group?.id;
+    config = {
+      title: awaitingGroup ? 'Awaiting Group Assignment' : 'Group Assigned',
+      description: awaitingGroup ? 'You will be assigned to a group soon.' : 'View your group details and schedule.',
+      ctaLabel: awaitingGroup ? 'View Status' : 'View Group',
+      ctaHref: awaitingGroup ? '/student/enrollment' : '/student/my-group',
+      color: 'success',
+      icon: awaitingGroup ? Clock : Users,
+    };
+  } else if (status === 'cancelled') {
+    config = {
+      title: 'Enrollment Cancelled',
+      description: 'Browse and enroll in another skill.',
+      ctaLabel: 'Browse Skills',
+      ctaHref: '/student/skills',
+      color: 'warning',
+      icon: AlertCircle,
+    };
+  }
+
+  const Icon = config.icon;
+
+  return (
+    <div className="flex items-start gap-4">
+      <div className={`flex-shrink-0 p-2 rounded-lg ${
+        config.color === 'success' ? 'bg-success-100' :
+        config.color === 'primary' ? 'bg-primary-100' :
+        config.color === 'warning' ? 'bg-warning-100' :
+        config.color === 'danger' ? 'bg-danger-100' : 'bg-default-100'
+      }`}>
+        <Icon className={`h-5 w-5 ${
+          config.color === 'success' ? 'text-success-600' :
+          config.color === 'primary' ? 'text-primary-600' :
+          config.color === 'warning' ? 'text-warning-600' :
+          config.color === 'danger' ? 'text-danger-600' : 'text-default-600'
+        }`} />
+      </div>
+      <div className="flex-1">
+        <h3 className="font-semibold text-default-900 mb-1">{config.title}</h3>
+        <p className="text-sm text-default-600 mb-3">{config.description}</p>
+        {config.ctaHref && (
+          <Button
+            as="a"
+            href={config.ctaHref}
+            color={config.color}
+            size="sm"
+            variant="flat"
+          >
+            {config.ctaLabel}
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function QuickActionButtons({ enrollment }: { enrollment: any }) {
+  const actions: Array<{
+    label: string;
+    href: string;
+    icon: React.ComponentType<any>;
+    color: 'primary' | 'default' | 'success';
+  }> = [
+    {
+      label: 'Browse Skills',
+      href: '/student/skills',
+      icon: BookOpen,
+      color: 'primary',
+    },
+    {
+      label: 'My Profile',
+      href: '/student/profile',
+      icon: User,
+      color: 'default',
+    },
+  ];
+
+  if (enrollment?.group) {
+    actions.push(
+      {
+        label: 'My Group',
+        href: '/student/my-group',
+        icon: Users,
+        color: 'primary',
+      },
+      {
+        label: 'Mark Attendance',
+        href: '/student/scan-qr',
+        icon: QrCode,
+        color: 'success',
+      },
+      {
+        label: 'View Schedule',
+        href: '/student/schedule',
+        icon: Calendar,
+        color: 'default',
+      }
+    );
+  }
+
+  return (
+    <div className="space-y-2">
+      {actions.map((action) => (
+        <Button
+          key={action.label}
+          as="a"
+          href={action.href}
+          color={action.color}
+          variant="flat"
+          className="w-full justify-start"
+          startContent={<action.icon className="h-4 w-4" />}
+        >
+          {action.label}
+        </Button>
+      ))}
     </div>
   );
 }

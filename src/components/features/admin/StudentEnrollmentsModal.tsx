@@ -158,7 +158,7 @@ export function StudentEnrollmentsModal({ isOpen, onClose, student }: StudentEnr
                   <BookOpen className="w-12 h-12 text-neutral-400 mx-auto mb-4" />
                   <h3 className="text-lg font-medium text-neutral-900 mb-2">No Enrollments</h3>
                   <p className="text-neutral-600">
-                    This student hasn&apos;t enrolled in any skills yet.
+                    This student hasn't enrolled in any skills yet.
                   </p>
                 </div>
               )}

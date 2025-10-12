@@ -13,7 +13,7 @@ export default function MentorGroupsPageView(props: { userId: string }) {
 
   const [skillFilter, setSkillFilter] = React.useState<string | null>(null)
   const [search, setSearch] = React.useState("")
-  const [selectedGroupId, setSelectedGroupId] = React.useState<number | null>(null)
+  const [selectedGroupId, setSelectedGroupId] = React.useState<string | null>(null)
 
   const { data: skills, isLoading: loadingSkills } = useQuery({
     queryKey: ["mentor-assigned-skills", userId],
@@ -44,6 +44,11 @@ export default function MentorGroupsPageView(props: { userId: string }) {
       return name.includes(q) || skillName.includes(q)
     })
   }, [groups, skillFilter, search])
+
+  // Get the selected group object
+  const selectedGroup = React.useMemo(() => {
+    return filteredGroups.find(g => g.id === selectedGroupId) || null
+  }, [filteredGroups, selectedGroupId])
 
   // Attendance report for selected group (for quick stats)
   const { data: report, isLoading: loadingReport } = useQuery({
@@ -127,7 +132,7 @@ export default function MentorGroupsPageView(props: { userId: string }) {
           ) : (
             <Tabs aria-label="Group Details" variant="underlined">
               <Tab key="roster" title="Roster">
-                <GroupStudentsRoster groupId={selectedGroupId} />
+                {selectedGroup ? <GroupStudentsRoster group={selectedGroup} /> : <div>Group not found</div>}
               </Tab>
               <Tab key="attendance" title="Attendance">
                 {loadingReport ? (

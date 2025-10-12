@@ -175,7 +175,7 @@ export function MentorModal({
   isDisabled // Makes it read-only
   disallowEmptySelection // Keeps the selection locked
 >
-  <SelectItem key="mentorship" value="mentorship">
+  <SelectItem key="mentorship">
     Mentorship
   </SelectItem>
 </Select>

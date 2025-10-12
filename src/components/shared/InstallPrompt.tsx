@@ -152,9 +152,9 @@ export function InstallPrompt({ className }: InstallPromptProps) {
                 <br />
                 1. Tap the Share button in Safari
                 <br />
-                2. Scroll down and tap &quot;Add to Home Screen&quot;
+                2. Scroll down and tap "Add to Home Screen"
                 <br />
-                3. Tap &quot;Add&quot; to confirm
+                3. Tap "Add" to confirm
               </>
             ) : (
               <>
@@ -198,8 +198,8 @@ export function InstallPrompt({ className }: InstallPromptProps) {
         
         <div className="text-xs text-gray-500 mt-2 text-center">
           {isIOS 
-            ? "This prompt will appear again in 7 days if you haven&apos;t installed the app."
-            : "This prompt will appear again in 7 days if you haven&apos;t installed the app."
+            ? "This prompt will appear again in 7 days if you haven't installed the app."
+            : "This prompt will appear again in 7 days if you haven't installed the app."
           }
         </div>
       </DialogContent>

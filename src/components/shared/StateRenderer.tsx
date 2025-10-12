@@ -30,6 +30,7 @@ export function StateRenderer<T>({
   emptyComponent,
   children,
 }: StateRendererProps<T>) {
+  // * Debug logging for state decisions
   console.log('[StateRenderer] Decision logic:', {
     data,
     dataLength: Array.isArray(data) ? data.length : 'not-array',
@@ -48,7 +49,6 @@ export function StateRenderer<T>({
       {/* * Show loading state only when explicitly loading */}
       {isLoading && (
         <>
-          {console.log('[StateRenderer] Showing LOADING state')}
           {loadingComponent ?? <DefaultLoadingComponent />}
         </>
       )}
@@ -56,7 +56,6 @@ export function StateRenderer<T>({
       {/* * Show error state */}
       {!isLoading && error && (
         <>
-          {console.log('[StateRenderer] Showing ERROR state')}
           {errorComponent ?? <DefaultErrorComponent error={error} onRetry={onRetry} />}
         </>
       )}
@@ -64,7 +63,6 @@ export function StateRenderer<T>({
       {/* * Show empty state for null/undefined or empty arrays when not loading and no error */}
       {!isLoading && !error && (data == null || (Array.isArray(data) && data.length === 0)) && (
         <>
-          {console.log('[StateRenderer] Showing EMPTY state')}
           {emptyComponent ?? <DefaultEmptyComponent message="No items to display." />}
         </>
       )}
@@ -72,7 +70,6 @@ export function StateRenderer<T>({
       {/* * Show data */}
       {!isLoading && !error && data != null && !(Array.isArray(data) && data.length === 0) && (
         <>
-          {console.log('[StateRenderer] Showing DATA state with:', data)}
           {children(data as NonNullable<T>)}
         </>
       )}

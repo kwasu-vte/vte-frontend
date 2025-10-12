@@ -66,6 +66,16 @@ const handleRequest = async (request: NextRequest, { params }: { params: Promise
     console.debug(`[BFF Proxy ${traceId}] Attached Bearer token from cookie.`);
   }
 
+  // * Special handling for refresh endpoint: ensure we use the current access token
+  if (path === 'v1/users/auth/refresh') {
+    if (sessionToken) {
+      requestHeaders.set('Authorization', `Bearer ${sessionToken.value}`);
+      console.debug(`[BFF Proxy ${traceId}] Using current access token for refresh call.`);
+    } else {
+      console.warn(`[BFF Proxy ${traceId}] No access token available for refresh call.`);
+    }
+  }
+
   // * Debug auth header presence and origin
   if (requestHeaders.has('Authorization')) {
     const authPreview = (requestHeaders.get('Authorization') || '').slice(0, 20);
@@ -74,7 +84,7 @@ const handleRequest = async (request: NextRequest, { params }: { params: Promise
     console.debug(`[BFF Proxy ${traceId}] No Authorization header present on upstream request.`);
   }
 
-  // * Handle logout specifically (fire-and-forget to API, clear cookie regardless)
+  // * Handle logout specifically (fire-and-forget to API, clear cookies regardless)
   if (path === 'v1/users/auth/logout') {
     try {
       await fetch(targetUrl, { method: 'POST', headers: requestHeaders });

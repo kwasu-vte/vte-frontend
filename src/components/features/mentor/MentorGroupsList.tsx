@@ -98,7 +98,7 @@ export default function MentorGroupsList(props: MentorGroupsListProps) {
           shadow="sm"
           className={`${isGrid ? "" : "w-full"} hover:shadow-md transition-shadow`}
           isPressable={!!onSelectGroup}
-          onPress={() => onSelectGroup?.(Number(group.id))}
+          onPress={() => onSelectGroup?.(group.id)}
         >
           <CardBody className="p-4">
             {/* Header Section */}

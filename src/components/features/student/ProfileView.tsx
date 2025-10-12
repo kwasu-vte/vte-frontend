@@ -1,16 +1,16 @@
 "use client"
 import React from "react"
-import { Card, CardBody, CardHeader, Chip, Divider } from "@heroui/react"
-import { User, GraduationCap, Building, Phone, Users, CheckCircle, AlertTriangle } from "lucide-react"
+import { Card, CardBody, CardHeader, Button, Divider } from "@heroui/react"
+import { User, GraduationCap, Building, Phone, Users } from "lucide-react"
 
 /**
  * * ProfileView
- * Read-only display of student profile with completion status indicator.
- * Follows design guide with NextUI components and proper styling.
+ * Read-only display of student profile information.
+ * Improved UI with better information hierarchy and cleaner layout.
  *
  * Props:
  * - profile: StudentProfile
- * - showCompletionBadge?: boolean
+ * - showCompletionBadge?: boolean (deprecated - kept for backward compatibility)
  */
 export type ProfileViewProps = {
   profile: {
@@ -27,101 +27,99 @@ export type ProfileViewProps = {
   showCompletionBadge?: boolean
 }
 
-function ProfileView({ profile, showCompletionBadge = true }: ProfileViewProps) {
-  const fields = [
-    { 
-      label: 'Matric Number', 
-      value: profile.matric_number,
-      icon: GraduationCap
-    },
-    { 
-      label: 'Student Level', 
-      value: profile.student_level,
-      icon: GraduationCap
-    },
-    { 
-      label: 'Department', 
-      value: profile.department,
-      icon: Building
-    },
-    { 
-      label: 'Faculty', 
-      value: profile.faculty || 'Not specified',
-      icon: Building
-    },
-    { 
-      label: 'Phone Number', 
-      value: profile.phone || 'Not provided',
-      icon: Phone
-    },
-    { 
-      label: 'Gender', 
-      value: profile.gender || 'Not specified',
-      icon: Users
-    },
-  ]
-
-  const completed = fields.every((f) => f.value && f.value !== 'Not provided' && f.value !== 'Not specified')
-
+function ProfileView({ profile }: ProfileViewProps) {
   return (
     <Card shadow="sm" className="w-full">
-      <CardHeader className="flex flex-col items-start gap-2">
-        <div className="flex items-center gap-2">
-          <User className="h-5 w-5 text-primary" />
-          <p className="text-xl font-medium leading-normal">Profile Information</p>
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between w-full">
+          <div className="flex items-center gap-2">
+            <User className="h-5 w-5 text-primary" />
+            <h2 className="text-lg font-semibold text-neutral-900">
+              Personal Information
+            </h2>
+          </div>
         </div>
-        {showCompletionBadge && (
-          <Chip
-            color={completed ? "success" : "warning"}
-            variant="flat"
-            startContent={completed ? <CheckCircle className="h-3 w-3" /> : <AlertTriangle className="h-3 w-3" />}
-          >
-            {completed ? 'Profile Complete' : 'Profile Incomplete'}
-          </Chip>
-        )}
       </CardHeader>
       
       <Divider />
       
-      <CardBody className="p-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {fields.map((field) => (
-            <div key={field.label} className="flex items-start gap-3">
-              <div className="text-neutral-400 mt-1">
-                <field.icon className="h-4 w-4" />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm text-neutral-600 mb-1">{field.label}</p>
-                <p className="text-neutral-900 font-medium">
-                  {field.value || <span className="italic text-neutral-400">Not provided</span>}
-                </p>
-              </div>
-            </div>
-          ))}
+      <CardBody className="pt-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-5">
+          <InfoField 
+            icon={User}
+            label="Full Name"
+            value={profile.full_name || "Not provided"}
+            isComplete={!!profile.full_name}
+          />
+          <InfoField 
+            icon={GraduationCap}
+            label="Matric Number"
+            value={profile.matric_number}
+            isComplete={true}
+          />
+          <InfoField 
+            icon={GraduationCap}
+            label="Level"
+            value={profile.student_level}
+            isComplete={true}
+          />
+          <InfoField 
+            icon={Building}
+            label="Department"
+            value={profile.department}
+            isComplete={true}
+          />
+          <InfoField 
+            icon={Building}
+            label="Faculty"
+            value={profile.faculty || "Not specified"}
+            isComplete={!!profile.faculty}
+          />
+          <InfoField 
+            icon={Phone}
+            label="Phone Number"
+            value={profile.phone || "Not provided"}
+            isComplete={!!profile.phone}
+          />
+          <InfoField 
+            icon={Users}
+            label="Gender"
+            value={profile.gender || "Not specified"}
+            isComplete={!!profile.gender}
+          />
         </div>
-
-        {/* Statistics */}
-        {(profile.attendances_count || profile.enrollments_count) && (
-          <>
-            <Divider className="my-6" />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {profile.enrollments_count && (
-                <div className="text-center p-4 bg-primary-50 rounded-lg">
-                  <p className="text-2xl font-bold text-primary">{profile.enrollments_count}</p>
-                  <p className="text-sm text-primary-700">Total Enrollments</p>
-                </div>
-              )}
-              {profile.attendances_count && (
-                <div className="text-center p-4 bg-success-50 rounded-lg">
-                  <p className="text-2xl font-bold text-success">{profile.attendances_count}</p>
-                  <p className="text-sm text-success-700">Attendance Records</p>
-                </div>
-              )}
-            </div>
-          </>
-        )}
       </CardBody>
     </Card>
+  )
+}
+
+/**
+ * * InfoField
+ * Individual field display component with icon, label, and value
+ */
+function InfoField({ 
+  icon: Icon, 
+  label, 
+  value, 
+  isComplete 
+}: { 
+  icon: any
+  label: string
+  value: string
+  isComplete: boolean 
+}) {
+  return (
+    <div className="flex items-start gap-3">
+      <div className="text-neutral-400 mt-0.5">
+        <Icon className="h-4 w-4" />
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-xs text-neutral-600 mb-0.5">{label}</p>
+        <p className={`text-sm font-medium ${isComplete ? 'text-neutral-900' : 'text-neutral-400 italic'} truncate`}>
+          {value}
+        </p>
+      </div>
+    </div>
   )
 }
 

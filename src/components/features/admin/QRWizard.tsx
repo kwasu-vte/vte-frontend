@@ -217,7 +217,7 @@ export function QRWizard({ currentStep, onStepChange, onComplete, initialData = 
     <Card>
       <CardHeader>
         <h2 className="text-xl font-semibold">Choose Your Training Program</h2>
-        <p className="text-neutral-600 mt-2 px-1">Select the vocational skill and specific training group you&apos;re managing.</p>
+        <p className="text-neutral-600 mt-2 px-1">Select the vocational skill and specific training group you're managing.</p>
       </CardHeader>
       <CardBody className="space-y-4">
         <Select
