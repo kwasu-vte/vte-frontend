@@ -73,7 +73,7 @@ export function MentorModal({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.first_name || !formData.last_name || !formData.email || !formData.specialization) {
+    if (!formData.first_name || !formData.last_name || !formData.email) {
       return;
     }
 
@@ -112,7 +112,7 @@ export function MentorModal({
     }));
   };
 
-  const isFormValid = formData.first_name && formData.last_name && formData.email && formData.specialization && 
+  const isFormValid = formData.first_name && formData.last_name && formData.email && 
     (mentor ? true : formData.password && formData.password_confirmation);
 
   const isPasswordMatch = !formData.password || !formData.password_confirmation || 

@@ -139,16 +139,14 @@ export function QRCodeTable({ skillId, groupId, onCreateClick }: QRCodeTableProp
   <SelectItem key="active">Active</SelectItem>
   <SelectItem key="expired">Expired</SelectItem>
 </Select>
- {qrCodes.length === 0 &&
           <Button
             color="primary"
             size="sm"
-            startContent={<Plus className="h-4 w-4" />}
+            startContent={<Plus className="h-3 w-4" />}
             onPress={onCreateClick}
-            className="p-2"
           >
-          <p className="text-sm"> Create QR Codes</p>
-          </Button>}
+          <p className="text-sm"> Create QR</p>
+          </Button>
         </div>
       </CardHeader>
       

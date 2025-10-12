@@ -347,7 +347,7 @@ const handleGeneratePDF = async () => {
       htmlContent += `
         <div class="header">
           <h1>VTE Practical Session QR Codes</h1>
-          <p>${quantity} QR Code${quantity > 1 ? 's' : ''} for Group ${qrCodeData.skill_group_id}</p>
+          <p>${quantity} QR Code${quantity > 1 ? 's' : ''} for  Group ${qrCodeData.skill_group_id}</p>
           ${pageLayout.totalPages > 1 ? `<p>Page ${page.pageNumber} of ${pageLayout.totalPages}</p>` : ''}
         </div>
         
