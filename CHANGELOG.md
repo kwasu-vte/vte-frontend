@@ -868,3 +868,6 @@
 - Added reassignStudent helper in src/lib/api/skill-groups.ts (remove + assign flow)
 - Updated admin enrollments UI to support Reassign action and modal
 - No breaking changes to existing APIs; purely additive UI capability
+
+## Rollback
+- Rolled back to commit 33ee6d820a45de69f5ca1c136a50ec9ec4faf89f on 2025-10-16T10:11:14Z
