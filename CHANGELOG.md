@@ -1,3 +1,6 @@
+## 2025-10-16 16:00:00Z
+### Changed
+- PWA: Removed service worker (files `public/sw.js`, `public/service-worker.js`) and disabled registration in `PWAManager`. Kept web app metadata/manifest only.
 ## feat(admin): enhanced navigation and UX improvements
 
 ### Navigation & Query Parameters
