@@ -19,8 +19,7 @@ export async function apiRequest<T>(endpoint: string, options: RequestInit = {})
   const isServer = typeof window === 'undefined';
 
   const origin = isServer
-    ? (process.env.NEXT_PUBLIC_APP_URL
-        || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000'))
+    ? (process.env.APP_BASE_URL ? process.env.APP_BASE_URL : 'http://localhost:3000')
     : '';
   const url = isServer ? `${origin}${proxyUrl}` : proxyUrl;
 

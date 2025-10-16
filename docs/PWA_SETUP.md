@@ -18,7 +18,7 @@ Create a `.env.local` file in your project root with the following variables:
 
 ```bash
 # PWA Configuration
-NEXT_PUBLIC_BASE_URL=http://localhost:3000
+APP_BASE_URL=http://localhost:3000
 ```
 
 ## Features Implemented
@@ -96,7 +96,7 @@ npm run dev -- --experimental-https
 ### Production Setup
 1. **HTTPS Required**: PWAs require HTTPS in production
 2. **VAPID Keys**: Generate production VAPID keys
-3. **Base URL**: Update `NEXT_PUBLIC_BASE_URL` for production
+3. **Base URL**: Update `APP_BASE_URL` for production
 4. **Service Worker**: Ensure SW is properly cached
 5. **Manifest**: Verify manifest accessibility
 
