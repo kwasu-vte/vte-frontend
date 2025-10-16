@@ -871,3 +871,6 @@
 
 ## Rollback
 - Reset main to 33ee6d820a45de69f5ca1c136a50ec9ec4faf89f on 2025-10-16T10:14:10Z
+
+## Chore
+- Defaulted APP_BASE_URL to https://vte.com.ng and removed localhost:3000 references (routes, metadata, API base, docs).
