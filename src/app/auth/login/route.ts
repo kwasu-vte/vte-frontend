@@ -50,7 +50,25 @@ export async function POST(request: NextRequest) {
     const redirectTarget = role === 'admin' || role === 'mentor' || role === 'student' ? `/${role}/dashboard` : '/';
 
     // * Build redirect response and set cookie on the browser response
-    const redirectUrl = new URL(request.nextUrl.searchParams.get('redirect') || redirectTarget, request.nextUrl.origin);
+    // * Guard against absolute redirects to other origins (e.g., localhost)
+    const rawRedirect = request.nextUrl.searchParams.get('redirect');
+    let safeRedirectPath = redirectTarget;
+    if (rawRedirect) {
+      try {
+        // Treat absolute URLs cautiously; allow only same-origin
+        if (rawRedirect.startsWith('http://') || rawRedirect.startsWith('https://')) {
+          const candidate = new URL(rawRedirect);
+          if (candidate.origin === request.nextUrl.origin) {
+            safeRedirectPath = candidate.pathname + candidate.search + candidate.hash;
+          }
+        } else if (rawRedirect.startsWith('/')) {
+          safeRedirectPath = rawRedirect;
+        }
+      } catch (_) {
+        // Ignore malformed redirect
+      }
+    }
+    const redirectUrl = new URL(safeRedirectPath, request.nextUrl.origin);
     const resp = NextResponse.redirect(redirectUrl);
     resp.cookies.set('session_token', accessToken, cookieOptions(isNaN(expiresIn) ? (remember ? 60 * 60 * 24 * 30 : 60 * 60 * 24 * 7) : expiresIn));
     return resp;
