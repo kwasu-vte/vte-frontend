@@ -22,8 +22,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, message: 'Username and password are required' }, { status: 400 });
     }
 
+    // * Determine base URL via environment with sensible defaults
+    const baseUrl = process.env.APP_BASE_URL || (process.env.NODE_ENV === 'production' ? 'https://vte.com.ng' : 'http://localhost:3000');
+
     // * Login via internal proxy
-    const loginRes = await fetch(`${request.nextUrl.origin}/api/v1/users/auth/login`, {
+    const loginRes = await fetch(new URL('/api/v1/users/auth/login', baseUrl), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify({ email: username, password }),
@@ -39,7 +42,7 @@ export async function POST(request: NextRequest) {
     }
 
     // * Immediately check user to compute redirect target
-    const meRes = await fetch(`${request.nextUrl.origin}/api/v1/users/auth/me`, {
+    const meRes = await fetch(new URL('/api/v1/users/auth/me', baseUrl), {
       headers: { 'Accept': 'application/json', 'Authorization': `Bearer ${accessToken}` },
     });
     const meJson = await meRes.json().catch(() => ({}));
