@@ -127,7 +127,7 @@ async function getEnrollmentPageData(userId: string, skillId: string | null): Pr
             const isServer = typeof window === 'undefined';
             const origin = isServer
               ? (process.env.NEXT_PUBLIC_APP_URL
-                  || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000'))
+                  || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://vte.com.ng'))
               : '';
             const url = `${origin}/api/v1/skills/${skillId}`;
             console.info('[EnrollmentPage:getEnrollmentPageData] fetching skill by id (fallback fetch):', url, 'authHdr=', !!headers['Authorization']);

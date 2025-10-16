@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
     }
 
     // * Determine base URL via environment with sensible defaults
-    const baseUrl = process.env.APP_BASE_URL || (process.env.NODE_ENV === 'production' ? 'https://vte.com.ng' : 'http://localhost:3000');
+    const baseUrl = process.env.APP_BASE_URL || 'https://vte.com.ng';
 
     // * Login via internal proxy
     const loginRes = await fetch(new URL('/api/v1/users/auth/login', baseUrl), {

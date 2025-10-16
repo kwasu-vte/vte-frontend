@@ -19,7 +19,7 @@ export async function apiRequest<T>(endpoint: string, options: RequestInit = {})
   const isServer = typeof window === 'undefined';
 
   const origin = isServer
-    ? (process.env.APP_BASE_URL ? process.env.APP_BASE_URL : 'http://localhost:3000')
+    ? (process.env.APP_BASE_URL ? process.env.APP_BASE_URL : 'https://vte.com.ng')
     : '';
   const url = isServer ? `${origin}${proxyUrl}` : proxyUrl;
 

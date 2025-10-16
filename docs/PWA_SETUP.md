@@ -18,7 +18,7 @@ Create a `.env.local` file in your project root with the following variables:
 
 ```bash
 # PWA Configuration
-APP_BASE_URL=http://localhost:3000
+APP_BASE_URL=https://vte.com.ng
 ```
 
 ## Features Implemented
